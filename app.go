@@ -62,6 +62,9 @@ resource "aws_iam_role" "role1" {
 }
 EOF
 }
+data "aws_s3_bucket" "my_data_lake" {
+  bucket = "my_data_lake.com"
+}
 `
 
 var cloudFormationRules = `
@@ -122,6 +125,15 @@ Rules:
         op: regex
         value: "role*"
     severity: WARNING
+  - id: R5
+    message: Check bucket name
+    resource: aws_s3_bucket
+    filters:
+      - type: value
+        key: bucket
+        op: regex
+        value: ".com$"
+    severity: WARNING
 `
 
 type LoggingFunction func(string)
@@ -159,13 +171,15 @@ func loadHCL(template string, log LoggingFunction) []interface{} {
 	jsonData, err := json.MarshalIndent(v, "", "  ")
 	log(string(jsonData))
 
-	var data interface{}
-	err = yaml.Unmarshal(jsonData, &data)
+	var hclData interface{}
+	err = yaml.Unmarshal(jsonData, &hclData)
 	if err != nil {
 		panic(err)
 	}
-	m := data.(map[string]interface{})
-	return m["resource"].([]interface{})
+	m := hclData.(map[string]interface{})
+	resources := m["resource"].([]interface{})
+	data := m["data"].([]interface{})
+	return append(resources, data...)
 }
 
 func search(expression string, data interface{}) interface{} {
@@ -284,6 +298,7 @@ func terraformResourceTypes() []string {
 	return []string{
 		"aws_instance",
 		"aws_iam_role",
+		"aws_s3_bucket",
 	}
 }
 
@@ -317,7 +332,7 @@ func terraform(log LoggingFunction) {
 						resourceId,
 						isValid(o, filter.Op, filter.Value, rule.Severity))
 				} else {
-					fmt.Printf("Skipping rule %s for %s %s\n", rule.Id, resourceId, resourceTypes[resourceId])
+					log(fmt.Sprintf("Skipping rule %s for %s %s\n", rule.Id, resourceId, resourceTypes[resourceId]))
 				}
 			}
 		}
