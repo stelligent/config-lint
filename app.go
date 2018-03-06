@@ -124,6 +124,17 @@ Rules:
     severity: WARNING
 `
 
+type LoggingFunction func(string)
+
+func makeLogger(verbose bool) LoggingFunction {
+	if verbose {
+		return func(message string) {
+			fmt.Println(message)
+		}
+	}
+	return func(message string) {}
+}
+
 func loadYAML(template string) map[string]interface{} {
 	jsonData, err := yaml.YAMLToJSON([]byte(template))
 	if err != nil {
@@ -139,14 +150,14 @@ func loadYAML(template string) map[string]interface{} {
 	return m["Resources"].(map[string]interface{})
 }
 
-func loadHCL(template string) []interface{} {
+func loadHCL(template string, log LoggingFunction) []interface{} {
 	var v interface{}
 	err := hcl.Unmarshal([]byte(template), &v)
 	if err != nil {
 		panic(err)
 	}
 	jsonData, err := json.MarshalIndent(v, "", "  ")
-	fmt.Println(string(jsonData))
+	log(string(jsonData))
 
 	var data interface{}
 	err = yaml.Unmarshal(jsonData, &data)
@@ -252,7 +263,7 @@ func isValid(searchResult, op, value, severity string) string {
 	return severity
 }
 
-func cloudFormation() {
+func cloudFormation(log LoggingFunction) {
 	resources := loadYAML(yamlTemplate)
 	ruleData := MustParseRules(cloudFormationRules)
 	for _, rule := range ruleData.Rules {
@@ -260,7 +271,7 @@ func cloudFormation() {
 		for _, filter := range rule.Filters {
 			for resourceId, resource := range resources {
 				o := searchData(filter.Key, resource)
-				//fmt.Printf("Key: %s Output: %s Looking for %s %s\n", filter.Key, o, filter.Op, filter.Value)
+				log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s\n", filter.Key, o, filter.Op, filter.Value))
 				fmt.Printf("ResourceId: %s %s\n",
 					resourceId,
 					isValid(o, filter.Op, filter.Value, rule.Severity))
@@ -276,8 +287,8 @@ func terraformResourceTypes() []string {
 	}
 }
 
-func terraform() {
-	hclResources := loadHCL(hclTemplate)
+func terraform(log LoggingFunction) {
+	hclResources := loadHCL(hclTemplate, log)
 
 	resources := make(map[string]interface{})
 	resourceTypes := make(map[string]interface{})
@@ -301,7 +312,7 @@ func terraform() {
 			for resourceId, resource := range resources {
 				if rule.Resource == resourceTypes[resourceId] {
 					o := searchData(filter.Key, resource)
-					fmt.Printf("Key: %s Output: %s Looking for %s %s\n", filter.Key, o, filter.Op, filter.Value)
+					log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s\n", filter.Key, o, filter.Op, filter.Value))
 					fmt.Printf("ResourceId: %s %s\n",
 						resourceId,
 						isValid(o, filter.Op, filter.Value, rule.Severity))
@@ -316,12 +327,13 @@ func terraform() {
 func main() {
 	parseCloudFormation := flag.Bool("cloudformation", false, "Validate CloudFormation template")
 	parseTerraform := flag.Bool("terraform", false, "Validate Terraform template")
+	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
 	flag.Parse()
 
 	if *parseCloudFormation {
-		cloudFormation()
+		cloudFormation(makeLogger(*verboseLogging))
 	}
 	if *parseTerraform {
-		terraform()
+		terraform(makeLogger(*verboseLogging))
 	}
 }
