@@ -1,0 +1,17 @@
+Rules:
+  - id: R1
+    message: Check instance type
+    filters:
+      - type: value
+        key: "Properties.InstanceType"
+        op: in
+        value: t2.micro,m3.medium
+    severity: WARNING
+  - id: R2
+    message: Check image id
+    filters:
+      - type: value
+        key: "Properties.ImageId"
+        op: eq
+        value: ami-f2d3638a
+    severity: FAILURE

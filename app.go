@@ -7,134 +7,10 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/hashicorp/hcl"
 	"github.com/jmespath/go-jmespath"
+	"io/ioutil"
 	"regexp"
 	"strings"
 )
-
-var yamlTemplate = `
-Resources:
-  Instance:
-    Type: "AWS::EC2::Instance"
-    Properties:
-      ImageId: ami-f2d3638a
-      InstanceType: t2.micro
-  AnotherInstance:
-    Type: "AWS::EC2::Instance"
-    Properties:
-      ImageId: ami-f2d3638a
-      InstanceType: m3.medium
-  ThirdInstance:
-    Type: "AWS::EC2::Instance"
-    Properties:
-      ImageId: ami-f2d3638b
-      InstanceType: c4.large
-`
-
-var hclTemplate = `
-resource "aws_instance" "first" {
-	ami = "ami-f2d3638a"
-	instance_type = "t2.micro"
-}
-resource "aws_instance" "second" {
-	ami = "ami-f2d3638a"
-	instance_type = "m3.medium"
-	tags {
-		Department = "Operations"
-	}
-}
-resource "aws_instance" "third" {
-	ami = "ami-f2d3638b"
-	instance_type = "c4.large"
-}
-resource "aws_iam_role" "role1" {
-    name = "role1"
-    assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-     {
-        "Action": "*",
-        "Principal": { "Service": "ec2.amazonaws.com" }
-        "Effect": "Allow"
-        "Resources": "*"
-     }
-  ]
-}
-EOF
-}
-data "aws_s3_bucket" "my_data_lake" {
-  bucket = "my_data_lake.com"
-}
-`
-
-var cloudFormationRules = `
-Rules:
-  - id: R1
-    message: Check instance type
-    filters:
-      - type: value
-        key: "Properties.InstanceType"
-        op: in
-        value: t2.micro,m3.medium
-    severity: WARNING
-  - id: R2
-    message: Check image id
-    filters:
-      - type: value
-        key: "Properties.ImageId"
-        op: eq
-        value: ami-f2d3638a
-    severity: FAILURE
-`
-
-var terraformRules = `
-Rules:
-  - id: R1
-    message: Check instance type
-    resource: aws_instance
-    filters:
-      - type: value
-        key: instance_type
-        op: in
-        value: t2.micro,m3.medium
-    severity: WARNING
-  - id: R2
-    message: Check image id
-    resource: aws_instance
-    filters:
-      - type: value
-        key: ami
-        op: in
-        value: ami-f2d3638a
-    severity: FAILURE
-  - id: R3
-    message: Check tags
-    resource: aws_instance
-    filters:
-      - type: value
-        key: "tags[].Department | [0]"
-        op: regex
-        value: Operations
-    severity: WARNING
-  - id: R4
-    message: Check role name
-    resource: aws_iam_role
-    filters:
-      - type: value
-        key: name
-        op: regex
-        value: "role*"
-    severity: WARNING
-  - id: R5
-    message: Check bucket name
-    resource: aws_s3_bucket
-    filters:
-      - type: value
-        key: bucket
-        op: regex
-        value: ".com$"
-    severity: WARNING
-`
 
 type LoggingFunction func(string)
 
@@ -147,11 +23,12 @@ func makeLogger(verbose bool) LoggingFunction {
 	return func(message string) {}
 }
 
-func loadYAML(template string) map[string]interface{} {
+func loadYAML(template string, log LoggingFunction) map[string]interface{} {
 	jsonData, err := yaml.YAMLToJSON([]byte(template))
 	if err != nil {
 		panic(err)
 	}
+	log(string(jsonData))
 
 	var data interface{}
 	err = yaml.Unmarshal(jsonData, &data)
@@ -278,8 +155,16 @@ func isValid(searchResult, op, value, severity string) string {
 }
 
 func cloudFormation(log LoggingFunction) {
-	resources := loadYAML(yamlTemplate)
-	ruleData := MustParseRules(cloudFormationRules)
+	yamlTemplate, err := ioutil.ReadFile("./files/cloudformation.yml")
+	if err != nil {
+		panic(err)
+	}
+	resources := loadYAML(string(yamlTemplate), log)
+	cloudFormationRules, err := ioutil.ReadFile("./rules/cloudformation.yml")
+	if err != nil {
+		panic(err)
+	}
+	ruleData := MustParseRules(string(cloudFormationRules))
 	for _, rule := range ruleData.Rules {
 		fmt.Printf("Rule %s: %s\n", rule.Id, rule.Message)
 		for _, filter := range rule.Filters {
@@ -303,7 +188,11 @@ func terraformResourceTypes() []string {
 }
 
 func terraform(log LoggingFunction) {
-	hclResources := loadHCL(hclTemplate, log)
+	hclTemplate, err := ioutil.ReadFile("./files/terraform.hcl")
+	if err != nil {
+		panic(err)
+	}
+	hclResources := loadHCL(string(hclTemplate), log)
 
 	resources := make(map[string]interface{})
 	resourceTypes := make(map[string]interface{})
@@ -320,7 +209,11 @@ func terraform(log LoggingFunction) {
 			}
 		}
 	}
-	ruleData := MustParseRules(terraformRules)
+	terraformRules, err := ioutil.ReadFile("./rules/terraform.yml")
+	if err != nil {
+		panic(err)
+	}
+	ruleData := MustParseRules(string(terraformRules))
 	for _, rule := range ruleData.Rules {
 		fmt.Printf("Rule %s: %s\n", rule.Id, rule.Message)
 		for _, filter := range rule.Filters {

@@ -1,0 +1,16 @@
+Resources:
+  Instance:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: ami-f2d3638a
+      InstanceType: t2.micro
+  AnotherInstance:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: ami-f2d3638a
+      InstanceType: m3.medium
+  ThirdInstance:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: ami-f2d3638b
+      InstanceType: c4.large

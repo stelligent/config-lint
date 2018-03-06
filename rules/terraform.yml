@@ -1,0 +1,46 @@
+Rules:
+  - id: R1
+    message: Check instance type
+    resource: aws_instance
+    filters:
+      - type: value
+        key: instance_type
+        op: in
+        value: t2.micro,m3.medium
+    severity: WARNING
+  - id: R2
+    message: Check image id
+    resource: aws_instance
+    filters:
+      - type: value
+        key: ami
+        op: in
+        value: ami-f2d3638a
+    severity: FAILURE
+  - id: R3
+    message: Check tags
+    resource: aws_instance
+    filters:
+      - type: value
+        key: "tags[].Department | [0]"
+        op: regex
+        value: Operations
+    severity: WARNING
+  - id: R4
+    message: Check role name
+    resource: aws_iam_role
+    filters:
+      - type: value
+        key: name
+        op: regex
+        value: "role*"
+    severity: WARNING
+  - id: R5
+    message: Check bucket name
+    resource: aws_s3_bucket
+    filters:
+      - type: value
+        key: bucket
+        op: regex
+        value: ".com$"
+    severity: WARNING
