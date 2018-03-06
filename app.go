@@ -154,8 +154,8 @@ func isValid(searchResult, op, value, severity string) string {
 	return severity
 }
 
-func cloudFormation(log LoggingFunction) {
-	yamlTemplate, err := ioutil.ReadFile("./files/cloudformation.yml")
+func cloudFormation(filename string, log LoggingFunction) {
+	yamlTemplate, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
@@ -187,8 +187,8 @@ func terraformResourceTypes() []string {
 	}
 }
 
-func terraform(log LoggingFunction) {
-	hclTemplate, err := ioutil.ReadFile("./files/terraform.hcl")
+func terraform(filename string, log LoggingFunction) {
+	hclTemplate, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
@@ -238,10 +238,12 @@ func main() {
 	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
 	flag.Parse()
 
-	if *parseCloudFormation {
-		cloudFormation(makeLogger(*verboseLogging))
-	}
-	if *parseTerraform {
-		terraform(makeLogger(*verboseLogging))
+	for _, filename := range flag.Args() {
+		if *parseCloudFormation {
+			cloudFormation(filename, makeLogger(*verboseLogging))
+		}
+		if *parseTerraform {
+			terraform(filename, makeLogger(*verboseLogging))
+		}
 	}
 }
