@@ -187,6 +187,12 @@ func terraformResourceTypes() []string {
 	}
 }
 
+type TerraformResource struct {
+	Id         string
+	Type       string
+	Properties interface{}
+}
+
 func terraform(filename string, log LoggingFunction) {
 	hclTemplate, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -194,16 +200,19 @@ func terraform(filename string, log LoggingFunction) {
 	}
 	hclResources := loadHCL(string(hclTemplate), log)
 
-	resources := make(map[string]interface{})
-	resourceTypes := make(map[string]interface{})
+	resources := make([]TerraformResource, 0)
 	for _, resource := range hclResources {
 		for _, resourceType := range terraformResourceTypes() {
 			templateResources := resource.(map[string]interface{})[resourceType]
 			if templateResources != nil {
 				for _, templateResource := range templateResources.([]interface{}) {
 					for resourceId, resource := range templateResource.(map[string]interface{}) {
-						resources[resourceId] = resource.([]interface{})[0]
-						resourceTypes[resourceId] = resourceType
+						tr := TerraformResource{
+							Id:         resourceId,
+							Type:       resourceType,
+							Properties: resource.([]interface{})[0],
+						}
+						resources = append(resources, tr)
 					}
 				}
 			}
@@ -217,15 +226,16 @@ func terraform(filename string, log LoggingFunction) {
 	for _, rule := range ruleData.Rules {
 		fmt.Printf("Rule %s: %s\n", rule.Id, rule.Message)
 		for _, filter := range rule.Filters {
-			for resourceId, resource := range resources {
-				if rule.Resource == resourceTypes[resourceId] {
-					o := searchData(filter.Key, resource)
-					log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s\n", filter.Key, o, filter.Op, filter.Value))
-					fmt.Printf("ResourceId: %s %s\n",
-						resourceId,
+			for _, resource := range resources {
+				if rule.Resource == resource.Type {
+					o := searchData(filter.Key, resource.Properties)
+					log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s", filter.Key, o, filter.Op, filter.Value))
+					fmt.Printf("ResourceId: %s Type: %s %s\n",
+						resource.Id,
+						resource.Type,
 						isValid(o, filter.Op, filter.Value, rule.Severity))
 				} else {
-					log(fmt.Sprintf("Skipping rule %s for %s %s\n", rule.Id, resourceId, resourceTypes[resourceId]))
+					log(fmt.Sprintf("Skipping rule %s for %s %s", rule.Id, resource.Id, resource.Type))
 				}
 			}
 		}
