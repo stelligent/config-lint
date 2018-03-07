@@ -113,10 +113,7 @@ func unquoted(s string) string {
 
 func isValid(searchResult, op, value, severity string) string {
 	// TODO see Cloud Custodian for ideas
-	// ADD gt, ge, lt, le
-	// absent, not-null, empty
-	// and, or, not, intersect
-	// glob
+	// ADD gt, ge, lt, le, not-null, empty, and, or, not, intersect, glob
 	switch op {
 	case "eq":
 		if searchResult == quoted(value) {
@@ -139,8 +136,16 @@ func isValid(searchResult, op, value, severity string) string {
 			}
 		}
 		return "OK"
+	case "absent":
+		if searchResult == "null" {
+			return "OK"
+		}
 	case "present":
 		if searchResult != "null" {
+			return "OK"
+		}
+	case "contains":
+		if strings.Contains(searchResult, value) {
 			return "OK"
 		}
 	case "regex":

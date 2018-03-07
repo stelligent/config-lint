@@ -33,13 +33,13 @@ Rules:
     tags:
       - ec2
   - id: R4
-    message: Role name should start with 'role'
+    message: Role name should contain the string 'role'
     resource: aws_iam_role
     filters:
       - type: value
         key: name
-        op: regex
-        value: "role*"
+        op: contains
+        value: "role"
     severity: WARNING
   - id: R5
     message: Bucket name should end with ".com"
@@ -57,4 +57,12 @@ Rules:
       - type: value
         key: "tags[].CostCenter | [0]"
         op: present
+    severity: FAILURE
+  - id: R7
+    message: Should not have a Foo tag
+    resource: aws_instance
+    filters:
+      - type: value
+        key: "tags[].Foo | [0]"
+        op: absent
     severity: FAILURE
