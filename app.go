@@ -59,14 +59,6 @@ func loadHCL(template string, log LoggingFunction) []interface{} {
 	return append(resources, data...)
 }
 
-func search(expression string, data interface{}) interface{} {
-	result, err := jmespath.Search(expression, data)
-	if err != nil {
-		panic(err)
-	}
-	return result
-}
-
 func searchData(expression string, data interface{}) string {
 	result, err := jmespath.Search(expression, data)
 	if err != nil {
