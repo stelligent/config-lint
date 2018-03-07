@@ -1,0 +1,51 @@
+# terraform-lint
+
+Validate a terraform HCL file using rules specified in a YAML file.
+
+# Run
+
+```
+go run app.go --terraform files/terraform.hcl
+```
+
+# Rules
+
+The rules file is currently hard-coded to be 'rules/terraform.yml'. It is a list of objects with the following attributes:
+
+* id: unique identifier for the rule
+* message: string to be printed when a validation error is detected
+* resource: the resource type to which the rule will be applied
+* severity: whether the validation generates a WARNING or a FAILURE
+* filters: a list of filters used to detect validation errors
+
+My thought is to require a command line parameter with a file or directory name where the rules can be found.
+If a directory name is given, load all the files in that directory. Maybe allow multiple directories to be specified
+
+# Filters
+
+Each filter contains the following attirbutes:
+
+* type: everything should be "value" for now
+* key: the JMES path used to find data in a resource
+* op: the operation to be performed on the data returned by searching for the JMES path
+* value: needed to most operations
+
+For each, to test that an AWS instance type has one of two values:
+```
+Rules:
+  - id: R1
+    message: Instance type should be t2.micro or m3.medium
+    resource: aws_instance
+    filters:
+      - type: value
+        key: instance_type
+        op: in
+        value: t2.micro,m3.medium
+    severity: WARNING
+```
+
+The filters and operations are modeled after those used by CloudCustodian: http://capitalone.github.io/cloud-custodian/docs/
+
+# TODO
+
+Lots to do. This is just a proof-of-concept.
