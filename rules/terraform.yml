@@ -18,13 +18,13 @@ Rules:
         value: ami-f2d3638a
     severity: FAILURE
   - id: R3
-    message: Department tag is recommended
+    message: Department tag is not valid
     resource: aws_instance
     filters:
       - type: value
         key: "tags[].Department | [0]"
-        op: regex
-        value: Operations
+        op: in
+        value: Operations,Sales,Marketing,Engineering
     severity: WARNING
   - id: R4
     message: Role name should start with 'role'
