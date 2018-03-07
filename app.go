@@ -84,6 +84,7 @@ type Rule struct {
 	Severity string
 	Resource string
 	Filters  []Filter
+	Tags     []string
 }
 
 type Rules struct {
@@ -226,9 +227,30 @@ type ValidationResult struct {
 	Message    string
 }
 
-func validateTerraformResources(resources []TerraformResource, ruleData Rules, log LoggingFunction) []ValidationResult {
+func listsIntersect(list1 []string, list2 []string) bool {
+	for _, a := range list1 {
+		for _, b := range list2 {
+			if a == b {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func filterRulesByTag(rules []Rule, tags []string) []Rule {
+	filteredRules := make([]Rule, 0)
+	for _, rule := range rules {
+		if tags == nil || listsIntersect(tags, rule.Tags) {
+			filteredRules = append(filteredRules, rule)
+		}
+	}
+	return filteredRules
+}
+
+func validateTerraformResources(resources []TerraformResource, ruleData Rules, tags []string, log LoggingFunction) []ValidationResult {
 	results := make([]ValidationResult, 0)
-	for _, rule := range ruleData.Rules {
+	for _, rule := range filterRulesByTag(ruleData.Rules, tags) {
 		log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
 		for _, filter := range rule.Filters {
 			for _, resource := range resources {
@@ -263,7 +285,7 @@ func printResults(results []ValidationResult) {
 	}
 }
 
-func terraform(filename string, log LoggingFunction) {
+func terraform(filename string, tags []string, log LoggingFunction) {
 	hclTemplate, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
@@ -271,14 +293,22 @@ func terraform(filename string, log LoggingFunction) {
 	resources := loadTerraformResources(loadHCL(string(hclTemplate), log))
 	rules := MustParseRules(loadTerraformRules())
 
-	results := validateTerraformResources(resources, rules, log)
+	results := validateTerraformResources(resources, rules, tags, log)
 	printResults(results)
+}
+
+func makeTagList(tags string) []string {
+	if tags == "" {
+		return nil
+	}
+	return strings.Split(tags, ",")
 }
 
 func main() {
 	parseCloudFormation := flag.Bool("cloudformation", false, "Validate CloudFormation template")
 	parseTerraform := flag.Bool("terraform", false, "Validate Terraform template")
 	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
+	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
 	flag.Parse()
 
 	for _, filename := range flag.Args() {
@@ -286,7 +316,7 @@ func main() {
 			cloudFormation(filename, makeLogger(*verboseLogging))
 		}
 		if *parseTerraform {
-			terraform(filename, makeLogger(*verboseLogging))
+			terraform(filename, makeTagList(*tags), makeLogger(*verboseLogging))
 		}
 	}
 }

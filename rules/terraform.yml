@@ -8,6 +8,8 @@ Rules:
         op: in
         value: t2.micro,m3.medium
     severity: WARNING
+    tags:
+      - ec2
   - id: R2
     message: Not an approved AMI
     resource: aws_instance
@@ -17,6 +19,8 @@ Rules:
         op: in
         value: ami-f2d3638a
     severity: FAILURE
+    tags:
+      - ec2
   - id: R3
     message: Department tag is not valid
     resource: aws_instance
@@ -26,6 +30,8 @@ Rules:
         op: in
         value: Operations,Sales,Marketing,Engineering
     severity: WARNING
+    tags:
+      - ec2
   - id: R4
     message: Role name should start with 'role'
     resource: aws_iam_role
