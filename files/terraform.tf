@@ -1,3 +1,6 @@
+provider "aws" {
+    region = "us-east-1"
+}
 resource "aws_instance" "first" {
 	ami = "ami-f2d3638a"
 	instance_type = "t2.micro"
@@ -30,12 +33,14 @@ resource "aws_iam_role" "role1" {
 {
   "Version": "2012-10-17",
   "Statement": [
-     {
-        "Action": "*",
-        "Principal": { "Service": "ec2.amazonaws.com" }
-        "Effect": "Allow"
-        "Resources": "*"
-     }
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
   ]
 }
 EOF
@@ -48,8 +53,8 @@ resource "aws_iam_role" "role2" {
   "Statement": [
      {
         "Action": "*",
-        "Principal": { "Service": "ec2.amazonaws.com" }
-        "Effect": "Allow"
+        "Principal": { "Service": "ec2.amazonaws.com" },
+        "Effect": "Allow",
         "Resources": "*"
      }
   ]
