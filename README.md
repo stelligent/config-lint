@@ -17,6 +17,7 @@ The rules file is currently hard-coded to be 'rules/terraform.yml'. It is a list
 * resource: the resource type to which the rule will be applied
 * severity: whether the validation generates a WARNING or a FAILURE
 * filters: a list of filters used to detect validation errors
+* tags: optional list of tags, command line has option to limit scans to a subset of tags
 
 My thought is to require a command line parameter with a file or directory name where the rules can be found.
 If a directory name is given, load all the files in that directory. Maybe allow multiple directories to be specified
