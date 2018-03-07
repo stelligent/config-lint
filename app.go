@@ -113,7 +113,7 @@ func unquoted(s string) string {
 func isValid(searchResult, op, value, severity string) string {
 	// TODO see Cloud Custodian for ideas
 	// ADD gt, ge, lt, le
-	// absent, present, not-null, empty
+	// absent, not-null, empty
 	// and, or, not, intersect
 	// glob
 	switch op {
@@ -138,6 +138,10 @@ func isValid(searchResult, op, value, severity string) string {
 			}
 		}
 		return "OK"
+	case "present":
+		if searchResult != "null" {
+			return "OK"
+		}
 	case "regex":
 		if regexp.MustCompile(value).MatchString(unquoted(searchResult)) {
 			return "OK"

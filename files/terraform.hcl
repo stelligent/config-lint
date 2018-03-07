@@ -1,12 +1,16 @@
 resource "aws_instance" "first" {
 	ami = "ami-f2d3638a"
 	instance_type = "t2.micro"
+    tags {
+        "CostCenter" = "1001"
+    }
 }
 resource "aws_instance" "second" {
 	ami = "ami-f2d3638a"
 	instance_type = "m3.medium"
 	tags {
 		Department = "Operations"
+        CostCenter = "2001"
 	}
 }
 resource "aws_instance" "third" {

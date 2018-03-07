@@ -44,3 +44,11 @@ Rules:
         op: regex
         value: ".com$"
     severity: WARNING
+  - id: R6
+    message: CostCenter tag is missing
+    resource: aws_instance
+    filters:
+      - type: value
+        key: "tags[].CostCenter | [0]"
+        op: present
+    severity: FAILURE
