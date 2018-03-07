@@ -151,31 +151,6 @@ func isValid(searchResult, op, value, severity string) string {
 	return severity
 }
 
-func cloudFormation(filename string, log LoggingFunction) {
-	yamlTemplate, err := ioutil.ReadFile(filename)
-	if err != nil {
-		panic(err)
-	}
-	resources := loadYAML(string(yamlTemplate), log)
-	cloudFormationRules, err := ioutil.ReadFile("./rules/cloudformation.yml")
-	if err != nil {
-		panic(err)
-	}
-	ruleData := MustParseRules(string(cloudFormationRules))
-	for _, rule := range ruleData.Rules {
-		fmt.Printf("Rule %s: %s\n", rule.Id, rule.Message)
-		for _, filter := range rule.Filters {
-			for resourceId, resource := range resources {
-				o := searchData(filter.Key, resource)
-				log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s\n", filter.Key, o, filter.Op, filter.Value))
-				fmt.Printf("ResourceId: %s %s\n",
-					resourceId,
-					isValid(o, filter.Op, filter.Value, rule.Severity))
-			}
-		}
-	}
-}
-
 func terraformResourceTypes() []string {
 	return []string{
 		"aws_instance",
@@ -305,16 +280,12 @@ func makeTagList(tags string) []string {
 }
 
 func main() {
-	parseCloudFormation := flag.Bool("cloudformation", false, "Validate CloudFormation template")
-	parseTerraform := flag.Bool("terraform", false, "Validate Terraform template")
+	parseTerraform := flag.Bool("terraform", true, "Validate Terraform template")
 	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
 	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
 	flag.Parse()
 
 	for _, filename := range flag.Args() {
-		if *parseCloudFormation {
-			cloudFormation(filename, makeLogger(*verboseLogging))
-		}
 		if *parseTerraform {
 			terraform(filename, makeTagList(*tags), makeLogger(*verboseLogging))
 		}
