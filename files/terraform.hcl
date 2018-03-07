@@ -32,3 +32,6 @@ EOF
 data "aws_s3_bucket" "my_data_lake" {
   bucket = "my_data_lake.com"
 }
+data "aws_s3_bucket" "non_compliant_bucket" {
+  bucket = "foo_bucket"
+}

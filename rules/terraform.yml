@@ -1,6 +1,6 @@
 Rules:
   - id: R1
-    message: Check instance type
+    message: Instance type should be t2.micro or m3.medium
     resource: aws_instance
     filters:
       - type: value
@@ -9,7 +9,7 @@ Rules:
         value: t2.micro,m3.medium
     severity: WARNING
   - id: R2
-    message: Check image id
+    message: Not an approved AMI
     resource: aws_instance
     filters:
       - type: value
@@ -18,7 +18,7 @@ Rules:
         value: ami-f2d3638a
     severity: FAILURE
   - id: R3
-    message: Check tags
+    message: Department tag is recommended
     resource: aws_instance
     filters:
       - type: value
@@ -27,7 +27,7 @@ Rules:
         value: Operations
     severity: WARNING
   - id: R4
-    message: Check role name
+    message: Role name should start with 'role'
     resource: aws_iam_role
     filters:
       - type: value
@@ -36,7 +36,7 @@ Rules:
         value: "role*"
     severity: WARNING
   - id: R5
-    message: Check bucket name
+    message: Bucket name should end with ".com"
     resource: aws_s3_bucket
     filters:
       - type: value

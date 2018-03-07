@@ -185,13 +185,7 @@ type TerraformResource struct {
 	Properties interface{}
 }
 
-func terraform(filename string, log LoggingFunction) {
-	hclTemplate, err := ioutil.ReadFile(filename)
-	if err != nil {
-		panic(err)
-	}
-	hclResources := loadHCL(string(hclTemplate), log)
-
+func loadTerraformResources(hclResources []interface{}) []TerraformResource {
 	resources := make([]TerraformResource, 0)
 	for _, resource := range hclResources {
 		for _, resourceType := range terraformResourceTypes() {
@@ -210,28 +204,71 @@ func terraform(filename string, log LoggingFunction) {
 			}
 		}
 	}
+	return resources
+}
+
+func loadTerraformRules() string {
 	terraformRules, err := ioutil.ReadFile("./rules/terraform.yml")
 	if err != nil {
 		panic(err)
 	}
-	ruleData := MustParseRules(string(terraformRules))
+	return string(terraformRules)
+}
+
+type ValidationResult struct {
+	Rule       string
+	ResourceId string
+	Status     string
+	Message    string
+}
+
+func validateTerraformResources(resources []TerraformResource, ruleData Rules, log LoggingFunction) []ValidationResult {
+	results := make([]ValidationResult, 0)
 	for _, rule := range ruleData.Rules {
-		fmt.Printf("Rule %s: %s\n", rule.Id, rule.Message)
+		log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
 		for _, filter := range rule.Filters {
 			for _, resource := range resources {
 				if rule.Resource == resource.Type {
 					o := searchData(filter.Key, resource.Properties)
+					status := isValid(o, filter.Op, filter.Value, rule.Severity)
 					log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s", filter.Key, o, filter.Op, filter.Value))
-					fmt.Printf("ResourceId: %s Type: %s %s\n",
+					log(fmt.Sprintf("ResourceId: %s Type: %s %s",
 						resource.Id,
 						resource.Type,
-						isValid(o, filter.Op, filter.Value, rule.Severity))
+						status))
+					if status != "OK" {
+						results = append(results, ValidationResult{
+							Rule:       rule.Id,
+							ResourceId: resource.Id,
+							Status:     status,
+							Message:    rule.Message,
+						})
+					}
 				} else {
 					log(fmt.Sprintf("Skipping rule %s for %s %s", rule.Id, resource.Id, resource.Type))
 				}
 			}
 		}
 	}
+	return results
+}
+
+func printResults(results []ValidationResult) {
+	for _, result := range results {
+		fmt.Println(result)
+	}
+}
+
+func terraform(filename string, log LoggingFunction) {
+	hclTemplate, err := ioutil.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+	resources := loadTerraformResources(loadHCL(string(hclTemplate), log))
+	rules := MustParseRules(loadTerraformRules())
+
+	results := validateTerraformResources(resources, rules, log)
+	printResults(results)
 }
 
 func main() {
