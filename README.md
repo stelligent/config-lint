@@ -60,3 +60,4 @@ Lots to do. This is just a proof-of-concept.
 * Add ability to extend with a Lambda function
 * Add command line paramter for rules file or directory (currently hard-coded)
 * Need way to discover list of resource types (currently a hard-coded list)
+* It's already big enough to warrant some automated tests
