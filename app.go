@@ -150,7 +150,7 @@ func isMatch(searchResult string, op string, value string) bool {
 		}
 		return false
 	case "regex":
-		if regexp.MustCompile(value).MatchString(unquoted(searchResult)) {
+		if regexp.MustCompile(value).MatchString(searchResult) {
 			return true
 		}
 		return false
