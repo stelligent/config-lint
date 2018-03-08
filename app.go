@@ -261,8 +261,8 @@ func searchAndMatch(filter Filter, resource TerraformResource, log LoggingFuncti
 	return status
 }
 
-func orOperation(rule Rule, filter Filter, resource TerraformResource, log LoggingFunction) string {
-	for _, childFilter := range filter.Or {
+func orOperation(rule Rule, filters []Filter, resource TerraformResource, log LoggingFunction) string {
+	for _, childFilter := range filters {
 		if searchAndMatch(childFilter, resource, log) {
 			return rule.Severity
 		}
@@ -270,8 +270,8 @@ func orOperation(rule Rule, filter Filter, resource TerraformResource, log Loggi
 	return "OK"
 }
 
-func andOperation(rule Rule, filter Filter, resource TerraformResource, log LoggingFunction) string {
-	for _, childFilter := range filter.And {
+func andOperation(rule Rule, filters []Filter, resource TerraformResource, log LoggingFunction) string {
+	for _, childFilter := range filters {
 		if !searchAndMatch(childFilter, resource, log) {
 			return "OK"
 		}
@@ -282,10 +282,10 @@ func andOperation(rule Rule, filter Filter, resource TerraformResource, log Logg
 func searchAndTest(rule Rule, filter Filter, resource TerraformResource, log LoggingFunction) string {
 	status := "OK"
 	if filter.Or != nil && len(filter.Or) > 0 {
-		return orOperation(rule, filter, resource, log)
+		return orOperation(rule, filter.Or, resource, log)
 	}
 	if filter.And != nil && len(filter.And) > 0 {
-		return andOperation(rule, filter, resource, log)
+		return andOperation(rule, filter.And, resource, log)
 	}
 	if searchAndMatch(filter, resource, log) {
 		status = rule.Severity
