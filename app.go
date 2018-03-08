@@ -288,13 +288,28 @@ func printResults(results []ValidationResult) {
 	}
 }
 
-func terraform(filename string, tags []string, log LoggingFunction) {
+func filterRules(allRules Rules, ruleIds []string) Rules {
+	if len(ruleIds) == 0 {
+		return allRules
+	}
+	filteredRules := make([]Rule, 0)
+	for _, rule := range allRules.Rules {
+		for _, id := range ruleIds {
+			if id == rule.Id {
+				filteredRules = append(filteredRules, rule)
+			}
+		}
+	}
+	return Rules{Rules: filteredRules}
+}
+
+func terraform(filename string, tags []string, ruleIds []string, log LoggingFunction) {
 	hclTemplate, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
 	resources := loadTerraformResources(filename, loadHCL(string(hclTemplate), log))
-	rules := MustParseRules(loadTerraformRules())
+	rules := filterRules(MustParseRules(loadTerraformRules()), ruleIds)
 
 	results := validateTerraformResources(resources, rules, tags, log)
 	printResults(results)
@@ -307,15 +322,23 @@ func makeTagList(tags string) []string {
 	return strings.Split(tags, ",")
 }
 
+func makeRulesList(ruleIds string) []string {
+	if ruleIds == "" {
+		return nil
+	}
+	return strings.Split(ruleIds, ",")
+}
+
 func main() {
 	parseTerraform := flag.Bool("terraform", true, "Validate Terraform template")
 	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
 	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
+	rules := flag.String("rules", "", "Run only the rules in this comma separated list")
 	flag.Parse()
 
 	for _, filename := range flag.Args() {
 		if *parseTerraform {
-			terraform(filename, makeTagList(*tags), makeLogger(*verboseLogging))
+			terraform(filename, makeTagList(*tags), makeRulesList(*rules), makeLogger(*verboseLogging))
 		}
 	}
 }
