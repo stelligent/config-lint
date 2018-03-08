@@ -175,6 +175,7 @@ func terraformResourceTypes() []string {
 		"aws_instance",
 		"aws_iam_role",
 		"aws_s3_bucket",
+		"aws_ebs_volume",
 	}
 }
 

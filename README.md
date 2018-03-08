@@ -59,3 +59,4 @@ Lots to do. This is just a proof-of-concept.
 * Add value_from to allow for dynamic data (again, see CloudCustodian)
 * Add ability to extend with a Lambda function
 * Add command line paramter for rules file or directory (currently hard-coded)
+* Need way to discover list of resource types (currently a hard-coded list)
