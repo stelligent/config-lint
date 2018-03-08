@@ -284,27 +284,33 @@ func searchAndTest(rule Rule, filter Filter, resource TerraformResource, log Log
 	return status
 }
 
+func filterResourcesByType(resources []TerraformResource, resourceType string) []TerraformResource {
+	filtered := make([]TerraformResource, 0)
+	for _, resource := range resources {
+		if resource.Type == resourceType {
+			filtered = append(filtered, resource)
+		}
+	}
+	return filtered
+}
+
 func validateTerraformResources(resources []TerraformResource, ruleData Rules, tags []string, log LoggingFunction) []ValidationResult {
 	results := make([]ValidationResult, 0)
 	for _, rule := range filterRulesByTag(ruleData.Rules, tags) {
 		log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
 		for _, filter := range rule.Filters {
-			for _, resource := range resources {
+			for _, resource := range filterResourcesByType(resources, rule.Resource) {
 				log(fmt.Sprintf("Checking resource %s", resource.Id))
-				if rule.Resource == resource.Type {
-					status := searchAndTest(rule, filter, resource, log)
-					if status != "OK" {
-						results = append(results, ValidationResult{
-							RuleId:       rule.Id,
-							ResourceId:   resource.Id,
-							ResourceType: resource.Type,
-							Status:       status,
-							Message:      rule.Message,
-							Filename:     resource.Filename,
-						})
-					}
-				} else {
-					log(fmt.Sprintf("Skipping rule %s for %s %s", rule.Id, resource.Id, resource.Type))
+				status := searchAndTest(rule, filter, resource, log)
+				if status != "OK" {
+					results = append(results, ValidationResult{
+						RuleId:       rule.Id,
+						ResourceId:   resource.Id,
+						ResourceType: resource.Type,
+						Status:       status,
+						Message:      rule.Message,
+						Filename:     resource.Filename,
+					})
 				}
 			}
 		}
