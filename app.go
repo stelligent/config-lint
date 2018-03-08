@@ -175,9 +175,10 @@ type TerraformResource struct {
 	Id         string
 	Type       string
 	Properties interface{}
+	Filename   string
 }
 
-func loadTerraformResources(hclResources []interface{}) []TerraformResource {
+func loadTerraformResources(filename string, hclResources []interface{}) []TerraformResource {
 	resources := make([]TerraformResource, 0)
 	for _, resource := range hclResources {
 		for _, resourceType := range terraformResourceTypes() {
@@ -189,6 +190,7 @@ func loadTerraformResources(hclResources []interface{}) []TerraformResource {
 							Id:         resourceId,
 							Type:       resourceType,
 							Properties: resource.([]interface{})[0],
+							Filename:   filename,
 						}
 						resources = append(resources, tr)
 					}
@@ -212,6 +214,7 @@ type ValidationResult struct {
 	ResourceId string
 	Status     string
 	Message    string
+	Filename   string
 }
 
 func listsIntersect(list1 []string, list2 []string) bool {
@@ -255,6 +258,7 @@ func validateTerraformResources(resources []TerraformResource, ruleData Rules, t
 							ResourceId: resource.Id,
 							Status:     status,
 							Message:    rule.Message,
+							Filename:   resource.Filename,
 						})
 					}
 				} else {
@@ -268,7 +272,12 @@ func validateTerraformResources(resources []TerraformResource, ruleData Rules, t
 
 func printResults(results []ValidationResult) {
 	for _, result := range results {
-		fmt.Println(result)
+		fmt.Printf("%s Resource '%s' in '%s': %s (%s)\n",
+			result.Status,
+			result.ResourceId,
+			result.Filename,
+			result.Message,
+			result.Rule)
 	}
 }
 
@@ -277,7 +286,7 @@ func terraform(filename string, tags []string, log LoggingFunction) {
 	if err != nil {
 		panic(err)
 	}
-	resources := loadTerraformResources(loadHCL(string(hclTemplate), log))
+	resources := loadTerraformResources(filename, loadHCL(string(hclTemplate), log))
 	rules := MustParseRules(loadTerraformRules())
 
 	results := validateTerraformResources(resources, rules, tags, log)
