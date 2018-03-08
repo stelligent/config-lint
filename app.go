@@ -54,9 +54,16 @@ func loadHCL(template string, log LoggingFunction) []interface{} {
 		panic(err)
 	}
 	m := hclData.(map[string]interface{})
-	resources := m["resource"].([]interface{})
-	data := m["data"].([]interface{})
-	return append(resources, data...)
+	results := make([]interface{}, 0)
+	if m["resource"] != nil {
+		log("Adding resources")
+		results = append(results, m["resource"].([]interface{})...)
+	}
+	if m["data"] != nil {
+		log("Adding data")
+		results = append(results, m["data"].([]interface{})...)
+	}
+	return results
 }
 
 func searchData(expression string, data interface{}) string {
