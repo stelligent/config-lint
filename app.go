@@ -67,6 +67,9 @@ func loadHCL(template string, log LoggingFunction) []interface{} {
 }
 
 func searchData(expression string, data interface{}) string {
+	if len(expression) == 0 {
+		return "null"
+	}
 	result, err := jmespath.Search(expression, data)
 	if err != nil {
 		panic(err)
@@ -83,6 +86,9 @@ type Filter struct {
 	Key   string
 	Op    string
 	Value string
+	Or    []Filter
+	And   []Filter
+	Not   []Filter
 }
 
 type Rule struct {
@@ -121,49 +127,51 @@ func isAbsent(s string) bool {
 	return false
 }
 
-func isValid(searchResult, op, value, severity string) string {
+func isMatch(searchResult string, op string, value string) bool {
 	// TODO see Cloud Custodian for ideas
-	// ADD gt, ge, lt, le, not-null, empty, and, or, not, intersect, glob
+	// ADD gt, ge, lt, le, not-null, empty, not, intersect, glob
 	switch op {
 	case "eq":
 		if searchResult == value {
-			return "OK"
+			return true
 		}
 	case "ne":
 		if searchResult != value {
-			return "OK"
+			return true
 		}
 	case "in":
 		for _, v := range strings.Split(value, ",") {
 			if v == searchResult {
-				return "OK"
+				return true
 			}
 		}
 	case "notin":
 		for _, v := range strings.Split(value, ",") {
 			if v == searchResult {
-				return severity
+				return false
 			}
 		}
-		return "OK"
+		return true
 	case "absent":
 		if isAbsent(searchResult) {
-			return "OK"
+			return true
 		}
 	case "present":
 		if searchResult != "null" {
-			return "OK"
+			return true
 		}
 	case "contains":
 		if strings.Contains(searchResult, value) {
-			return "OK"
+			return true
 		}
+		return false
 	case "regex":
 		if regexp.MustCompile(value).MatchString(unquoted(searchResult)) {
-			return "OK"
+			return true
 		}
+		return false
 	}
-	return severity
+	return false
 }
 
 func terraformResourceTypes() []string {
@@ -242,6 +250,49 @@ func filterRulesByTag(rules []Rule, tags []string) []Rule {
 	return filteredRules
 }
 
+func searchAndMatch(filter Filter, resource TerraformResource, log LoggingFunction) bool {
+	o := unquoted(searchData(filter.Key, resource.Properties))
+	status := isMatch(o, filter.Op, filter.Value)
+	log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s", filter.Key, o, filter.Op, filter.Value))
+	log(fmt.Sprintf("ResourceId: %s Type: %s %s",
+		resource.Id,
+		resource.Type,
+		status))
+	return status
+}
+
+func orOperation(rule Rule, filter Filter, resource TerraformResource, log LoggingFunction) string {
+	for _, childFilter := range filter.Or {
+		if searchAndMatch(childFilter, resource, log) {
+			return rule.Severity
+		}
+	}
+	return "OK"
+}
+
+func andOperation(rule Rule, filter Filter, resource TerraformResource, log LoggingFunction) string {
+	for _, childFilter := range filter.And {
+		if !searchAndMatch(childFilter, resource, log) {
+			return "OK"
+		}
+	}
+	return rule.Severity
+}
+
+func searchAndTest(rule Rule, filter Filter, resource TerraformResource, log LoggingFunction) string {
+	status := "OK"
+	if filter.Or != nil && len(filter.Or) > 0 {
+		return orOperation(rule, filter, resource, log)
+	}
+	if filter.And != nil && len(filter.And) > 0 {
+		return andOperation(rule, filter, resource, log)
+	}
+	if searchAndMatch(filter, resource, log) {
+		status = rule.Severity
+	}
+	return status
+}
+
 func validateTerraformResources(resources []TerraformResource, ruleData Rules, tags []string, log LoggingFunction) []ValidationResult {
 	results := make([]ValidationResult, 0)
 	for _, rule := range filterRulesByTag(ruleData.Rules, tags) {
@@ -250,13 +301,7 @@ func validateTerraformResources(resources []TerraformResource, ruleData Rules, t
 			for _, resource := range resources {
 				log(fmt.Sprintf("Checking resource %s", resource.Id))
 				if rule.Resource == resource.Type {
-					o := unquoted(searchData(filter.Key, resource.Properties))
-					status := isValid(o, filter.Op, filter.Value, rule.Severity)
-					log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s", filter.Key, o, filter.Op, filter.Value))
-					log(fmt.Sprintf("ResourceId: %s Type: %s %s",
-						resource.Id,
-						resource.Type,
-						status))
+					status := searchAndTest(rule, filter, resource, log)
 					if status != "OK" {
 						results = append(results, ValidationResult{
 							Rule:       rule.Id,
@@ -308,7 +353,6 @@ func terraform(filename string, tags []string, ruleIds []string, log LoggingFunc
 	}
 	resources := loadTerraformResources(filename, loadHCL(string(hclTemplate), log))
 	rules := filterRules(MustParseRules(loadTerraformRules()), ruleIds)
-
 	results := validateTerraformResources(resources, rules, tags, log)
 	printResults(results)
 }

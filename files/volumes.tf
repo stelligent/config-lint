@@ -14,3 +14,10 @@ resource "aws_ebs_volume" "vol2" {
     }
     encrypted = false
 }
+resource "aws_ebs_volume" "vol3" {
+    availability_zone = "us-west-2a"
+    size = 40
+    tags {
+        Name = "HelloWorld"
+    }
+}

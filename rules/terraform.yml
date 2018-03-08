@@ -71,9 +71,27 @@ Rules:
     message: EBS Volumes must be encrypted
     severity: FAILURE
     filters:
-      - type: value
-        key: encrypted
-        op: eq
-        value: false
+      - or:
+        - type: value
+          key: encrypted
+          op: eq
+          value: false
+        - type: value
+          key: encrypted
+          op: absent
     tags:
       - ebs
+  - id: ANDTEST
+    resource: aws_instance
+    message: Should not have both CostCenter and Department tags
+    severity: WARNING
+    filters:
+      - and:
+        - type: value
+          key: "tags[].CostCenter | [0]"
+          op: present
+        - type: vlaue
+          key: "tags[].Department | [0]"
+          op: present
+    tags:
+      - and-test
