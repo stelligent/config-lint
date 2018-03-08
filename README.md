@@ -50,3 +50,12 @@ The filters and operations are modeled after those used by CloudCustodian: http:
 # TODO
 
 Lots to do. This is just a proof-of-concept.
+
+* Embedded JSON for IAM policies should be parsed and made available for JMESPath query
+* Add an optional YAML file for project settings, such as ignoring certain rules for certain resources
+* Implement more of the operators from CloudCustodian
+* Figure out what other filter types might be needed (if any)
+* Improve output - table format, JSON format
+* Add value_from to allow for dynamic data (again, see CloudCustodian)
+* Add ability to extend with a Lambda function
+* Add command line paramter for rules file or directory (currently hard-coded)
