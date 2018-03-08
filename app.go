@@ -107,10 +107,6 @@ func MustParseRules(rules string) Rules {
 	return r
 }
 
-func quoted(s string) string {
-	return "\"" + s + "\""
-}
-
 func unquoted(s string) string {
 	if s[0] == '"' {
 		return s[1 : len(s)-1]
@@ -130,22 +126,22 @@ func isValid(searchResult, op, value, severity string) string {
 	// ADD gt, ge, lt, le, not-null, empty, and, or, not, intersect, glob
 	switch op {
 	case "eq":
-		if searchResult == quoted(value) {
+		if searchResult == value {
 			return "OK"
 		}
 	case "ne":
-		if searchResult != quoted(value) {
+		if searchResult != value {
 			return "OK"
 		}
 	case "in":
 		for _, v := range strings.Split(value, ",") {
-			if quoted(v) == searchResult {
+			if v == searchResult {
 				return "OK"
 			}
 		}
 	case "notin":
 		for _, v := range strings.Split(value, ",") {
-			if quoted(v) == searchResult {
+			if v == searchResult {
 				return severity
 			}
 		}
@@ -252,8 +248,9 @@ func validateTerraformResources(resources []TerraformResource, ruleData Rules, t
 		log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
 		for _, filter := range rule.Filters {
 			for _, resource := range resources {
+				log(fmt.Sprintf("Checking resource %s", resource.Id))
 				if rule.Resource == resource.Type {
-					o := searchData(filter.Key, resource.Properties)
+					o := unquoted(searchData(filter.Key, resource.Properties))
 					status := isValid(o, filter.Op, filter.Value, rule.Severity)
 					log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s", filter.Key, o, filter.Op, filter.Value))
 					log(fmt.Sprintf("ResourceId: %s Type: %s %s",
