@@ -5,7 +5,7 @@ Validate a terraform HCL file using rules specified in a YAML file.
 # Run
 
 ```
-go run app.go --terraform files/terraform.hcl
+go run app.go files/terraform.hcl
 ```
 
 # Rules
@@ -24,7 +24,7 @@ If a directory name is given, load all the files in that directory. Maybe allow 
 
 # Filters
 
-Each filter contains the following attirbutes:
+Each filter contains the following attributes:
 
 * type: everything should be "value" for now
 * key: the JMES path used to find data in a resource
@@ -58,5 +58,5 @@ Lots to do. This is just a proof-of-concept.
 * Improve output - table format, JSON format
 * Add value_from to allow for dynamic data (again, see CloudCustodian)
 * Add ability to extend with a Lambda function
-* Add command line paramter for rules file or directory (currently hard-coded)
+* Add command line parameter for rules file or directory (currently hard-coded)
 * It's already big enough to warrant some automated tests

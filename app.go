@@ -23,22 +23,6 @@ func makeLogger(verbose bool) LoggingFunction {
 	return func(message string) {}
 }
 
-func loadYAML(template string, log LoggingFunction) map[string]interface{} {
-	jsonData, err := yaml.YAMLToJSON([]byte(template))
-	if err != nil {
-		panic(err)
-	}
-	log(string(jsonData))
-
-	var data interface{}
-	err = yaml.Unmarshal(jsonData, &data)
-	if err != nil {
-		panic(err)
-	}
-	m := data.(map[string]interface{})
-	return m["Resources"].(map[string]interface{})
-}
-
 func loadHCL(template string, log LoggingFunction) []interface{} {
 	var v interface{}
 	err := hcl.Unmarshal([]byte(template), &v)
