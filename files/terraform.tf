@@ -3,6 +3,7 @@ resource "aws_instance" "first" {
 	instance_type = "t2.micro"
     tags {
         "CostCenter" = "1001"
+        "Project" = "Web"
     }
 }
 resource "aws_instance" "second" {
@@ -11,6 +12,7 @@ resource "aws_instance" "second" {
 	tags {
 		Department = "Operations"
         CostCenter = "2001"
+        "Project" = "Web"
 	}
 }
 resource "aws_instance" "third" {
@@ -22,6 +24,7 @@ resource "aws_instance" "foo" {
 	instance_type = "c4.large"
     tags {
         Foo = "Foo"
+        "Project" = "Web"
     }
 }
 resource "aws_iam_role" "role1" {

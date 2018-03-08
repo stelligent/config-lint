@@ -71,27 +71,48 @@ Rules:
     message: EBS Volumes must be encrypted
     severity: FAILURE
     filters:
-      - or:
-        - type: value
-          key: encrypted
-          op: eq
-          value: false
-        - type: value
-          key: encrypted
-          op: absent
+      - type: value
+        key: encrypted
+        op: eq
+        value: true
     tags:
       - ebs
+  - id: ORTEST
+    resource: aws_instance
+    message: Should have instance_type of t2.micro or m3.medium
+    severity: WARNING
+    filters:
+      - or:
+        - type: value
+          key: instance_type
+          op: eq
+          value: t2.micro
+        - type: value
+          key: instance_type
+          op: eq
+          value: m3.medium
+
   - id: ANDTEST
     resource: aws_instance
-    message: Should not have both CostCenter and Department tags
+    message: Should have both Project and Department tags
     severity: WARNING
     filters:
       - and:
         - type: value
           key: "tags[].CostCenter | [0]"
           op: present
-        - type: vlaue
-          key: "tags[].Department | [0]"
+        - type: value
+          key: "tags[].Project | [0]"
           op: present
     tags:
       - and-test
+  - id: NOTTEST
+    resource: aws_instance
+    message: Should not have instance type of c4.large
+    severity: WARNING
+    filters:
+      - not:
+        - type: value
+          key: instance_type
+          op: eq
+          value: c4.large

@@ -255,19 +255,19 @@ func searchAndMatch(filter Filter, resource TerraformResource, log LoggingFuncti
 func orOperation(rule Rule, filters []Filter, resource TerraformResource, log LoggingFunction) string {
 	for _, childFilter := range filters {
 		if searchAndMatch(childFilter, resource, log) {
-			return rule.Severity
+			return "OK"
 		}
 	}
-	return "OK"
+	return rule.Severity
 }
 
 func andOperation(rule Rule, filters []Filter, resource TerraformResource, log LoggingFunction) string {
 	for _, childFilter := range filters {
 		if !searchAndMatch(childFilter, resource, log) {
-			return "OK"
+			return rule.Severity
 		}
 	}
-	return rule.Severity
+	return "OK"
 }
 
 func notOperation(rule Rule, filters []Filter, resource TerraformResource, log LoggingFunction) string {
