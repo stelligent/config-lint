@@ -66,3 +66,14 @@ Rules:
         key: "tags[].Foo"
         op: absent
     severity: FAILURE
+  - id: VOLUME1
+    resource: aws_ebs_volume
+    message: EBS Volumes must be encrypted
+    severity: FAILURE
+    filters:
+      - type: value
+        key: encrypted
+        op: eq
+        value: false
+    tags:
+      - ebs
