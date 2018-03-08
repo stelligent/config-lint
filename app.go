@@ -118,6 +118,13 @@ func unquoted(s string) string {
 	return s
 }
 
+func isAbsent(s string) bool {
+	if s == "null" || s == "[]" {
+		return true
+	}
+	return false
+}
+
 func isValid(searchResult, op, value, severity string) string {
 	// TODO see Cloud Custodian for ideas
 	// ADD gt, ge, lt, le, not-null, empty, and, or, not, intersect, glob
@@ -144,7 +151,7 @@ func isValid(searchResult, op, value, severity string) string {
 		}
 		return "OK"
 	case "absent":
-		if searchResult == "null" {
+		if isAbsent(searchResult) {
 			return "OK"
 		}
 	case "present":

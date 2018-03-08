@@ -63,6 +63,6 @@ Rules:
     resource: aws_instance
     filters:
       - type: value
-        key: "tags[].Foo | [0]"
+        key: "tags[].Foo"
         op: absent
     severity: FAILURE
