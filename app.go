@@ -174,15 +174,6 @@ func isMatch(searchResult string, op string, value string) bool {
 	return false
 }
 
-func terraformResourceTypes() []string {
-	return []string{
-		"aws_instance",
-		"aws_iam_role",
-		"aws_s3_bucket",
-		"aws_ebs_volume",
-	}
-}
-
 type TerraformResource struct {
 	Id         string
 	Type       string
@@ -193,8 +184,7 @@ type TerraformResource struct {
 func loadTerraformResources(filename string, hclResources []interface{}) []TerraformResource {
 	resources := make([]TerraformResource, 0)
 	for _, resource := range hclResources {
-		for _, resourceType := range terraformResourceTypes() {
-			templateResources := resource.(map[string]interface{})[resourceType]
+		for resourceType, templateResources := range resource.(map[string]interface{}) {
 			if templateResources != nil {
 				for _, templateResource := range templateResources.([]interface{}) {
 					for resourceId, resource := range templateResource.(map[string]interface{}) {
@@ -222,11 +212,12 @@ func loadTerraformRules() string {
 }
 
 type ValidationResult struct {
-	Rule       string
-	ResourceId string
-	Status     string
-	Message    string
-	Filename   string
+	RuleId       string
+	ResourceId   string
+	ResourceType string
+	Status       string
+	Message      string
+	Filename     string
 }
 
 func listsIntersect(list1 []string, list2 []string) bool {
@@ -304,11 +295,12 @@ func validateTerraformResources(resources []TerraformResource, ruleData Rules, t
 					status := searchAndTest(rule, filter, resource, log)
 					if status != "OK" {
 						results = append(results, ValidationResult{
-							Rule:       rule.Id,
-							ResourceId: resource.Id,
-							Status:     status,
-							Message:    rule.Message,
-							Filename:   resource.Filename,
+							RuleId:       rule.Id,
+							ResourceId:   resource.Id,
+							ResourceType: resource.Type,
+							Status:       status,
+							Message:      rule.Message,
+							Filename:     resource.Filename,
 						})
 					}
 				} else {
@@ -322,12 +314,13 @@ func validateTerraformResources(resources []TerraformResource, ruleData Rules, t
 
 func printResults(results []ValidationResult) {
 	for _, result := range results {
-		fmt.Printf("%s Resource '%s' in '%s': %s (%s)\n",
+		fmt.Printf("%s %s '%s' in '%s': %s (%s)\n",
 			result.Status,
+			result.ResourceType,
 			result.ResourceId,
 			result.Filename,
 			result.Message,
-			result.Rule)
+			result.RuleId)
 	}
 }
 
