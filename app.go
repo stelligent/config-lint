@@ -129,7 +129,7 @@ func isAbsent(s string) bool {
 
 func isMatch(searchResult string, op string, value string) bool {
 	// TODO see Cloud Custodian for ideas
-	// ADD gt, ge, lt, le, not-null, empty, not, intersect, glob
+	// ADD gt, ge, lt, le, not-null, empty, intersect, glob
 	switch op {
 	case "eq":
 		if searchResult == value {
@@ -270,6 +270,15 @@ func andOperation(rule Rule, filters []Filter, resource TerraformResource, log L
 	return rule.Severity
 }
 
+func notOperation(rule Rule, filters []Filter, resource TerraformResource, log LoggingFunction) string {
+	for _, childFilter := range filters {
+		if searchAndMatch(childFilter, resource, log) {
+			return rule.Severity
+		}
+	}
+	return "OK"
+}
+
 func searchAndTest(rule Rule, filter Filter, resource TerraformResource, log LoggingFunction) string {
 	status := "OK"
 	if filter.Or != nil && len(filter.Or) > 0 {
@@ -277,6 +286,9 @@ func searchAndTest(rule Rule, filter Filter, resource TerraformResource, log Log
 	}
 	if filter.And != nil && len(filter.And) > 0 {
 		return andOperation(rule, filter.And, resource, log)
+	}
+	if filter.Not != nil && len(filter.Not) > 0 {
+		return notOperation(rule, filter.Not, resource, log)
 	}
 	if searchAndMatch(filter, resource, log) {
 		status = rule.Severity
