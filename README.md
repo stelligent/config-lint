@@ -60,3 +60,4 @@ Lots to do. This is just a proof-of-concept.
 * Add ability to extend with a Lambda function
 * Add command line parameter for rules file or directory (currently hard-coded)
 * It's already big enough to warrant some automated tests
+* It should be possible to nest the and, or, not operators
