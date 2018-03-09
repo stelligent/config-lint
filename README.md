@@ -56,6 +56,7 @@ Lots to do. This is just a proof-of-concept.
 * Implement more of the operators from CloudCustodian
 * Figure out what other filter types might be needed (if any)
 * Improve output - table format, JSON format
+* Output should be grouped by resource id
 * Add value_from to allow for dynamic data (again, see CloudCustodian)
 * Add ability to extend with a Lambda function
 * Add command line parameter for rules file or directory (currently hard-coded)
