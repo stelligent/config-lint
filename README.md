@@ -5,7 +5,7 @@ Validate a terraform HCL file using rules specified in a YAML file.
 # Run
 
 ```
-go run app.go files/terraform.hcl
+go run app.go files/*.tf
 ```
 
 # Rules
