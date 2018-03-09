@@ -39,13 +39,11 @@ func loadHCL(template string, log LoggingFunction) []interface{} {
 	}
 	m := hclData.(map[string]interface{})
 	results := make([]interface{}, 0)
-	if m["resource"] != nil {
-		log("Adding resources")
-		results = append(results, m["resource"].([]interface{})...)
-	}
-	if m["data"] != nil {
-		log("Adding data")
-		results = append(results, m["data"].([]interface{})...)
+	for _, key := range []string{"resource", "data"} {
+		if m[key] != nil {
+			log(fmt.Sprintf("Adding %s", key))
+			results = append(results, m[key].([]interface{})...)
+		}
 	}
 	return results
 }
