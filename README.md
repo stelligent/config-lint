@@ -31,7 +31,7 @@ Each filter contains the following attributes:
 * op: the operation to be performed on the data returned by searching for the JMES path
 * value: needed to most operations
 
-For each, to test that an AWS instance type has one of two values:
+For example, to test that an AWS instance type has one of two values:
 ```
 Rules:
   - id: R1
