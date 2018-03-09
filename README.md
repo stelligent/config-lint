@@ -29,7 +29,7 @@ Each filter contains the following attributes:
 * type: everything should be "value" for now
 * key: the JMES path used to find data in a resource
 * op: the operation to be performed on the data returned by searching for the JMES path
-* value: needed to most operations
+* value: needed for most operations
 
 For example, to test that an AWS instance type has one of two values:
 ```
@@ -44,6 +44,27 @@ Rules:
         value: t2.micro,m3.medium
     severity: WARNING
 ```
+
+This could also be done by using the or operation with two different filters:
+
+```
+Rules:
+  - id: R2
+    message: Instance type should be t2.micro or m3.medium
+    resource: aws_instance
+    filters:
+      or:
+        - type: value
+          key: instance_type
+          op: eq
+          value: t2.micro
+        - type: value
+          key: instance_type
+          op: eq
+          value: m3.medium
+    severity: WARNING
+```
+
 
 The filters and operations are modeled after those used by CloudCustodian: http://capitalone.github.io/cloud-custodian/docs/
 
