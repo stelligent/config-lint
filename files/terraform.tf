@@ -1,27 +1,27 @@
 resource "aws_instance" "first" {
-	ami = "ami-f2d3638a"
-	instance_type = "t2.micro"
+    ami = "ami-f2d3638a"
+    instance_type = "t2.micro"
     tags {
         "CostCenter" = "1001"
         "Project" = "Web"
     }
 }
 resource "aws_instance" "second" {
-	ami = "ami-f2d3638a"
-	instance_type = "m3.medium"
-	tags {
-		Department = "Operations"
+    ami = "ami-f2d3638a"
+    instance_type = "m3.medium"
+    tags {
+    Department = "Operations"
         CostCenter = "2001"
         "Project" = "Web"
-	}
+    }
 }
 resource "aws_instance" "third" {
-	ami = "ami-f2d3638b"
-	instance_type = "c4.large"
+    ami = "ami-f2d3638b"
+    instance_type = "c4.large"
 }
 resource "aws_instance" "foo" {
-	ami = "ami-f2d3638b"
-	instance_type = "c4.large"
+    ami = "ami-f2d3638b"
+    instance_type = "c4.large"
     tags {
         Foo = "Foo"
         "Project" = "Web"
