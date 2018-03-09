@@ -229,7 +229,7 @@ func searchAndMatch(filter Filter, resource TerraformResource, log LoggingFuncti
 	o := unquoted(searchData(filter.Key, resource.Properties))
 	status := isMatch(o, filter.Op, filter.Value)
 	log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s", filter.Key, o, filter.Op, filter.Value))
-	log(fmt.Sprintf("ResourceId: %s Type: %s %s",
+	log(fmt.Sprintf("ResourceId: %s Type: %s %t",
 		resource.Id,
 		resource.Type,
 		status))
@@ -274,7 +274,7 @@ func searchAndTest(rule Rule, filter Filter, resource TerraformResource, log Log
 	if filter.Not != nil && len(filter.Not) > 0 {
 		return notOperation(rule, filter.Not, resource, log)
 	}
-	if searchAndMatch(filter, resource, log) {
+	if !searchAndMatch(filter, resource, log) {
 		status = rule.Severity
 	}
 	return status
