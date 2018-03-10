@@ -80,14 +80,14 @@ func filterTerraformResourcesByType(resources []TerraformResource, resourceType 
 	return filtered
 }
 
-func validateTerraformResources(resources []TerraformResource, ruleData Rules, tags []string, log LoggingFunction) []ValidationResult {
+func validateTerraformResources(resources []TerraformResource, rules []Rule, tags []string, log LoggingFunction) []ValidationResult {
 	results := make([]ValidationResult, 0)
-	for _, rule := range filterRulesByTag(ruleData.Rules, tags) {
+	for _, rule := range filterRulesByTag(rules, tags) {
 		log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
 		for _, filter := range rule.Filters {
 			for _, resource := range filterTerraformResourcesByType(resources, rule.Resource) {
 				log(fmt.Sprintf("Checking resource %s", resource.Id))
-				status := searchAndTest(rule, filter, resource, log)
+				status := applyFilter(rule, filter, resource, log)
 				if status != "OK" {
 					results = append(results, ValidationResult{
 						RuleId:       rule.Id,

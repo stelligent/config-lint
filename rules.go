@@ -23,17 +23,17 @@ func filterRulesByTag(rules []Rule, tags []string) []Rule {
 	return filteredRules
 }
 
-func filterRulesById(allRules Rules, ruleIds []string) Rules {
+func filterRulesById(rules []Rule, ruleIds []string) []Rule {
 	if len(ruleIds) == 0 {
-		return allRules
+		return rules
 	}
 	filteredRules := make([]Rule, 0)
-	for _, rule := range allRules.Rules {
+	for _, rule := range rules {
 		for _, id := range ruleIds {
 			if id == rule.Id {
 				filteredRules = append(filteredRules, rule)
 			}
 		}
 	}
-	return Rules{Rules: filteredRules}
+	return filteredRules
 }
