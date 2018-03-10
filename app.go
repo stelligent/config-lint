@@ -25,8 +25,11 @@ type Rule struct {
 	Tags     []string
 }
 
-type Rules struct {
-	Rules []Rule
+type RuleSet struct {
+	Description string
+	Files       []string
+	Rules       []Rule
+	Version     string
 }
 
 type ValidationResult struct {

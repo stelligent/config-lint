@@ -6,6 +6,7 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/hashicorp/hcl"
 	"io/ioutil"
+	"path/filepath"
 )
 
 type TerraformResource struct {
@@ -111,10 +112,27 @@ func validateTerraformResources(resources []TerraformResource, rules []Rule, tag
 	return results
 }
 
+func shouldIncludeFile(patterns []string, filename string) bool {
+	for _, pattern := range patterns {
+		_, file := filepath.Split(filename)
+		matched, err := filepath.Match(pattern, file)
+		if err != nil {
+			panic(err)
+		}
+		if matched {
+			return true
+		}
+	}
+	return false
+}
+
 func terraform(filename string, rulesFilename string, tags []string, ruleIds []string, log LoggingFunction) {
 	resources := loadTerraformResources(filename, log)
 	// TODO move the parsing up one level - no need to parse the rules for every single file!
-	rules := filterRulesById(MustParseRules(loadTerraformRules(rulesFilename)).Rules, ruleIds)
-	results := validateTerraformResources(resources, rules, tags, log)
-	printResults(results)
+	ruleSet := MustParseRules(loadTerraformRules(rulesFilename))
+	if shouldIncludeFile(ruleSet.Files, filename) {
+		rules := filterRulesById(ruleSet.Rules, ruleIds)
+		results := validateTerraformResources(resources, rules, tags, log)
+		printResults(results)
+	}
 }

@@ -4,8 +4,8 @@ import (
 	"github.com/ghodss/yaml"
 )
 
-func MustParseRules(rules string) Rules {
-	r := Rules{}
+func MustParseRules(rules string) RuleSet {
+	r := RuleSet{}
 	err := yaml.Unmarshal([]byte(rules), &r)
 	if err != nil {
 		panic(err)

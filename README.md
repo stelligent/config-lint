@@ -33,6 +33,10 @@ Each filter contains the following attributes:
 
 For example, to test that an AWS instance type has one of two values:
 ```
+Version: 1
+Description: Example rules
+Files:
+  - "*.tf"
 Rules:
   - id: R1
     message: Instance type should be t2.micro or m3.medium
@@ -48,6 +52,10 @@ Rules:
 This could also be done by using the or operation with two different filters:
 
 ```
+Version: 1
+Description: Example rules
+Files:
+  - "*.tf"
 Rules:
   - id: R2
     message: Instance type should be t2.micro or m3.medium
