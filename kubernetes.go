@@ -62,8 +62,7 @@ func filterKubernetesResourcesByType(resources []KubernetesResource, resourceTyp
 	return filtered
 }
 
-func validateKubernetesResources(resources []KubernetesResource, rules []Rule, tags []string, log LoggingFunction) ValidationReport {
-	var report ValidationReport
+func validateKubernetesResources(report *ValidationReport, resources []KubernetesResource, rules []Rule, tags []string, log LoggingFunction) {
 	for _, rule := range filterRulesByTag(rules, tags) {
 		log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
 		for _, filter := range rule.Filters {
@@ -84,27 +83,27 @@ func validateKubernetesResources(resources []KubernetesResource, rules []Rule, t
 						report.Warnings = append(report.Warnings, v)
 					}
 					if status == "FAILURE" {
-						report.Warnings = append(report.Failures, v)
+						report.Failures = append(report.Failures, v)
 					}
 				}
 			}
 		}
 	}
-	return report
 }
 
-func kubernetes(filenames []string, rulesFilename string, tags []string, ruleIds []string, log LoggingFunction) {
+func kubernetes(filenames []string, rulesFilename string, tags []string, ruleIds []string, log LoggingFunction) ValidationReport {
+	var report ValidationReport
 	ruleSet := MustParseRules(loadKubernetesRules(rulesFilename))
 	rules := filterRulesById(ruleSet.Rules, ruleIds)
 	for _, filename := range filenames {
 		if shouldIncludeFile(ruleSet.Files, filename) {
 			log(fmt.Sprintf("Processing %s", filename))
 			resources := loadKubernetesResources(filename, log)
-			report := validateKubernetesResources(resources, rules, tags, log)
-			report.FilesScanned = filenames
-			printResults(report)
+			validateKubernetesResources(&report, resources, rules, tags, log)
+			report.FilesScanned = append(report.FilesScanned, filename)
 		}
 	}
+	return report
 }
 
 func kubernetesSearch(filenames []string, searchExpression string, log LoggingFunction) {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"strings"
@@ -48,15 +49,18 @@ type ValidationReport struct {
 	FilesScanned  []string
 }
 
-func printResults(report ValidationReport) {
-	for _, result := range report.AllViolations {
-		fmt.Printf("%s %s '%s' in '%s': %s (%s)\n",
-			result.Status,
-			result.ResourceType,
-			result.ResourceId,
-			result.Filename,
-			result.Message,
-			result.RuleId)
+func printReport(report ValidationReport, queryExpression string) {
+	if queryExpression != "" {
+		v := searchData(queryExpression, report)
+		if v != "null" {
+			fmt.Println(v)
+		}
+	} else {
+		jsonData, err := json.MarshalIndent(report, "", "  ")
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(string(jsonData))
 	}
 }
 
@@ -81,6 +85,7 @@ func main() {
 	rulesFilename := flag.String("rules", "./rules/terraform.yml", "Rules file")
 	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
 	ids := flag.String("ids", "", "Run only the rules in this comma separated list")
+	queryExpression := flag.String("query", "", "JMESPath expression to query the results")
 	searchExpression := flag.String("search", "", "JMESPath expression to evaluation against the files")
 	flag.Parse()
 
@@ -90,14 +95,16 @@ func main() {
 		if *searchExpression != "" {
 			kubernetesSearch(flag.Args(), *searchExpression, logger)
 		} else {
-			kubernetes(flag.Args(), *rulesFilename, makeTagList(*tags), makeRulesList(*ids), logger)
+			report := kubernetes(flag.Args(), *rulesFilename, makeTagList(*tags), makeRulesList(*ids), logger)
+			printReport(report, *queryExpression)
 		}
 	}
 	if *terraformFiles {
 		if *searchExpression != "" {
 			terraformSearch(flag.Args(), *searchExpression, logger)
 		} else {
-			terraform(flag.Args(), *rulesFilename, makeTagList(*tags), makeRulesList(*ids), logger)
+			report := terraform(flag.Args(), *rulesFilename, makeTagList(*tags), makeRulesList(*ids), logger)
+			printReport(report, *queryExpression)
 		}
 	}
 }

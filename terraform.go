@@ -27,6 +27,9 @@ func loadHCL(filename string, log LoggingFunction) []interface{} {
 		panic(err)
 	}
 	jsonData, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		panic(err)
+	}
 	log(string(jsonData))
 
 	var hclData interface{}
@@ -90,8 +93,7 @@ func filterTerraformResourcesByType(resources []TerraformResource, resourceType 
 	return filtered
 }
 
-func validateTerraformResources(resources []TerraformResource, rules []Rule, tags []string, log LoggingFunction) ValidationReport {
-	var report ValidationReport
+func validateTerraformResources(report *ValidationReport, resources []TerraformResource, rules []Rule, tags []string, log LoggingFunction) {
 	for _, rule := range filterRulesByTag(rules, tags) {
 		log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
 		for _, filter := range rule.Filters {
@@ -108,31 +110,30 @@ func validateTerraformResources(resources []TerraformResource, rules []Rule, tag
 						Filename:     resource.Filename,
 					}
 					report.AllViolations = append(report.AllViolations, v)
-					report.AllViolations = append(report.AllViolations, v)
 					if status == "WARNING" {
 						report.Warnings = append(report.Warnings, v)
 					}
 					if status == "FAILURE" {
-						report.Warnings = append(report.Failures, v)
+						report.Failures = append(report.Failures, v)
 					}
 				}
 			}
 		}
 	}
-	return report
 }
 
-func terraform(filenames []string, rulesFilename string, tags []string, ruleIds []string, log LoggingFunction) {
+func terraform(filenames []string, rulesFilename string, tags []string, ruleIds []string, log LoggingFunction) ValidationReport {
+	var report ValidationReport
 	ruleSet := MustParseRules(loadTerraformRules(rulesFilename))
 	rules := filterRulesById(ruleSet.Rules, ruleIds)
 	for _, filename := range filenames {
 		if shouldIncludeFile(ruleSet.Files, filename) {
 			resources := loadTerraformResources(filename, log)
-			report := validateTerraformResources(resources, rules, tags, log)
-			report.FilesScanned = filenames
-			printResults(report)
+			validateTerraformResources(&report, resources, rules, tags, log)
+			report.FilesScanned = append(report.FilesScanned, filename)
 		}
 	}
+	return report
 }
 
 func terraformSearch(filenames []string, searchExpression string, log LoggingFunction) {
