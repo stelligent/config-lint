@@ -66,11 +66,12 @@ func makeRulesList(ruleIds string) []string {
 
 func main() {
 	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
+	rulesFilename := flag.String("rules", "./rules/terraform.yml", "Rules file")
 	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
-	rules := flag.String("rules", "", "Run only the rules in this comma separated list")
+	ids := flag.String("ids", "", "Run only the rules in this comma separated list")
 	flag.Parse()
 
 	for _, filename := range flag.Args() {
-		terraform(filename, makeTagList(*tags), makeRulesList(*rules), makeLogger(*verboseLogging))
+		terraform(filename, *rulesFilename, makeTagList(*tags), makeRulesList(*ids), makeLogger(*verboseLogging))
 	}
 }

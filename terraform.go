@@ -69,8 +69,8 @@ func loadTerraformResources(filename string, log LoggingFunction) []TerraformRes
 	return resources
 }
 
-func loadTerraformRules() string {
-	terraformRules, err := ioutil.ReadFile("./rules/terraform.yml")
+func loadTerraformRules(filename string) string {
+	terraformRules, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
@@ -111,9 +111,10 @@ func validateTerraformResources(resources []TerraformResource, rules []Rule, tag
 	return results
 }
 
-func terraform(filename string, tags []string, ruleIds []string, log LoggingFunction) {
+func terraform(filename string, rulesFilename string, tags []string, ruleIds []string, log LoggingFunction) {
 	resources := loadTerraformResources(filename, log)
-	rules := filterRulesById(MustParseRules(loadTerraformRules()).Rules, ruleIds)
+	// TODO move the parsing up one level - no need to parse the rules for every single file!
+	rules := filterRulesById(MustParseRules(loadTerraformRules(rulesFilename)).Rules, ruleIds)
 	results := validateTerraformResources(resources, rules, tags, log)
 	printResults(results)
 }

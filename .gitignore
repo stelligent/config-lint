@@ -1,2 +1,2 @@
 files/.terraform/*
-terraform-lint
+config-lint
