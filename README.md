@@ -1,16 +1,16 @@
-# terraform-lint
+# config-lint
 
-Validate a terraform HCL file using rules specified in a YAML file.
+Validate configuration files using rules specified in a YAML file.
 
 # Run
 
 ```
-go run app.go files/*.tf
+go run app.go --terraform files/*
 ```
 
 # Rules
 
-The rules file is currently hard-coded to be 'rules/terraform.yml'. It is a list of objects with the following attributes:
+The rules file includes a list of objects with the following attributes:
 
 * id: unique identifier for the rule
 * message: string to be printed when a validation error is detected
@@ -18,9 +18,6 @@ The rules file is currently hard-coded to be 'rules/terraform.yml'. It is a list
 * severity: whether the validation generates a WARNING or a FAILURE
 * filters: a list of filters used to detect validation errors
 * tags: optional list of tags, command line has option to limit scans to a subset of tags
-
-My thought is to require a command line parameter with a file or directory name where the rules can be found.
-If a directory name is given, load all the files in that directory. Maybe allow multiple directories to be specified
 
 # Filters
 
@@ -88,6 +85,7 @@ Lots to do. This is just a proof-of-concept.
 * Output should be grouped by resource id
 * Add value_from to allow for dynamic data (again, see CloudCustodian)
 * Add ability to extend with a Lambda function
-* Add command line parameter for rules file or directory (currently hard-coded)
 * It should be possible to nest the and, or, not operators
 * Instead of iterating through rules, filters, then resources, make resources the outer loop, so results are reports by resource id
+* Add examples to this file for Kubernetes files
+* Support multiple rules files, or a rules directory
