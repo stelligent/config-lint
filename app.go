@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -49,7 +50,7 @@ type ValidationReport struct {
 	FilesScanned  []string
 }
 
-func printReport(report ValidationReport, queryExpression string) {
+func printReport(report ValidationReport, queryExpression string) int {
 	if queryExpression != "" {
 		v := searchData(queryExpression, report)
 		if v != "null" {
@@ -62,6 +63,10 @@ func printReport(report ValidationReport, queryExpression string) {
 		}
 		fmt.Println(string(jsonData))
 	}
+	if len(report.Failures) > 0 {
+		return 1
+	}
+	return 0
 }
 
 func makeTagList(tags string) []string {
@@ -91,12 +96,14 @@ func main() {
 
 	logger := makeLogger(*verboseLogging)
 
+	exitCode := 0
+
 	if *kubernetesFiles {
 		if *searchExpression != "" {
 			kubernetesSearch(flag.Args(), *searchExpression, logger)
 		} else {
 			report := kubernetes(flag.Args(), *rulesFilename, makeTagList(*tags), makeRulesList(*ids), logger)
-			printReport(report, *queryExpression)
+			exitCode = printReport(report, *queryExpression)
 		}
 	}
 	if *terraformFiles {
@@ -104,7 +111,8 @@ func main() {
 			terraformSearch(flag.Args(), *searchExpression, logger)
 		} else {
 			report := terraform(flag.Args(), *rulesFilename, makeTagList(*tags), makeRulesList(*ids), logger)
-			printReport(report, *queryExpression)
+			exitCode = printReport(report, *queryExpression)
 		}
 	}
+	os.Exit(exitCode)
 }
