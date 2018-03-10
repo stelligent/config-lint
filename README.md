@@ -87,8 +87,26 @@ Rules:
     severity: WARNING
 ```
 
-
 The filters and operations are modeled after those used by CloudCustodian: http://capitalone.github.io/cloud-custodian/docs/
+
+# Output
+
+The program outputs a JSON string with the results. The JSON object has the following attributes:
+
+* FilesScanned - a list of the filenames evaluated
+* Warnings - a list of rules with severity WARNING that were triggered
+* Failures - a list of rules with severity FAILURE that were triggered
+* AllViolations - a list of rules with any severity that were triggered (in case you use something other than WARNING or FAILURE)
+
+You can limit the output by specifying a JMESPath expression for the --query command line option. For example, if you just wanted to see the Failures, you can do the following:
+
+```
+./config-lint --terraform --rules rules/terraform.yml --query 'Failures' files/*
+```
+
+# Exit Code
+
+If at least one rule with a severity of FAILURE was triggered the exit code will be 1, otherwise it will be 0.
 
 # Developing new rules using --search
 
