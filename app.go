@@ -32,7 +32,7 @@ type RuleSet struct {
 	Version     string
 }
 
-type ValidationResult struct {
+type Violation struct {
 	RuleId       string
 	ResourceId   string
 	ResourceType string
@@ -41,8 +41,15 @@ type ValidationResult struct {
 	Filename     string
 }
 
-func printResults(results []ValidationResult) {
-	for _, result := range results {
+type ValidationReport struct {
+	Warnings      []Violation
+	Failures      []Violation
+	AllViolations []Violation
+	FilesScanned  []string
+}
+
+func printResults(report ValidationReport) {
+	for _, result := range report.AllViolations {
 		fmt.Printf("%s %s '%s' in '%s': %s (%s)\n",
 			result.Status,
 			result.ResourceType,

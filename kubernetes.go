@@ -62,8 +62,8 @@ func filterKubernetesResourcesByType(resources []KubernetesResource, resourceTyp
 	return filtered
 }
 
-func validateKubernetesResources(resources []KubernetesResource, rules []Rule, tags []string, log LoggingFunction) []ValidationResult {
-	results := make([]ValidationResult, 0)
+func validateKubernetesResources(resources []KubernetesResource, rules []Rule, tags []string, log LoggingFunction) ValidationReport {
+	var report ValidationReport
 	for _, rule := range filterRulesByTag(rules, tags) {
 		log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
 		for _, filter := range rule.Filters {
@@ -71,19 +71,26 @@ func validateKubernetesResources(resources []KubernetesResource, rules []Rule, t
 				log(fmt.Sprintf("Checking resource %s", resource.Id))
 				status := applyFilter(rule, filter, resource, log)
 				if status != "OK" {
-					results = append(results, ValidationResult{
+					v := Violation{
 						RuleId:       rule.Id,
 						ResourceId:   resource.Id,
 						ResourceType: resource.Type,
 						Status:       status,
 						Message:      rule.Message,
 						Filename:     resource.Filename,
-					})
+					}
+					report.AllViolations = append(report.AllViolations, v)
+					if status == "WARNING" {
+						report.Warnings = append(report.Warnings, v)
+					}
+					if status == "FAILURE" {
+						report.Warnings = append(report.Failures, v)
+					}
 				}
 			}
 		}
 	}
-	return results
+	return report
 }
 
 func kubernetes(filenames []string, rulesFilename string, tags []string, ruleIds []string, log LoggingFunction) {
@@ -93,8 +100,9 @@ func kubernetes(filenames []string, rulesFilename string, tags []string, ruleIds
 		if shouldIncludeFile(ruleSet.Files, filename) {
 			log(fmt.Sprintf("Processing %s", filename))
 			resources := loadKubernetesResources(filename, log)
-			results := validateKubernetesResources(resources, rules, tags, log)
-			printResults(results)
+			report := validateKubernetesResources(resources, rules, tags, log)
+			report.FilesScanned = filenames
+			printResults(report)
 		}
 	}
 }

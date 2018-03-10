@@ -90,8 +90,8 @@ func filterTerraformResourcesByType(resources []TerraformResource, resourceType 
 	return filtered
 }
 
-func validateTerraformResources(resources []TerraformResource, rules []Rule, tags []string, log LoggingFunction) []ValidationResult {
-	results := make([]ValidationResult, 0)
+func validateTerraformResources(resources []TerraformResource, rules []Rule, tags []string, log LoggingFunction) ValidationReport {
+	var report ValidationReport
 	for _, rule := range filterRulesByTag(rules, tags) {
 		log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
 		for _, filter := range rule.Filters {
@@ -99,19 +99,27 @@ func validateTerraformResources(resources []TerraformResource, rules []Rule, tag
 				log(fmt.Sprintf("Checking resource %s", resource.Id))
 				status := applyFilter(rule, filter, resource, log)
 				if status != "OK" {
-					results = append(results, ValidationResult{
+					v := Violation{
 						RuleId:       rule.Id,
 						ResourceId:   resource.Id,
 						ResourceType: resource.Type,
 						Status:       status,
 						Message:      rule.Message,
 						Filename:     resource.Filename,
-					})
+					}
+					report.AllViolations = append(report.AllViolations, v)
+					report.AllViolations = append(report.AllViolations, v)
+					if status == "WARNING" {
+						report.Warnings = append(report.Warnings, v)
+					}
+					if status == "FAILURE" {
+						report.Warnings = append(report.Failures, v)
+					}
 				}
 			}
 		}
 	}
-	return results
+	return report
 }
 
 func terraform(filenames []string, rulesFilename string, tags []string, ruleIds []string, log LoggingFunction) {
@@ -120,8 +128,9 @@ func terraform(filenames []string, rulesFilename string, tags []string, ruleIds 
 	for _, filename := range filenames {
 		if shouldIncludeFile(ruleSet.Files, filename) {
 			resources := loadTerraformResources(filename, log)
-			results := validateTerraformResources(resources, rules, tags, log)
-			printResults(results)
+			report := validateTerraformResources(resources, rules, tags, log)
+			report.FilesScanned = filenames
+			printResults(report)
 		}
 	}
 }
