@@ -103,3 +103,14 @@ func validateTerraformResources(resources []TerraformResource, rules []Rule, tag
 	}
 	return results
 }
+
+func terraform(filename string, tags []string, ruleIds []string, log LoggingFunction) {
+	hclTemplate, err := ioutil.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+	resources := loadTerraformResources(filename, loadHCL(string(hclTemplate), log))
+	rules := filterRulesById(MustParseRules(loadTerraformRules()).Rules, ruleIds)
+	results := validateTerraformResources(resources, rules, tags, log)
+	printResults(results)
+}
