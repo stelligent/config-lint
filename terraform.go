@@ -15,9 +15,14 @@ type TerraformResource struct {
 	Filename   string
 }
 
-func loadHCL(template string, log LoggingFunction) []interface{} {
+func loadHCL(filename string, log LoggingFunction) []interface{} {
+	template, err := ioutil.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+
 	var v interface{}
-	err := hcl.Unmarshal([]byte(template), &v)
+	err = hcl.Unmarshal([]byte(template), &v)
 	if err != nil {
 		panic(err)
 	}
@@ -40,7 +45,9 @@ func loadHCL(template string, log LoggingFunction) []interface{} {
 	return results
 }
 
-func loadTerraformResources(filename string, hclResources []interface{}) []TerraformResource {
+func loadTerraformResources(filename string, log LoggingFunction) []TerraformResource {
+	hclResources := loadHCL(filename, log)
+
 	resources := make([]TerraformResource, 0)
 	for _, resource := range hclResources {
 		for resourceType, templateResources := range resource.(map[string]interface{}) {
@@ -105,11 +112,7 @@ func validateTerraformResources(resources []TerraformResource, rules []Rule, tag
 }
 
 func terraform(filename string, tags []string, ruleIds []string, log LoggingFunction) {
-	hclTemplate, err := ioutil.ReadFile(filename)
-	if err != nil {
-		panic(err)
-	}
-	resources := loadTerraformResources(filename, loadHCL(string(hclTemplate), log))
+	resources := loadTerraformResources(filename, log)
 	rules := filterRulesById(MustParseRules(loadTerraformRules()).Rules, ruleIds)
 	results := validateTerraformResources(resources, rules, tags, log)
 	printResults(results)

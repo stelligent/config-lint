@@ -81,5 +81,5 @@ Lots to do. This is just a proof-of-concept.
 * Add value_from to allow for dynamic data (again, see CloudCustodian)
 * Add ability to extend with a Lambda function
 * Add command line parameter for rules file or directory (currently hard-coded)
-* It's already big enough to warrant some automated tests
 * It should be possible to nest the and, or, not operators
+* Instead of iterating through rules, filters, then resources, make resources the outer loop, so results are reports by resource id
