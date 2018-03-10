@@ -98,3 +98,16 @@ func kubernetes(filenames []string, rulesFilename string, tags []string, ruleIds
 		}
 	}
 }
+
+func kubernetesSearch(filenames []string, searchExpression string, log LoggingFunction) {
+	for _, filename := range filenames {
+		log(fmt.Sprintf("Searching %s", filename))
+		resources := loadKubernetesResources(filename, log)
+		for _, resource := range resources {
+			v := searchData(searchExpression, resource.Properties)
+			if v != "null" {
+				fmt.Println(v)
+			}
+		}
+	}
+}

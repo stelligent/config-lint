@@ -74,12 +74,23 @@ func main() {
 	rulesFilename := flag.String("rules", "./rules/terraform.yml", "Rules file")
 	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
 	ids := flag.String("ids", "", "Run only the rules in this comma separated list")
+	searchExpression := flag.String("search", "", "JMESPath expression to evaluation against the files")
 	flag.Parse()
 
+	logger := makeLogger(*verboseLogging)
+
 	if *kubernetesFiles {
-		kubernetes(flag.Args(), *rulesFilename, makeTagList(*tags), makeRulesList(*ids), makeLogger(*verboseLogging))
+		if *searchExpression != "" {
+			kubernetesSearch(flag.Args(), *searchExpression, logger)
+		} else {
+			kubernetes(flag.Args(), *rulesFilename, makeTagList(*tags), makeRulesList(*ids), logger)
+		}
 	}
 	if *terraformFiles {
-		terraform(flag.Args(), *rulesFilename, makeTagList(*tags), makeRulesList(*ids), makeLogger(*verboseLogging))
+		if *searchExpression != "" {
+			terraformSearch(flag.Args(), *searchExpression, logger)
+		} else {
+			terraform(flag.Args(), *rulesFilename, makeTagList(*tags), makeRulesList(*ids), logger)
+		}
 	}
 }

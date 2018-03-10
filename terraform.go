@@ -125,3 +125,16 @@ func terraform(filenames []string, rulesFilename string, tags []string, ruleIds 
 		}
 	}
 }
+
+func terraformSearch(filenames []string, searchExpression string, log LoggingFunction) {
+	for _, filename := range filenames {
+		log(fmt.Sprintf("Searching %s", filename))
+		resources := loadTerraformResources(filename, log)
+		for _, resource := range resources {
+			v := searchData(searchExpression, resource.Properties)
+			if v != "null" {
+				fmt.Println(v)
+			}
+		}
+	}
+}
