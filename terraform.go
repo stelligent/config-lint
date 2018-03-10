@@ -126,13 +126,14 @@ func shouldIncludeFile(patterns []string, filename string) bool {
 	return false
 }
 
-func terraform(filename string, rulesFilename string, tags []string, ruleIds []string, log LoggingFunction) {
-	resources := loadTerraformResources(filename, log)
-	// TODO move the parsing up one level - no need to parse the rules for every single file!
+func terraform(filenames []string, rulesFilename string, tags []string, ruleIds []string, log LoggingFunction) {
 	ruleSet := MustParseRules(loadTerraformRules(rulesFilename))
-	if shouldIncludeFile(ruleSet.Files, filename) {
-		rules := filterRulesById(ruleSet.Rules, ruleIds)
-		results := validateTerraformResources(resources, rules, tags, log)
-		printResults(results)
+	rules := filterRulesById(ruleSet.Rules, ruleIds)
+	for _, filename := range filenames {
+		if shouldIncludeFile(ruleSet.Files, filename) {
+			resources := loadTerraformResources(filename, log)
+			results := validateTerraformResources(resources, rules, tags, log)
+			printResults(results)
+		}
 	}
 }

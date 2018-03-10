@@ -74,7 +74,5 @@ func main() {
 	ids := flag.String("ids", "", "Run only the rules in this comma separated list")
 	flag.Parse()
 
-	for _, filename := range flag.Args() {
-		terraform(filename, *rulesFilename, makeTagList(*tags), makeRulesList(*ids), makeLogger(*verboseLogging))
-	}
+	terraform(flag.Args(), *rulesFilename, makeTagList(*tags), makeRulesList(*ids), makeLogger(*verboseLogging))
 }
