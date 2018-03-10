@@ -1,0 +1,22 @@
+Version: 1
+Description: Rules for Kubernetes spec files
+Files:
+  - "*.yml"
+Rules:
+  - id: K1
+    message: Kind must be pod
+    resource: "*"
+    filters:
+      - type: value
+        key: kind
+        op: in
+        value: Pod
+    severity: FAILURE
+  - id: K2
+    message: Must include containers
+    resource: "*"
+    filters:
+      - type: value
+        key: spec.containers
+        op: present
+    severity: FAILURE

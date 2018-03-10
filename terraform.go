@@ -6,7 +6,6 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/hashicorp/hcl"
 	"io/ioutil"
-	"path/filepath"
 )
 
 type TerraformResource struct {
@@ -79,6 +78,9 @@ func loadTerraformRules(filename string) string {
 }
 
 func filterTerraformResourcesByType(resources []TerraformResource, resourceType string) []TerraformResource {
+	if resourceType == "*" {
+		return resources
+	}
 	filtered := make([]TerraformResource, 0)
 	for _, resource := range resources {
 		if resource.Type == resourceType {
@@ -110,20 +112,6 @@ func validateTerraformResources(resources []TerraformResource, rules []Rule, tag
 		}
 	}
 	return results
-}
-
-func shouldIncludeFile(patterns []string, filename string) bool {
-	for _, pattern := range patterns {
-		_, file := filepath.Split(filename)
-		matched, err := filepath.Match(pattern, file)
-		if err != nil {
-			panic(err)
-		}
-		if matched {
-			return true
-		}
-	}
-	return false
 }
 
 func terraform(filenames []string, rulesFilename string, tags []string, ruleIds []string, log LoggingFunction) {

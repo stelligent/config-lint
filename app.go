@@ -68,11 +68,18 @@ func makeRulesList(ruleIds string) []string {
 }
 
 func main() {
+	kubernetesFiles := flag.Bool("kubernetes", false, "Process kubernetes files")
+	terraformFiles := flag.Bool("terraform", false, "Process terraform files")
 	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
 	rulesFilename := flag.String("rules", "./rules/terraform.yml", "Rules file")
 	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
 	ids := flag.String("ids", "", "Run only the rules in this comma separated list")
 	flag.Parse()
 
-	terraform(flag.Args(), *rulesFilename, makeTagList(*tags), makeRulesList(*ids), makeLogger(*verboseLogging))
+	if *kubernetesFiles {
+		kubernetes(flag.Args(), *rulesFilename, makeTagList(*tags), makeRulesList(*ids), makeLogger(*verboseLogging))
+	}
+	if *terraformFiles {
+		terraform(flag.Args(), *rulesFilename, makeTagList(*tags), makeRulesList(*ids), makeLogger(*verboseLogging))
+	}
 }

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: www
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    volumeMounts:
+    - mountPath: /srv/www
+      name: www-data
+      readOnly: true
+  - name: git-monitor
+    image: kubernetes/git-monitor
+    env:
+    - name: GIT_REPO
+      value: http://github.com/some/repo.git
+    volumeMounts:
+    - mountPath: /data
+      name: www-data
+  volumes:
+  - name: www-data
+    emptyDir: {}

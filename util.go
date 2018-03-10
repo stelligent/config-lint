@@ -1,5 +1,9 @@
 package main
 
+import (
+	"path/filepath"
+)
+
 func unquoted(s string) string {
 	if s[0] == '"' {
 		return s[1 : len(s)-1]
@@ -24,6 +28,20 @@ func listsIntersect(list1 []string, list2 []string) bool {
 			if a == b {
 				return true
 			}
+		}
+	}
+	return false
+}
+
+func shouldIncludeFile(patterns []string, filename string) bool {
+	for _, pattern := range patterns {
+		_, file := filepath.Split(filename)
+		matched, err := filepath.Match(pattern, file)
+		if err != nil {
+			panic(err)
+		}
+		if matched {
+			return true
 		}
 	}
 	return false
