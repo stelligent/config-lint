@@ -133,7 +133,7 @@ func terraformSearch(filenames []string, searchExpression string, log LoggingFun
 		for _, resource := range resources {
 			v := searchData(searchExpression, resource.Properties)
 			if v != "null" {
-				fmt.Println(v)
+				fmt.Printf("%s: %s\n", filename, v)
 			}
 		}
 	}
