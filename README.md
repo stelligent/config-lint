@@ -31,29 +31,37 @@ The rules file specifies what files to process, and what validations to perform.
 
 ## Attributes for the Rule Set
 
-* Version: current ignored
-* Description: text description for the file, not currently used
-* Type: should be 'Terraform' or 'Kubernetes'
-* Files: filenames must match one of these patterns to be processed by this set of rules
-* Rules: a list of rules, see next section
+|Name       |Description                                                                         |
+|-----------|------------------------------------------------------------------------------------|
+|Version    |Currently ignored                                                                   |
+|Description|Text description for the file, not currently used                                   |
+|Type       |Should be 'Terraform' or 'Kubernetes'                                               |
+|Files      |Filenames must match one of these patterns to be processed by this set of rules     |
+|Rules      |A list of rules, see next section                                                   |
 
 ## Attributes for each Rule
 
-* id: unique identifier for the rule
-* message: string to be printed when a validation error is detected
-* resource: the resource type to which the rule will be applied
-* severity: whether the validation generates a WARNING or a FAILURE
-* filters: a list of filters used to detect validation errors, see next section
-* tags: optional list of tags, command line has option to limit scans to a subset of tags
+Each rule contains the following attributes:
+
+|Name       |Description                                                                         |
+|-----------|------------------------------------------------------------------------------------|
+|id         | A unique identifier for the rule                                                   |
+|message    | A string to be printed when a validation error is detected                         |
+|resource   | The resource type to which the rule will be applied                                |
+|severity   | Should be 'WARNING' or 'FAILURE'                                                   |
+|filters    | A list of filters used to detect validation errors, see next section               |
+|tags       | Optional list of tags, command line has option to limit scans to a subset of tags  |
 
 ## Attributes for each Filter
 
 Each filter contains the following attributes:
 
-* type: everything should be "value" for now
-* key: the JMES path used to find data in a resource
-* op: the operation to be performed on the data returned by searching for the JMES path
-* value: needed for most operations
+|Name       |Description                                                                         |
+|-----------|------------------------------------------------------------------------------------|
+|type       | Should always be "value" for now                                                   |
+|key        | JMES path used to find data in a resource                                          |
+|op         | Operation to perform on the data returned by searching for the key                 |
+|value      | Literal value needed for most operations                                           |
 
 ## Examples
 
