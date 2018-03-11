@@ -15,13 +15,13 @@ The program currently supports Terraform and Kubernetes files.
 ## Validate Terraform files
 
 ```
-./config-lint --rules rules/terraform.yml files/*
+./config-lint --rules example-files/rules/terraform.yml example-files/config/*
 ```
 
 ## Validate Kubernetes files
 
 ```
-./config-lint --rules rules/kubernetes.yml files/*
+./config-lint --rules example-files/rules/kubernetes.yml example-files/config/*
 ```
 
 
@@ -264,7 +264,7 @@ The program outputs a JSON string with the results. The JSON object has the foll
 You can limit the output by specifying a JMESPath expression for the --query command line option. For example, if you just wanted to see the RecordIds for failed checks, you can do the following:
 
 ```
-./config-lint --rules rules/terraform.yml --query 'Violations.FAILURE[].ResourceId' files/*
+./config-lint --rules example-files/rules/terraform.yml --query 'Violations.FAILURE[].ResourceId' example-files/config/*
 ```
 
 # Exit Code
@@ -280,7 +280,7 @@ The expressions can be tricky to get right, so this tool provides a --search opt
 This example will scan the example terraform file and print the "ami" attribute for each resource:
 
 ```
-./config-lint --rules rules/terraform.yml --search 'ami' files/terraform.tf
+./config-lint --rules example-files/rules/terraform.yml --search 'ami' example-files/config/terraform.tf
 ```
 
 If you specify --search, the rules files is only used to determine the type of configuration files.
