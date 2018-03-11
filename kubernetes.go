@@ -91,9 +91,8 @@ func validateKubernetesResources(report *ValidationReport, resources []Kubernete
 	}
 }
 
-func kubernetes(filenames []string, rulesFilename string, tags []string, ruleIds []string, log LoggingFunction) ValidationReport {
+func kubernetes(filenames []string, ruleSet RuleSet, tags []string, ruleIds []string, log LoggingFunction) ValidationReport {
 	var report ValidationReport
-	ruleSet := MustParseRules(loadKubernetesRules(rulesFilename))
 	rules := filterRulesById(ruleSet.Rules, ruleIds)
 	for _, filename := range filenames {
 		if shouldIncludeFile(ruleSet.Files, filename) {

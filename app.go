@@ -98,11 +98,13 @@ func main() {
 
 	exitCode := 0
 
+	ruleSet := MustParseRules(loadTerraformRules(*rulesFilename))
+
 	if *kubernetesFiles {
 		if *searchExpression != "" {
 			kubernetesSearch(flag.Args(), *searchExpression, logger)
 		} else {
-			report := kubernetes(flag.Args(), *rulesFilename, makeTagList(*tags), makeRulesList(*ids), logger)
+			report := kubernetes(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids), logger)
 			exitCode = printReport(report, *queryExpression)
 		}
 	}
@@ -110,7 +112,7 @@ func main() {
 		if *searchExpression != "" {
 			terraformSearch(flag.Args(), *searchExpression, logger)
 		} else {
-			report := terraform(flag.Args(), *rulesFilename, makeTagList(*tags), makeRulesList(*ids), logger)
+			report := terraform(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids), logger)
 			exitCode = printReport(report, *queryExpression)
 		}
 	}
