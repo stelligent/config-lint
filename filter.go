@@ -9,13 +9,13 @@ func searchAndMatch(filter Filter, resource TerraformResource, log LoggingFuncti
 	if err != nil {
 		panic(err)
 	}
-	status := isMatch(unquoted(v), filter.Op, filter.Value)
+	match := isMatch(unquoted(v), filter.Op, filter.Value)
 	log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s", filter.Key, v, filter.Op, filter.Value))
 	log(fmt.Sprintf("ResourceId: %s Type: %s %t",
 		resource.Id,
 		resource.Type,
-		status))
-	return status
+		match))
+	return match
 }
 
 func orOperation(rule Rule, filters []Filter, resource TerraformResource, log LoggingFunction) string {
