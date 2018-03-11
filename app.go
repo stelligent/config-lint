@@ -28,6 +28,7 @@ type Rule struct {
 }
 
 type RuleSet struct {
+	Type        string
 	Description string
 	Files       []string
 	Rules       []Rule
@@ -84,8 +85,6 @@ func makeRulesList(ruleIds string) []string {
 }
 
 func main() {
-	kubernetesFiles := flag.Bool("kubernetes", false, "Process kubernetes files")
-	terraformFiles := flag.Bool("terraform", false, "Process terraform files")
 	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
 	rulesFilename := flag.String("rules", "./rules/terraform.yml", "Rules file")
 	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
@@ -100,21 +99,28 @@ func main() {
 
 	ruleSet := MustParseRules(loadTerraformRules(*rulesFilename))
 
-	if *kubernetesFiles {
-		if *searchExpression != "" {
-			kubernetesSearch(flag.Args(), *searchExpression, logger)
-		} else {
-			report := kubernetes(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids), logger)
-			exitCode = printReport(report, *queryExpression)
+	switch ruleSet.Type {
+	case "Kubernetes":
+		{
+			if *searchExpression != "" {
+				kubernetesSearch(flag.Args(), *searchExpression, logger)
+			} else {
+				report := kubernetes(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids), logger)
+				exitCode = printReport(report, *queryExpression)
+			}
 		}
-	}
-	if *terraformFiles {
-		if *searchExpression != "" {
-			terraformSearch(flag.Args(), *searchExpression, logger)
-		} else {
-			report := terraform(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids), logger)
-			exitCode = printReport(report, *queryExpression)
+	case "Terraform":
+		{
+			if *searchExpression != "" {
+				terraformSearch(flag.Args(), *searchExpression, logger)
+			} else {
+				report := terraform(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids), logger)
+				exitCode = printReport(report, *queryExpression)
+			}
 		}
+	default:
+		fmt.Printf("Type not supported: %s\n", ruleSet.Type)
+		exitCode = 1
 	}
 	os.Exit(exitCode)
 }

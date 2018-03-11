@@ -1,5 +1,6 @@
 Version: 1
 Description: Rules for Kubernetes spec files
+Type: Kubernetes
 Files:
   - "*.yml"
 Rules:

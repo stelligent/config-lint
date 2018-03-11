@@ -15,13 +15,13 @@ The program currently supports Terraform and Kubernetes files.
 ## Validate Terraform files
 
 ```
-./config-lint --terraform files/*
+./config-lint --rules rules/terraform.yml files/*
 ```
 
 ## Validate Kubernetes files
 
 ```
-./config-lint --kubernetes files/*
+./config-lint --rules rules/kubernetes.yml files/*
 ```
 
 
@@ -49,6 +49,7 @@ For example, to test that an AWS instance type has one of two values:
 ```
 Version: 1
 Description: Example rules
+Type: Terraform
 Files:
   - "*.tf"
 Rules:
@@ -68,6 +69,7 @@ This could also be done by using the or operation with two different filters:
 ```
 Version: 1
 Description: Example rules
+Type: Terraform
 Files:
   - "*.tf"
 Rules:

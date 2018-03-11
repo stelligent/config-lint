@@ -1,5 +1,6 @@
 Version: 1
 Description: Rules for Terraform configuration files
+Type: Terraform
 Files:
   - "*.tf"
 Rules:
