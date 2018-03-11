@@ -50,6 +50,11 @@ type ValidationReport struct {
 	FilesScanned []string
 }
 
+type Linter interface {
+	Validate(filenames []string, ruleSet RuleSet, tags []string, ruleIds []string) ValidationReport
+	Search(filenames []string, searchExpression string)
+}
+
 func printReport(report ValidationReport, queryExpression string) int {
 	jsonData, err := json.MarshalIndent(report, "", "  ")
 	if err != nil {
@@ -88,6 +93,18 @@ func makeRulesList(ruleIds string) []string {
 	return strings.Split(ruleIds, ",")
 }
 
+func makeLinter(linterType string, log LoggingFunction) Linter {
+	switch linterType {
+	case "Kubernetes":
+		return KubernetesLinter{Log: log}
+	case "Terraform":
+		return TerraformLinter{Log: log}
+	default:
+		fmt.Printf("Type not supported: %s\n", linterType)
+		return nil
+	}
+}
+
 func main() {
 	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
 	rulesFilename := flag.String("rules", "./rules/terraform.yml", "Rules file")
@@ -97,34 +114,17 @@ func main() {
 	searchExpression := flag.String("search", "", "JMESPath expression to evaluation against the files")
 	flag.Parse()
 
-	logger := makeLogger(*verboseLogging)
-
 	exitCode := 0
 
 	ruleSet := MustParseRules(loadTerraformRules(*rulesFilename))
-
-	switch ruleSet.Type {
-	case "Kubernetes":
-		{
-			if *searchExpression != "" {
-				kubernetesSearch(flag.Args(), *searchExpression, logger)
-			} else {
-				report := kubernetes(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids), logger)
-				exitCode = printReport(report, *queryExpression)
-			}
+	linter := makeLinter(ruleSet.Type, makeLogger(*verboseLogging))
+	if linter != nil {
+		if *searchExpression != "" {
+			linter.Search(flag.Args(), *searchExpression)
+		} else {
+			report := linter.Validate(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids))
+			exitCode = printReport(report, *queryExpression)
 		}
-	case "Terraform":
-		{
-			if *searchExpression != "" {
-				terraformSearch(flag.Args(), *searchExpression, logger)
-			} else {
-				report := terraform(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids), logger)
-				exitCode = printReport(report, *queryExpression)
-			}
-		}
-	default:
-		fmt.Printf("Type not supported: %s\n", ruleSet.Type)
-		exitCode = 1
 	}
 	os.Exit(exitCode)
 }

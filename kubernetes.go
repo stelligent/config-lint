@@ -6,6 +6,10 @@ import (
 	"io/ioutil"
 )
 
+type KubernetesLinter struct {
+	Log LoggingFunction
+}
+
 // TODO - is it really necessary to have two types?
 type KubernetesResource = TerraformResource
 
@@ -85,7 +89,7 @@ func validateKubernetesResources(report *ValidationReport, resources []Kubernete
 	}
 }
 
-func kubernetes(filenames []string, ruleSet RuleSet, tags []string, ruleIds []string, log LoggingFunction) ValidationReport {
+func (l KubernetesLinter) Validate(filenames []string, ruleSet RuleSet, tags []string, ruleIds []string) ValidationReport {
 	report := ValidationReport{
 		Violations:   make(map[string]([]Violation), 0),
 		FilesScanned: make([]string, 0),
@@ -93,19 +97,19 @@ func kubernetes(filenames []string, ruleSet RuleSet, tags []string, ruleIds []st
 	rules := filterRulesById(ruleSet.Rules, ruleIds)
 	for _, filename := range filenames {
 		if shouldIncludeFile(ruleSet.Files, filename) {
-			log(fmt.Sprintf("Processing %s", filename))
-			resources := loadKubernetesResources(filename, log)
-			validateKubernetesResources(&report, resources, rules, tags, log)
+			l.Log(fmt.Sprintf("Processing %s", filename))
+			resources := loadKubernetesResources(filename, l.Log)
+			validateKubernetesResources(&report, resources, rules, tags, l.Log)
 			report.FilesScanned = append(report.FilesScanned, filename)
 		}
 	}
 	return report
 }
 
-func kubernetesSearch(filenames []string, searchExpression string, log LoggingFunction) {
+func (l KubernetesLinter) Search(filenames []string, searchExpression string) {
 	for _, filename := range filenames {
-		log(fmt.Sprintf("Searching %s", filename))
-		resources := loadKubernetesResources(filename, log)
+		l.Log(fmt.Sprintf("Searching %s", filename))
+		resources := loadKubernetesResources(filename, l.Log)
 		for _, resource := range resources {
 			v, err := searchData(searchExpression, resource.Properties)
 			if err == nil && v != "null" {

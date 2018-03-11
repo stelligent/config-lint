@@ -8,6 +8,10 @@ import (
 	"io/ioutil"
 )
 
+type TerraformLinter struct {
+	Log LoggingFunction
+}
+
 type TerraformResource struct {
 	Id         string
 	Type       string
@@ -116,7 +120,7 @@ func validateTerraformResources(report *ValidationReport, resources []TerraformR
 	}
 }
 
-func terraform(filenames []string, ruleSet RuleSet, tags []string, ruleIds []string, log LoggingFunction) ValidationReport {
+func (l TerraformLinter) Validate(filenames []string, ruleSet RuleSet, tags []string, ruleIds []string) ValidationReport {
 	report := ValidationReport{
 		Violations:   make(map[string]([]Violation), 0),
 		FilesScanned: make([]string, 0),
@@ -124,18 +128,18 @@ func terraform(filenames []string, ruleSet RuleSet, tags []string, ruleIds []str
 	rules := filterRulesById(ruleSet.Rules, ruleIds)
 	for _, filename := range filenames {
 		if shouldIncludeFile(ruleSet.Files, filename) {
-			resources := loadTerraformResources(filename, log)
-			validateTerraformResources(&report, resources, rules, tags, log)
+			resources := loadTerraformResources(filename, l.Log)
+			validateTerraformResources(&report, resources, rules, tags, l.Log)
 			report.FilesScanned = append(report.FilesScanned, filename)
 		}
 	}
 	return report
 }
 
-func terraformSearch(filenames []string, searchExpression string, log LoggingFunction) {
+func (l TerraformLinter) Search(filenames []string, searchExpression string) {
 	for _, filename := range filenames {
-		log(fmt.Sprintf("Searching %s", filename))
-		resources := loadTerraformResources(filename, log)
+		l.Log(fmt.Sprintf("Searching %s", filename))
+		resources := loadTerraformResources(filename, l.Log)
 		for _, resource := range resources {
 			v, err := searchData(searchExpression, resource.Properties)
 			if err == nil && v != "null" {
