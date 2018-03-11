@@ -112,7 +112,9 @@ func (l KubernetesLinter) Search(filenames []string, searchExpression string) {
 		resources := loadKubernetesResources(filename, l.Log)
 		for _, resource := range resources {
 			v, err := searchData(searchExpression, resource.Properties)
-			if err == nil && v != "null" {
+			if err != nil {
+				fmt.Println(err)
+			} else {
 				fmt.Printf("%s: %s\n", filename, v)
 			}
 		}
