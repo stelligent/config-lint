@@ -136,15 +136,15 @@ Example:
 Example:
 ```
 ...
-  - id: R1
-    message: Instance type should not be c4.large
-    resource: aws_instance
+  - id: SG1
+    resource: aws_security_group
+    message: Security group should not allow ingress from 0.0.0.0/0
+    severity: FAILURE
     filters:
       - type: value
-        key: instance_type
+        key: "ingress[].cidr_blocks[] | [0]"
         op: ne
-        value: c4.large
-    severity: WARNING
+        value: "0.0.0.0/0"
 ...
 ```
 
