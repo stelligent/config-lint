@@ -100,10 +100,10 @@ The program outputs a JSON string with the results. The JSON object has the foll
 * Failures - a list of rules with severity FAILURE that were triggered
 * AllViolations - a list of rules with any severity that were triggered (in case you use something other than WARNING or FAILURE)
 
-You can limit the output by specifying a JMESPath expression for the --query command line option. For example, if you just wanted to see the Failures, you can do the following:
+You can limit the output by specifying a JMESPath expression for the --query command line option. For example, if you just wanted to see the RecordIds for failed checks, you can do the following:
 
 ```
-./config-lint --terraform --rules rules/terraform.yml --query 'Failures' files/*
+./config-lint --rules rules/terraform.yml --query 'Failures[].ResourceId' files/*
 ```
 
 # Exit Code
