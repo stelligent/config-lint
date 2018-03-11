@@ -109,13 +109,7 @@ func validateTerraformResources(report *ValidationReport, resources []TerraformR
 						Message:      rule.Message,
 						Filename:     resource.Filename,
 					}
-					report.AllViolations = append(report.AllViolations, v)
-					if status == "WARNING" {
-						report.Warnings = append(report.Warnings, v)
-					}
-					if status == "FAILURE" {
-						report.Failures = append(report.Failures, v)
-					}
+					report.Violations[status] = append(report.Violations[status], v)
 				}
 			}
 		}
@@ -123,7 +117,10 @@ func validateTerraformResources(report *ValidationReport, resources []TerraformR
 }
 
 func terraform(filenames []string, ruleSet RuleSet, tags []string, ruleIds []string, log LoggingFunction) ValidationReport {
-	var report ValidationReport
+	report := ValidationReport{
+		Violations:   make(map[string]([]Violation), 0),
+		FilesScanned: make([]string, 0),
+	}
 	rules := filterRulesById(ruleSet.Rules, ruleIds)
 	for _, filename := range filenames {
 		if shouldIncludeFile(ruleSet.Files, filename) {

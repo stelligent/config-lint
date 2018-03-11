@@ -121,3 +121,12 @@ Rules:
           key: instance_type
           op: eq
           value: c4.large
+  - id: SG1
+    resource: aws_security_group
+    message: Security group should not allow ingress from 0.0.0.0/0
+    severity: FAILURE
+    filters:
+      - type: value
+        key: "ingress[].cidr_blocks[] | [0]"
+        op: ne
+        value: "0.0.0.0/0"

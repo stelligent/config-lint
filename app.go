@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/ghodss/yaml"
 	"os"
 	"strings"
 )
@@ -45,26 +46,29 @@ type Violation struct {
 }
 
 type ValidationReport struct {
-	Warnings      []Violation
-	Failures      []Violation
-	AllViolations []Violation
-	FilesScanned  []string
+	Violations   map[string]([]Violation)
+	FilesScanned []string
 }
 
 func printReport(report ValidationReport, queryExpression string) int {
+	jsonData, err := json.MarshalIndent(report, "", "  ")
+	if err != nil {
+		panic(err)
+	}
 	if queryExpression != "" {
-		v := searchData(queryExpression, report)
+		var data interface{}
+		err = yaml.Unmarshal(jsonData, &data)
+		if err != nil {
+			panic(err)
+		}
+		v := searchData(queryExpression, data)
 		if v != "null" {
 			fmt.Println(v)
 		}
 	} else {
-		jsonData, err := json.MarshalIndent(report, "", "  ")
-		if err != nil {
-			panic(err)
-		}
 		fmt.Println(string(jsonData))
 	}
-	if len(report.Failures) > 0 {
+	if len(report.Violations["FAILURE"]) > 0 {
 		return 1
 	}
 	return 0

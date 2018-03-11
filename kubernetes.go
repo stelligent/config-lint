@@ -78,13 +78,7 @@ func validateKubernetesResources(report *ValidationReport, resources []Kubernete
 						Message:      rule.Message,
 						Filename:     resource.Filename,
 					}
-					report.AllViolations = append(report.AllViolations, v)
-					if status == "WARNING" {
-						report.Warnings = append(report.Warnings, v)
-					}
-					if status == "FAILURE" {
-						report.Failures = append(report.Failures, v)
-					}
+					report.Violations[status] = append(report.Violations[status], v)
 				}
 			}
 		}
