@@ -5,17 +5,17 @@ import (
 	"github.com/jmespath/go-jmespath"
 )
 
-func searchData(expression string, data interface{}) string {
+func searchData(expression string, data interface{}) (string, error) {
 	if len(expression) == 0 {
-		return "null"
+		return "null", nil
 	}
 	result, err := jmespath.Search(expression, data)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 	toJSON, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	return string(toJSON)
+	return string(toJSON), nil
 }

@@ -104,8 +104,8 @@ func kubernetesSearch(filenames []string, searchExpression string, log LoggingFu
 		log(fmt.Sprintf("Searching %s", filename))
 		resources := loadKubernetesResources(filename, log)
 		for _, resource := range resources {
-			v := searchData(searchExpression, resource.Properties)
-			if v != "null" {
+			v, err := searchData(searchExpression, resource.Properties)
+			if err == nil && v != "null" {
 				fmt.Printf("%s: %s\n", filename, v)
 			}
 		}

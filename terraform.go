@@ -137,8 +137,8 @@ func terraformSearch(filenames []string, searchExpression string, log LoggingFun
 		log(fmt.Sprintf("Searching %s", filename))
 		resources := loadTerraformResources(filename, log)
 		for _, resource := range resources {
-			v := searchData(searchExpression, resource.Properties)
-			if v != "null" {
+			v, err := searchData(searchExpression, resource.Properties)
+			if err == nil && v != "null" {
 				fmt.Printf("%s: %s\n", filename, v)
 			}
 		}

@@ -61,8 +61,8 @@ func printReport(report ValidationReport, queryExpression string) int {
 		if err != nil {
 			panic(err)
 		}
-		v := searchData(queryExpression, data)
-		if v != "null" {
+		v, err := searchData(queryExpression, data)
+		if err == nil && v != "null" {
 			fmt.Println(v)
 		}
 	} else {

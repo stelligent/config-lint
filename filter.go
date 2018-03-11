@@ -5,9 +5,12 @@ import (
 )
 
 func searchAndMatch(filter Filter, resource TerraformResource, log LoggingFunction) bool {
-	o := unquoted(searchData(filter.Key, resource.Properties))
-	status := isMatch(o, filter.Op, filter.Value)
-	log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s", filter.Key, o, filter.Op, filter.Value))
+	v, err := searchData(filter.Key, resource.Properties)
+	if err != nil {
+		panic(err)
+	}
+	status := isMatch(unquoted(v), filter.Op, filter.Value)
+	log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s", filter.Key, v, filter.Op, filter.Value))
 	log(fmt.Sprintf("ResourceId: %s Type: %s %t",
 		resource.Id,
 		resource.Type,

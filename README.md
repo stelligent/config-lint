@@ -304,3 +304,4 @@ Lots to do. This is just a proof-of-concept.
 * Support multiple rules files, or a rules directory
 * Add a --table option which uses tablewriter for more readable report
 * Not operator takes a list (to match the way Cloud Custodian works), should make sure size == 1
+* JMESPath.Search sometimes returns unexpected error when there are no matches - need to work on error handling
