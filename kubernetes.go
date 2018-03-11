@@ -86,7 +86,10 @@ func validateKubernetesResources(report *ValidationReport, resources []Kubernete
 }
 
 func kubernetes(filenames []string, ruleSet RuleSet, tags []string, ruleIds []string, log LoggingFunction) ValidationReport {
-	var report ValidationReport
+	report := ValidationReport{
+		Violations:   make(map[string]([]Violation), 0),
+		FilesScanned: make([]string, 0),
+	}
 	rules := filterRulesById(ruleSet.Rules, ruleIds)
 	for _, filename := range filenames {
 		if shouldIncludeFile(ruleSet.Files, filename) {
