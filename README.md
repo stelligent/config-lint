@@ -25,18 +25,28 @@ The program currently supports Terraform and Kubernetes files.
 ```
 
 
-# Rules
+# Rules File
 
-The rules file includes a list of objects with the following attributes:
+The rules file specifies what files to process, and what validations to perform.
+
+## Attributes for the Rule Set
+
+* Version: current ignored
+* Description: text description for the file, not currently used
+* Type: should be 'Terraform' or 'Kubernetes'
+* Files: filenames must match one of these patterns to be processed by this set of rules
+* Rules: a list of rules, see next section
+
+## Attributes for each Rule
 
 * id: unique identifier for the rule
 * message: string to be printed when a validation error is detected
 * resource: the resource type to which the rule will be applied
 * severity: whether the validation generates a WARNING or a FAILURE
-* filters: a list of filters used to detect validation errors
+* filters: a list of filters used to detect validation errors, see next section
 * tags: optional list of tags, command line has option to limit scans to a subset of tags
 
-# Filters
+## Attributes for each Filter
 
 Each filter contains the following attributes:
 
@@ -45,7 +55,9 @@ Each filter contains the following attributes:
 * op: the operation to be performed on the data returned by searching for the JMES path
 * value: needed for most operations
 
-For example, to test that an AWS instance type has one of two values:
+## Examples
+
+To test that an AWS instance type has one of two values:
 ```
 Version: 1
 Description: Example rules
@@ -91,6 +103,147 @@ Rules:
 
 The filters and operations are modeled after those used by CloudCustodian: http://capitalone.github.io/cloud-custodian/docs/
 
+
+## Operations supported for a Filter
+
+* eq - Equals
+
+Example:
+```
+...
+  - id: VOLUME1
+    resource: aws_ebs_volume
+    message: EBS Volumes must be encrypted
+    severity: FAILURE
+    filters:
+      - type: value
+        key: encrypted
+        op: eq
+        value: true
+...
+```
+
+* ne - Not equals
+
+Example:
+```
+...
+  - id: R1
+    message: Instance type should not be c4.large
+    resource: aws_instance
+    filters:
+      - type: value
+        key: instance_type
+        op: ne
+        value: c4.large
+    severity: WARNING
+...
+```
+
+* in - In list of values
+
+Example:
+```
+...
+  - id: R1
+    message: Instance type should be t2.micro or m3.medium
+    resource: aws_instance
+    filters:
+      - type: value
+        key: instance_type
+        op: in
+        value: t2.micro,m3.medium
+    severity: WARNING
+...
+```
+
+* notin - Not in list of values
+
+* present - Attribute is present
+
+Example:
+```
+...
+  - id: R6
+    message: Department tag is required
+    resource: aws_instance
+    filters:
+      - type: value
+        key: "tags[].Department | [0]"
+        op: present
+    severity: FAILURE
+...
+```
+
+* absent - Attribute is not present
+
+* contains - Attribute contains a substring
+
+* regex - Attribute matches a regular expression
+
+* not - Logical not of another filter
+
+Example:
+```
+...
+  - id: NOTTEST
+    resource: aws_instance
+    message: Should not have instance type of c4.large
+    severity: WARNING
+    filters:
+      - not:
+        - type: value
+          key: instance_type
+          op: eq
+          value: c4.large
+...
+```
+
+* and - Logical and of a list of filters
+
+Exmaple:
+```
+...
+  - id: ANDTEST
+    resource: aws_instance
+    message: Should have both Project and Department tags
+    severity: WARNING
+    filters:
+      - and:
+        - type: value
+          key: "tags[].Department | [0]"
+          op: present
+        - type: value
+          key: "tags[].Project | [0]"
+          op: present
+    tags:
+      - and-test
+...
+```
+
+* or - Logical or  of a list of filters
+
+Example:
+
+```
+...
+  - id: ORTEST
+    resource: aws_instance
+    message: Should have instance_type of t2.micro or m3.medium
+    severity: WARNING
+    filters:
+      - or:
+        - type: value
+          key: instance_type
+          op: eq
+          value: t2.micro
+        - type: value
+          key: instance_type
+          op: eq
+          value: m3.medium
+...
+```
+
 # Output
 
 The program outputs a JSON string with the results. The JSON object has the following attributes:
@@ -99,6 +252,8 @@ The program outputs a JSON string with the results. The JSON object has the foll
 * Warnings - a list of rules with severity WARNING that were triggered
 * Failures - a list of rules with severity FAILURE that were triggered
 * AllViolations - a list of rules with any severity that were triggered (in case you use something other than WARNING or FAILURE)
+
+## Using --query to limit the output
 
 You can limit the output by specifying a JMESPath expression for the --query command line option. For example, if you just wanted to see the RecordIds for failed checks, you can do the following:
 
@@ -138,3 +293,5 @@ Lots to do. This is just a proof-of-concept.
 * Instead of iterating through rules, filters, then resources, make resources the outer loop, so results are reports by resource id
 * Add examples to this file for Kubernetes files
 * Support multiple rules files, or a rules directory
+* Add a --table option which uses tablewriter for more readable report
+* Not operator takes a list (to match the way Cloud Custodian works), should make sure size == 1
