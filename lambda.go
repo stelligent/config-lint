@@ -32,7 +32,7 @@ func printValue(expression string, data interface{}) {
 	fmt.Println("value:", value)
 }
 
-func noLog(string) {
+func log(string) {
 }
 
 func handler(configEvent events.ConfigEvent) (string, error) {
@@ -51,23 +51,25 @@ func handler(configEvent events.ConfigEvent) (string, error) {
 		fmt.Println("configurationItem:", configurationItem)
 		fmt.Println("configuration:", configurationItem.Configuration)
 
-		//printValue("@", configurationItem.Configuration)
-		printValue("provisionedThroughput", configurationItem.Configuration)
-		printValue("provisionedThroughput.writeCapacityUnits", configurationItem.Configuration)
-		printValue("provisionedThroughput.readCapacityUnits", configurationItem.Configuration)
-		printValue("tableName", configurationItem.Configuration)
-		printValue("tableStatus", configurationItem.Configuration)
+		printValue("@", configurationItem.Configuration)
 
-		ruleSet := MustParseRules(loadRules("./example-files/rules/aws-config.yml")) // FIXME remove Terraform from function name
+		complianceType := "NOT_APPLICABLE"
+		ruleSet := MustParseRules(loadRules("./example-files/rules/aws-config.yml"))
 		for _, rule := range ruleSet.Rules {
-			for _, filter := range rule.Filters {
-				resource := KubernetesResource{
-					Id:         configurationItem.ResourceId,
-					Type:       configurationItem.ResourceType,
-					Properties: configurationItem.Configuration,
+			if rule.Resource == configurationItem.ResourceType {
+				complianceType = "COMPLIANT"
+				for _, filter := range rule.Filters {
+					resource := KubernetesResource{
+						Id:         configurationItem.ResourceId,
+						Type:       configurationItem.ResourceType,
+						Properties: configurationItem.Configuration,
+					}
+					status := applyFilter(rule, filter, resource, log)
+					fmt.Println(status, resource)
+					if status != "OK" {
+						complianceType = status
+					}
 				}
-				status := applyFilter(rule, filter, resource, noLog)
-				fmt.Println(status, resource)
 			}
 		}
 
@@ -76,7 +78,7 @@ func handler(configEvent events.ConfigEvent) (string, error) {
 				&configservice.Evaluation{
 					ComplianceResourceType: aws.String(configurationItem.ResourceType),
 					ComplianceResourceId:   aws.String(configurationItem.ResourceId),
-					ComplianceType:         aws.String("COMPLIANT"),
+					ComplianceType:         aws.String(complianceType),
 					OrderingTimestamp:      aws.Time(time.Now()),
 				},
 			},

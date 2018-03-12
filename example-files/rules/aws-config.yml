@@ -9,7 +9,7 @@ Rules:
       - type: value
         key: provisionedThroughput.writeCapacityUnits
         op: present
-    severity: FAILURE
+    severity: NON_COMPLIANT
   - id: CFG2
     message: Table status must have provisionedThroughput
     resource: AWS::DynamoDB::Table
@@ -17,4 +17,4 @@ Rules:
       - type: value
         key: provisionedThroughput.readCapacityUnits
         op: present
-    severity: FAILURE
+    severity: NON_COMPLIANT
