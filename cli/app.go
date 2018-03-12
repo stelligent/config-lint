@@ -5,57 +5,17 @@ import (
 	"flag"
 	"fmt"
 	"github.com/ghodss/yaml"
+	"github.com/lhitchon/config-lint/filter"
 	"os"
 	"strings"
 )
 
-type Filter struct {
-	Type  string
-	Key   string
-	Op    string
-	Value string
-	Or    []Filter
-	And   []Filter
-	Not   []Filter
-}
-
-type Rule struct {
-	Id       string
-	Message  string
-	Severity string
-	Resource string
-	Filters  []Filter
-	Tags     []string
-}
-
-type RuleSet struct {
-	Type        string
-	Description string
-	Files       []string
-	Rules       []Rule
-	Version     string
-}
-
-type Violation struct {
-	RuleId       string
-	ResourceId   string
-	ResourceType string
-	Status       string
-	Message      string
-	Filename     string
-}
-
-type ValidationReport struct {
-	Violations   map[string]([]Violation)
-	FilesScanned []string
-}
-
 type Linter interface {
-	Validate(filenames []string, ruleSet RuleSet, tags []string, ruleIds []string) ValidationReport
+	Validate(filenames []string, ruleSet filter.RuleSet, tags []string, ruleIds []string) filter.ValidationReport
 	Search(filenames []string, searchExpression string)
 }
 
-func printReport(report ValidationReport, queryExpression string) int {
+func printReport(report filter.ValidationReport, queryExpression string) int {
 	jsonData, err := json.MarshalIndent(report, "", "  ")
 	if err != nil {
 		panic(err)
@@ -66,7 +26,7 @@ func printReport(report ValidationReport, queryExpression string) int {
 		if err != nil {
 			panic(err)
 		}
-		v, err := searchData(queryExpression, data)
+		v, err := filter.SearchData(queryExpression, data)
 		if err == nil && v != "null" {
 			fmt.Println(v)
 		}
@@ -93,7 +53,7 @@ func makeRulesList(ruleIds string) []string {
 	return strings.Split(ruleIds, ",")
 }
 
-func makeLinter(linterType string, log LoggingFunction) Linter {
+func makeLinter(linterType string, log filter.LoggingFunction) Linter {
 	switch linterType {
 	case "Kubernetes":
 		return KubernetesLinter{Log: log}
@@ -105,7 +65,7 @@ func makeLinter(linterType string, log LoggingFunction) Linter {
 	}
 }
 
-func command_line_main() {
+func main() {
 	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
 	rulesFilename := flag.String("rules", "./rules/terraform.yml", "Rules file")
 	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
@@ -116,8 +76,8 @@ func command_line_main() {
 
 	exitCode := 0
 
-	ruleSet := MustParseRules(loadRules(*rulesFilename))
-	linter := makeLinter(ruleSet.Type, makeLogger(*verboseLogging))
+	ruleSet := filter.MustParseRules(filter.LoadRules(*rulesFilename))
+	linter := makeLinter(ruleSet.Type, filter.MakeLogger(*verboseLogging))
 	if linter != nil {
 		if *searchExpression != "" {
 			linter.Search(flag.Args(), *searchExpression)

@@ -1,4 +1,4 @@
-package main
+package filter
 
 import (
 	"encoding/json"
@@ -23,13 +23,13 @@ func TestSimple(t *testing.T) {
 			},
 		},
 	}
-	resource := TerraformResource{
+	resource := Resource{
 		Id:         "a_test_resource",
 		Type:       "aws_instance",
 		Properties: map[string]interface{}{"instance_type": "t2.micro"},
 		Filename:   "test.tf",
 	}
-	status := applyFilter(rule, rule.Filters[0], resource, testLogging)
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "OK" {
 		t.Error("Expecting simple rule to match")
 	}
@@ -60,13 +60,13 @@ func TestOrToMatch(t *testing.T) {
 			},
 		},
 	}
-	resource := TerraformResource{
+	resource := Resource{
 		Id:         "a_test_resource",
 		Type:       "aws_instance",
 		Properties: map[string]interface{}{"instance_type": "t2.micro"},
 		Filename:   "test.tf",
 	}
-	status := applyFilter(rule, rule.Filters[0], resource, testLogging)
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "OK" {
 		t.Error("Expecting or to return OK")
 	}
@@ -97,13 +97,13 @@ func TestOrToNotMatch(t *testing.T) {
 			},
 		},
 	}
-	resource := TerraformResource{
+	resource := Resource{
 		Id:         "a_test_resource",
 		Type:       "aws_instance",
 		Properties: map[string]interface{}{"instance_type": "m3.medium"},
 		Filename:   "test.tf",
 	}
-	status := applyFilter(rule, rule.Filters[0], resource, testLogging)
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting or to return FAILURE")
 	}
@@ -134,7 +134,7 @@ func TestAndToMatch(t *testing.T) {
 			},
 		},
 	}
-	resource := TerraformResource{
+	resource := Resource{
 		Id:   "a_test_resource",
 		Type: "aws_instance",
 		Properties: map[string]interface{}{
@@ -143,7 +143,7 @@ func TestAndToMatch(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := applyFilter(rule, rule.Filters[0], resource, testLogging)
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "OK" {
 		t.Error("Expecting and to return OK")
 	}
@@ -174,7 +174,7 @@ func TestAndToNotMatch(t *testing.T) {
 			},
 		},
 	}
-	resource := TerraformResource{
+	resource := Resource{
 		Id:   "a_test_resource",
 		Type: "aws_instance",
 		Properties: map[string]interface{}{
@@ -183,7 +183,7 @@ func TestAndToNotMatch(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := applyFilter(rule, rule.Filters[0], resource, testLogging)
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting and to return FAILURE")
 	}
@@ -208,7 +208,7 @@ func TestNotToMatch(t *testing.T) {
 			},
 		},
 	}
-	resource := TerraformResource{
+	resource := Resource{
 		Id:   "a_test_resource",
 		Type: "aws_instance",
 		Properties: map[string]interface{}{
@@ -216,7 +216,7 @@ func TestNotToMatch(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := applyFilter(rule, rule.Filters[0], resource, testLogging)
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "OK" {
 		t.Error("Expecting no to return OK")
 	}
@@ -241,7 +241,7 @@ func TestNotToNotMatch(t *testing.T) {
 			},
 		},
 	}
-	resource := TerraformResource{
+	resource := Resource{
 		Id:   "a_test_resource",
 		Type: "aws_instance",
 		Properties: map[string]interface{}{
@@ -249,7 +249,7 @@ func TestNotToNotMatch(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := applyFilter(rule, rule.Filters[0], resource, testLogging)
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting no to return FAILURE")
 	}
@@ -284,7 +284,7 @@ func TestNestedNot(t *testing.T) {
 			},
 		},
 	}
-	resource := TerraformResource{
+	resource := Resource{
 		Id:   "a_test_resource",
 		Type: "aws_instance",
 		Properties: map[string]interface{}{
@@ -292,7 +292,7 @@ func TestNestedNot(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := applyFilter(rule, rule.Filters[0], resource, testLogging)
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting nested boolean to return FAILURE")
 	}
@@ -327,7 +327,7 @@ func TestNestedBooleans(t *testing.T) {
 			},
 		},
 	}
-	resource := TerraformResource{
+	resource := Resource{
 		Id:         "a_test_resource",
 		Type:       "aws_instance",
 		Properties: map[string]interface{}{},
@@ -356,7 +356,7 @@ func TestNestedBooleans(t *testing.T) {
 	if err != nil {
 		t.Error("Error parsing resource JSON")
 	}
-	status := applyFilter(rule, rule.Filters[0], resource, testLogging)
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "NOT_COMPLIANT" {
 		t.Error("Expecting nested boolean to return NOT_COMPLIANT")
 	}

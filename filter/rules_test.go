@@ -1,4 +1,4 @@
-package main
+package filter
 
 import (
 	"testing"
@@ -38,7 +38,7 @@ func TestParseRules(t *testing.T) {
 
 func TestFilterRulesByTag(t *testing.T) {
 	tags := []string{"s3"}
-	r := filterRulesByTag(MustParseRules(content).Rules, tags)
+	r := FilterRulesByTag(MustParseRules(content).Rules, tags)
 	if len(r) != 1 {
 		t.Error("Expected filterRulesByTag to return 1 rule")
 	}
@@ -49,7 +49,7 @@ func TestFilterRulesByTag(t *testing.T) {
 
 func TestFilterRulesById(t *testing.T) {
 	ids := []string{"TEST2"}
-	r := filterRulesById(MustParseRules(content).Rules, ids)
+	r := FilterRulesById(MustParseRules(content).Rules, ids)
 	if len(r) != 1 {
 		t.Error("Expected filterRulesById to return 1 rule")
 	}

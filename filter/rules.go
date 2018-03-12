@@ -1,11 +1,11 @@
-package main
+package filter
 
 import (
 	"github.com/ghodss/yaml"
 	"io/ioutil"
 )
 
-func loadRules(filename string) string {
+func LoadRules(filename string) string {
 	rules, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
@@ -22,7 +22,7 @@ func MustParseRules(rules string) RuleSet {
 	return r
 }
 
-func filterRulesByTag(rules []Rule, tags []string) []Rule {
+func FilterRulesByTag(rules []Rule, tags []string) []Rule {
 	filteredRules := make([]Rule, 0)
 	for _, rule := range rules {
 		if tags == nil || listsIntersect(tags, rule.Tags) {
@@ -32,7 +32,7 @@ func filterRulesByTag(rules []Rule, tags []string) []Rule {
 	return filteredRules
 }
 
-func filterRulesById(rules []Rule, ruleIds []string) []Rule {
+func FilterRulesById(rules []Rule, ruleIds []string) []Rule {
 	if len(ruleIds) == 0 {
 		return rules
 	}

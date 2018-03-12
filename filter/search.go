@@ -1,11 +1,11 @@
-package main
+package filter
 
 import (
 	"encoding/json"
 	"github.com/jmespath/go-jmespath"
 )
 
-func searchData(expression string, data interface{}) (string, error) {
+func SearchData(expression string, data interface{}) (string, error) {
 	if len(expression) == 0 {
 		return "null", nil
 	}

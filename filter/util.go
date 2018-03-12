@@ -1,4 +1,4 @@
-package main
+package filter
 
 import (
 	"path/filepath"
@@ -33,7 +33,7 @@ func listsIntersect(list1 []string, list2 []string) bool {
 	return false
 }
 
-func shouldIncludeFile(patterns []string, filename string) bool {
+func ShouldIncludeFile(patterns []string, filename string) bool {
 	for _, pattern := range patterns {
 		_, file := filepath.Split(filename)
 		matched, err := filepath.Match(pattern, file)

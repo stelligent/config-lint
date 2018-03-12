@@ -1,11 +1,11 @@
-package main
+package filter
 
 import (
 	"fmt"
 )
 
-func searchAndMatch(filter Filter, resource TerraformResource, log LoggingFunction) bool {
-	v, err := searchData(filter.Key, resource.Properties)
+func searchAndMatch(filter Filter, resource Resource, log LoggingFunction) bool {
+	v, err := SearchData(filter.Key, resource.Properties)
 	if err != nil {
 		panic(err)
 	}
@@ -18,7 +18,7 @@ func searchAndMatch(filter Filter, resource TerraformResource, log LoggingFuncti
 	return match
 }
 
-func orOperation(filters []Filter, resource TerraformResource, log LoggingFunction) bool {
+func orOperation(filters []Filter, resource Resource, log LoggingFunction) bool {
 	for _, childFilter := range filters {
 		if booleanOperation(childFilter, resource, log) {
 			return true
@@ -27,7 +27,7 @@ func orOperation(filters []Filter, resource TerraformResource, log LoggingFuncti
 	return false
 }
 
-func andOperation(filters []Filter, resource TerraformResource, log LoggingFunction) bool {
+func andOperation(filters []Filter, resource Resource, log LoggingFunction) bool {
 	for _, childFilter := range filters {
 		if !booleanOperation(childFilter, resource, log) {
 			return false
@@ -36,7 +36,7 @@ func andOperation(filters []Filter, resource TerraformResource, log LoggingFunct
 	return true
 }
 
-func notOperation(filters []Filter, resource TerraformResource, log LoggingFunction) bool {
+func notOperation(filters []Filter, resource Resource, log LoggingFunction) bool {
 	for _, childFilter := range filters {
 		if booleanOperation(childFilter, resource, log) {
 			return false
@@ -45,7 +45,7 @@ func notOperation(filters []Filter, resource TerraformResource, log LoggingFunct
 	return true
 }
 
-func booleanOperation(filter Filter, resource TerraformResource, log LoggingFunction) bool {
+func booleanOperation(filter Filter, resource Resource, log LoggingFunction) bool {
 	if filter.Or != nil && len(filter.Or) > 0 {
 		return orOperation(filter.Or, resource, log)
 	}
@@ -58,7 +58,7 @@ func booleanOperation(filter Filter, resource TerraformResource, log LoggingFunc
 	return searchAndMatch(filter, resource, log)
 }
 
-func applyFilter(rule Rule, filter Filter, resource TerraformResource, log LoggingFunction) string {
+func ApplyFilter(rule Rule, filter Filter, resource Resource, log LoggingFunction) string {
 	status := "OK"
 	if !booleanOperation(filter, resource, log) {
 		status = rule.Severity

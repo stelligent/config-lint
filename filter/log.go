@@ -1,10 +1,10 @@
-package main
+package filter
 
 import "fmt"
 
 type LoggingFunction func(string)
 
-func makeLogger(verbose bool) LoggingFunction {
+func MakeLogger(verbose bool) LoggingFunction {
 	if verbose {
 		return func(message string) {
 			fmt.Println(message)

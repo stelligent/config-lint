@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/configservice"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/lhitchon/config-lint/filter"
 	"time"
 )
 
@@ -26,7 +27,7 @@ type InvokingEvent struct {
 
 func printValue(expression string, data interface{}) {
 	fmt.Println("expression:", expression)
-	value, err := searchData(expression, data)
+	value, err := filter.SearchData(expression, data)
 	if err != nil {
 		fmt.Println("err:", err)
 	}
@@ -96,17 +97,17 @@ func handler(configEvent events.ConfigEvent) (string, error) {
 	printValue("@", configurationItem.Configuration)
 
 	complianceType := "NOT_APPLICABLE"
-	ruleSet := MustParseRules(rulesString)
+	ruleSet := filter.MustParseRules(rulesString)
 	for _, rule := range ruleSet.Rules {
 		if rule.Resource == configurationItem.ResourceType {
 			complianceType = "COMPLIANT"
-			for _, filter := range rule.Filters {
-				resource := KubernetesResource{
+			for _, ruleFilter := range rule.Filters {
+				resource := filter.Resource{
 					Id:         configurationItem.ResourceId,
 					Type:       configurationItem.ResourceType,
 					Properties: configurationItem.Configuration,
 				}
-				status := applyFilter(rule, filter, resource, log)
+				status := filter.ApplyFilter(rule, ruleFilter, resource, log)
 				fmt.Println(status, resource)
 				if status != "OK" {
 					complianceType = status
