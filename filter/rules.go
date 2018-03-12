@@ -1,6 +1,7 @@
 package filter
 
 import (
+	"fmt"
 	"github.com/ghodss/yaml"
 	"io/ioutil"
 )
@@ -45,4 +46,29 @@ func FilterRulesById(rules []Rule, ruleIds []string) []Rule {
 		}
 	}
 	return filteredRules
+}
+
+func ApplyRule(rule Rule, resource Resource, log LoggingFunction) (string, []Violation) {
+	returnStatus := "OK"
+	violations := make([]Violation, 0)
+	if ExcludeResource(rule, resource) {
+		return returnStatus, violations
+	}
+	for _, ruleFilter := range rule.Filters {
+		log(fmt.Sprintf("Checking resource %s", resource.Id))
+		status := ApplyFilter(rule, ruleFilter, resource, log)
+		if status != "OK" {
+			returnStatus = status
+			v := Violation{
+				RuleId:       rule.Id,
+				ResourceId:   resource.Id,
+				ResourceType: resource.Type,
+				Status:       status,
+				Message:      rule.Message,
+				Filename:     resource.Filename,
+			}
+			violations = append(violations, v)
+		}
+	}
+	return returnStatus, violations
 }

@@ -86,24 +86,14 @@ func filterTerraformResourcesByType(resources []filter.Resource, resourceType st
 func validateTerraformResources(report *filter.ValidationReport, resources []filter.Resource, rules []filter.Rule, tags []string, log filter.LoggingFunction) {
 	for _, rule := range filter.FilterRulesByTag(rules, tags) {
 		log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
-		for _, ruleFilter := range rule.Filters {
-			for _, resource := range filterTerraformResourcesByType(resources, rule.Resource) {
-				if filter.ExcludeResource(rule, resource) {
-					log(fmt.Sprintf("Ignoring resource %s", resource.Id))
-				} else {
-					log(fmt.Sprintf("Checking resource %s", resource.Id))
-					status := filter.ApplyFilter(rule, ruleFilter, resource, log)
-					if status != "OK" {
-						v := filter.Violation{
-							RuleId:       rule.Id,
-							ResourceId:   resource.Id,
-							ResourceType: resource.Type,
-							Status:       status,
-							Message:      rule.Message,
-							Filename:     resource.Filename,
-						}
-						report.Violations[status] = append(report.Violations[status], v)
-					}
+		for _, resource := range filterTerraformResourcesByType(resources, rule.Resource) {
+			if filter.ExcludeResource(rule, resource) {
+				log(fmt.Sprintf("Ignoring resource %s", resource.Id))
+			} else {
+				log(fmt.Sprintf("Checking resource %s", resource.Id))
+				_, violations := filter.ApplyRule(rule, resource, log)
+				for _, violation := range violations {
+					report.Violations[violation.Status] = append(report.Violations[violation.Status], violation)
 				}
 			}
 		}
