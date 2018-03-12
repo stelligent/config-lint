@@ -21,6 +21,8 @@ Rules:
   - id: SG1
     message: Security group should not allow ingress from 0.0.0.0/0
     resource: AWS::EC2::SecurityGroup
+    except:
+      - sg-88206cff
     filters:
       - not:
           - and:

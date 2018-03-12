@@ -2,7 +2,7 @@
 CLI_FILES = $(shell find cli filter -name \*.go)
 LAMBDA_FILES = $(shell find lambda filter -name \*.go)
 
-cli: $(CLI_FILES)
+config-lint: $(CLI_FILES)
 	go build -o config-lint cli/*.go
 
 lambda: $(LAMBDA_FILES)

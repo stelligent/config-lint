@@ -361,3 +361,37 @@ func TestNestedBooleans(t *testing.T) {
 		t.Error("Expecting nested boolean to return NOT_COMPLIANT")
 	}
 }
+
+func TestExceptions(t *testing.T) {
+	rule := Rule{
+		Id:     "EXCEPT",
+		Except: []string{"200", "300"},
+	}
+	resources := []Resource{
+		Resource{Id: "100"},
+		Resource{Id: "200"},
+		Resource{Id: "300"},
+		Resource{Id: "400"},
+	}
+	filteredResources := FilterResourceExceptions(rule, resources)
+	if len(filteredResources) != 2 {
+		t.Error("Expecting exceptions to be removed from resource list")
+	}
+}
+
+func TestNoExceptions(t *testing.T) {
+	rule := Rule{
+		Id:     "EXCEPT",
+		Except: []string{},
+	}
+	resources := []Resource{
+		Resource{Id: "100"},
+		Resource{Id: "200"},
+		Resource{Id: "300"},
+		Resource{Id: "400"},
+	}
+	filteredResources := FilterResourceExceptions(rule, resources)
+	if len(filteredResources) != 4 {
+		t.Error("Expecting no exceptions to return all resources")
+	}
+}

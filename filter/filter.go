@@ -58,6 +58,28 @@ func booleanOperation(filter Filter, resource Resource, log LoggingFunction) boo
 	return searchAndMatch(filter, resource, log)
 }
 
+func ExcludeResource(rule Rule, resource Resource) bool {
+	for _, id := range rule.Except {
+		if id == resource.Id {
+			return true
+		}
+	}
+	return false
+}
+
+func FilterResourceExceptions(rule Rule, resources []Resource) []Resource {
+	if rule.Except == nil || len(rule.Except) == 0 {
+		return resources
+	}
+	filtered := make([]Resource, 0)
+	for _, resource := range resources {
+		if ExcludeResource(rule, resource) {
+			filtered = append(filtered, resource)
+		}
+	}
+	return filtered
+}
+
 func ApplyFilter(rule Rule, filter Filter, resource Resource, log LoggingFunction) string {
 	status := "OK"
 	if !booleanOperation(filter, resource, log) {

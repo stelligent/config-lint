@@ -16,6 +16,7 @@ type Rule struct {
 	Severity string
 	Resource string
 	Filters  []Filter
+	Except   []string
 	Tags     []string
 }
 

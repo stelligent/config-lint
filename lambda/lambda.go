@@ -100,17 +100,21 @@ func handler(configEvent events.ConfigEvent) (string, error) {
 	ruleSet := filter.MustParseRules(rulesString)
 	for _, rule := range ruleSet.Rules {
 		if rule.Resource == configurationItem.ResourceType {
-			complianceType = "COMPLIANT"
-			for _, ruleFilter := range rule.Filters {
-				resource := filter.Resource{
-					Id:         configurationItem.ResourceId,
-					Type:       configurationItem.ResourceType,
-					Properties: configurationItem.Configuration,
-				}
-				status := filter.ApplyFilter(rule, ruleFilter, resource, log)
-				fmt.Println(status, resource)
-				if status != "OK" {
-					complianceType = status
+			resource := filter.Resource{
+				Id:         configurationItem.ResourceId,
+				Type:       configurationItem.ResourceType,
+				Properties: configurationItem.Configuration,
+			}
+			if filter.ExcludeResource(rule, resource) {
+				fmt.Println("Ignoring resource:", resource.Id)
+			} else {
+				complianceType = "COMPLIANT"
+				for _, ruleFilter := range rule.Filters {
+					status := filter.ApplyFilter(rule, ruleFilter, resource, log)
+					fmt.Println(status, resource)
+					if status != "OK" {
+						complianceType = status
+					}
 				}
 			}
 		}
