@@ -304,3 +304,6 @@ Lots to do. This is just a proof-of-concept.
 * Support multiple rules files, or a rules directory
 * Add a --table option which uses tablewriter for more readable report
 * Not operator takes a list (to match the way Cloud Custodian works), should make sure size == 1
+* All examples so far have a single filter in the list - need to make sure that a boolean 'and' is implied by that
+* Figure out how dependency management works in go
+* Reorganize directories under $GOPATH, use github... names in import, add ability to build multiple binaries
