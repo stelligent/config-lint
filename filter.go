@@ -18,45 +18,49 @@ func searchAndMatch(filter Filter, resource TerraformResource, log LoggingFuncti
 	return match
 }
 
-func orOperation(rule Rule, filters []Filter, resource TerraformResource, log LoggingFunction) string {
+func orOperation(filters []Filter, resource TerraformResource, log LoggingFunction) bool {
 	for _, childFilter := range filters {
-		if searchAndMatch(childFilter, resource, log) {
-			return "OK"
+		if booleanOperation(childFilter, resource, log) {
+			return true
 		}
 	}
-	return rule.Severity
+	return false
 }
 
-func andOperation(rule Rule, filters []Filter, resource TerraformResource, log LoggingFunction) string {
+func andOperation(filters []Filter, resource TerraformResource, log LoggingFunction) bool {
 	for _, childFilter := range filters {
-		if !searchAndMatch(childFilter, resource, log) {
-			return rule.Severity
+		if !booleanOperation(childFilter, resource, log) {
+			return false
 		}
 	}
-	return "OK"
+	return true
 }
 
-func notOperation(rule Rule, filters []Filter, resource TerraformResource, log LoggingFunction) string {
+func notOperation(filters []Filter, resource TerraformResource, log LoggingFunction) bool {
 	for _, childFilter := range filters {
-		if searchAndMatch(childFilter, resource, log) {
-			return rule.Severity
+		if booleanOperation(childFilter, resource, log) {
+			return false
 		}
 	}
-	return "OK"
+	return true
+}
+
+func booleanOperation(filter Filter, resource TerraformResource, log LoggingFunction) bool {
+	if filter.Or != nil && len(filter.Or) > 0 {
+		return orOperation(filter.Or, resource, log)
+	}
+	if filter.And != nil && len(filter.And) > 0 {
+		return andOperation(filter.And, resource, log)
+	}
+	if filter.Not != nil && len(filter.Not) > 0 {
+		return notOperation(filter.Not, resource, log)
+	}
+	return searchAndMatch(filter, resource, log)
 }
 
 func applyFilter(rule Rule, filter Filter, resource TerraformResource, log LoggingFunction) string {
 	status := "OK"
-	if filter.Or != nil && len(filter.Or) > 0 {
-		return orOperation(rule, filter.Or, resource, log)
-	}
-	if filter.And != nil && len(filter.And) > 0 {
-		return andOperation(rule, filter.And, resource, log)
-	}
-	if filter.Not != nil && len(filter.Not) > 0 {
-		return notOperation(rule, filter.Not, resource, log)
-	}
-	if !searchAndMatch(filter, resource, log) {
+	if !booleanOperation(filter, resource, log) {
 		status = rule.Severity
 	}
 	return status

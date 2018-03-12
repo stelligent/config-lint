@@ -298,7 +298,6 @@ Lots to do. This is just a proof-of-concept.
 * Output should be grouped by resource id
 * Add value_from to allow for dynamic data (again, see CloudCustodian)
 * Add ability to extend with a Lambda function
-* It should be possible to nest the and, or, not operators
 * Instead of iterating through rules, filters, then resources, make resources the outer loop, so results are reports by resource id
 * Add examples to this file for Kubernetes files
 * Support multiple rules files, or a rules directory
