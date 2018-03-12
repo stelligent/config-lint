@@ -20,7 +20,7 @@ func searchAndMatch(filter Filter, resource TerraformResource, log LoggingFuncti
 
 func orOperation(filters []Filter, resource TerraformResource, log LoggingFunction) bool {
 	for _, childFilter := range filters {
-		if searchAndMatch(childFilter, resource, log) {
+		if booleanOperation(childFilter, resource, log) {
 			return true
 		}
 	}
@@ -29,7 +29,7 @@ func orOperation(filters []Filter, resource TerraformResource, log LoggingFuncti
 
 func andOperation(filters []Filter, resource TerraformResource, log LoggingFunction) bool {
 	for _, childFilter := range filters {
-		if !searchAndMatch(childFilter, resource, log) {
+		if !booleanOperation(childFilter, resource, log) {
 			return false
 		}
 	}
@@ -38,7 +38,7 @@ func andOperation(filters []Filter, resource TerraformResource, log LoggingFunct
 
 func notOperation(filters []Filter, resource TerraformResource, log LoggingFunction) bool {
 	for _, childFilter := range filters {
-		if searchAndMatch(childFilter, resource, log) {
+		if booleanOperation(childFilter, resource, log) {
 			return false
 		}
 	}
