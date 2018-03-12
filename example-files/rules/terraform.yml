@@ -29,6 +29,9 @@ Rules:
   - id: R3
     message: Department tag is not valid
     resource: aws_instance
+    except:
+        - foo
+        - third
     filters:
       - type: value
         key: "tags[].Department | [0]"

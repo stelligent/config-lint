@@ -60,18 +60,22 @@ func validateKubernetesResources(report *filter.ValidationReport, resources []fi
 		log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
 		for _, ruleFilter := range rule.Filters {
 			for _, resource := range filterKubernetesResourcesByType(resources, rule.Resource) {
-				log(fmt.Sprintf("Checking resource %s", resource.Id))
-				status := filter.ApplyFilter(rule, ruleFilter, resource, log)
-				if status != "OK" {
-					v := filter.Violation{
-						RuleId:       rule.Id,
-						ResourceId:   resource.Id,
-						ResourceType: resource.Type,
-						Status:       status,
-						Message:      rule.Message,
-						Filename:     resource.Filename,
+				if filter.ExcludeResource(rule, resource) {
+					log(fmt.Sprintf("Ignoring resource %s", resource.Id))
+				} else {
+					log(fmt.Sprintf("Checking resource %s", resource.Id))
+					status := filter.ApplyFilter(rule, ruleFilter, resource, log)
+					if status != "OK" {
+						v := filter.Violation{
+							RuleId:       rule.Id,
+							ResourceId:   resource.Id,
+							ResourceType: resource.Type,
+							Status:       status,
+							Message:      rule.Message,
+							Filename:     resource.Filename,
+						}
+						report.Violations[status] = append(report.Violations[status], v)
 					}
-					report.Violations[status] = append(report.Violations[status], v)
 				}
 			}
 		}
