@@ -306,3 +306,4 @@ Lots to do. This is just a proof-of-concept.
 * All examples so far have a single filter in the list - need to make sure that a boolean 'and' is implied by that
 * Figure out how dependency management works in go
 * Reorganize directories under $GOPATH, use github... names in import, add ability to build multiple binaries
+* The lambda function does not handle OverSizedChangeNotification
