@@ -76,14 +76,6 @@ func loadTerraformResources(filename string, log LoggingFunction) []TerraformRes
 	return resources
 }
 
-func loadTerraformRules(filename string) string {
-	terraformRules, err := ioutil.ReadFile(filename)
-	if err != nil {
-		panic(err)
-	}
-	return string(terraformRules)
-}
-
 func filterTerraformResourcesByType(resources []TerraformResource, resourceType string) []TerraformResource {
 	if resourceType == "*" {
 		return resources

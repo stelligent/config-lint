@@ -13,15 +13,6 @@ type KubernetesLinter struct {
 // TODO - is it really necessary to have two types?
 type KubernetesResource = TerraformResource
 
-// TODO duplicates loadTerraformRules
-func loadKubernetesRules(filename string) string {
-	kubernetesRules, err := ioutil.ReadFile(filename)
-	if err != nil {
-		panic(err)
-	}
-	return string(kubernetesRules)
-}
-
 func loadYAML(filename string, log LoggingFunction) []interface{} {
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {

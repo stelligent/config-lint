@@ -2,7 +2,16 @@ package main
 
 import (
 	"github.com/ghodss/yaml"
+	"io/ioutil"
 )
+
+func loadRules(filename string) string {
+	rules, err := ioutil.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+	return string(rules)
+}
 
 func MustParseRules(rules string) RuleSet {
 	r := RuleSet{}

@@ -116,7 +116,7 @@ func main() {
 
 	exitCode := 0
 
-	ruleSet := MustParseRules(loadTerraformRules(*rulesFilename))
+	ruleSet := MustParseRules(loadRules(*rulesFilename))
 	linter := makeLinter(ruleSet.Type, makeLogger(*verboseLogging))
 	if linter != nil {
 		if *searchExpression != "" {
