@@ -135,11 +135,6 @@ func handler(configEvent events.ConfigEvent) (string, error) {
 	return "Done", nil
 }
 
-func handler2(configEvent events.ConfigEvent) (string, error) {
-	fmt.Println(configEvent)
-	return "Done", nil
-}
-
 func main() {
 	lambda.Start(handler)
 }
