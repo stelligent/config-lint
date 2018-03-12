@@ -1,0 +1,20 @@
+Version: 1
+Description: Rules for AWS Config
+Type: AWSConfig
+Rules:
+  - id: CFG1
+    message: Table status must have provisionedThroughput
+    resource: AWS::DynamoDB::Table
+    filters:
+      - type: value
+        key: provisionedThroughput.writeCapacityUnits
+        op: present
+    severity: FAILURE
+  - id: CFG2
+    message: Table status must have provisionedThroughput
+    resource: AWS::DynamoDB::Table
+    filters:
+      - type: value
+        key: provisionedThroughput.readCapacityUnits
+        op: present
+    severity: FAILURE

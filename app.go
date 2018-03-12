@@ -105,7 +105,7 @@ func makeLinter(linterType string, log LoggingFunction) Linter {
 	}
 }
 
-func main() {
+func command_line_main() {
 	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
 	rulesFilename := flag.String("rules", "./rules/terraform.yml", "Rules file")
 	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")

@@ -1,2 +1,4 @@
 files/.terraform/*
 config-lint
+main
+*.zip
