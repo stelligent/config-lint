@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"testing"
 )
 
@@ -294,5 +295,69 @@ func TestNestedNot(t *testing.T) {
 	status := applyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting nested boolean to return FAILURE")
+	}
+}
+
+func TestNestedBooleans(t *testing.T) {
+	rule := Rule{
+		Id:       "TEST1",
+		Message:  "Do not allow access to port 22 from 0.0.0.0/0",
+		Severity: "NOT_COMPLIANT",
+		Resource: "aws_instance",
+		Filters: []Filter{
+			Filter{
+				Not: []Filter{
+					Filter{
+						And: []Filter{
+							Filter{
+								Type:  "value",
+								Key:   "ipPermissions[].fromPort[]",
+								Op:    "contains",
+								Value: "22",
+							},
+							Filter{
+								Type:  "value",
+								Key:   "ipPermissions[].ipRanges[]",
+								Op:    "contains",
+								Value: "0.0.0.0/0",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	resource := TerraformResource{
+		Id:         "a_test_resource",
+		Type:       "aws_instance",
+		Properties: map[string]interface{}{},
+		Filename:   "test.tf",
+	}
+	rulesJSON := `{
+            "description": "2017-12-03T03:14:29.856Z",
+            "groupName": "test-8246",
+            "ipPermissions": [
+                {
+                    "fromPort": 22,
+                    "ipProtocol": "tcp",
+                    "toPort": 22,
+                    "ipv4Ranges": [
+                        {
+                            "cidrIp": "0.0.0.0/0"
+                        }
+                    ],
+                    "ipRanges": [
+                        "0.0.0.0/0"
+                    ]
+                }
+            ]
+        }`
+	err := json.Unmarshal([]byte(rulesJSON), &resource.Properties)
+	if err != nil {
+		t.Error("Error parsing resource JSON")
+	}
+	status := applyFilter(rule, rule.Filters[0], resource, testLogging)
+	if status != "NOT_COMPLIANT" {
+		t.Error("Expecting nested boolean to return NOT_COMPLIANT")
 	}
 }

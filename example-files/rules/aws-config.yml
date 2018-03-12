@@ -18,3 +18,18 @@ Rules:
         key: provisionedThroughput.readCapacityUnits
         op: present
     severity: NON_COMPLIANT
+  - id: SG1
+    message: Security group should not allow ingress from 0.0.0.0/0
+    resource: AWS::EC2::SecurityGroup
+    filters:
+      - not:
+          - and:
+              - type: value
+                key: ipPermissions[].fromPort[]
+                op: contains
+                value: "22"
+              - type: value
+                key: ipPermissions[].ipRanges[]
+                op: contains
+                value: 0.0.0.0/0
+    severity: NON_COMPLIANT
