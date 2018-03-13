@@ -9,8 +9,9 @@ func searchAndMatch(filter Filter, resource Resource, valueSource ValueSource, l
 	if err != nil {
 		panic(err)
 	}
-	match := isMatch(unquoted(v), filter.Op, valueSource.GetValue(filter))
-	log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s", filter.Key, v, filter.Op, filter.Value))
+	value := valueSource.GetValue(filter)
+	match := isMatch(unquoted(v), filter.Op, value)
+	log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s", filter.Key, v, filter.Op, value))
 	log(fmt.Sprintf("ResourceId: %s Type: %s %t",
 		resource.Id,
 		resource.Type,

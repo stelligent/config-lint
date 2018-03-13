@@ -90,7 +90,6 @@ func (l TerraformLinter) ValidateTerraformResources(report *filter.ValidationRep
 			if filter.ExcludeResource(rule, resource) {
 				l.Log(fmt.Sprintf("Ignoring resource %s", resource.Id))
 			} else {
-				l.Log(fmt.Sprintf("Checking resource %s", resource.Id))
 				_, violations := filter.ApplyRule(rule, resource, l.Log)
 				for _, violation := range violations {
 					report.Violations[violation.Status] = append(report.Violations[violation.Status], violation)

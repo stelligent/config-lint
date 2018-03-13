@@ -2,16 +2,19 @@ package filter
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 type StandardValueSource struct {
+	Log LoggingFunction
 }
 
 func (v StandardValueSource) GetValue(filter Filter) string {
 	if filter.ValueFrom.Bucket != "" {
+		v.Log(fmt.Sprintf("Getting value_from s3://%s/%s", filter.ValueFrom.Bucket, filter.ValueFrom.Key))
 		content, err := v.GetValueFromS3(filter.ValueFrom.Bucket, filter.ValueFrom.Key)
 		if err != nil {
 			return "Error" // FIXME
