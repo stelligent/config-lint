@@ -8,12 +8,16 @@ type Filter struct {
 	Or        []Filter
 	And       []Filter
 	Not       []Filter
-	ValueFrom FilterValueFrom
+	ValueFrom FilterValueFrom `json:"value_from"`
 }
 
 type FilterValueFrom struct {
 	Bucket string
 	Key    string
+}
+
+type ValueSource interface {
+	GetValue(Filter) string
 }
 
 type Rule struct {

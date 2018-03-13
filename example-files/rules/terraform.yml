@@ -133,3 +133,16 @@ Rules:
         key: "ingress[].cidr_blocks[] | [0]"
         op: ne
         value: "0.0.0.0/0"
+  - id: VALUEFROM1
+    message: Instance type should be in list from S3 object
+    resource: aws_instance
+    filters:
+      - type: value
+        key: instance_type
+        op: in
+        value_from:
+          bucket: config-rules-for-lambda
+          key: instance-types
+    severity: WARNING
+    tags:
+      - ec2

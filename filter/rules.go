@@ -54,9 +54,10 @@ func ApplyRule(rule Rule, resource Resource, log LoggingFunction) (string, []Vio
 	if ExcludeResource(rule, resource) {
 		return returnStatus, violations
 	}
+	valueSource := StandardValueSource{}
 	for _, ruleFilter := range rule.Filters {
 		log(fmt.Sprintf("Checking resource %s", resource.Id))
-		status := ApplyFilter(rule, ruleFilter, resource, log)
+		status := ApplyFilter(rule, ruleFilter, resource, valueSource, log)
 		if status != "OK" {
 			returnStatus = status
 			v := Violation{

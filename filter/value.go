@@ -7,9 +7,12 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
-func getValue(filter Filter) string {
+type StandardValueSource struct {
+}
+
+func (v StandardValueSource) GetValue(filter Filter) string {
 	if filter.ValueFrom.Bucket != "" {
-		content, err := getValueFromS3(filter.ValueFrom.Bucket, filter.ValueFrom.Key)
+		content, err := v.GetValueFromS3(filter.ValueFrom.Bucket, filter.ValueFrom.Key)
 		if err != nil {
 			return "Error" // FIXME
 		}
@@ -18,8 +21,7 @@ func getValue(filter Filter) string {
 	return filter.Value
 }
 
-func getValueFromS3(bucket string, key string) (string, error) {
-
+func (v StandardValueSource) GetValueFromS3(bucket string, key string) (string, error) {
 	region := &aws.Config{Region: aws.String("us-east-1")}
 	awsSession := session.New()
 	s3Client := s3.New(awsSession, region)
