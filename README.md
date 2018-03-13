@@ -1,11 +1,17 @@
 # config-lint
 
-Validate configuration files using rules specified in a YAML file.
+A command line tool to validate configuration files using rules specified in a YAML file.
 
-# Build
+There is also the ability to deploy an AWS Lambda that can be used as a custom rule
+AWS Config. The compliance tests are written in YAML, using the same format. This
+YAML is stored in an S3 object, and the bucket and key of the object are passed as 
+parameters to the AWS Config fule
+
+
+# Build Command Line tool
 
 ```
-make
+make config-lint
 ```
 
 # Run
@@ -48,6 +54,7 @@ Each rule contains the following attributes:
 |id         | A unique identifier for the rule                                                   |
 |message    | A string to be printed when a validation error is detected                         |
 |resource   | The resource type to which the rule will be applied                                |
+|except     | An optional list of resource ids that should not be validated                      |
 |severity   | Should be 'WARNING' or 'FAILURE'                                                   |
 |filters    | A list of filters used to detect validation errors, see next section               |
 |tags       | Optional list of tags, command line has option to limit scans to a subset of tags  |
@@ -287,6 +294,53 @@ If you specify --search, the rules files is only used to determine the type of c
 The files will *not* be scanned for violations.
 
 
+# Custom Rule for AWS Config
+
+```
+make lambda
+```
+
+This builds and deploys an AWS Lambda function. The ARN for the Lambda is used to set up a custom AWS Config rule. 
+The same YAML format is used to specify the rules to test for  compliance. The severity of the rules for
+this use case should be set to NON_COMPLIANT
+
+There are two parameters that need to also be configured for the AWS Config rule:
+
+|Name       |Description                                                                         |
+|-----------|------------------------------------------------------------------------------------|
+|bucket     | S3 bucket that contains the S3 object with the YAML rules                          |
+|key        | Key of the S3 object                                                               |
+
+
+## AWS Config example
+
+Here's an example of an AWS Config rule that checks for port 22 being open to all IP addresses.
+It also includes the 'except:' option which allows the check to be ignored for some resources.
+
+```
+Version: 1
+Description: Rules for AWS Config
+Type: AWSConfig
+Rules:
+  - id: SG1
+    message: Security group should not allow ingress from 0.0.0.0/0
+    resource: AWS::EC2::SecurityGroup
+    except:
+      - sg-88206cff
+    severity: NON_COMPLIANT
+    filters:
+      - not:
+          - and:
+              - type: value
+                key: ipPermissions[].fromPort[]
+                op: contains
+                value: "22"
+              - type: value
+                key: ipPermissions[].ipRanges[]
+                op: contains
+                value: 0.0.0.0/0
+```
+
 # TODO
 
 Lots to do. This is just a proof-of-concept.
@@ -305,3 +359,4 @@ Lots to do. This is just a proof-of-concept.
 * Figure out how dependency management works in go
 * Reorganize directories under $GOPATH, use github... names in import, add ability to build multiple binaries
 * The lambda function does not handle OverSizedChangeNotification
+* The lambda function name is hard-coded in the Makefile
