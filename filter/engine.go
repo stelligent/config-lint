@@ -1,13 +1,19 @@
 package filter
 
 type Filter struct {
-	Type  string
-	Key   string
-	Op    string
-	Value string
-	Or    []Filter
-	And   []Filter
-	Not   []Filter
+	Type      string
+	Key       string
+	Op        string
+	Value     string
+	Or        []Filter
+	And       []Filter
+	Not       []Filter
+	ValueFrom FilterValueFrom
+}
+
+type FilterValueFrom struct {
+	Bucket string
+	Key    string
 }
 
 type Rule struct {

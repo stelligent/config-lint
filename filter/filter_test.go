@@ -395,3 +395,33 @@ func TestNoExceptions(t *testing.T) {
 		t.Error("Expecting no exceptions to return all resources")
 	}
 }
+
+func TestValueFrom(t *testing.T) {
+	rule := Rule{
+		Id:       "TEST1",
+		Message:  "Test Rule",
+		Severity: "FAILURE",
+		Resource: "aws_instance",
+		Filters: []Filter{
+			Filter{
+				Type: "value",
+				Key:  "instance_type",
+				Op:   "in",
+				ValueFrom: FilterValueFrom{
+					Bucket: "config-rules-for-lambda",
+					Key:    "instance-types",
+				},
+			},
+		},
+	}
+	resource := Resource{
+		Id:         "a_test_resource",
+		Type:       "aws_instance",
+		Properties: map[string]interface{}{"instance_type": "t2.micro"},
+		Filename:   "test.tf",
+	}
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
+	if status != "OK" {
+		t.Error("Expecting simple rule to match")
+	}
+}
