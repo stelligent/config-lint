@@ -55,15 +55,15 @@ func filterKubernetesResourcesByType(resources []filter.Resource, resourceType s
 	return filtered
 }
 
-func validateKubernetesResources(report *filter.ValidationReport, resources []filter.Resource, rules []filter.Rule, tags []string, log filter.LoggingFunction) {
+func (l KubernetesLinter) ValidateKubernetesResources(report *filter.ValidationReport, resources []filter.Resource, rules []filter.Rule, tags []string) {
 	for _, rule := range filter.FilterRulesByTag(rules, tags) {
-		log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
+		l.Log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
 		for _, resource := range filterKubernetesResourcesByType(resources, rule.Resource) {
 			if filter.ExcludeResource(rule, resource) {
-				log(fmt.Sprintf("Ignoring resource %s", resource.Id))
+				l.Log(fmt.Sprintf("Ignoring resource %s", resource.Id))
 			} else {
-				log(fmt.Sprintf("Checking resource %s", resource.Id))
-				_, violations := filter.ApplyRule(rule, resource, log)
+				l.Log(fmt.Sprintf("Checking resource %s", resource.Id))
+				_, violations := filter.ApplyRule(rule, resource, l.Log)
 				for _, violation := range violations {
 					report.Violations[violation.Status] = append(report.Violations[violation.Status], violation)
 				}
@@ -82,7 +82,7 @@ func (l KubernetesLinter) Validate(filenames []string, ruleSet filter.RuleSet, t
 		if filter.ShouldIncludeFile(ruleSet.Files, filename) {
 			l.Log(fmt.Sprintf("Processing %s", filename))
 			resources := loadKubernetesResources(filename, l.Log)
-			validateKubernetesResources(&report, resources, rules, tags, l.Log)
+			l.ValidateKubernetesResources(&report, resources, rules, tags)
 			report.FilesScanned = append(report.FilesScanned, filename)
 		}
 	}

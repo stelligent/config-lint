@@ -83,15 +83,15 @@ func filterTerraformResourcesByType(resources []filter.Resource, resourceType st
 	return filtered
 }
 
-func validateTerraformResources(report *filter.ValidationReport, resources []filter.Resource, rules []filter.Rule, tags []string, log filter.LoggingFunction) {
+func (l TerraformLinter) ValidateTerraformResources(report *filter.ValidationReport, resources []filter.Resource, rules []filter.Rule, tags []string) {
 	for _, rule := range filter.FilterRulesByTag(rules, tags) {
-		log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
+		l.Log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
 		for _, resource := range filterTerraformResourcesByType(resources, rule.Resource) {
 			if filter.ExcludeResource(rule, resource) {
-				log(fmt.Sprintf("Ignoring resource %s", resource.Id))
+				l.Log(fmt.Sprintf("Ignoring resource %s", resource.Id))
 			} else {
-				log(fmt.Sprintf("Checking resource %s", resource.Id))
-				_, violations := filter.ApplyRule(rule, resource, log)
+				l.Log(fmt.Sprintf("Checking resource %s", resource.Id))
+				_, violations := filter.ApplyRule(rule, resource, l.Log)
 				for _, violation := range violations {
 					report.Violations[violation.Status] = append(report.Violations[violation.Status], violation)
 				}
@@ -109,7 +109,7 @@ func (l TerraformLinter) Validate(filenames []string, ruleSet filter.RuleSet, ta
 	for _, filename := range filenames {
 		if filter.ShouldIncludeFile(ruleSet.Files, filename) {
 			resources := loadTerraformResources(filename, l.Log)
-			validateTerraformResources(&report, resources, rules, tags, l.Log)
+			l.ValidateTerraformResources(&report, resources, rules, tags)
 			report.FilesScanned = append(report.FilesScanned, filename)
 		}
 	}
