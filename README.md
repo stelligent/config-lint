@@ -345,7 +345,6 @@ Rules:
 
 Lots to do. This is just a proof-of-concept.
 
-* Find a better name than 'filter' - this tool actually inverts the sense of a filter in Cloud Custodian
 * Embedded JSON for IAM policies should be parsed and made available for JMESPath query
 * Add an optional YAML file for project settings, such as ignoring certain rules for certain resources
 * Implement more of the operators from Cloud Custodian
@@ -358,6 +357,5 @@ Lots to do. This is just a proof-of-concept.
 * Add a --table option which uses tablewriter for more readable report
 * Not operator takes a list (to match the way Cloud Custodian works), should make sure size == 1
 * Figure out how dependency management works in go
-* Reorganize directories under $GOPATH, use github... names in import, add ability to build multiple binaries
 * The lambda function does not handle OverSizedChangeNotification
 * The lambda function name is hard-coded in the Makefile

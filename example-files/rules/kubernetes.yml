@@ -7,7 +7,7 @@ Rules:
   - id: K1
     message: Kind must be pod
     resource: "*"
-    filters:
+    assertions:
       - type: value
         key: kind
         op: in
@@ -16,7 +16,7 @@ Rules:
   - id: K2
     message: Must include containers
     resource: "*"
-    filters:
+    assertions:
       - type: value
         key: spec.containers
         op: present

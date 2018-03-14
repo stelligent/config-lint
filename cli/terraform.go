@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"github.com/ghodss/yaml"
 	"github.com/hashicorp/hcl"
-	"github.com/lhitchon/config-lint/filter"
+	"github.com/lhitchon/config-lint/assertion"
 	"io/ioutil"
 )
 
 type TerraformLinter struct {
-	Log filter.LoggingFunction
+	Log assertion.LoggingFunction
 }
 
-func loadHCL(filename string, log filter.LoggingFunction) []interface{} {
+func loadHCL(filename string, log assertion.LoggingFunction) []interface{} {
 	template, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
@@ -46,16 +46,16 @@ func loadHCL(filename string, log filter.LoggingFunction) []interface{} {
 	return results
 }
 
-func loadTerraformResources(filename string, log filter.LoggingFunction) []filter.Resource {
+func loadTerraformResources(filename string, log assertion.LoggingFunction) []assertion.Resource {
 	hclResources := loadHCL(filename, log)
 
-	resources := make([]filter.Resource, 0)
+	resources := make([]assertion.Resource, 0)
 	for _, resource := range hclResources {
 		for resourceType, templateResources := range resource.(map[string]interface{}) {
 			if templateResources != nil {
 				for _, templateResource := range templateResources.([]interface{}) {
 					for resourceId, resource := range templateResource.(map[string]interface{}) {
-						tr := filter.Resource{
+						tr := assertion.Resource{
 							Id:         resourceId,
 							Type:       resourceType,
 							Properties: resource.([]interface{})[0],
@@ -70,11 +70,11 @@ func loadTerraformResources(filename string, log filter.LoggingFunction) []filte
 	return resources
 }
 
-func filterTerraformResourcesByType(resources []filter.Resource, resourceType string) []filter.Resource {
+func filterTerraformResourcesByType(resources []assertion.Resource, resourceType string) []assertion.Resource {
 	if resourceType == "*" {
 		return resources
 	}
-	filtered := make([]filter.Resource, 0)
+	filtered := make([]assertion.Resource, 0)
 	for _, resource := range resources {
 		if resource.Type == resourceType {
 			filtered = append(filtered, resource)
@@ -83,19 +83,19 @@ func filterTerraformResourcesByType(resources []filter.Resource, resourceType st
 	return filtered
 }
 
-func (l TerraformLinter) ValidateTerraformResources(report *filter.ValidationReport, resources []filter.Resource, rules []filter.Rule, tags []string) {
+func (l TerraformLinter) ValidateTerraformResources(report *assertion.ValidationReport, resources []assertion.Resource, rules []assertion.Rule, tags []string) {
 
-	valueSource := filter.StandardValueSource{Log: l.Log}
-	filteredRules := filter.FilterRulesByTag(rules, tags)
-	resolvedRules := filter.ResolveRules(filteredRules, valueSource, l.Log)
+	valueSource := assertion.StandardValueSource{Log: l.Log}
+	filteredRules := assertion.FilterRulesByTag(rules, tags)
+	resolvedRules := assertion.ResolveRules(filteredRules, valueSource, l.Log)
 
 	for _, rule := range resolvedRules {
 		l.Log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
 		for _, resource := range filterTerraformResourcesByType(resources, rule.Resource) {
-			if filter.ExcludeResource(rule, resource) {
+			if assertion.ExcludeResource(rule, resource) {
 				l.Log(fmt.Sprintf("Ignoring resource %s", resource.Id))
 			} else {
-				_, violations := filter.ApplyRule(rule, resource, l.Log)
+				_, violations := assertion.CheckRule(rule, resource, l.Log)
 				for _, violation := range violations {
 					report.Violations[violation.Status] = append(report.Violations[violation.Status], violation)
 				}
@@ -104,14 +104,14 @@ func (l TerraformLinter) ValidateTerraformResources(report *filter.ValidationRep
 	}
 }
 
-func (l TerraformLinter) Validate(filenames []string, ruleSet filter.RuleSet, tags []string, ruleIds []string) filter.ValidationReport {
-	report := filter.ValidationReport{
-		Violations:   make(map[string]([]filter.Violation), 0),
+func (l TerraformLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string) assertion.ValidationReport {
+	report := assertion.ValidationReport{
+		Violations:   make(map[string]([]assertion.Violation), 0),
 		FilesScanned: make([]string, 0),
 	}
-	rules := filter.FilterRulesById(ruleSet.Rules, ruleIds)
+	rules := assertion.FilterRulesById(ruleSet.Rules, ruleIds)
 	for _, filename := range filenames {
-		if filter.ShouldIncludeFile(ruleSet.Files, filename) {
+		if assertion.ShouldIncludeFile(ruleSet.Files, filename) {
 			resources := loadTerraformResources(filename, l.Log)
 			l.ValidateTerraformResources(&report, resources, rules, tags)
 			report.FilesScanned = append(report.FilesScanned, filename)
@@ -125,7 +125,7 @@ func (l TerraformLinter) Search(filenames []string, searchExpression string) {
 		l.Log(fmt.Sprintf("Searching %s", filename))
 		resources := loadTerraformResources(filename, l.Log)
 		for _, resource := range resources {
-			v, err := filter.SearchData(searchExpression, resource.Properties)
+			v, err := assertion.SearchData(searchExpression, resource.Properties)
 			if err != nil {
 				fmt.Println(err)
 			} else {

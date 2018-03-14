@@ -7,7 +7,7 @@ Rules:
   - id: R1
     message: Instance type should be t2.micro or m3.medium
     resource: aws_instance
-    filters:
+    assertions:
       - type: value
         key: instance_type
         op: in
@@ -18,7 +18,7 @@ Rules:
   - id: R2
     message: Not an approved AMI
     resource: aws_instance
-    filters:
+    assertions:
       - type: value
         key: ami
         op: in
@@ -32,7 +32,7 @@ Rules:
     except:
         - foo
         - third
-    filters:
+    assertions:
       - type: value
         key: "tags[].Department | [0]"
         op: in
@@ -43,7 +43,7 @@ Rules:
   - id: R4
     message: Role name should contain the string 'role'
     resource: aws_iam_role
-    filters:
+    assertions:
       - type: value
         key: name
         op: contains
@@ -52,7 +52,7 @@ Rules:
   - id: R5
     message: Bucket name should end with ".com"
     resource: aws_s3_bucket
-    filters:
+    assertions:
       - type: value
         key: bucket
         op: regex
@@ -61,7 +61,7 @@ Rules:
   - id: R6
     message: CostCenter tag is missing
     resource: aws_instance
-    filters:
+    assertions:
       - type: value
         key: "tags[].CostCenter | [0]"
         op: present
@@ -69,7 +69,7 @@ Rules:
   - id: R7
     message: Should not have a Foo tag
     resource: aws_instance
-    filters:
+    assertions:
       - type: value
         key: "tags[].Foo"
         op: absent
@@ -78,7 +78,7 @@ Rules:
     resource: aws_ebs_volume
     message: EBS Volumes must be encrypted
     severity: FAILURE
-    filters:
+    assertions:
       - type: value
         key: encrypted
         op: eq
@@ -89,7 +89,7 @@ Rules:
     resource: aws_instance
     message: Should have instance_type of t2.micro or m3.medium
     severity: WARNING
-    filters:
+    assertions:
       - or:
         - type: value
           key: instance_type
@@ -104,7 +104,7 @@ Rules:
     resource: aws_instance
     message: Should have both Project and Department tags
     severity: WARNING
-    filters:
+    assertions:
       - and:
         - type: value
           key: "tags[].Department | [0]"
@@ -118,7 +118,7 @@ Rules:
     resource: aws_instance
     message: Should not have instance type of c4.large
     severity: WARNING
-    filters:
+    assertions:
       - not:
         - type: value
           key: instance_type
@@ -128,7 +128,7 @@ Rules:
     resource: aws_security_group
     message: Security group should not allow ingress from 0.0.0.0/0
     severity: FAILURE
-    filters:
+    assertions:
       - type: value
         key: "ingress[].cidr_blocks[] | [0]"
         op: ne
@@ -136,7 +136,7 @@ Rules:
   - id: VALUEFROM1
     message: Instance type should be in list from S3 object
     resource: aws_instance
-    filters:
+    assertions:
       - type: value
         key: instance_type
         op: in

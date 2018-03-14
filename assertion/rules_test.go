@@ -1,4 +1,4 @@
-package filter
+package assertion
 
 import (
 	"testing"
@@ -7,9 +7,9 @@ import (
 type TestValueSource struct {
 }
 
-func (t TestValueSource) GetValue(filter Filter) string {
-	if filter.Value != "" {
-		return filter.Value
+func (t TestValueSource) GetValue(assertion Assertion) string {
+	if assertion.Value != "" {
+		return assertion.Value
 	}
 	return "m3.medium"
 }
@@ -23,7 +23,7 @@ var content = `Rules:
     message: Test message
     resource: aws_instance
     severity: WARNING
-    filters:
+    assertions:
       - type: value
         key: instance_type
         op: in
@@ -34,7 +34,7 @@ var content = `Rules:
     message: Test message
     resource: aws_s3_bucket
     severity: WARNING
-    filters:
+    assertions:
       - type: value
         key: name
         op: eq
@@ -77,7 +77,7 @@ var ruleWithMultipleFilters = `Rules:
     message: Test message
     resource: aws_instance
     severity: FAILURE
-    filters:
+    assertions:
       - type: value
         key: instance_type
         op: eq
@@ -96,7 +96,7 @@ func TestRuleWithMultipleFilter(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "t2.micro", "ami": "ami-000000"},
 		Filename:   "test.tf",
 	}
-	status, violations := ApplyRule(rules.Rules[0], resource, testLogging)
+	status, violations := CheckRule(rules.Rules[0], resource, testLogging)
 	if status != "OK" {
 		t.Error("Expecting multiple rule to match")
 	}
@@ -113,7 +113,7 @@ func TestMultipleFiltersWithSingleFailure(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "t2.micro", "ami": "ami-111111"},
 		Filename:   "test.tf",
 	}
-	status, violations := ApplyRule(rules.Rules[0], resource, testLogging)
+	status, violations := CheckRule(rules.Rules[0], resource, testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting multiple rule to return FAILURE")
 	}
@@ -130,7 +130,7 @@ func TestMultipleFiltersWithMultipleFailures(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "c3.medium", "ami": "ami-111111"},
 		Filename:   "test.tf",
 	}
-	status, violations := ApplyRule(rules.Rules[0], resource, testLogging)
+	status, violations := CheckRule(rules.Rules[0], resource, testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting multiple rule to return FAILURE")
 	}
@@ -144,7 +144,7 @@ var ruleWithValueFrom = `Rules:
     message: Test value_from
     severity: FAILURE
     resource: aws_instance
-    filters:
+    assertions:
       - type: value
         key: instance_type
         op: in
@@ -162,7 +162,7 @@ func TestValueFrom(t *testing.T) {
 		Filename:   "test.tf",
 	}
 	resolved := ResolveRules(rules.Rules, testValueSource(), testLogging)
-	status, violations := ApplyRule(resolved[0], resource, testLogging)
+	status, violations := CheckRule(resolved[0], resource, testLogging)
 	if status != "OK" {
 		t.Error("Expecting value_from to match")
 	}

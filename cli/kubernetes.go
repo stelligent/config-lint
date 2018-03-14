@@ -3,15 +3,15 @@ package main
 import (
 	"fmt"
 	"github.com/ghodss/yaml"
-	"github.com/lhitchon/config-lint/filter"
+	"github.com/lhitchon/config-lint/assertion"
 	"io/ioutil"
 )
 
 type KubernetesLinter struct {
-	Log filter.LoggingFunction
+	Log assertion.LoggingFunction
 }
 
-func loadYAML(filename string, log filter.LoggingFunction) []interface{} {
+func loadYAML(filename string, log assertion.LoggingFunction) []interface{} {
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
@@ -26,12 +26,12 @@ func loadYAML(filename string, log filter.LoggingFunction) []interface{} {
 	return []interface{}{m}
 }
 
-func loadKubernetesResources(filename string, log filter.LoggingFunction) []filter.Resource {
+func loadKubernetesResources(filename string, log assertion.LoggingFunction) []assertion.Resource {
 	yamlResources := loadYAML(filename, log)
-	resources := make([]filter.Resource, 0)
+	resources := make([]assertion.Resource, 0)
 	for _, resource := range yamlResources {
 		m := resource.(map[string]interface{})
-		kr := filter.Resource{
+		kr := assertion.Resource{
 			Id:         filename,
 			Type:       m["kind"].(string),
 			Properties: m,
@@ -42,11 +42,11 @@ func loadKubernetesResources(filename string, log filter.LoggingFunction) []filt
 	return resources
 }
 
-func filterKubernetesResourcesByType(resources []filter.Resource, resourceType string) []filter.Resource {
+func filterKubernetesResourcesByType(resources []assertion.Resource, resourceType string) []assertion.Resource {
 	if resourceType == "*" {
 		return resources
 	}
-	filtered := make([]filter.Resource, 0)
+	filtered := make([]assertion.Resource, 0)
 	for _, resource := range resources {
 		if resource.Type == resourceType {
 			filtered = append(filtered, resource)
@@ -55,19 +55,19 @@ func filterKubernetesResourcesByType(resources []filter.Resource, resourceType s
 	return filtered
 }
 
-func (l KubernetesLinter) ValidateKubernetesResources(report *filter.ValidationReport, resources []filter.Resource, rules []filter.Rule, tags []string) {
+func (l KubernetesLinter) ValidateKubernetesResources(report *assertion.ValidationReport, resources []assertion.Resource, rules []assertion.Rule, tags []string) {
 
-	valueSource := filter.StandardValueSource{Log: l.Log}
-	filteredRules := filter.FilterRulesByTag(rules, tags)
-	resolvedRules := filter.ResolveRules(filteredRules, valueSource, l.Log)
+	valueSource := assertion.StandardValueSource{Log: l.Log}
+	filteredRules := assertion.FilterRulesByTag(rules, tags)
+	resolvedRules := assertion.ResolveRules(filteredRules, valueSource, l.Log)
 
 	for _, rule := range resolvedRules {
 		l.Log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
 		for _, resource := range filterKubernetesResourcesByType(resources, rule.Resource) {
-			if filter.ExcludeResource(rule, resource) {
+			if assertion.ExcludeResource(rule, resource) {
 				l.Log(fmt.Sprintf("Ignoring resource %s", resource.Id))
 			} else {
-				_, violations := filter.ApplyRule(rule, resource, l.Log)
+				_, violations := assertion.CheckRule(rule, resource, l.Log)
 				for _, violation := range violations {
 					report.Violations[violation.Status] = append(report.Violations[violation.Status], violation)
 				}
@@ -76,14 +76,14 @@ func (l KubernetesLinter) ValidateKubernetesResources(report *filter.ValidationR
 	}
 }
 
-func (l KubernetesLinter) Validate(filenames []string, ruleSet filter.RuleSet, tags []string, ruleIds []string) filter.ValidationReport {
-	report := filter.ValidationReport{
-		Violations:   make(map[string]([]filter.Violation), 0),
+func (l KubernetesLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string) assertion.ValidationReport {
+	report := assertion.ValidationReport{
+		Violations:   make(map[string]([]assertion.Violation), 0),
 		FilesScanned: make([]string, 0),
 	}
-	rules := filter.FilterRulesById(ruleSet.Rules, ruleIds)
+	rules := assertion.FilterRulesById(ruleSet.Rules, ruleIds)
 	for _, filename := range filenames {
-		if filter.ShouldIncludeFile(ruleSet.Files, filename) {
+		if assertion.ShouldIncludeFile(ruleSet.Files, filename) {
 			l.Log(fmt.Sprintf("Processing %s", filename))
 			resources := loadKubernetesResources(filename, l.Log)
 			l.ValidateKubernetesResources(&report, resources, rules, tags)
@@ -98,7 +98,7 @@ func (l KubernetesLinter) Search(filenames []string, searchExpression string) {
 		l.Log(fmt.Sprintf("Searching %s", filename))
 		resources := loadKubernetesResources(filename, l.Log)
 		for _, resource := range resources {
-			v, err := filter.SearchData(searchExpression, resource.Properties)
+			v, err := assertion.SearchData(searchExpression, resource.Properties)
 			if err != nil {
 				fmt.Println(err)
 			} else {

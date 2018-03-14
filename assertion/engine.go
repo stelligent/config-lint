@@ -1,32 +1,32 @@
-package filter
+package assertion
 
-type Filter struct {
+type Assertion struct {
 	Type      string
 	Key       string
 	Op        string
 	Value     string
-	Or        []Filter
-	And       []Filter
-	Not       []Filter
-	ValueFrom FilterValueFrom `json:"value_from"`
+	Or        []Assertion
+	And       []Assertion
+	Not       []Assertion
+	ValueFrom AssertionValueFrom `json:"value_from"`
 }
 
-type FilterValueFrom struct {
+type AssertionValueFrom struct {
 	Url string
 }
 
 type ValueSource interface {
-	GetValue(Filter) string
+	GetValue(Assertion) string
 }
 
 type Rule struct {
-	Id       string
-	Message  string
-	Severity string
-	Resource string
-	Filters  []Filter
-	Except   []string
-	Tags     []string
+	Id         string
+	Message    string
+	Severity   string
+	Resource   string
+	Assertions []Assertion
+	Except     []string
+	Tags       []string
 }
 
 type RuleSet struct {

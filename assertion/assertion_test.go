@@ -1,4 +1,4 @@
-package filter
+package assertion
 
 import (
 	"encoding/json"
@@ -14,8 +14,8 @@ func testsimple(t *testing.T) {
 		Message:  "test rule",
 		Severity: "failure",
 		Resource: "aws_instance",
-		Filters: []Filter{
-			Filter{
+		Assertions: []Assertion{
+			Assertion{
 				Type:  "value",
 				Key:   "instance_type",
 				Op:    "eq",
@@ -29,7 +29,7 @@ func testsimple(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "t2.micro"},
 		Filename:   "test.tf",
 	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
+	status := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
 	if status != "OK" {
 		t.Error("Expecting simple rule to match")
 	}
@@ -41,16 +41,16 @@ func TestOrToMatch(t *testing.T) {
 		Message:  "Test Rule",
 		Severity: "FAILURE",
 		Resource: "aws_instance",
-		Filters: []Filter{
-			Filter{
-				Or: []Filter{
-					Filter{
+		Assertions: []Assertion{
+			Assertion{
+				Or: []Assertion{
+					Assertion{
 						Type:  "value",
 						Key:   "instance_type",
 						Op:    "eq",
 						Value: "t2.micro",
 					},
-					Filter{
+					Assertion{
 						Type:  "value",
 						Key:   "instance_type",
 						Op:    "eq",
@@ -66,7 +66,7 @@ func TestOrToMatch(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "t2.micro"},
 		Filename:   "test.tf",
 	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
+	status := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
 	if status != "OK" {
 		t.Error("Expecting or to return OK")
 	}
@@ -78,16 +78,16 @@ func TestOrToNotMatch(t *testing.T) {
 		Message:  "Test Rule",
 		Severity: "FAILURE",
 		Resource: "aws_instance",
-		Filters: []Filter{
-			Filter{
-				Or: []Filter{
-					Filter{
+		Assertions: []Assertion{
+			Assertion{
+				Or: []Assertion{
+					Assertion{
 						Type:  "value",
 						Key:   "instance_type",
 						Op:    "eq",
 						Value: "t2.micro",
 					},
-					Filter{
+					Assertion{
 						Type:  "value",
 						Key:   "instance_type",
 						Op:    "eq",
@@ -103,7 +103,7 @@ func TestOrToNotMatch(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "m3.medium"},
 		Filename:   "test.tf",
 	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
+	status := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting or to return FAILURE")
 	}
@@ -115,16 +115,16 @@ func TestAndToMatch(t *testing.T) {
 		Message:  "Test Rule",
 		Severity: "FAILURE",
 		Resource: "aws_instance",
-		Filters: []Filter{
-			Filter{
-				And: []Filter{
-					Filter{
+		Assertions: []Assertion{
+			Assertion{
+				And: []Assertion{
+					Assertion{
 						Type:  "value",
 						Key:   "instance_type",
 						Op:    "eq",
 						Value: "t2.micro",
 					},
-					Filter{
+					Assertion{
 						Type:  "value",
 						Key:   "ami",
 						Op:    "eq",
@@ -143,7 +143,7 @@ func TestAndToMatch(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
+	status := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
 	if status != "OK" {
 		t.Error("Expecting and to return OK")
 	}
@@ -155,16 +155,16 @@ func TestAndToNotMatch(t *testing.T) {
 		Message:  "Test Rule",
 		Severity: "FAILURE",
 		Resource: "aws_instance",
-		Filters: []Filter{
-			Filter{
-				And: []Filter{
-					Filter{
+		Assertions: []Assertion{
+			Assertion{
+				And: []Assertion{
+					Assertion{
 						Type:  "value",
 						Key:   "instance_type",
 						Op:    "eq",
 						Value: "t2.micro",
 					},
-					Filter{
+					Assertion{
 						Type:  "value",
 						Key:   "ami",
 						Op:    "eq",
@@ -183,7 +183,7 @@ func TestAndToNotMatch(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
+	status := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting and to return FAILURE")
 	}
@@ -195,10 +195,10 @@ func TestNotToMatch(t *testing.T) {
 		Message:  "Test Rule",
 		Severity: "FAILURE",
 		Resource: "aws_instance",
-		Filters: []Filter{
-			Filter{
-				Not: []Filter{
-					Filter{
+		Assertions: []Assertion{
+			Assertion{
+				Not: []Assertion{
+					Assertion{
 						Type:  "value",
 						Key:   "instance_type",
 						Op:    "eq",
@@ -216,7 +216,7 @@ func TestNotToMatch(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
+	status := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
 	if status != "OK" {
 		t.Error("Expecting no to return OK")
 	}
@@ -228,10 +228,10 @@ func TestNotToNotMatch(t *testing.T) {
 		Message:  "Test Rule",
 		Severity: "FAILURE",
 		Resource: "aws_instance",
-		Filters: []Filter{
-			Filter{
-				Not: []Filter{
-					Filter{
+		Assertions: []Assertion{
+			Assertion{
+				Not: []Assertion{
+					Assertion{
 						Type:  "value",
 						Key:   "instance_type",
 						Op:    "eq",
@@ -249,7 +249,7 @@ func TestNotToNotMatch(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
+	status := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting no to return FAILURE")
 	}
@@ -261,18 +261,18 @@ func TestNestedNot(t *testing.T) {
 		Message:  "Test Rule",
 		Severity: "FAILURE",
 		Resource: "aws_instance",
-		Filters: []Filter{
-			Filter{
-				Not: []Filter{
-					Filter{
-						Or: []Filter{
-							Filter{
+		Assertions: []Assertion{
+			Assertion{
+				Not: []Assertion{
+					Assertion{
+						Or: []Assertion{
+							Assertion{
 								Type:  "value",
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "t2.micro",
 							},
-							Filter{
+							Assertion{
 								Type:  "value",
 								Key:   "instance_type",
 								Op:    "eq",
@@ -292,7 +292,7 @@ func TestNestedNot(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
+	status := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting nested boolean to return FAILURE")
 	}
@@ -304,18 +304,18 @@ func TestNestedBooleans(t *testing.T) {
 		Message:  "Do not allow access to port 22 from 0.0.0.0/0",
 		Severity: "NOT_COMPLIANT",
 		Resource: "aws_instance",
-		Filters: []Filter{
-			Filter{
-				Not: []Filter{
-					Filter{
-						And: []Filter{
-							Filter{
+		Assertions: []Assertion{
+			Assertion{
+				Not: []Assertion{
+					Assertion{
+						And: []Assertion{
+							Assertion{
 								Type:  "value",
 								Key:   "ipPermissions[].fromPort[]",
 								Op:    "contains",
 								Value: "22",
 							},
-							Filter{
+							Assertion{
 								Type:  "value",
 								Key:   "ipPermissions[].ipRanges[]",
 								Op:    "contains",
@@ -356,7 +356,7 @@ func TestNestedBooleans(t *testing.T) {
 	if err != nil {
 		t.Error("Error parsing resource JSON")
 	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
+	status := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
 	if status != "NOT_COMPLIANT" {
 		t.Error("Expecting nested boolean to return NOT_COMPLIANT")
 	}

@@ -1,4 +1,4 @@
-package filter
+package assertion
 
 import (
 	"bytes"
@@ -13,10 +13,10 @@ type StandardValueSource struct {
 	Log LoggingFunction
 }
 
-func (v StandardValueSource) GetValue(filter Filter) string {
-	if filter.ValueFrom.Url != "" {
-		v.Log(fmt.Sprintf("Getting value_from %s", filter.ValueFrom.Url))
-		parsedURL, err := url.Parse(filter.ValueFrom.Url)
+func (v StandardValueSource) GetValue(assertion Assertion) string {
+	if assertion.ValueFrom.Url != "" {
+		v.Log(fmt.Sprintf("Getting value_from %s", assertion.ValueFrom.Url))
+		parsedURL, err := url.Parse(assertion.ValueFrom.Url)
 		if err != nil {
 			panic(err)
 		}
@@ -30,7 +30,7 @@ func (v StandardValueSource) GetValue(filter Filter) string {
 		v.Log(content)
 		return content
 	}
-	return filter.Value
+	return assertion.Value
 }
 
 func (v StandardValueSource) GetValueFromS3(bucket string, key string) (string, error) {

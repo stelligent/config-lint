@@ -10,7 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/configservice"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/lhitchon/config-lint/filter"
+	"github.com/lhitchon/config-lint/assertion"
 	"time"
 )
 
@@ -27,14 +27,15 @@ type InvokingEvent struct {
 
 func printValue(expression string, data interface{}) {
 	fmt.Println("expression:", expression)
-	value, err := filter.SearchData(expression, data)
+	value, err := assertion.SearchData(expression, data)
 	if err != nil {
 		fmt.Println("err:", err)
 	}
 	fmt.Println("value:", value)
 }
 
-func log(string) {
+func log(s string) {
+	fmt.Println(s)
 }
 
 type RuleParameters struct {
@@ -79,8 +80,7 @@ func handler(configEvent events.ConfigEvent) (string, error) {
 		fmt.Println(err)
 		return "Error parsing JSON for RuleParameters", nil
 	}
-	fmt.Println("Bucket:", ruleParameters.Bucket)
-	fmt.Println("Key:", ruleParameters.Key)
+	fmt.Printf("Rules object in bucket: %s key: %s\n", ruleParameters.Bucket, ruleParameters.Key)
 
 	rulesString, err := loadRulesFromS3(s3Client, ruleParameters.Bucket, ruleParameters.Key)
 	if err != nil {
@@ -94,29 +94,30 @@ func handler(configEvent events.ConfigEvent) (string, error) {
 	fmt.Println("configurationItem:", configurationItem)
 	fmt.Println("configuration:", configurationItem.Configuration)
 
-	printValue("@", configurationItem.Configuration)
-
 	complianceType := "NOT_APPLICABLE"
-	ruleSet := filter.MustParseRules(rulesString)
-	for _, rule := range ruleSet.Rules {
+	ruleSet := assertion.MustParseRules(rulesString)
+	valueSource := assertion.StandardValueSource{Log: log}
+	resolvedRules := assertion.ResolveRules(ruleSet.Rules, valueSource, log)
+	for _, rule := range resolvedRules {
 		if rule.Resource == configurationItem.ResourceType {
-			resource := filter.Resource{
+			resource := assertion.Resource{
 				Id:         configurationItem.ResourceId,
 				Type:       configurationItem.ResourceType,
 				Properties: configurationItem.Configuration,
 			}
-			if filter.ExcludeResource(rule, resource) {
-				fmt.Println("Ignoring resource:", resource.Id)
-			} else {
-				complianceType = "COMPLIANT"
-				for _, ruleFilter := range rule.Filters {
-					status := filter.ApplyFilter(rule, ruleFilter, resource, log)
-					fmt.Println(status, resource)
-					if status != "OK" {
-						complianceType = status
-					}
+			_, violations := assertion.CheckRule(rule, resource, log)
+			if len(violations) > 0 {
+				fmt.Println("Resource in NON_COMPLIANT")
+				complianceType = "NON_COMPLIANT"
+				for _, violation := range violations {
+					fmt.Println(violation)
 				}
+			} else {
+				fmt.Println("Resource in COMPLIANT")
+				complianceType = "COMPLIANT"
 			}
+		} else {
+			fmt.Println("Ignoring Resource")
 		}
 	}
 

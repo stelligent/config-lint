@@ -1,4 +1,4 @@
-package filter
+package assertion
 
 import (
 	"fmt"
@@ -58,25 +58,26 @@ func ResolveRules(rules []Rule, valueSource ValueSource, log LoggingFunction) []
 
 func ResolveRule(rule Rule, valueSource ValueSource, log LoggingFunction) Rule {
 	resolvedRule := rule
-	resolvedRule.Filters = make([]Filter, 0)
-	for _, filter := range rule.Filters {
-		resolvedFilter := filter
-		resolvedFilter.Value = valueSource.GetValue(filter)
-		resolvedFilter.ValueFrom = FilterValueFrom{}
-		resolvedRule.Filters = append(resolvedRule.Filters, resolvedFilter)
+	resolvedRule.Assertions = make([]Assertion, 0)
+	for _, assertion := range rule.Assertions {
+		resolvedAssertion := assertion
+		resolvedAssertion.Value = valueSource.GetValue(assertion)
+		resolvedAssertion.ValueFrom = AssertionValueFrom{}
+		resolvedRule.Assertions = append(resolvedRule.Assertions, resolvedAssertion)
 	}
 	return resolvedRule
 }
 
-func ApplyRule(rule Rule, resource Resource, log LoggingFunction) (string, []Violation) {
+func CheckRule(rule Rule, resource Resource, log LoggingFunction) (string, []Violation) {
 	returnStatus := "OK"
 	violations := make([]Violation, 0)
 	if ExcludeResource(rule, resource) {
+		fmt.Println("Ignoring resource:", resource.Id)
 		return returnStatus, violations
 	}
-	for _, ruleFilter := range rule.Filters {
+	for _, ruleAssertion := range rule.Assertions {
 		log(fmt.Sprintf("Checking resource %s", resource.Id))
-		status := ApplyFilter(rule, ruleFilter, resource, log)
+		status := CheckAssertion(rule, ruleAssertion, resource, log)
 		if status != "OK" {
 			returnStatus = status
 			v := Violation{
@@ -93,13 +94,13 @@ func ApplyRule(rule Rule, resource Resource, log LoggingFunction) (string, []Vio
 	return returnStatus, violations
 }
 
-func ResolveValuesInFilters(filters []Filter, valueSource ValueSource, log LoggingFunction) []Filter {
-	resolved := make([]Filter, 0)
-	for _, filter := range filters {
-		resolvedFilter := filter
-		resolvedFilter.Value = valueSource.GetValue(filter)
-		resolvedFilter.ValueFrom = FilterValueFrom{}
-		resolved = append(resolved, resolvedFilter)
+func ResolveValuesInAssertions(assertions []Assertion, valueSource ValueSource, log LoggingFunction) []Assertion {
+	resolved := make([]Assertion, 0)
+	for _, assertion := range assertions {
+		resolvedAssertion := assertion
+		resolvedAssertion.Value = valueSource.GetValue(assertion)
+		resolvedAssertion.ValueFrom = AssertionValueFrom{}
+		resolved = append(resolved, resolvedAssertion)
 	}
 	return resolved
 }

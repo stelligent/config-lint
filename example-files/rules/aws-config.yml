@@ -5,7 +5,7 @@ Rules:
   - id: CFG1
     message: Table status must have provisionedThroughput
     resource: AWS::DynamoDB::Table
-    filters:
+    assertions:
       - type: value
         key: provisionedThroughput.writeCapacityUnits
         op: present
@@ -13,7 +13,7 @@ Rules:
   - id: CFG2
     message: Table status must have provisionedThroughput
     resource: AWS::DynamoDB::Table
-    filters:
+    assertions:
       - type: value
         key: provisionedThroughput.readCapacityUnits
         op: present
@@ -23,7 +23,7 @@ Rules:
     resource: AWS::EC2::SecurityGroup
     except:
       - sg-88206cff
-    filters:
+    assertions:
       - not:
           - and:
               - type: value

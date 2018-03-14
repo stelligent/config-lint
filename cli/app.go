@@ -5,17 +5,17 @@ import (
 	"flag"
 	"fmt"
 	"github.com/ghodss/yaml"
-	"github.com/lhitchon/config-lint/filter"
+	"github.com/lhitchon/config-lint/assertion"
 	"os"
 	"strings"
 )
 
 type Linter interface {
-	Validate(filenames []string, ruleSet filter.RuleSet, tags []string, ruleIds []string) filter.ValidationReport
+	Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string) assertion.ValidationReport
 	Search(filenames []string, searchExpression string)
 }
 
-func printReport(report filter.ValidationReport, queryExpression string) int {
+func printReport(report assertion.ValidationReport, queryExpression string) int {
 	jsonData, err := json.MarshalIndent(report, "", "  ")
 	if err != nil {
 		panic(err)
@@ -26,7 +26,7 @@ func printReport(report filter.ValidationReport, queryExpression string) int {
 		if err != nil {
 			panic(err)
 		}
-		v, err := filter.SearchData(queryExpression, data)
+		v, err := assertion.SearchData(queryExpression, data)
 		if err == nil && v != "null" {
 			fmt.Println(v)
 		}
@@ -53,7 +53,7 @@ func makeRulesList(ruleIds string) []string {
 	return strings.Split(ruleIds, ",")
 }
 
-func makeLinter(linterType string, log filter.LoggingFunction) Linter {
+func makeLinter(linterType string, log assertion.LoggingFunction) Linter {
 	switch linterType {
 	case "Kubernetes":
 		return KubernetesLinter{Log: log}
@@ -76,8 +76,8 @@ func main() {
 
 	exitCode := 0
 
-	ruleSet := filter.MustParseRules(filter.LoadRules(*rulesFilename))
-	linter := makeLinter(ruleSet.Type, filter.MakeLogger(*verboseLogging))
+	ruleSet := assertion.MustParseRules(assertion.LoadRules(*rulesFilename))
+	linter := makeLinter(ruleSet.Type, assertion.MakeLogger(*verboseLogging))
 	if linter != nil {
 		if *searchExpression != "" {
 			linter.Search(flag.Args(), *searchExpression)

@@ -1,4 +1,4 @@
-package filter
+package assertion
 
 import (
 	"path/filepath"

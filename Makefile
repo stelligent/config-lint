@@ -1,6 +1,6 @@
 
-CLI_FILES = $(shell find cli filter -name \*.go)
-LAMBDA_FILES = $(shell find lambda filter -name \*.go)
+CLI_FILES = $(shell find cli assertion -name \*.go)
+LAMBDA_FILES = $(shell find lambda assertion -name \*.go)
 
 config-lint: $(CLI_FILES)
 	go build -o config-lint cli/*.go
