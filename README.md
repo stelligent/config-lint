@@ -350,7 +350,7 @@ Lots to do. This is just a proof-of-concept.
 * Implement more of the operators from CloudCustodian
 * Figure out what other filter types might be needed (if any)
 * Output should be grouped by resource id
-* Add value_from to allow for dynamic data (again, see CloudCustodian)
+* Finish implementing value_from to allow for dynamic data (again, see CloudCustodian)
 * Add ability to extend with a Lambda function
 * Add examples to this file for Kubernetes files
 * Support multiple rules files, or a rules directory
