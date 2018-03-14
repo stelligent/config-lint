@@ -84,14 +84,18 @@ func filterTerraformResourcesByType(resources []filter.Resource, resourceType st
 }
 
 func (l TerraformLinter) ValidateTerraformResources(report *filter.ValidationReport, resources []filter.Resource, rules []filter.Rule, tags []string) {
+
 	valueSource := filter.StandardValueSource{Log: l.Log}
-	for _, rule := range filter.FilterRulesByTag(rules, tags) {
+	filteredRules := filter.FilterRulesByTag(rules, tags)
+	resolvedRules := filter.ResolveRules(filteredRules, valueSource, l.Log)
+
+	for _, rule := range resolvedRules {
 		l.Log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
 		for _, resource := range filterTerraformResourcesByType(resources, rule.Resource) {
 			if filter.ExcludeResource(rule, resource) {
 				l.Log(fmt.Sprintf("Ignoring resource %s", resource.Id))
 			} else {
-				_, violations := filter.ApplyRule(rule, resource, valueSource, l.Log)
+				_, violations := filter.ApplyRule(rule, resource, l.Log)
 				for _, violation := range violations {
 					report.Violations[violation.Status] = append(report.Violations[violation.Status], violation)
 				}

@@ -48,14 +48,33 @@ func FilterRulesById(rules []Rule, ruleIds []string) []Rule {
 	return filteredRules
 }
 
-func ApplyRule(rule Rule, resource Resource, valueSource ValueSource, log LoggingFunction) (string, []Violation) {
+func ResolveRules(rules []Rule, valueSource ValueSource, log LoggingFunction) []Rule {
+	resolvedRules := make([]Rule, 0)
+	for _, rule := range rules {
+		resolvedRules = append(resolvedRules, ResolveRule(rule, valueSource, log))
+	}
+	return resolvedRules
+}
+
+func ResolveRule(rule Rule, valueSource ValueSource, log LoggingFunction) Rule {
+	resolvedRule := rule
+	resolvedRule.Filters = make([]Filter, 0)
+	for _, filter := range rule.Filters {
+		resolvedFilter := filter
+		resolvedFilter.Value = valueSource.GetValue(filter)
+		resolvedFilter.ValueFrom = FilterValueFrom{}
+		resolvedRule.Filters = append(resolvedRule.Filters, resolvedFilter)
+	}
+	return resolvedRule
+}
+
+func ApplyRule(rule Rule, resource Resource, log LoggingFunction) (string, []Violation) {
 	returnStatus := "OK"
 	violations := make([]Violation, 0)
 	if ExcludeResource(rule, resource) {
 		return returnStatus, violations
 	}
-	resolvedFilters := ResolveValuesInFilters(rule.Filters, valueSource, log)
-	for _, ruleFilter := range resolvedFilters {
+	for _, ruleFilter := range rule.Filters {
 		log(fmt.Sprintf("Checking resource %s", resource.Id))
 		status := ApplyFilter(rule, ruleFilter, resource, log)
 		if status != "OK" {

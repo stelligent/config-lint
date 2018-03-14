@@ -96,7 +96,7 @@ func TestRuleWithMultipleFilter(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "t2.micro", "ami": "ami-000000"},
 		Filename:   "test.tf",
 	}
-	status, violations := ApplyRule(rules.Rules[0], resource, testValueSource(), testLogging)
+	status, violations := ApplyRule(rules.Rules[0], resource, testLogging)
 	if status != "OK" {
 		t.Error("Expecting multiple rule to match")
 	}
@@ -113,7 +113,7 @@ func TestMultipleFiltersWithSingleFailure(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "t2.micro", "ami": "ami-111111"},
 		Filename:   "test.tf",
 	}
-	status, violations := ApplyRule(rules.Rules[0], resource, testValueSource(), testLogging)
+	status, violations := ApplyRule(rules.Rules[0], resource, testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting multiple rule to return FAILURE")
 	}
@@ -130,7 +130,7 @@ func TestMultipleFiltersWithMultipleFailures(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "c3.medium", "ami": "ami-111111"},
 		Filename:   "test.tf",
 	}
-	status, violations := ApplyRule(rules.Rules[0], resource, testValueSource(), testLogging)
+	status, violations := ApplyRule(rules.Rules[0], resource, testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting multiple rule to return FAILURE")
 	}
@@ -161,7 +161,8 @@ func TestValueFrom(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "m3.medium"},
 		Filename:   "test.tf",
 	}
-	status, violations := ApplyRule(rules.Rules[0], resource, testValueSource(), testLogging)
+	resolved := ResolveRules(rules.Rules, testValueSource(), testLogging)
+	status, violations := ApplyRule(resolved[0], resource, testLogging)
 	if status != "OK" {
 		t.Error("Expecting value_from to match")
 	}
