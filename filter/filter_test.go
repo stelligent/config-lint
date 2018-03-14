@@ -8,20 +8,6 @@ import (
 func testLogging(s string) {
 }
 
-type TestValueSource struct {
-}
-
-func (t TestValueSource) GetValue(filter Filter) string {
-	if filter.Value != "" {
-		return filter.Value
-	}
-	return "m3.medium"
-}
-
-func testValueSource() ValueSource {
-	return TestValueSource{}
-}
-
 func testsimple(t *testing.T) {
 	rule := Rule{
 		Id:       "test1",
@@ -43,7 +29,7 @@ func testsimple(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "t2.micro"},
 		Filename:   "test.tf",
 	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testValueSource(), testLogging)
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "OK" {
 		t.Error("Expecting simple rule to match")
 	}
@@ -80,7 +66,7 @@ func TestOrToMatch(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "t2.micro"},
 		Filename:   "test.tf",
 	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testValueSource(), testLogging)
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "OK" {
 		t.Error("Expecting or to return OK")
 	}
@@ -117,7 +103,7 @@ func TestOrToNotMatch(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "m3.medium"},
 		Filename:   "test.tf",
 	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testValueSource(), testLogging)
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting or to return FAILURE")
 	}
@@ -157,7 +143,7 @@ func TestAndToMatch(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testValueSource(), testLogging)
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "OK" {
 		t.Error("Expecting and to return OK")
 	}
@@ -197,7 +183,7 @@ func TestAndToNotMatch(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testValueSource(), testLogging)
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting and to return FAILURE")
 	}
@@ -230,7 +216,7 @@ func TestNotToMatch(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testValueSource(), testLogging)
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "OK" {
 		t.Error("Expecting no to return OK")
 	}
@@ -263,7 +249,7 @@ func TestNotToNotMatch(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testValueSource(), testLogging)
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting no to return FAILURE")
 	}
@@ -306,7 +292,7 @@ func TestNestedNot(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testValueSource(), testLogging)
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting nested boolean to return FAILURE")
 	}
@@ -370,7 +356,7 @@ func TestNestedBooleans(t *testing.T) {
 	if err != nil {
 		t.Error("Error parsing resource JSON")
 	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testValueSource(), testLogging)
+	status := ApplyFilter(rule, rule.Filters[0], resource, testLogging)
 	if status != "NOT_COMPLIANT" {
 		t.Error("Expecting nested boolean to return NOT_COMPLIANT")
 	}
@@ -407,35 +393,5 @@ func TestNoExceptions(t *testing.T) {
 	filteredResources := FilterResourceExceptions(rule, resources)
 	if len(filteredResources) != 4 {
 		t.Error("Expecting no exceptions to return all resources")
-	}
-}
-
-func TestValueFrom(t *testing.T) {
-	rule := Rule{
-		Id:       "TEST1",
-		Message:  "Test Rule",
-		Severity: "FAILURE",
-		Resource: "aws_instance",
-		Filters: []Filter{
-			Filter{
-				Type: "value",
-				Key:  "instance_type",
-				Op:   "in",
-				ValueFrom: FilterValueFrom{
-					Bucket: "config-rules-for-lambda",
-					Key:    "instance-types",
-				},
-			},
-		},
-	}
-	resource := Resource{
-		Id:         "a_test_resource",
-		Type:       "aws_instance",
-		Properties: map[string]interface{}{"instance_type": "m3.medium"},
-		Filename:   "test.tf",
-	}
-	status := ApplyFilter(rule, rule.Filters[0], resource, testValueSource(), testLogging)
-	if status != "OK" {
-		t.Error("Expecting value_from to match")
 	}
 }

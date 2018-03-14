@@ -56,13 +56,14 @@ func filterKubernetesResourcesByType(resources []filter.Resource, resourceType s
 }
 
 func (l KubernetesLinter) ValidateKubernetesResources(report *filter.ValidationReport, resources []filter.Resource, rules []filter.Rule, tags []string) {
+	valueSource := filter.StandardValueSource{Log: l.Log}
 	for _, rule := range filter.FilterRulesByTag(rules, tags) {
 		l.Log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
 		for _, resource := range filterKubernetesResourcesByType(resources, rule.Resource) {
 			if filter.ExcludeResource(rule, resource) {
 				l.Log(fmt.Sprintf("Ignoring resource %s", resource.Id))
 			} else {
-				_, violations := filter.ApplyRule(rule, resource, l.Log)
+				_, violations := filter.ApplyRule(rule, resource, valueSource, l.Log)
 				for _, violation := range violations {
 					report.Violations[violation.Status] = append(report.Violations[violation.Status], violation)
 				}

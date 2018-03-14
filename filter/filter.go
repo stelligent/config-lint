@@ -4,14 +4,13 @@ import (
 	"fmt"
 )
 
-func searchAndMatch(filter Filter, resource Resource, valueSource ValueSource, log LoggingFunction) bool {
+func searchAndMatch(filter Filter, resource Resource, log LoggingFunction) bool {
 	v, err := SearchData(filter.Key, resource.Properties)
 	if err != nil {
 		panic(err)
 	}
-	value := valueSource.GetValue(filter)
-	match := isMatch(unquoted(v), filter.Op, value)
-	log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s", filter.Key, v, filter.Op, value))
+	match := isMatch(unquoted(v), filter.Op, filter.Value)
+	log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s", filter.Key, v, filter.Op, filter.Value))
 	log(fmt.Sprintf("ResourceId: %s Type: %s %t",
 		resource.Id,
 		resource.Type,
@@ -19,44 +18,44 @@ func searchAndMatch(filter Filter, resource Resource, valueSource ValueSource, l
 	return match
 }
 
-func orOperation(filters []Filter, resource Resource, valueSource ValueSource, log LoggingFunction) bool {
+func orOperation(filters []Filter, resource Resource, log LoggingFunction) bool {
 	for _, childFilter := range filters {
-		if booleanOperation(childFilter, resource, valueSource, log) {
+		if booleanOperation(childFilter, resource, log) {
 			return true
 		}
 	}
 	return false
 }
 
-func andOperation(filters []Filter, resource Resource, valueSource ValueSource, log LoggingFunction) bool {
+func andOperation(filters []Filter, resource Resource, log LoggingFunction) bool {
 	for _, childFilter := range filters {
-		if !booleanOperation(childFilter, resource, valueSource, log) {
+		if !booleanOperation(childFilter, resource, log) {
 			return false
 		}
 	}
 	return true
 }
 
-func notOperation(filters []Filter, resource Resource, valueSource ValueSource, log LoggingFunction) bool {
+func notOperation(filters []Filter, resource Resource, log LoggingFunction) bool {
 	for _, childFilter := range filters {
-		if booleanOperation(childFilter, resource, valueSource, log) {
+		if booleanOperation(childFilter, resource, log) {
 			return false
 		}
 	}
 	return true
 }
 
-func booleanOperation(filter Filter, resource Resource, valueSource ValueSource, log LoggingFunction) bool {
+func booleanOperation(filter Filter, resource Resource, log LoggingFunction) bool {
 	if filter.Or != nil && len(filter.Or) > 0 {
-		return orOperation(filter.Or, resource, valueSource, log)
+		return orOperation(filter.Or, resource, log)
 	}
 	if filter.And != nil && len(filter.And) > 0 {
-		return andOperation(filter.And, resource, valueSource, log)
+		return andOperation(filter.And, resource, log)
 	}
 	if filter.Not != nil && len(filter.Not) > 0 {
-		return notOperation(filter.Not, resource, valueSource, log)
+		return notOperation(filter.Not, resource, log)
 	}
-	return searchAndMatch(filter, resource, valueSource, log)
+	return searchAndMatch(filter, resource, log)
 }
 
 func ExcludeResource(rule Rule, resource Resource) bool {
@@ -81,9 +80,9 @@ func FilterResourceExceptions(rule Rule, resources []Resource) []Resource {
 	return filtered
 }
 
-func ApplyFilter(rule Rule, filter Filter, resource Resource, valueSource ValueSource, log LoggingFunction) string {
+func ApplyFilter(rule Rule, filter Filter, resource Resource, log LoggingFunction) string {
 	status := "OK"
-	if !booleanOperation(filter, resource, valueSource, log) {
+	if !booleanOperation(filter, resource, log) {
 		status = rule.Severity
 	}
 	return status

@@ -4,6 +4,20 @@ import (
 	"testing"
 )
 
+type TestValueSource struct {
+}
+
+func (t TestValueSource) GetValue(filter Filter) string {
+	if filter.Value != "" {
+		return filter.Value
+	}
+	return "m3.medium"
+}
+
+func testValueSource() ValueSource {
+	return TestValueSource{}
+}
+
 var content = `Rules:
   - id: TEST1
     message: Test message
@@ -82,7 +96,7 @@ func TestRuleWithMultipleFilter(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "t2.micro", "ami": "ami-000000"},
 		Filename:   "test.tf",
 	}
-	status, violations := ApplyRule(rules.Rules[0], resource, testLogging)
+	status, violations := ApplyRule(rules.Rules[0], resource, testValueSource(), testLogging)
 	if status != "OK" {
 		t.Error("Expecting multiple rule to match")
 	}
@@ -99,7 +113,7 @@ func TestMultipleFiltersWithSingleFailure(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "t2.micro", "ami": "ami-111111"},
 		Filename:   "test.tf",
 	}
-	status, violations := ApplyRule(rules.Rules[0], resource, testLogging)
+	status, violations := ApplyRule(rules.Rules[0], resource, testValueSource(), testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting multiple rule to return FAILURE")
 	}
@@ -116,11 +130,42 @@ func TestMultipleFiltersWithMultipleFailures(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "c3.medium", "ami": "ami-111111"},
 		Filename:   "test.tf",
 	}
-	status, violations := ApplyRule(rules.Rules[0], resource, testLogging)
+	status, violations := ApplyRule(rules.Rules[0], resource, testValueSource(), testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting multiple rule to return FAILURE")
 	}
 	if len(violations) != 2 {
 		t.Error("Expecting multiple rule to have two violations")
+	}
+}
+
+var ruleWithValueFrom = `Rules:
+  - id: FROM1
+    message: Test value_from
+    severity: FAILURE
+    resource: aws_instance
+    filters:
+      - type: value
+        key: instance_type
+        op: in
+        value_from:
+          bucket: config-rules-for-lambda
+          key: instance-types
+`
+
+func TestValueFrom(t *testing.T) {
+	rules := MustParseRules(ruleWithValueFrom)
+	resource := Resource{
+		Id:         "a_test_resource",
+		Type:       "aws_instance",
+		Properties: map[string]interface{}{"instance_type": "m3.medium"},
+		Filename:   "test.tf",
+	}
+	status, violations := ApplyRule(rules.Rules[0], resource, testValueSource(), testLogging)
+	if status != "OK" {
+		t.Error("Expecting value_from to match")
+	}
+	if len(violations) != 0 {
+		t.Error("Expecting value_from test to have 0 violations")
 	}
 }
