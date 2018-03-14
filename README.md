@@ -116,7 +116,7 @@ Rules:
     severity: WARNING
 ```
 
-The filters and operations are modeled after those used by CloudCustodian: http://capitalone.github.io/cloud-custodian/docs/
+The filters and operations are modeled after those used by Cloud Custodian: http://capitalone.github.io/cloud-custodian/docs/
 
 
 ## Operations supported for a Filter
@@ -345,12 +345,13 @@ Rules:
 
 Lots to do. This is just a proof-of-concept.
 
+* Find a better name than 'filter' - this tool actually inverts the sense of a filter in Cloud Custodian
 * Embedded JSON for IAM policies should be parsed and made available for JMESPath query
 * Add an optional YAML file for project settings, such as ignoring certain rules for certain resources
-* Implement more of the operators from CloudCustodian
+* Implement more of the operators from Cloud Custodian
 * Figure out what other filter types might be needed (if any)
 * Output should be grouped by resource id
-* Finish implementing value_from to allow for dynamic data (again, see CloudCustodian)
+* Finish implementing value_from to allow for dynamic data (again, see Cloud Custodian)
 * Add ability to extend with a Lambda function
 * Add examples to this file for Kubernetes files
 * Support multiple rules files, or a rules directory
