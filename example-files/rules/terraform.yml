@@ -141,8 +141,7 @@ Rules:
         key: instance_type
         op: in
         value_from:
-          bucket: config-rules-for-lambda
-          key: instance-types
+          url: s3://config-rules-for-lambda/instance-types
     severity: WARNING
     tags:
       - ec2

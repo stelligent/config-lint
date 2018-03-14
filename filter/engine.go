@@ -12,8 +12,7 @@ type Filter struct {
 }
 
 type FilterValueFrom struct {
-	Bucket string
-	Key    string
+	Url string
 }
 
 type ValueSource interface {

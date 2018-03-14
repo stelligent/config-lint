@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"net/url"
 )
 
 type StandardValueSource struct {
@@ -13,12 +14,20 @@ type StandardValueSource struct {
 }
 
 func (v StandardValueSource) GetValue(filter Filter) string {
-	if filter.ValueFrom.Bucket != "" {
-		v.Log(fmt.Sprintf("Getting value_from s3://%s/%s", filter.ValueFrom.Bucket, filter.ValueFrom.Key))
-		content, err := v.GetValueFromS3(filter.ValueFrom.Bucket, filter.ValueFrom.Key)
+	if filter.ValueFrom.Url != "" {
+		v.Log(fmt.Sprintf("Getting value_from %s", filter.ValueFrom.Url))
+		parsedURL, err := url.Parse(filter.ValueFrom.Url)
+		if err != nil {
+			panic(err)
+		}
+		if parsedURL.Scheme != "s3" && parsedURL.Scheme != "S3" {
+			panic(fmt.Sprintf("Unsupported protocol for value_from: %s", parsedURL.Scheme))
+		}
+		content, err := v.GetValueFromS3(parsedURL.Host, parsedURL.Path)
 		if err != nil {
 			return "Error" // FIXME
 		}
+		v.Log(content)
 		return content
 	}
 	return filter.Value
