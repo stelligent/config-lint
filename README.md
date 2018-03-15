@@ -39,11 +39,11 @@ The rules file specifies what files to process, and what validations to perform.
 
 |Name       |Description                                                                         |
 |-----------|------------------------------------------------------------------------------------|
-|Version    |Currently ignored                                                                   |
-|Description|Text description for the file, not currently used                                   |
-|Type       |Should be 'Terraform' or 'Kubernetes'                                               |
-|Files      |Filenames must match one of these patterns to be processed by this set of rules     |
-|Rules      |A list of rules, see next section                                                   |
+|version    |Currently ignored                                                                   |
+|description|Text description for the file, not currently used                                   |
+|type       |Should be 'Terraform' or 'Kubernetes'                                               |
+|files      |Filenames must match one of these patterns to be processed by this set of rules     |
+|rules      |A list of rules, see next section                                                   |
 
 ## Attributes for each Rule
 
