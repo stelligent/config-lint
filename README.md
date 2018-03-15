@@ -56,12 +56,12 @@ Each rule contains the following attributes:
 |resource   | The resource type to which the rule will be applied                                |
 |except     | An optional list of resource ids that should not be validated                      |
 |severity   | Should be 'WARNING' or 'FAILURE'                                                   |
-|filters    | A list of filters used to detect validation errors, see next section               |
+|assertions | A list of assertions used to detect validation errors, see next section            |
 |tags       | Optional list of tags, command line has option to limit scans to a subset of tags  |
 
-## Attributes for each Filter
+## Attributes for each Assertion
 
-Each filter contains the following attributes:
+Each assertion contains the following attributes:
 
 |Name       |Description                                                                         |
 |-----------|------------------------------------------------------------------------------------|
@@ -83,7 +83,7 @@ Rules:
   - id: R1
     message: Instance type should be t2.micro or m3.medium
     resource: aws_instance
-    filters:
+    assertions:
       - type: value
         key: instance_type
         op: in
@@ -91,7 +91,7 @@ Rules:
     severity: WARNING
 ```
 
-This could also be done by using the or operation with two different filters:
+This could also be done by using the or operation with two different assertions:
 
 ```
 Version: 1
@@ -103,7 +103,7 @@ Rules:
   - id: R2
     message: Instance type should be t2.micro or m3.medium
     resource: aws_instance
-    filters:
+    assertions:
       or:
         - type: value
           key: instance_type
@@ -116,10 +116,10 @@ Rules:
     severity: WARNING
 ```
 
-The filters and operations are modeled after those used by Cloud Custodian: http://capitalone.github.io/cloud-custodian/docs/
+The assertions and operations are modeled after those used by Cloud Custodian: http://capitalone.github.io/cloud-custodian/docs/
 
 
-## Operations supported for a Filter
+## Operations supported for an Assertion
 
 * eq - Equals
 
@@ -130,7 +130,7 @@ Example:
     resource: aws_ebs_volume
     message: EBS Volumes must be encrypted
     severity: FAILURE
-    filters:
+    assertions:
       - type: value
         key: encrypted
         op: eq
@@ -147,7 +147,7 @@ Example:
     resource: aws_security_group
     message: Security group should not allow ingress from 0.0.0.0/0
     severity: FAILURE
-    filters:
+    assertions:
       - type: value
         key: "ingress[].cidr_blocks[] | [0]"
         op: ne
@@ -163,7 +163,7 @@ Example:
   - id: R1
     message: Instance type should be t2.micro or m3.medium
     resource: aws_instance
-    filters:
+    assertions:
       - type: value
         key: instance_type
         op: in
@@ -182,7 +182,7 @@ Example:
   - id: R6
     message: Department tag is required
     resource: aws_instance
-    filters:
+    assertions:
       - type: value
         key: "tags[].Department | [0]"
         op: present
@@ -196,7 +196,7 @@ Example:
 
 * regex - Attribute matches a regular expression
 
-* not - Logical not of another filter
+* not - Logical not of another assertions
 
 Example:
 ```
@@ -205,7 +205,7 @@ Example:
     resource: aws_instance
     message: Should not have instance type of c4.large
     severity: WARNING
-    filters:
+    assertions:
       - not:
         - type: value
           key: instance_type
@@ -214,7 +214,7 @@ Example:
 ...
 ```
 
-* and - Logical and of a list of filters
+* and - Logical and of a list of assertions
 
 Exmaple:
 ```
@@ -223,7 +223,7 @@ Exmaple:
     resource: aws_instance
     message: Should have both Project and Department tags
     severity: WARNING
-    filters:
+    assertions:
       - and:
         - type: value
           key: "tags[].Department | [0]"
@@ -236,7 +236,7 @@ Exmaple:
 ...
 ```
 
-* or - Logical or  of a list of filters
+* or - Logical or  of a list of assertions
 
 Example:
 
@@ -246,7 +246,7 @@ Example:
     resource: aws_instance
     message: Should have instance_type of t2.micro or m3.medium
     severity: WARNING
-    filters:
+    assertions:
       - or:
         - type: value
           key: instance_type
@@ -328,7 +328,7 @@ Rules:
     except:
       - sg-88206cff
     severity: NON_COMPLIANT
-    filters:
+    assertions:
       - not:
           - and:
               - type: value
@@ -348,7 +348,7 @@ Lots to do. This is just a proof-of-concept.
 * Embedded JSON for IAM policies should be parsed and made available for JMESPath query
 * Add an optional YAML file for project settings, such as ignoring certain rules for certain resources
 * Implement more of the operators from Cloud Custodian
-* Figure out what other filter types might be needed (if any)
+* Figure out what other assertion types might be needed (if any)
 * Output should be grouped by resource id
 * Finish implementing value_from to allow for dynamic data (again, see Cloud Custodian)
 * Add ability to extend with a Lambda function
