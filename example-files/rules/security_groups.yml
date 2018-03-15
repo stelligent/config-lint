@@ -1,0 +1,14 @@
+Version: 1
+Description: Rules for Security Groups
+Type: SecurityGroup
+Rules:
+  - id: SG1
+    message: Should not allow access to SSH from anywhere
+    resource: "AWS::EC2::SecurityGroup"
+    assertions:
+      - not:
+          - type: value
+            key: IpPermissions[?(FromPort==`22`)].IpRanges[].CidrIp | [0]
+            op: eq
+            value: "0.0.0.0/0"
+    severity: NON_COMPLIANT

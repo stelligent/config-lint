@@ -46,3 +46,16 @@ func ShouldIncludeFile(patterns []string, filename string) bool {
 	}
 	return false
 }
+
+func FilterResourcesByType(resources []Resource, resourceType string) []Resource {
+	if resourceType == "*" {
+		return resources
+	}
+	filtered := make([]Resource, 0)
+	for _, resource := range resources {
+		if resource.Type == resourceType {
+			filtered = append(filtered, resource)
+		}
+	}
+	return filtered
+}
