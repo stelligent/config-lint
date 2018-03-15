@@ -1,6 +1,8 @@
 # config-lint
 
-A command line tool to validate configuration files using rules specified in a YAML file.
+A command line tool to validate configurations using rules specified in a YAML file.
+The data being validated can come from template files, such as a Terraform file.
+There is also an example of a Linter that runs agains data returned from an AWS API call.
 
 There is also the ability to deploy an AWS Lambda that can be used as a custom rule
 AWS Config. The compliance tests are written in YAML, using the same format. This
@@ -28,6 +30,12 @@ The program currently supports Terraform and Kubernetes files.
 
 ```
 ./config-lint --rules example-files/rules/kubernetes.yml example-files/config/*
+```
+
+## Validate Existing Security Groups
+
+```
+./config-lint --rules example-files/rules/security-groups.yml
 ```
 
 
