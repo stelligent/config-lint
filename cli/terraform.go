@@ -122,14 +122,14 @@ func (l TerraformLinter) Validate(filenames []string, ruleSet assertion.RuleSet,
 
 func (l TerraformLinter) Search(filenames []string, searchExpression string) {
 	for _, filename := range filenames {
-		l.Log(fmt.Sprintf("Searching %s", filename))
+		fmt.Printf("Searching %s:\n", filename)
 		resources := loadTerraformResources(filename, l.Log)
 		for _, resource := range resources {
 			v, err := assertion.SearchData(searchExpression, resource.Properties)
 			if err != nil {
 				fmt.Println(err)
 			} else {
-				fmt.Printf("%s: %s\n", filename, v)
+				fmt.Printf("%s: %s\n", resource.Id, v)
 			}
 		}
 	}
