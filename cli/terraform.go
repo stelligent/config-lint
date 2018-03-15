@@ -70,19 +70,6 @@ func loadTerraformResources(filename string, log assertion.LoggingFunction) []as
 	return resources
 }
 
-func filterTerraformResourcesByType(resources []assertion.Resource, resourceType string) []assertion.Resource {
-	if resourceType == "*" {
-		return resources
-	}
-	filtered := make([]assertion.Resource, 0)
-	for _, resource := range resources {
-		if resource.Type == resourceType {
-			filtered = append(filtered, resource)
-		}
-	}
-	return filtered
-}
-
 func (l TerraformLinter) ValidateTerraformResources(report *assertion.ValidationReport, resources []assertion.Resource, rules []assertion.Rule, tags []string) {
 
 	valueSource := assertion.StandardValueSource{Log: l.Log}
@@ -91,7 +78,7 @@ func (l TerraformLinter) ValidateTerraformResources(report *assertion.Validation
 
 	for _, rule := range resolvedRules {
 		l.Log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
-		for _, resource := range filterTerraformResourcesByType(resources, rule.Resource) {
+		for _, resource := range assertion.FilterResourcesByType(resources, rule.Resource) {
 			if assertion.ExcludeResource(rule, resource) {
 				l.Log(fmt.Sprintf("Ignoring resource %s", resource.Id))
 			} else {
