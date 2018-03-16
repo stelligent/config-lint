@@ -13,6 +13,22 @@ type TerraformLinter struct {
 	Log assertion.LoggingFunction
 }
 
+func parsePolicy(resource assertion.Resource, attribute string) assertion.Resource {
+	if resource.Properties != nil {
+		properties := resource.Properties.(map[string]interface{})
+		if policyAttribute, hasPolicyString := properties[attribute]; hasPolicyString {
+			policyString := policyAttribute.(string)
+			var policy interface{}
+			err := json.Unmarshal([]byte(policyString), &policy)
+			if err != nil {
+				panic(err)
+			}
+			properties[attribute] = policy
+		}
+	}
+	return resource
+}
+
 func loadHCL(filename string, log assertion.LoggingFunction) []interface{} {
 	template, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -61,7 +77,7 @@ func loadTerraformResources(filename string, log assertion.LoggingFunction) []as
 							Properties: resource.([]interface{})[0],
 							Filename:   filename,
 						}
-						resources = append(resources, tr)
+						resources = append(resources, parsePolicy(tr, "assume_role_policy"))
 					}
 				}
 			}
