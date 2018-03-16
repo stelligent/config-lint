@@ -1,6 +1,7 @@
 package assertion
 
 import (
+	"encoding/json"
 	"path/filepath"
 )
 
@@ -22,6 +23,14 @@ func isPresent(s string) bool {
 	return !isAbsent(s)
 }
 
+func isNotNull(s string) bool {
+	return s != "null"
+}
+
+func isEmpty(s string) bool {
+	return s == "null" || s == "[]"
+}
+
 func listsIntersect(list1 []string, list2 []string) bool {
 	for _, a := range list1 {
 		for _, b := range list2 {
@@ -31,6 +40,20 @@ func listsIntersect(list1 []string, list2 []string) bool {
 		}
 	}
 	return false
+}
+
+func jsonListsIntersect(s1 string, s2 string) bool {
+	var a1 []string
+	var a2 []string
+	err := json.Unmarshal([]byte(s1), &a1)
+	if err != nil {
+		return false
+	}
+	err = json.Unmarshal([]byte(s2), &a2)
+	if err != nil {
+		return false
+	}
+	return listsIntersect(a1, a2)
 }
 
 func ShouldIncludeFile(patterns []string, filename string) bool {

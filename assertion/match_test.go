@@ -36,6 +36,21 @@ func TestIsMatch(t *testing.T) {
 		{SearchResult: "Foo", Op: "regex", Value: "o$", ExpectedResult: true},
 		{SearchResult: "Foo", Op: "regex", Value: "^F", ExpectedResult: true},
 		{SearchResult: "Foo", Op: "regex", Value: "^Bar$", ExpectedResult: false},
+		{SearchResult: "a", Op: "lt", Value: "b", ExpectedResult: true},
+		{SearchResult: "a", Op: "lt", Value: "a", ExpectedResult: false},
+		{SearchResult: "a", Op: "le", Value: "a", ExpectedResult: true},
+		{SearchResult: "b", Op: "le", Value: "a", ExpectedResult: false},
+		{SearchResult: "b", Op: "gt", Value: "a", ExpectedResult: true},
+		{SearchResult: "b", Op: "gt", Value: "b", ExpectedResult: false},
+		{SearchResult: "b", Op: "ge", Value: "b", ExpectedResult: true},
+		{SearchResult: "b", Op: "ge", Value: "c", ExpectedResult: false},
+		{SearchResult: "null", Op: "not-null", Value: "", ExpectedResult: false},
+		{SearchResult: "1", Op: "not-null", Value: "", ExpectedResult: true},
+		{SearchResult: "[]", Op: "empty", Value: "", ExpectedResult: true},
+		{SearchResult: "[100]", Op: "empty", Value: "", ExpectedResult: false},
+		{SearchResult: "null", Op: "empty", Value: "", ExpectedResult: true},
+		{SearchResult: "[\"one\",\"two\"]", Op: "intersect", Value: "[\"two\",\"three\"]", ExpectedResult: true},
+		{SearchResult: "[\"one\",\"two\"]", Op: "intersect", Value: "[\"three\",\"four\"]", ExpectedResult: false},
 	}
 	for _, tc := range testCases {
 		b := isMatch(tc.SearchResult, tc.Op, tc.Value)

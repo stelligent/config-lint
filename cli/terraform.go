@@ -13,17 +13,19 @@ type TerraformLinter struct {
 	Log assertion.LoggingFunction
 }
 
-func parsePolicy(resource assertion.Resource, attribute string) assertion.Resource {
+func parsePolicy(resource assertion.Resource) assertion.Resource {
 	if resource.Properties != nil {
 		properties := resource.Properties.(map[string]interface{})
-		if policyAttribute, hasPolicyString := properties[attribute]; hasPolicyString {
-			if policyString, ok := policyAttribute.(string); ok {
-				var policy interface{}
-				err := json.Unmarshal([]byte(policyString), &policy)
-				if err != nil {
-					panic(err)
+		for _, attribute := range []string{"assume_role_policy", "policy"} {
+			if policyAttribute, hasPolicyString := properties[attribute]; hasPolicyString {
+				if policyString, isString := policyAttribute.(string); isString {
+					var policy interface{}
+					err := json.Unmarshal([]byte(policyString), &policy)
+					if err != nil {
+						panic(err)
+					}
+					properties[attribute] = policy
 				}
-				properties[attribute] = policy
 			}
 		}
 	}
@@ -78,7 +80,7 @@ func loadTerraformResources(filename string, log assertion.LoggingFunction) []as
 							Properties: resource.([]interface{})[0],
 							Filename:   filename,
 						}
-						resources = append(resources, parsePolicy(tr, "assume_role_policy"))
+						resources = append(resources, parsePolicy(tr))
 					}
 				}
 			}

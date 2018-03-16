@@ -6,8 +6,6 @@ import (
 )
 
 func isMatch(searchResult string, op string, value string) bool {
-	// TODO see Cloud Custodian for ideas
-	// ADD gt, ge, lt, le, not-null, empty, intersect, glob
 	switch op {
 	case "eq":
 		if searchResult == value {
@@ -15,6 +13,22 @@ func isMatch(searchResult string, op string, value string) bool {
 		}
 	case "ne":
 		if searchResult != value {
+			return true
+		}
+	case "lt":
+		if searchResult < value {
+			return true
+		}
+	case "le":
+		if searchResult <= value {
+			return true
+		}
+	case "gt":
+		if searchResult > value {
+			return true
+		}
+	case "ge":
+		if searchResult >= value {
 			return true
 		}
 	case "in":
@@ -36,6 +50,18 @@ func isMatch(searchResult string, op string, value string) bool {
 		}
 	case "present":
 		if isPresent(searchResult) {
+			return true
+		}
+	case "not-null":
+		if isNotNull(searchResult) {
+			return true
+		}
+	case "empty":
+		if isEmpty(searchResult) {
+			return true
+		}
+	case "intersect":
+		if jsonListsIntersect(searchResult, value) {
 			return true
 		}
 	case "contains":

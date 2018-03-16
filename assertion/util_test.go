@@ -55,3 +55,11 @@ func TestIntersectFalse(t *testing.T) {
 		t.Errorf("listsIntersect should return false fails")
 	}
 }
+
+func TestJSONListsIntersectTrue(t *testing.T) {
+	s1 := "[ \"foo\", \"bar\" ]"
+	s2 := "[ \"baz\", \"bar\" ]"
+	if jsonListsIntersect(s1, s2) != true {
+		t.Errorf("JSONIntersect should return true")
+	}
+}

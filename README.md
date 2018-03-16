@@ -353,9 +353,7 @@ Rules:
 
 Lots to do. This is just a proof-of-concept.
 
-* Embedded JSON for IAM policies should be parsed and made available for JMESPath query
 * Add an optional YAML file for project settings, such as ignoring certain rules for certain resources
-* Implement more of the operators from Cloud Custodian
 * Figure out what other assertion types might be needed (if any)
 * Finish implementing value_from to allow for dynamic data (again, see Cloud Custodian)
 * Add ability to extend with a Lambda function
