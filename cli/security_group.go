@@ -69,15 +69,10 @@ func (l SecurityGroupLinter) ValidateSecurityGroupResources(report *assertion.Va
 	}
 }
 
-func (l SecurityGroupLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string) assertion.ValidationReport {
-	report := assertion.ValidationReport{
-		Violations:   make(map[string]([]assertion.Violation), 0),
-		FilesScanned: make([]string, 0),
-	}
+func (l SecurityGroupLinter) Validate(report *assertion.ValidationReport, filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string) {
 	rules := assertion.FilterRulesById(ruleSet.Rules, ruleIds)
 	resources := loadSecurityGroupResources(l.Log)
-	l.ValidateSecurityGroupResources(&report, resources, rules, tags)
-	return report
+	l.ValidateSecurityGroupResources(report, resources, rules, tags)
 }
 
 func (l SecurityGroupLinter) Search(filenames []string, ruleSet assertion.RuleSet, searchExpression string) {

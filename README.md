@@ -358,7 +358,6 @@ Lots to do. This is just a proof-of-concept.
 * Finish implementing value_from to allow for dynamic data (again, see Cloud Custodian)
 * Add ability to extend with a Lambda function
 * Add examples to this file for Kubernetes files
-* Support multiple rules files, or a rules directory
 * Figure out how dependency management works in go
 * The lambda function does not handle OverSizedChangeNotification
 * The lambda function name is hard-coded in the Makefile

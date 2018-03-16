@@ -11,7 +11,7 @@ import (
 )
 
 type Linter interface {
-	Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string) assertion.ValidationReport
+	Validate(report *assertion.ValidationReport, filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string)
 	Search(filenames []string, ruleSet assertion.RuleSet, searchExpression string)
 }
 
@@ -67,9 +67,21 @@ func makeLinter(linterType string, log assertion.LoggingFunction) Linter {
 	}
 }
 
+type arrayFlags []string
+
+func (i *arrayFlags) String() string {
+	return "my string representation"
+}
+
+func (i *arrayFlags) Set(value string) error {
+	*i = append(*i, value)
+	return nil
+}
+
 func main() {
+	var rulesFilenames arrayFlags
 	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
-	rulesFilename := flag.String("rules", "./rules/terraform.yml", "Rules file")
+	flag.Var(&rulesFilenames, "rules", "Rules file")
 	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
 	ids := flag.String("ids", "", "Run only the rules in this comma separated list")
 	queryExpression := flag.String("query", "", "JMESPath expression to query the results")
@@ -78,14 +90,21 @@ func main() {
 
 	exitCode := 0
 
-	ruleSet := assertion.MustParseRules(assertion.LoadRules(*rulesFilename))
-	linter := makeLinter(ruleSet.Type, assertion.MakeLogger(*verboseLogging))
-	if linter != nil {
-		if *searchExpression != "" {
-			linter.Search(flag.Args(), ruleSet, *searchExpression)
-		} else {
-			report := linter.Validate(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids))
-			exitCode = printReport(report, *queryExpression)
+	report := assertion.ValidationReport{
+		Violations:   make(map[string]([]assertion.Violation), 0),
+		FilesScanned: make([]string, 0),
+	}
+
+	for _, rulesFilename := range rulesFilenames {
+		ruleSet := assertion.MustParseRules(assertion.LoadRules(rulesFilename))
+		linter := makeLinter(ruleSet.Type, assertion.MakeLogger(*verboseLogging))
+		if linter != nil {
+			if *searchExpression != "" {
+				linter.Search(flag.Args(), ruleSet, *searchExpression)
+			} else {
+				linter.Validate(&report, flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids))
+				exitCode = printReport(report, *queryExpression)
+			}
 		}
 	}
 	os.Exit(exitCode)
