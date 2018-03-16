@@ -16,3 +16,8 @@ resource "aws_iam_role" "test_role" {
 }
 EOF
 }
+
+resource "aws_iam_role" "test_role_with_invalid_policy" {
+    name = "role1"
+    assume_role_policy = [ "foo" ]
+}

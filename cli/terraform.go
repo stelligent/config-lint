@@ -17,13 +17,14 @@ func parsePolicy(resource assertion.Resource, attribute string) assertion.Resour
 	if resource.Properties != nil {
 		properties := resource.Properties.(map[string]interface{})
 		if policyAttribute, hasPolicyString := properties[attribute]; hasPolicyString {
-			policyString := policyAttribute.(string)
-			var policy interface{}
-			err := json.Unmarshal([]byte(policyString), &policy)
-			if err != nil {
-				panic(err)
+			if policyString, ok := policyAttribute.(string); ok {
+				var policy interface{}
+				err := json.Unmarshal([]byte(policyString), &policy)
+				if err != nil {
+					panic(err)
+				}
+				properties[attribute] = policy
 			}
-			properties[attribute] = policy
 		}
 	}
 	return resource
