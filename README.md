@@ -359,7 +359,6 @@ Lots to do. This is just a proof-of-concept.
 * Add ability to extend with a Lambda function
 * Add examples to this file for Kubernetes files
 * Support multiple rules files, or a rules directory
-* Not operator takes a list (to match the way Cloud Custodian works), should make sure size == 1
 * Figure out how dependency management works in go
 * The lambda function does not handle OverSizedChangeNotification
 * The lambda function name is hard-coded in the Makefile

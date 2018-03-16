@@ -37,6 +37,7 @@ func andOperation(assertions []Assertion, resource Resource, log LoggingFunction
 }
 
 func notOperation(assertions []Assertion, resource Resource, log LoggingFunction) bool {
+	// more than one child filter treated as not any
 	for _, childAssertion := range assertions {
 		if booleanOperation(childAssertion, resource, log) {
 			return false
