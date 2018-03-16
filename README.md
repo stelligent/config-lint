@@ -357,12 +357,10 @@ Lots to do. This is just a proof-of-concept.
 * Add an optional YAML file for project settings, such as ignoring certain rules for certain resources
 * Implement more of the operators from Cloud Custodian
 * Figure out what other assertion types might be needed (if any)
-* Output should be grouped by resource id
 * Finish implementing value_from to allow for dynamic data (again, see Cloud Custodian)
 * Add ability to extend with a Lambda function
 * Add examples to this file for Kubernetes files
 * Support multiple rules files, or a rules directory
-* Add a --table option which uses tablewriter for more readable report
 * Not operator takes a list (to match the way Cloud Custodian works), should make sure size == 1
 * Figure out how dependency management works in go
 * The lambda function does not handle OverSizedChangeNotification
