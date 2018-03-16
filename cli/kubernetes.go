@@ -80,16 +80,18 @@ func (l KubernetesLinter) Validate(filenames []string, ruleSet assertion.RuleSet
 	return report
 }
 
-func (l KubernetesLinter) Search(filenames []string, searchExpression string) {
+func (l KubernetesLinter) Search(filenames []string, ruleSet assertion.RuleSet, searchExpression string) {
 	for _, filename := range filenames {
-		fmt.Printf("Searching %s:\n", filename)
-		resources := loadKubernetesResources(filename, l.Log)
-		for _, resource := range resources {
-			v, err := assertion.SearchData(searchExpression, resource.Properties)
-			if err != nil {
-				fmt.Println(err)
-			} else {
-				fmt.Printf("%s: %s\n", resource.Id, v)
+		if assertion.ShouldIncludeFile(ruleSet.Files, filename) {
+			fmt.Printf("Searching %s:\n", filename)
+			resources := loadKubernetesResources(filename, l.Log)
+			for _, resource := range resources {
+				v, err := assertion.SearchData(searchExpression, resource.Properties)
+				if err != nil {
+					fmt.Println(err)
+				} else {
+					fmt.Printf("%s: %s\n", resource.Id, v)
+				}
 			}
 		}
 	}

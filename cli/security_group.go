@@ -80,7 +80,7 @@ func (l SecurityGroupLinter) Validate(filenames []string, ruleSet assertion.Rule
 	return report
 }
 
-func (l SecurityGroupLinter) Search(filenames []string, searchExpression string) {
+func (l SecurityGroupLinter) Search(filenames []string, ruleSet assertion.RuleSet, searchExpression string) {
 	resources := loadSecurityGroupResources(l.Log)
 	for _, resource := range resources {
 		v, err := assertion.SearchData(searchExpression, resource.Properties)

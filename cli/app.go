@@ -12,7 +12,7 @@ import (
 
 type Linter interface {
 	Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string) assertion.ValidationReport
-	Search(filenames []string, searchExpression string)
+	Search(filenames []string, ruleSet assertion.RuleSet, searchExpression string)
 }
 
 func printReport(report assertion.ValidationReport, queryExpression string) int {
@@ -82,7 +82,7 @@ func main() {
 	linter := makeLinter(ruleSet.Type, assertion.MakeLogger(*verboseLogging))
 	if linter != nil {
 		if *searchExpression != "" {
-			linter.Search(flag.Args(), *searchExpression)
+			linter.Search(flag.Args(), ruleSet, *searchExpression)
 		} else {
 			report := linter.Validate(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids))
 			exitCode = printReport(report, *queryExpression)
