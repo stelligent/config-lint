@@ -1,7 +1,6 @@
 package assertion
 
 import (
-	"encoding/json"
 	"github.com/jmespath/go-jmespath"
 )
 
@@ -13,9 +12,5 @@ func SearchData(expression string, data interface{}) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	toJSON, err := json.MarshalIndent(result, "", "  ")
-	if err != nil {
-		return "", err
-	}
-	return string(toJSON), nil
+	return JSONStringify(result)
 }

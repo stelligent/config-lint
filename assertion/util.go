@@ -82,3 +82,11 @@ func FilterResourcesByType(resources []Resource, resourceType string) []Resource
 	}
 	return filtered
 }
+
+func JSONStringify(data interface{}) (string, error) {
+	b, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
