@@ -31,7 +31,12 @@ func printValue(expression string, data interface{}) {
 	if err != nil {
 		fmt.Println("err:", err)
 	}
-	fmt.Println("value:", value)
+	s, err := assertion.JSONStringify(v)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("Value: %s\n", s)
+	}
 }
 
 func log(s string) {

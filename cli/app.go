@@ -27,8 +27,12 @@ func printReport(report assertion.ValidationReport, queryExpression string) int 
 			panic(err)
 		}
 		v, err := assertion.SearchData(queryExpression, data)
-		if err == nil && v != "null" {
-			fmt.Println(v)
+		if err != nil {
+			panic(err)
+		}
+		s, err := assertion.JSONStringify(v)
+		if err == nil && s != "null" {
+			fmt.Println(s)
 		}
 	} else {
 		fmt.Println(string(jsonData))

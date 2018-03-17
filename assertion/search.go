@@ -4,13 +4,9 @@ import (
 	"github.com/jmespath/go-jmespath"
 )
 
-func SearchData(expression string, data interface{}) (string, error) {
+func SearchData(expression string, data interface{}) (interface{}, error) {
 	if len(expression) == 0 {
 		return "null", nil
 	}
-	result, err := jmespath.Search(expression, data)
-	if err != nil {
-		return "", err
-	}
-	return JSONStringify(result)
+	return jmespath.Search(expression, data)
 }

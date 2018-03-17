@@ -5,7 +5,31 @@ import (
 	"strings"
 )
 
-func isMatch(searchResult string, op string, value string) bool {
+func isNil(data interface{}) bool {
+	return data == nil
+}
+
+func isString(data interface{}) bool {
+	_, ok := data.(string)
+	return ok
+}
+
+func isSlice(data interface{}) bool {
+	_, ok := data.([]interface{})
+	return ok
+}
+
+func isObject(data interface{}) bool {
+	_, ok := data.(map[string]interface{})
+	return ok
+}
+
+func isMatch(data interface{}, op string, value string) bool {
+	searchResult, err := JSONStringify(data)
+	if err != nil {
+		panic(err)
+	}
+	searchResult = unquoted(searchResult)
 	switch op {
 	case "eq":
 		if searchResult == value {
@@ -52,10 +76,10 @@ func isMatch(searchResult string, op string, value string) bool {
 		if isPresent(searchResult) {
 			return true
 		}
+	case "null":
+		return isNil(data)
 	case "not-null":
-		if isNotNull(searchResult) {
-			return true
-		}
+		return !isNil(data)
 	case "empty":
 		if isEmpty(searchResult) {
 			return true

@@ -1,6 +1,8 @@
 package assertion
 
 import (
+	"encoding/json"
+	"fmt"
 	"testing"
 )
 
@@ -10,6 +12,28 @@ type TestCase struct {
 	Value          string
 	ExpectedResult bool
 	Message        string
+}
+
+func getQuotesRight(jsonString string) string {
+	if len(jsonString) == 0 {
+		return jsonString
+	}
+	if jsonString[0] != '[' {
+		jsonString = quoted(jsonString)
+	}
+	return jsonString
+}
+
+func unmarshal(s string) (interface{}, error) {
+	var searchResult interface{}
+	jsonString := getQuotesRight(s)
+	if len(jsonString) > 0 {
+		err := json.Unmarshal([]byte(jsonString), &searchResult)
+		if err != nil {
+			return "", err
+		}
+	}
+	return searchResult, nil
 }
 
 func TestIsMatch(t *testing.T) {
@@ -44,7 +68,9 @@ func TestIsMatch(t *testing.T) {
 		{SearchResult: "b", Op: "gt", Value: "b", ExpectedResult: false},
 		{SearchResult: "b", Op: "ge", Value: "b", ExpectedResult: true},
 		{SearchResult: "b", Op: "ge", Value: "c", ExpectedResult: false},
-		{SearchResult: "null", Op: "not-null", Value: "", ExpectedResult: false},
+		{SearchResult: "", Op: "null", Value: "", ExpectedResult: true},
+		{SearchResult: "1", Op: "null", Value: "", ExpectedResult: false},
+		{SearchResult: "", Op: "not-null", Value: "", ExpectedResult: false},
 		{SearchResult: "1", Op: "not-null", Value: "", ExpectedResult: true},
 		{SearchResult: "[]", Op: "empty", Value: "", ExpectedResult: true},
 		{SearchResult: "[100]", Op: "empty", Value: "", ExpectedResult: false},
@@ -53,7 +79,12 @@ func TestIsMatch(t *testing.T) {
 		{SearchResult: "[\"one\",\"two\"]", Op: "intersect", Value: "[\"three\",\"four\"]", ExpectedResult: false},
 	}
 	for _, tc := range testCases {
-		b := isMatch(tc.SearchResult, tc.Op, tc.Value)
+		searchResult, err := unmarshal(tc.SearchResult)
+		if err != nil {
+			fmt.Println(err)
+			t.Errorf("Unable to parse %s\n", tc.SearchResult)
+		}
+		b := isMatch(searchResult, tc.Op, tc.Value)
 		if b != tc.ExpectedResult {
 			t.Errorf("Expected '%s' %s '%s' to be %t", tc.SearchResult, tc.Op, tc.Value, tc.ExpectedResult)
 		}

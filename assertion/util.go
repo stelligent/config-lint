@@ -2,6 +2,7 @@ package assertion
 
 import (
 	"encoding/json"
+	"fmt"
 	"path/filepath"
 )
 
@@ -10,6 +11,10 @@ func unquoted(s string) string {
 		return s[1 : len(s)-1]
 	}
 	return s
+}
+
+func quoted(s string) string {
+	return fmt.Sprintf("\"%s\"", s)
 }
 
 func isAbsent(s string) bool {

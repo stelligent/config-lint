@@ -82,7 +82,12 @@ func (l SecurityGroupLinter) Search(filenames []string, ruleSet assertion.RuleSe
 		if err != nil {
 			fmt.Println(err)
 		} else {
-			fmt.Printf("%s: %s\n", resource.Id, v)
+			s, err := assertion.JSONStringify(v)
+			if err != nil {
+				fmt.Println(err)
+			} else {
+				fmt.Printf("%s: %s\n", resource.Id, s)
+			}
 		}
 	}
 }
