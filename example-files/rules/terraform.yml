@@ -129,10 +129,31 @@ Rules:
     message: Security group should not allow ingress from 0.0.0.0/0
     severity: FAILURE
     assertions:
-      - type: value
-        key: "ingress[].cidr_blocks[] | [0]"
-        op: ne
-        value: "0.0.0.0/0"
+      - not:
+        - type: value
+          key: "ingress[].cidr_blocks[]"
+          op: contains
+          value: "0.0.0.0/0"
+  - id: SG2
+    resource: aws_security_group
+    message: Security group should not allow ingress from 0.0.0.0/0
+    severity: FAILURE
+    assertions:
+      - not:
+        - type: value
+          key: "ingress[?(from_port==`22`)].cidr_blocks[]"
+          op: contains
+          value: "0.0.0.0/0"
+  - id: SG3
+    resource: aws_security_group
+    message: Security group should not allow ingress from 0.0.0.0/0
+    severity: FAILURE
+    assertions:
+      - not:
+        - type: value
+          key: "ingress[?(from_port==`3389`)].cidr_blocks[]"
+          op: contains
+          value: "0.0.0.0/0"
   - id: VALUEFROM1
     message: Instance type should be in list from S3 object
     resource: aws_instance
