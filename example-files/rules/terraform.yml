@@ -210,3 +210,11 @@ Rules:
           key: policy.Statement[].Resource
           op: contains
           value: "*"
+  - id: ELB_ACCESS_LOGGING
+    message: ELB should enable access logging
+    resource: aws_elb
+    severity: WARNING
+    assertions:
+      - type: value
+        key: access_logs
+        op: present

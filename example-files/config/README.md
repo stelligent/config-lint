@@ -3,6 +3,8 @@
 Done:
 * CloudFront logging must be enabled
 
+* ELB must access logging should be enabled
+
 * EBS Volumes must be encrypted
 
 * IamPolicyNotActionRule
@@ -12,7 +14,6 @@ Done:
 
 TODO
 * CloudFront resource !Metadata['AWS::CloudFront::Authentication'].nil?  How to specify in Terraform?
-* ELB must access logging should be enabled
 
 * IamManagedPolicyNotActionRule  - How is this different than a plain IamPolicy?
 * IamManagedPolicyNotResourceRule
