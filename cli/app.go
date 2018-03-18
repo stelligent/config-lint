@@ -107,9 +107,11 @@ func main() {
 				linter.Search(flag.Args(), ruleSet, *searchExpression)
 			} else {
 				linter.Validate(&report, flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids))
-				exitCode = printReport(report, *queryExpression)
 			}
 		}
+	}
+	if *searchExpression == "" {
+		exitCode = printReport(report, *queryExpression)
 	}
 	os.Exit(exitCode)
 }
