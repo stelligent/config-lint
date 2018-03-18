@@ -89,12 +89,13 @@ func loadTerraformResources(filename string, log assertion.LoggingFunction) []as
 	return resources
 }
 
-func (l TerraformLinter) ValidateTerraformResources(report *assertion.ValidationReport, resources []assertion.Resource, rules []assertion.Rule, tags []string) {
+func (l TerraformLinter) ValidateTerraformResources(resources []assertion.Resource, rules []assertion.Rule, tags []string) []assertion.Violation {
 
 	valueSource := assertion.StandardValueSource{Log: l.Log}
 	filteredRules := assertion.FilterRulesByTag(rules, tags)
 	resolvedRules := assertion.ResolveRules(filteredRules, valueSource, l.Log)
 
+	allViolations := make([]assertion.Violation, 0)
 	for _, rule := range resolvedRules {
 		l.Log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
 		for _, resource := range assertion.FilterResourcesByType(resources, rule.Resource) {
@@ -102,12 +103,11 @@ func (l TerraformLinter) ValidateTerraformResources(report *assertion.Validation
 				l.Log(fmt.Sprintf("Ignoring resource %s", resource.Id))
 			} else {
 				_, violations := assertion.CheckRule(rule, resource, l.Log)
-				for _, violation := range violations {
-					report.Violations[violation.Status] = append(report.Violations[violation.Status], violation)
-				}
+				allViolations = append(allViolations, violations...)
 			}
 		}
 	}
+	return allViolations
 }
 
 func (l TerraformLinter) Validate(report *assertion.ValidationReport, filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string) {
@@ -115,7 +115,10 @@ func (l TerraformLinter) Validate(report *assertion.ValidationReport, filenames 
 	for _, filename := range filenames {
 		if assertion.ShouldIncludeFile(ruleSet.Files, filename) {
 			resources := loadTerraformResources(filename, l.Log)
-			l.ValidateTerraformResources(report, resources, rules, tags)
+			violations := l.ValidateTerraformResources(resources, rules, tags)
+			for _, violation := range violations {
+				report.Violations[violation.Status] = append(report.Violations[violation.Status], violation)
+			}
 			report.FilesScanned = append(report.FilesScanned, filename)
 		}
 	}
