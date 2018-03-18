@@ -41,7 +41,7 @@ resource "aws_iam_policy" "policy_1" {
 EOF
 }
 
-resource "aws_iam_policy" "policy_2" {
+resource "aws_iam_policy" "policy_with_not_action" {
     name = "policy_1"
     policy = <<EOF
 {
@@ -54,6 +54,49 @@ resource "aws_iam_policy" "policy_2" {
       },
       "Effect": "Allow",
       "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "policy_with_not_resource" {
+    name = "policy_1"
+    policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": "",
+      "NotResource": [
+        "resource1",
+        "resource2"
+      ]
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "policy_with_wildcards" {
+    name = "policy_1"
+    policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "*",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": "",
+      "Resource": "*"
     }
   ]
 }

@@ -161,4 +161,31 @@ Rules:
       - type: value
         key: policy.Statement[].NotAction
         op: absent
-
+  - id: POLICY_NOT_RESOURCE
+    message: Should not allow not resource in IAM policy
+    resource: aws_iam_policy
+    severity: WARNING
+    assertions:
+      - type: value
+        key: policy.Statement[].NotResource
+        op: absent
+  - id: POLICY_WILDCARD_ACTION
+    message: Should not allow not wildcard action in IAM policy
+    resource: aws_iam_policy
+    severity: FAILURE
+    assertions:
+      - not:
+        - type: value
+          key: policy.Statement[].Action
+          op: contains
+          value: "*"
+  - id: POLICY_WILDCARD_RESOURCE
+    message: Should not allow not wildcard resource in IAM policy
+    resource: aws_iam_policy
+    severity: WARNING
+    assertions:
+      - not:
+        - type: value
+          key: policy.Statement[].Resource
+          op: contains
+          value: "*"
