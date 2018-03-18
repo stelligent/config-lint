@@ -180,7 +180,7 @@ Example:
 ...
 ```
 
-* notin - Not in list of values
+* not-in - Not in list of values
 
 * present - Attribute is present
 

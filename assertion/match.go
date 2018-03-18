@@ -66,7 +66,7 @@ func isMatch(data interface{}, op string, value string) bool {
 				return true
 			}
 		}
-	case "notin":
+	case "not-in":
 		for _, v := range strings.Split(value, ",") {
 			if v == searchResult {
 				return false
