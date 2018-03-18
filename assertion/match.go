@@ -14,9 +14,14 @@ func isString(data interface{}) bool {
 	return ok
 }
 
-func isSlice(data interface{}) bool {
-	_, ok := data.([]interface{})
-	return ok
+func convertToString(data interface{}) (string, bool) {
+	s, ok := data.(string)
+	return s, ok
+}
+
+func convertToSliceOfStrings(data interface{}) ([]string, bool) {
+	s, ok := data.([]string)
+	return s, ok
 }
 
 func isObject(data interface{}) bool {
@@ -89,10 +94,20 @@ func isMatch(data interface{}, op string, value string) bool {
 			return true
 		}
 	case "contains":
-		if strings.Contains(searchResult, value) {
-			return true
+		if s, isString := convertToString(data); isString {
+			if strings.Contains(s, value) {
+				return true
+			}
 		}
-		return false
+		if c, isSlice := convertToSliceOfStrings(data); isSlice {
+			for _, element := range c {
+				if element == value {
+					return true
+				}
+			}
+			return false
+		}
+		return strings.Contains(searchResult, value)
 	case "regex":
 		if regexp.MustCompile(value).MatchString(searchResult) {
 			return true

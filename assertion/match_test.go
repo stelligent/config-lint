@@ -7,7 +7,7 @@ import (
 )
 
 type TestCase struct {
-	SearchResult   string
+	SearchResult   interface{}
 	Op             string
 	Value          string
 	ExpectedResult bool
@@ -38,6 +38,8 @@ func unmarshal(s string) (interface{}, error) {
 
 func TestIsMatch(t *testing.T) {
 
+	sliceOfTags := []string{"Foo", "Bar"}
+
 	testCases := []TestCase{
 		{SearchResult: "Foo", Op: "eq", Value: "Foo", ExpectedResult: true},
 		{SearchResult: "Foo", Op: "eq", Value: "Bar", ExpectedResult: false},
@@ -57,6 +59,9 @@ func TestIsMatch(t *testing.T) {
 		{SearchResult: "[]", Op: "present", Value: "", ExpectedResult: false},
 		{SearchResult: "Foo", Op: "contains", Value: "oo", ExpectedResult: true},
 		{SearchResult: "Foo", Op: "contains", Value: "aa", ExpectedResult: false},
+		{SearchResult: sliceOfTags, Op: "contains", Value: "Foo", ExpectedResult: true},
+		{SearchResult: sliceOfTags, Op: "contains", Value: "Bar", ExpectedResult: true},
+		{SearchResult: sliceOfTags, Op: "contains", Value: "oo", ExpectedResult: false},
 		{SearchResult: "Foo", Op: "regex", Value: "o$", ExpectedResult: true},
 		{SearchResult: "Foo", Op: "regex", Value: "^F", ExpectedResult: true},
 		{SearchResult: "Foo", Op: "regex", Value: "^Bar$", ExpectedResult: false},
@@ -79,12 +84,17 @@ func TestIsMatch(t *testing.T) {
 		{SearchResult: "[\"one\",\"two\"]", Op: "intersect", Value: "[\"three\",\"four\"]", ExpectedResult: false},
 	}
 	for _, tc := range testCases {
-		searchResult, err := unmarshal(tc.SearchResult)
-		if err != nil {
-			fmt.Println(err)
-			t.Errorf("Unable to parse %s\n", tc.SearchResult)
+		var b bool
+		if s, isString := tc.SearchResult.(string); isString {
+			searchResult, err := unmarshal(s)
+			if err != nil {
+				fmt.Println(err)
+				t.Errorf("Unable to parse %s\n", tc.SearchResult)
+			}
+			b = isMatch(searchResult, tc.Op, tc.Value)
+		} else {
+			b = isMatch(tc.SearchResult, tc.Op, tc.Value)
 		}
-		b := isMatch(searchResult, tc.Op, tc.Value)
 		if b != tc.ExpectedResult {
 			t.Errorf("Expected '%s' %s '%s' to be %t", tc.SearchResult, tc.Op, tc.Value, tc.ExpectedResult)
 		}
