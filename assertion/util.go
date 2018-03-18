@@ -6,6 +6,11 @@ import (
 	"path/filepath"
 )
 
+func convertToSlice(data interface{}) ([]interface{}, bool) {
+	s, ok := data.([]interface{})
+	return s, ok
+}
+
 func unquoted(s string) string {
 	if s[0] == '"' {
 		return s[1 : len(s)-1]
@@ -32,8 +37,17 @@ func isNotNull(s string) bool {
 	return s != "null"
 }
 
-func isEmpty(s string) bool {
-	return s == "null" || s == "[]"
+func isEmpty(data interface{}) bool {
+	if data == nil {
+		return true
+	}
+	if s, isString := convertToString(data); isString {
+		return len(s) == 0
+	}
+	if c, isSlice := convertToSlice(data); isSlice {
+		return len(c) == 0
+	}
+	return false
 }
 
 func listsIntersect(list1 []string, list2 []string) bool {

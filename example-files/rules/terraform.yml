@@ -145,3 +145,20 @@ Rules:
     severity: WARNING
     tags:
       - ec2
+  - id: CLOUDFRONT_LOGGING
+    message: CloudFront Distribution must configure logging
+    resource: s3_distribution
+    severity: FAILURE
+    assertions:
+      - type: value
+        key: logging_config
+        op: present
+  - id: POLICY_NOT_ACTION
+    message: Should not allow not action in IAM policy
+    resource: aws_iam_policy
+    severity: WARNING
+    assertions:
+      - type: value
+        key: policy.Statement[].NotAction
+        op: absent
+

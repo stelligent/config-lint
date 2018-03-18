@@ -39,6 +39,7 @@ func unmarshal(s string) (interface{}, error) {
 func TestIsMatch(t *testing.T) {
 
 	sliceOfTags := []string{"Foo", "Bar"}
+	emptySlice := []interface{}{}
 
 	testCases := []TestCase{
 		{SearchResult: "Foo", Op: "eq", Value: "Foo", ExpectedResult: true},
@@ -77,9 +78,10 @@ func TestIsMatch(t *testing.T) {
 		{SearchResult: "1", Op: "null", Value: "", ExpectedResult: false},
 		{SearchResult: "", Op: "not-null", Value: "", ExpectedResult: false},
 		{SearchResult: "1", Op: "not-null", Value: "", ExpectedResult: true},
-		{SearchResult: "[]", Op: "empty", Value: "", ExpectedResult: true},
-		{SearchResult: "[100]", Op: "empty", Value: "", ExpectedResult: false},
-		{SearchResult: "null", Op: "empty", Value: "", ExpectedResult: true},
+		{SearchResult: "", Op: "empty", Value: "", ExpectedResult: true},
+		{SearchResult: "Foo", Op: "empty", Value: "", ExpectedResult: false},
+		{SearchResult: emptySlice, Op: "empty", Value: "", ExpectedResult: true},
+		{SearchResult: sliceOfTags, Op: "empty", Value: "", ExpectedResult: false},
 		{SearchResult: "[\"one\",\"two\"]", Op: "intersect", Value: "[\"two\",\"three\"]", ExpectedResult: true},
 		{SearchResult: "[\"one\",\"two\"]", Op: "intersect", Value: "[\"three\",\"four\"]", ExpectedResult: false},
 	}

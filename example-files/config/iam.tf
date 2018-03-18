@@ -40,6 +40,26 @@ resource "aws_iam_policy" "policy_1" {
 }
 EOF
 }
+
+resource "aws_iam_policy" "policy_2" {
+    name = "policy_1"
+    policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "NotAction": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
 resource "aws_iam_group_policy" "group_policy_1" {
     name = "group_policy_1"
     policy = <<EOF
