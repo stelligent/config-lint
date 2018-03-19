@@ -12,6 +12,11 @@ Done:
 * IamPolicyWildcardActionRule
 * IamPolicyWildcardResourceRule
 
+* S3BucketPolicyNotActionRule
+* S3BucketPolicyNotPrincipalRule
+* S3BucketPolicyWildcardActionRule
+* S3BucketPolicyWildcardPrincipalRule
+
 TODO
 * CloudFront resource !Metadata['AWS::CloudFront::Authentication'].nil?  How to specify in Terraform?
 
@@ -34,10 +39,6 @@ TODO
 * ManagedPolicyOnUserRule
 * PolicyOnUserRule
 
-* S3BucketPolicyNotActionRule
-* S3BucketPolicyNotPrincipalRule
-* S3BucketPolicyWildcardActionRule
-* S3BucketPolicyWildcardPrincipalRule
 * S3BucketPublicReadAclRule
 * S3BucketPublicReadWriteAclRule
 
