@@ -4,20 +4,45 @@ Type: Kubernetes
 Files:
   - "*.yml"
 Rules:
-  - id: K1
-    message: Kind must be pod
+  - id: ALLOW_KIND
+    severity: FAILURE
+    message: Allowed kinds
     resource: "*"
     assertions:
       - type: value
         key: kind
         op: in
-        value: Pod
+        value: Pod,Policy,ServiceAccount
+  - id: POD_CONTAINERS
     severity: FAILURE
-  - id: K2
-    message: Must include containers
-    resource: "*"
+    message: Pod must include containers
+    resource: Pod
     assertions:
       - type: value
         key: spec.containers
         op: present
+  - id: POD_SERVICE_ACCOUNT
     severity: FAILURE
+    message: Pod should use a service account
+    resource: Pod
+    assertions:
+      - type: value
+        key: serviceAccountName
+        op: present
+  - id: POLICY
+    severity: FAILURE
+    message: Policy must include a spec
+    resource: Policy
+    assertions:
+      - type: value
+        key: spec
+        op: present
+  - id: DEFAULT_NAMESPACE
+    severity: FAILURE
+    message: Policy should not use default namespace
+    resource: Policy
+    assertions:
+      - type: value
+        key: spec.namespace
+        op: ne
+        value: default
