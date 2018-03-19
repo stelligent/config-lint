@@ -254,3 +254,29 @@ Rules:
           key: policy.Statement[].Action
           op: contains
           value: "*"
+  - id: SNS_TOPIC_POLICY_WILDCARD_PRINCIPAL
+    message: Should not allow wildcard principal in SNS topic policy
+    resource: aws_sns_topic_policy
+    severity: WARNING
+    assertions:
+      - not:
+        - type: value
+          key: policy.Statement[].Principal
+          op: contains
+          value: "*"
+  - id: SNS_TOPIC_POLICY_NOT_ACTION
+    message: Should not include NotAction in SNS topic policy
+    resource: aws_sns_topic_policy
+    severity: WARNING
+    assertions:
+      - type: value
+        key: policy.Statement[].NotAction
+        op: absent
+  - id: SNS_TOPIC_POLICY_NOT_PRINCIPAL
+    message: Should not include NotPrincipal in SNS topic policy
+    resource: aws_sns_topic_policy
+    severity: WARNING
+    assertions:
+      - type: value
+        key: policy.Statement[].NotPrincipal
+        op: absent

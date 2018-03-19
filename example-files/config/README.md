@@ -17,6 +17,10 @@ Done:
 * S3BucketPolicyWildcardActionRule
 * S3BucketPolicyWildcardPrincipalRule
 
+* SnsTopicPolicyNotActionRule
+* SnsTopicPolicyNotPrincipalRule
+* SnsTopicPolicyWildcardPrincipalRule
+
 TODO
 * CloudFront resource !Metadata['AWS::CloudFront::Authentication'].nil?  How to specify in Terraform?
 
@@ -48,10 +52,6 @@ TODO
 * SecurityGroupIngressOpenToWorldRule
 * SecurityGroupIngressPortRangeRule
 * SecurityGroupMissingEgressRule
-
-* SnsTopicPolicyNotActionRule
-* SnsTopicPolicyNotPrincipalRule
-* SnsTopicPolicyWildcardPrincipalRule
 
 * SqsQueuePolicyNotActionRule
 * SqsQueuePolicyNotPrincipalRule
