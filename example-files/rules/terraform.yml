@@ -40,24 +40,6 @@ Rules:
     severity: WARNING
     tags:
       - ec2
-  - id: R4
-    message: Role name should contain the string 'role'
-    resource: aws_iam_role
-    assertions:
-      - type: value
-        key: name
-        op: contains
-        value: "role"
-    severity: WARNING
-  - id: R5
-    message: Bucket name should end with ".com"
-    resource: aws_s3_bucket
-    assertions:
-      - type: value
-        key: bucket
-        op: regex
-        value: ".com$"
-    severity: WARNING
   - id: R6
     message: CostCenter tag is missing
     resource: aws_instance
@@ -65,14 +47,6 @@ Rules:
       - type: value
         key: "tags[].CostCenter | [0]"
         op: present
-    severity: FAILURE
-  - id: R7
-    message: Should not have a Foo tag
-    resource: aws_instance
-    assertions:
-      - type: value
-        key: "tags[].Foo"
-        op: absent
     severity: FAILURE
   - id: VOLUME1
     resource: aws_ebs_volume
@@ -248,6 +222,17 @@ Rules:
         op: present
     tags:
       - elb
+  - id: S3_BUCKET_NAME
+    message: Bucket name is invalid
+    resource: aws_s3_bucket
+    assertions:
+      - type: value
+        key: bucket
+        op: regex
+        value: "^[a-zA-Z0-9.-]+$"
+    severity: FAILURE
+    tags:
+      - s3
   - id: S3_NOT_ACTION
     message: SHould not use NotAction in S3 bucket policy
     resource: aws_s3_bucket_policy

@@ -1,5 +1,11 @@
+data "aws_s3_bucket" "bucket_example" {
+  bucket = "my-data-lake"
+}
+data "aws_s3_bucket" "bucket_name_with_underscores" {
+  bucket = "my_data_lake"
+}
 resource "aws_s3_bucket" "b1" {
-  bucket = "my_tf_test_bucket_1"
+  bucket = "test-bucket-1"
 }
 
 resource "aws_s3_bucket_policy" "b1" {
@@ -25,7 +31,7 @@ POLICY
 }
 
 resource "aws_s3_bucket" "b2" {
-  bucket = "my_tf_test_bucket_2"
+  bucket = "test-bucket-2"
 }
 
 resource "aws_s3_bucket_policy" "bucket_with_not" {
