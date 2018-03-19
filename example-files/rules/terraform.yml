@@ -109,7 +109,7 @@ Rules:
   - id: SG_WORLD_INGRESS
     resource: aws_security_group
     message: Security group should not allow ingress from 0.0.0.0/0 or ::/0
-    severity: FAILURE
+    severity: WARNING
     assertions:
       - not:
         -or:
@@ -123,6 +123,25 @@ Rules:
             value: "::/0"
     tags:
       - sg
+
+  - id: SG_WORLD_EGRESS
+    resource: aws_security_group
+    message: Security group should not allow egress to 0.0.0.0/0 or ::/0
+    severity: WARNING
+    assertions:
+      - not:
+        -or:
+          - type: value
+            key: "egress[].cidr_blocks[]"
+            op: contains
+            value: "0.0.0.0/0"
+          - type: value
+            key: "egress[].cidr_blocks[]"
+            op: contains
+            value: "::/0"
+    tags:
+      - sg
+
 
   - id: SG_SSH_WORLD_INGRESS
     resource: aws_security_group
@@ -157,6 +176,51 @@ Rules:
             key: "ingress[?(from_port==`3389`)].cidr_blocks[]"
             op: contains
             value: "::/0"
+    tags:
+      - sg
+
+  - id: SG_NON_32_INGRESS
+    resource: aws_security_group
+    message: Security group should not allow ingress from CIDR block that does not end in /32
+    severity: WARNING
+    assertions:
+      - type: value
+        key: "ingress[].cidr_blocks[] | [0]"
+        op: regex
+        value: ".*/32$"
+    tags:
+      - sg
+
+  - id: SG_INGRESS_PORT_RANGE
+    resource: aws_security_group
+    message: Security group ingress should specify single port instead of range
+    severity: WARNING
+    assertions:
+      - type: value
+        key: "ingress[?(from_port!=to_port)]"
+        op: empty
+    tags:
+      - sg
+
+  - id: SG_EGRESS_PORT_RANGE
+    resource: aws_security_group
+    message: Security group egress should specify single port instead of range
+    severity: WARNING
+    assertions:
+      - type: value
+        key: "egress[?(from_port!=to_port)]"
+        op: empty
+    tags:
+      - sg
+
+  - id: SG_MISSING_EGRESS
+    resource: aws_security_group
+    message: Security group should specify egress rules
+    severity: WARNING
+    assertions:
+      - type: value
+        key: "egress"
+        op: present
     tags:
       - sg
 

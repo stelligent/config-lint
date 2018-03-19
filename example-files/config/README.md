@@ -20,6 +20,13 @@ Done:
 * S3BucketPolicyWildcardActionRule
 * S3BucketPolicyWildcardPrincipalRule
 
+* SecurityGroupEgressOpenToWorldRule
+* SecurityGroupEgressPortRangeRule
+* SecurityGroupIngressCidrNon32Rule - but what is standalong ingress in cfn_nag?
+* SecurityGroupIngressOpenToWorldRule
+* SecurityGroupIngressPortRangeRule
+* SecurityGroupMissingEgressRule
+
 * SnsTopicPolicyNotActionRule
 * SnsTopicPolicyNotPrincipalRule
 * SnsTopicPolicyWildcardPrincipalRule
@@ -52,12 +59,6 @@ TODO
 * S3BucketPublicReadAclRule
 * S3BucketPublicReadWriteAclRule
 
-* SecurityGroupEgressOpenToWorldRule
-* SecurityGroupEgressPortRangeRule
-* SecurityGroupIngressCidrNon32Rule
-* SecurityGroupIngressOpenToWorldRule
-* SecurityGroupIngressPortRangeRule
-* SecurityGroupMissingEgressRule
 
 * UserHasInlinePolicyRule
 * UserMissingGroupRule
