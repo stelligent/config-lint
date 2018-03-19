@@ -110,18 +110,19 @@ func (l TerraformLinter) ValidateTerraformResources(resources []assertion.Resour
 	return allViolations
 }
 
-func (l TerraformLinter) Validate(report *assertion.ValidationReport, filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string) {
+func (l TerraformLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string) ([]string, []assertion.Violation) {
 	rules := assertion.FilterRulesById(ruleSet.Rules, ruleIds)
+	allViolations := make([]assertion.Violation, 0)
+	filesScanned := make([]string, 0)
 	for _, filename := range filenames {
 		if assertion.ShouldIncludeFile(ruleSet.Files, filename) {
 			resources := loadTerraformResources(filename, l.Log)
 			violations := l.ValidateTerraformResources(resources, rules, tags)
-			for _, violation := range violations {
-				report.Violations[violation.Status] = append(report.Violations[violation.Status], violation)
-			}
-			report.FilesScanned = append(report.FilesScanned, filename)
+			allViolations = append(allViolations, violations...)
+			filesScanned = append(filesScanned, filename)
 		}
 	}
+	return filesScanned, allViolations
 }
 
 func (l TerraformLinter) Search(filenames []string, ruleSet assertion.RuleSet, searchExpression string) {

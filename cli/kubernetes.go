@@ -63,19 +63,20 @@ func (l KubernetesLinter) ValidateKubernetesResources(resources []assertion.Reso
 	return allViolations
 }
 
-func (l KubernetesLinter) Validate(report *assertion.ValidationReport, filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string) {
+func (l KubernetesLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string) ([]string, []assertion.Violation) {
 	rules := assertion.FilterRulesById(ruleSet.Rules, ruleIds)
+	allViolations := make([]assertion.Violation, 0)
+	filesScanned := make([]string, 0)
 	for _, filename := range filenames {
 		if assertion.ShouldIncludeFile(ruleSet.Files, filename) {
 			l.Log(fmt.Sprintf("Processing %s", filename))
 			resources := loadKubernetesResources(filename, l.Log)
 			violations := l.ValidateKubernetesResources(resources, rules, tags)
-			for _, violation := range violations {
-				report.Violations[violation.Status] = append(report.Violations[violation.Status], violation)
-			}
-			report.FilesScanned = append(report.FilesScanned, filename)
+			allViolations = append(allViolations, violations...)
+			filesScanned = append(filesScanned, filename)
 		}
 	}
+	return filesScanned, allViolations
 }
 
 func (l KubernetesLinter) Search(filenames []string, ruleSet assertion.RuleSet, searchExpression string) {

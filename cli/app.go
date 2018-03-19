@@ -11,7 +11,7 @@ import (
 )
 
 type Linter interface {
-	Validate(report *assertion.ValidationReport, filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string)
+	Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string) ([]string, []assertion.Violation)
 	Search(filenames []string, ruleSet assertion.RuleSet, searchExpression string)
 }
 
@@ -106,7 +106,11 @@ func main() {
 			if *searchExpression != "" {
 				linter.Search(flag.Args(), ruleSet, *searchExpression)
 			} else {
-				linter.Validate(&report, flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids))
+				filesScanned, violations := linter.Validate(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids))
+				for _, violation := range violations {
+					report.Violations[violation.Status] = append(report.Violations[violation.Status], violation)
+				}
+				report.FilesScanned = append(report.FilesScanned, filesScanned...)
 			}
 		}
 	}
