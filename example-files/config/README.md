@@ -12,6 +12,9 @@ Done:
 * IamPolicyWildcardActionRule
 * IamPolicyWildcardResourceRule
 
+* IamRoleNotActionOnPermissionsPolicyRule
+* IamRoleNotResourceOnPermissionsPolicyRule
+
 * S3BucketPolicyNotActionRule
 * S3BucketPolicyNotPrincipalRule
 * S3BucketPolicyWildcardActionRule
@@ -34,10 +37,8 @@ TODO
 * IamManagedPolicyWildcardActionRule
 * IamManagedPolicyWildcardResourceRule
 
-* IamRoleNotActionOnPermissionsPolicyRule
 * IamRoleNotActionOnTrustPolicyRule
 * IamRoleNotPrincipalOnTrustPolicyRule
-* IamRoleNotResourceOnPermissionsPolicyRule
 * IamRoleWildcardActionOnPermissionsPolicyRule
 * IamRoleWildcardActionOnTrustPolicyRule
 * IamRoleWildcardResourceOnPermissionsPolicyRule

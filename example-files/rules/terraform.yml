@@ -175,23 +175,27 @@ Rules:
         key: logging_config
         op: present
   - id: POLICY_NOT_ACTION
-    message: Should not allow not action in IAM policy
+    message: Should not use NotAction in IAM policy
     resource: aws_iam_policy
     severity: WARNING
     assertions:
       - type: value
         key: policy.Statement[].NotAction
         op: absent
+    tags:
+      - iam
   - id: POLICY_NOT_RESOURCE
-    message: Should not allow not resource in IAM policy
+    message: Should not use NotResource in IAM policy
     resource: aws_iam_policy
     severity: WARNING
     assertions:
       - type: value
         key: policy.Statement[].NotResource
         op: absent
+    tags:
+      - iam
   - id: POLICY_WILDCARD_ACTION
-    message: Should not allow not wildcard action in IAM policy
+    message: Should not use wildcard action in IAM policy
     resource: aws_iam_policy
     severity: FAILURE
     assertions:
@@ -200,8 +204,10 @@ Rules:
           key: policy.Statement[].Action
           op: contains
           value: "*"
+    tags:
+      - iam
   - id: POLICY_WILDCARD_RESOURCE
-    message: Should not allow not wildcard resource in IAM policy
+    message: Should not use wildcard resource in IAM policy
     resource: aws_iam_policy
     severity: WARNING
     assertions:
@@ -210,6 +216,28 @@ Rules:
           key: policy.Statement[].Resource
           op: contains
           value: "*"
+    tags:
+      - iam
+  - id: ROLE_NOT_ACTION
+    message: Should not use NotAction in IAM role
+    resource: aws_iam_role
+    severity: WARNING
+    assertions:
+      - type: value
+        key: assume_role_policy.Statement[].NotAction
+        op: absent
+    tags:
+      - iam
+  - id: ROLE_NOT_RESOURCE
+    message: Should not use NotResource in IAM role
+    resource: aws_iam_role
+    severity: WARNING
+    assertions:
+      - type: value
+        key: assume_role_policy.Statement[].NotResource
+        op: absent
+    tags:
+      - iam
   - id: ELB_ACCESS_LOGGING
     message: ELB should enable access logging
     resource: aws_elb

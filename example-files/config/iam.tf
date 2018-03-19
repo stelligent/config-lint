@@ -17,6 +17,27 @@ resource "aws_iam_role" "iam_role_1" {
 EOF
 }
 
+resource "aws_iam_role" "iam_role_with_not" {
+    name = "iam_role_1"
+    assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "NotAction": "sts:AssumeRole",
+      "NotResource": [
+        "resource1",
+        "resource2"
+      ],
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+
 resource "aws_iam_role" "role_with_invalid_policy" {
     name = "role1"
     assume_role_policy = [ "invalid" ]
