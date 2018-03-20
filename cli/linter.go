@@ -76,3 +76,17 @@ func (l BaseLinter) SearchFiles(filenames []string, ruleSet assertion.RuleSet, s
 		}
 	}
 }
+
+func makeLinter(linterType string, log assertion.LoggingFunction) Linter {
+	switch linterType {
+	case "Kubernetes":
+		return KubernetesLinter{Log: log}
+	case "Terraform":
+		return TerraformLinter{Log: log}
+	case "SecurityGroup":
+		return SecurityGroupLinter{Log: log}
+	default:
+		fmt.Printf("Type not supported: %s\n", linterType)
+		return nil
+	}
+}
