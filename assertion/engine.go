@@ -19,6 +19,11 @@ type ValueSource interface {
 	GetValue(Assertion) string
 }
 
+type InvokeRuleAPI struct {
+	Url     string
+	Payload string
+}
+
 type Rule struct {
 	Id         string
 	Message    string
@@ -27,6 +32,7 @@ type Rule struct {
 	Assertions []Assertion
 	Except     []string
 	Tags       []string
+	Invoke     InvokeRuleAPI
 }
 
 type RuleSet struct {

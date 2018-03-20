@@ -75,6 +75,9 @@ func CheckRule(rule Rule, resource Resource, log LoggingFunction) (string, []Vio
 		fmt.Println("Ignoring resource:", resource.Id)
 		return returnStatus, violations
 	}
+	if rule.Invoke.Url != "" {
+		return invoke(rule, resource, log)
+	}
 	for _, ruleAssertion := range rule.Assertions {
 		log(fmt.Sprintf("Checking resource %s", resource.Id))
 		status := CheckAssertion(rule, ruleAssertion, resource, log)

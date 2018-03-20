@@ -46,3 +46,12 @@ Rules:
         key: spec.namespace
         op: ne
         value: default
+  - id: CUSTOM
+    severity: FAILURE
+    message: Custom
+    resource: Policy
+    invoke:
+      url: https://19kfojjbi2.execute-api.us-east-1.amazonaws.com/dev
+      payload: "{ user: spec.user, namespace: spec.namespace }"
+    tags:
+      - custom
