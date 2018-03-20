@@ -74,7 +74,10 @@ func makeLinter(linterType string, log assertion.LoggingFunction) Linter {
 type arrayFlags []string
 
 func (i *arrayFlags) String() string {
-	return "my string representation"
+	if i != nil {
+		return strings.Join(*i, ",")
+	}
+	return ""
 }
 
 func (i *arrayFlags) Set(value string) error {
@@ -85,7 +88,7 @@ func (i *arrayFlags) Set(value string) error {
 func main() {
 	var rulesFilenames arrayFlags
 	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
-	flag.Var(&rulesFilenames, "rules", "Rules file")
+	flag.Var(&rulesFilenames, "rules", "Rules file, can be specified multiple times")
 	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
 	ids := flag.String("ids", "", "Run only the rules in this comma separated list")
 	queryExpression := flag.String("query", "", "JMESPath expression to query the results")

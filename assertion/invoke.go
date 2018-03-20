@@ -15,7 +15,11 @@ type InvokeResponse struct {
 	Violations []InvokeViolation
 }
 
-func invoke(rule Rule, resource Resource, log LoggingFunction) (string, []Violation) {
+type StandardExternalRuleInvoker struct {
+	Log LoggingFunction
+}
+
+func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (string, []Violation) {
 	status := "OK"
 	violations := make([]Violation, 0)
 	payload := resource.Properties
@@ -27,7 +31,7 @@ func invoke(rule Rule, resource Resource, log LoggingFunction) (string, []Violat
 		payload = p
 	}
 	payloadJSON, err := JSONStringify(payload)
-	log(fmt.Sprintf("Invoke %s on %s\n", rule.Invoke.Url, payloadJSON))
+	e.Log(fmt.Sprintf("Invoke %s on %s\n", rule.Invoke.Url, payloadJSON))
 	httpResponse, err := http.Get(rule.Invoke.Url)
 	if err != nil {
 		return rule.Severity, violations // TODO set violation to HTTP call failed
@@ -37,7 +41,7 @@ func invoke(rule Rule, resource Resource, log LoggingFunction) (string, []Violat
 	if err != nil {
 		return rule.Severity, violations // TODO set violation to read body failed
 	}
-	log(string(body))
+	e.Log(string(body))
 	var invokeResponse InvokeResponse
 	err = json.Unmarshal(body, &invokeResponse)
 	if err != nil {

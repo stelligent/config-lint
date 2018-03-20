@@ -18,6 +18,20 @@ func testValueSource() ValueSource {
 	return TestValueSource{}
 }
 
+type MockExternalRuleInvoker struct {
+	InvokeCount int
+}
+
+func mockExternalRuleInvoker() *MockExternalRuleInvoker {
+	return &MockExternalRuleInvoker{InvokeCount: 0}
+}
+
+func (e *MockExternalRuleInvoker) Invoke(Rule, Resource) (string, []Violation) {
+	e.InvokeCount += 1
+	noViolations := make([]Violation, 0)
+	return "OK", noViolations
+}
+
 var content = `Rules:
   - id: TEST1
     message: Test message
@@ -96,7 +110,7 @@ func TestRuleWithMultipleFilter(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "t2.micro", "ami": "ami-000000"},
 		Filename:   "test.tf",
 	}
-	status, violations := CheckRule(rules.Rules[0], resource, testLogging)
+	status, violations := CheckRule(rules.Rules[0], resource, mockExternalRuleInvoker(), testLogging)
 	if status != "OK" {
 		t.Error("Expecting multiple rule to match")
 	}
@@ -113,7 +127,7 @@ func TestMultipleFiltersWithSingleFailure(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "t2.micro", "ami": "ami-111111"},
 		Filename:   "test.tf",
 	}
-	status, violations := CheckRule(rules.Rules[0], resource, testLogging)
+	status, violations := CheckRule(rules.Rules[0], resource, mockExternalRuleInvoker(), testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting multiple rule to return FAILURE")
 	}
@@ -130,7 +144,7 @@ func TestMultipleFiltersWithMultipleFailures(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "c3.medium", "ami": "ami-111111"},
 		Filename:   "test.tf",
 	}
-	status, violations := CheckRule(rules.Rules[0], resource, testLogging)
+	status, violations := CheckRule(rules.Rules[0], resource, mockExternalRuleInvoker(), testLogging)
 	if status != "FAILURE" {
 		t.Error("Expecting multiple rule to return FAILURE")
 	}
@@ -162,11 +176,36 @@ func TestValueFrom(t *testing.T) {
 		Filename:   "test.tf",
 	}
 	resolved := ResolveRules(rules.Rules, testValueSource(), testLogging)
-	status, violations := CheckRule(resolved[0], resource, testLogging)
+	status, violations := CheckRule(resolved[0], resource, mockExternalRuleInvoker(), testLogging)
 	if status != "OK" {
 		t.Error("Expecting value_from to match")
 	}
 	if len(violations) != 0 {
 		t.Error("Expecting value_from test to have 0 violations")
+	}
+}
+
+var ruleWithInvoke = `Rules:
+  - id: FROM1
+    message: Test value_from
+    severity: FAILURE
+    resource: aws_instance
+    invoke:
+      url: http://localhost
+`
+
+func TestInvoke(t *testing.T) {
+	rules := MustParseRules(ruleWithInvoke)
+	resource := Resource{
+		Id:         "a_test_resource",
+		Type:       "aws_instance",
+		Properties: map[string]interface{}{"instance_type": "m3.medium"},
+		Filename:   "test.tf",
+	}
+	resolved := ResolveRules(rules.Rules, testValueSource(), testLogging)
+	e := mockExternalRuleInvoker()
+	CheckRule(resolved[0], resource, e, testLogging)
+	if e.InvokeCount != 1 {
+		t.Error("Expecting external rule engine to be invoked")
 	}
 }

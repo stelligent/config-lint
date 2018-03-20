@@ -103,6 +103,7 @@ func handler(configEvent events.ConfigEvent) (string, error) {
 	ruleSet := assertion.MustParseRules(rulesString)
 	valueSource := assertion.StandardValueSource{Log: log}
 	resolvedRules := assertion.ResolveRules(ruleSet.Rules, valueSource, log)
+	externalRules := StandardExternalRuleInvoker{Log: log}
 	for _, rule := range resolvedRules {
 		if rule.Resource == configurationItem.ResourceType {
 			resource := assertion.Resource{
@@ -110,7 +111,7 @@ func handler(configEvent events.ConfigEvent) (string, error) {
 				Type:       configurationItem.ResourceType,
 				Properties: configurationItem.Configuration,
 			}
-			_, violations := assertion.CheckRule(rule, resource, log)
+			_, violations := assertion.CheckRule(rule, resource, externalRules, log)
 			if len(violations) > 0 {
 				fmt.Println("Resource in NON_COMPLIANT")
 				complianceType = "NON_COMPLIANT"

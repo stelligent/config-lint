@@ -63,3 +63,7 @@ type Resource struct {
 	Properties interface{}
 	Filename   string
 }
+
+type ExternalRuleInvoker interface {
+	Invoke(Rule, Resource) (string, []Violation)
+}

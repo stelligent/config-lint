@@ -53,6 +53,7 @@ func (l SecurityGroupLinter) ValidateSecurityGroupResources(resources []assertio
 	valueSource := assertion.StandardValueSource{Log: l.Log}
 	filteredRules := assertion.FilterRulesByTag(rules, tags)
 	resolvedRules := assertion.ResolveRules(filteredRules, valueSource, l.Log)
+	externalRules := assertion.StandardExternalRuleInvoker{Log: l.Log}
 
 	allViolations := make([]assertion.Violation, 0)
 	for _, rule := range resolvedRules {
@@ -61,7 +62,7 @@ func (l SecurityGroupLinter) ValidateSecurityGroupResources(resources []assertio
 			if assertion.ExcludeResource(rule, resource) {
 				l.Log(fmt.Sprintf("Ignoring resource %s", resource.Id))
 			} else {
-				_, violations := assertion.CheckRule(rule, resource, l.Log)
+				_, violations := assertion.CheckRule(rule, resource, externalRules, l.Log)
 				allViolations = append(allViolations, violations...)
 			}
 		}

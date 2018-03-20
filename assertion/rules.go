@@ -68,7 +68,7 @@ func ResolveRule(rule Rule, valueSource ValueSource, log LoggingFunction) Rule {
 	return resolvedRule
 }
 
-func CheckRule(rule Rule, resource Resource, log LoggingFunction) (string, []Violation) {
+func CheckRule(rule Rule, resource Resource, e ExternalRuleInvoker, log LoggingFunction) (string, []Violation) {
 	returnStatus := "OK"
 	violations := make([]Violation, 0)
 	if ExcludeResource(rule, resource) {
@@ -76,7 +76,7 @@ func CheckRule(rule Rule, resource Resource, log LoggingFunction) (string, []Vio
 		return returnStatus, violations
 	}
 	if rule.Invoke.Url != "" {
-		return invoke(rule, resource, log)
+		return e.Invoke(rule, resource)
 	}
 	for _, ruleAssertion := range rule.Assertions {
 		log(fmt.Sprintf("Checking resource %s", resource.Id))
