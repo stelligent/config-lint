@@ -224,7 +224,7 @@ Example:
 
 * and - Logical and of a list of assertions
 
-Exmaple:
+Example:
 ```
 ...
   - id: ANDTEST
