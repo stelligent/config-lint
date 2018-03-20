@@ -1,13 +1,17 @@
 package main
 
 import (
-	"fmt"
 	"github.com/ghodss/yaml"
 	"github.com/lhitchon/config-lint/assertion"
 	"io/ioutil"
 )
 
 type KubernetesLinter struct {
+	BaseLinter
+	Log assertion.LoggingFunction
+}
+
+type KubernetesResourceLoader struct {
 	Log assertion.LoggingFunction
 }
 
@@ -26,8 +30,8 @@ func loadYAML(filename string, log assertion.LoggingFunction) []interface{} {
 	return []interface{}{m}
 }
 
-func loadKubernetesResources(filename string, log assertion.LoggingFunction) []assertion.Resource {
-	yamlResources := loadYAML(filename, log)
+func (l KubernetesResourceLoader) Load(filename string) []assertion.Resource {
+	yamlResources := loadYAML(filename, l.Log)
 	resources := make([]assertion.Resource, 0)
 	for _, resource := range yamlResources {
 		m := resource.(map[string]interface{})
@@ -42,62 +46,12 @@ func loadKubernetesResources(filename string, log assertion.LoggingFunction) []a
 	return resources
 }
 
-func (l KubernetesLinter) ValidateKubernetesResources(resources []assertion.Resource, rules []assertion.Rule, tags []string) []assertion.Violation {
-
-	valueSource := assertion.StandardValueSource{Log: l.Log}
-	filteredRules := assertion.FilterRulesByTag(rules, tags)
-	resolvedRules := assertion.ResolveRules(filteredRules, valueSource, l.Log)
-	externalRules := assertion.StandardExternalRuleInvoker{Log: l.Log}
-
-	allViolations := make([]assertion.Violation, 0)
-	for _, rule := range resolvedRules {
-		l.Log(fmt.Sprintf("Rule %s: %s", rule.Id, rule.Message))
-		for _, resource := range assertion.FilterResourcesByType(resources, rule.Resource) {
-			if assertion.ExcludeResource(rule, resource) {
-				l.Log(fmt.Sprintf("Ignoring resource %s", resource.Id))
-			} else {
-				_, violations := assertion.CheckRule(rule, resource, externalRules, l.Log)
-				allViolations = append(allViolations, violations...)
-			}
-		}
-	}
-	return allViolations
-}
-
 func (l KubernetesLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string) ([]string, []assertion.Violation) {
-	rules := assertion.FilterRulesById(ruleSet.Rules, ruleIds)
-	allViolations := make([]assertion.Violation, 0)
-	filesScanned := make([]string, 0)
-	for _, filename := range filenames {
-		if assertion.ShouldIncludeFile(ruleSet.Files, filename) {
-			l.Log(fmt.Sprintf("Processing %s", filename))
-			resources := loadKubernetesResources(filename, l.Log)
-			violations := l.ValidateKubernetesResources(resources, rules, tags)
-			allViolations = append(allViolations, violations...)
-			filesScanned = append(filesScanned, filename)
-		}
-	}
-	return filesScanned, allViolations
+	loader := KubernetesResourceLoader{Log: l.Log}
+	return l.ValidateFiles(filenames, ruleSet, tags, ruleIds, loader, l.Log)
 }
 
 func (l KubernetesLinter) Search(filenames []string, ruleSet assertion.RuleSet, searchExpression string) {
-	for _, filename := range filenames {
-		if assertion.ShouldIncludeFile(ruleSet.Files, filename) {
-			fmt.Printf("Searching %s:\n", filename)
-			resources := loadKubernetesResources(filename, l.Log)
-			for _, resource := range resources {
-				v, err := assertion.SearchData(searchExpression, resource.Properties)
-				if err != nil {
-					fmt.Println(err)
-				} else {
-					s, err := assertion.JSONStringify(v)
-					if err != nil {
-						fmt.Println(err)
-					} else {
-						fmt.Printf("%s: %s\n", resource.Id, s)
-					}
-				}
-			}
-		}
-	}
+	loader := KubernetesResourceLoader{Log: l.Log}
+	l.SearchFiles(filenames, ruleSet, searchExpression, loader)
 }

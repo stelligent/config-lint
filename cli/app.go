@@ -10,11 +10,6 @@ import (
 	"strings"
 )
 
-type Linter interface {
-	Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string) ([]string, []assertion.Violation)
-	Search(filenames []string, ruleSet assertion.RuleSet, searchExpression string)
-}
-
 func printReport(report assertion.ValidationReport, queryExpression string) int {
 	jsonData, err := json.MarshalIndent(report, "", "  ")
 	if err != nil {
