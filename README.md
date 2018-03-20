@@ -267,6 +267,40 @@ Example:
 ...
 ```
 
+## Invoking an external API for more difficult cases
+
+If the combination of JMESPath and the simple expression DSL are not sufficient, it is possible to have the
+rules engine make an API call to validate a resource. Instead of the list of assertions, set the invoke
+attribute to an object containg these attributes:
+
+* url - An HTTP GET request will be made to this URL
+* payload - A JMESPath expression used to generate the JSON payload to include in the GET request. If not provided, the entire resource will be included (same as using '@' in JMESPath)
+
+The return value should look like this:
+```
+{
+   "Violations": [
+       { "Message": "First Violation" }
+   ]
+}
+```
+
+Example:
+```
+...
+  - id: CUSTOM
+    severity: FAILURE
+    message: Custom
+    resource: Policy
+    invoke:
+      url: https://19kfojjbi2.execute-api.us-east-1.amazonaws.com/dev
+      payload: "{ user: spec.user, namespace: spec.namespace }"
+    tags:
+      - custom
+...
+```
+
+
 # Output
 
 The program outputs a JSON string with the results. The JSON object has the following attributes:

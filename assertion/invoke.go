@@ -18,9 +18,13 @@ type InvokeResponse struct {
 func invoke(rule Rule, resource Resource, log LoggingFunction) (string, []Violation) {
 	status := "OK"
 	violations := make([]Violation, 0)
-	payload, err := SearchData(rule.Invoke.Payload, resource.Properties)
-	if err != nil {
-		panic(err)
+	payload := resource.Properties
+	if rule.Invoke.Payload != "" {
+		p, err := SearchData(rule.Invoke.Payload, resource.Properties)
+		if err != nil {
+			panic(err)
+		}
+		payload = p
 	}
 	payloadJSON, err := JSONStringify(payload)
 	log(fmt.Sprintf("Invoke %s on %s\n", rule.Invoke.Url, payloadJSON))
