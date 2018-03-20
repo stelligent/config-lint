@@ -18,16 +18,15 @@ func testValueSource() ValueSource {
 	return TestValueSource{}
 }
 
-type MockExternalRuleInvoker struct {
-	InvokeCount int
-}
+type MockExternalRuleInvoker int
 
 func mockExternalRuleInvoker() *MockExternalRuleInvoker {
-	return &MockExternalRuleInvoker{InvokeCount: 0}
+	var m MockExternalRuleInvoker
+	return &m
 }
 
 func (e *MockExternalRuleInvoker) Invoke(Rule, Resource) (string, []Violation) {
-	e.InvokeCount += 1
+	*e += 1
 	noViolations := make([]Violation, 0)
 	return "OK", noViolations
 }
@@ -203,9 +202,9 @@ func TestInvoke(t *testing.T) {
 		Filename:   "test.tf",
 	}
 	resolved := ResolveRules(rules.Rules, testValueSource(), testLogging)
-	e := mockExternalRuleInvoker()
-	CheckRule(resolved[0], resource, e, testLogging)
-	if e.InvokeCount != 1 {
+	counter := mockExternalRuleInvoker()
+	CheckRule(resolved[0], resource, counter, testLogging)
+	if *counter != 1 {
 		t.Error("Expecting external rule engine to be invoked")
 	}
 }
