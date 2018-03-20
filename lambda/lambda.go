@@ -31,7 +31,7 @@ func printValue(expression string, data interface{}) {
 	if err != nil {
 		fmt.Println("err:", err)
 	}
-	s, err := assertion.JSONStringify(v)
+	s, err := assertion.JSONStringify(value)
 	if err != nil {
 		fmt.Println(err)
 	} else {
@@ -103,7 +103,7 @@ func handler(configEvent events.ConfigEvent) (string, error) {
 	ruleSet := assertion.MustParseRules(rulesString)
 	valueSource := assertion.StandardValueSource{Log: log}
 	resolvedRules := assertion.ResolveRules(ruleSet.Rules, valueSource, log)
-	externalRules := StandardExternalRuleInvoker{Log: log}
+	externalRules := assertion.StandardExternalRuleInvoker{Log: log}
 	for _, rule := range resolvedRules {
 		if rule.Resource == configurationItem.ResourceType {
 			resource := assertion.Resource{
