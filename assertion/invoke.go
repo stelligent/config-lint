@@ -34,18 +34,61 @@ func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (strin
 	e.Log(fmt.Sprintf("Invoke %s on %s\n", rule.Invoke.Url, payloadJSON))
 	httpResponse, err := http.Get(rule.Invoke.Url)
 	if err != nil {
-		return rule.Severity, violations // TODO set violation to HTTP call failed
+		violations := []Violation{
+			Violation{
+				RuleId:       rule.Id,
+				Status:       rule.Severity,
+				ResourceId:   resource.Id,
+				ResourceType: resource.Type,
+				Filename:     resource.Filename,
+				Message:      fmt.Sprintf("Invoke failed: %s", err.Error()),
+			},
+		}
+		return rule.Severity, violations
+	}
+	if httpResponse.StatusCode != 200 {
+		violations := []Violation{
+			Violation{
+				RuleId:       rule.Id,
+				Status:       rule.Severity,
+				ResourceId:   resource.Id,
+				ResourceType: resource.Type,
+				Filename:     resource.Filename,
+				Message:      fmt.Sprintf("Invoke failed, StatusCode: %d", httpResponse.StatusCode),
+			},
+		}
+		return rule.Severity, violations
 	}
 	defer httpResponse.Body.Close()
 	body, err := ioutil.ReadAll(httpResponse.Body)
 	if err != nil {
-		return rule.Severity, violations // TODO set violation to read body failed
+		violations := []Violation{
+			Violation{
+				RuleId:       rule.Id,
+				Status:       rule.Severity,
+				ResourceId:   resource.Id,
+				ResourceType: resource.Type,
+				Filename:     resource.Filename,
+				Message:      "Invoke response cannot be read",
+			},
+		}
+		return rule.Severity, violations
 	}
 	e.Log(string(body))
 	var invokeResponse InvokeResponse
 	err = json.Unmarshal(body, &invokeResponse)
 	if err != nil {
-		return rule.Severity, violations // TODO cannot parse response
+		violations := []Violation{
+			Violation{
+				RuleId:       rule.Id,
+				Status:       rule.Severity,
+				ResourceId:   resource.Id,
+				ResourceType: resource.Type,
+				Filename:     resource.Filename,
+				Message:      "Invoke response cannot be parsed",
+			},
+		}
+		return rule.Severity, violations
 	}
 	for _, violation := range invokeResponse.Violations {
 		status = rule.Severity
