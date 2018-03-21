@@ -4,6 +4,7 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/lhitchon/config-lint/assertion"
 	"io/ioutil"
+	"path/filepath"
 )
 
 type KubernetesLinter struct {
@@ -30,13 +31,33 @@ func loadYAML(filename string, log assertion.LoggingFunction) []interface{} {
 	return []interface{}{m}
 }
 
+func getResourceIdFromMetadata(m map[string]interface{}) (string, bool) {
+	if metadata, ok := m["metadata"].(map[string]interface{}); ok {
+		if name, ok := metadata["name"].(string); ok {
+			return name, true
+		}
+	}
+	return "", false
+}
+
+func getResourceIdFromFilename(filename string) string {
+	_, resourceId := filepath.Split(filename)
+	return resourceId
+}
+
 func (l KubernetesResourceLoader) Load(filename string) []assertion.Resource {
 	yamlResources := loadYAML(filename, l.Log)
 	resources := make([]assertion.Resource, 0)
 	for _, resource := range yamlResources {
 		m := resource.(map[string]interface{})
+		var resourceId string
+		if name, ok := getResourceIdFromMetadata(m); ok {
+			resourceId = name
+		} else {
+			resourceId = getResourceIdFromFilename(filename)
+		}
 		kr := assertion.Resource{
-			Id:         filename,
+			Id:         resourceId,
 			Type:       m["kind"].(string),
 			Properties: m,
 			Filename:   filename,
