@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: NetworkPolicy
+metadata:
+  name: policy2
+spec:
+  allowIncoming:
+    toPorts:
+      - port: 80
+        protocol: TCP
+  podSelector:
+    segment: backend
+

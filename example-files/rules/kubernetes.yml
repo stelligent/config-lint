@@ -12,7 +12,7 @@ Rules:
       - type: value
         key: kind
         op: in
-        value: Pod,Policy,ServiceAccount
+        value: Pod,Policy,ServiceAccount,NetworkPolicy
   - id: POD_CONTAINERS
     severity: FAILURE
     message: Pod must include containers
@@ -29,6 +29,21 @@ Rules:
       - type: value
         key: serviceAccountName
         op: present
+  - id: POD_SECURITY_CONTEXT
+    severity: FAILURE
+    message: Pod should set securityContent
+    resource: Pod
+    assertions:
+      - type: value
+        key: spec.securityContext.runAsNonRoot
+        op: eq
+        value: true
+      - type: value
+        key: spec.securityContext.readOnlyRootFilesystem
+        op: eq
+        value: true
+    tags:
+      - security
   - id: POLICY
     severity: FAILURE
     message: Policy must include a spec
@@ -55,3 +70,13 @@ Rules:
       payload: "{ user: spec.user, namespace: spec.namespace }"
     tags:
       - custom
+  - id: NETWORK
+    severity: FAILURE
+    message: Network policy should include from pods
+    resource: NetworkPolicy
+    assertions:
+      - type: value
+        key: spec.allowIncoming.from[].pods
+        op: present
+    tags:
+      - network
