@@ -4,6 +4,7 @@ Type: Kubernetes
 Files:
   - "*.yml"
 Rules:
+
   - id: ALLOW_KIND
     severity: FAILURE
     message: Allowed kinds
@@ -13,6 +14,9 @@ Rules:
         key: kind
         op: in
         value: Pod,Policy,ServiceAccount,NetworkPolicy
+    tags:
+      - kind
+
   - id: POD_CONTAINERS
     severity: FAILURE
     message: Pod must include containers
@@ -21,6 +25,9 @@ Rules:
       - type: value
         key: spec.containers
         op: present
+    tags:
+      - pod
+
   - id: POD_SERVICE_ACCOUNT
     severity: FAILURE
     message: Pod should use a service account
@@ -29,6 +36,9 @@ Rules:
       - type: value
         key: serviceAccountName
         op: present
+    tags:
+      - pod
+
   - id: POD_SECURITY_CONTEXT
     severity: FAILURE
     message: Pod should set securityContent
@@ -43,7 +53,9 @@ Rules:
         op: eq
         value: true
     tags:
+      - pod
       - security
+
   - id: POLICY
     severity: FAILURE
     message: Policy must include a spec
@@ -52,6 +64,9 @@ Rules:
       - type: value
         key: spec
         op: present
+    tags:
+      - policy
+
   - id: DEFAULT_NAMESPACE
     severity: FAILURE
     message: Policy should not use default namespace
@@ -61,6 +76,9 @@ Rules:
         key: spec.namespace
         op: ne
         value: default
+    tags:
+      - policy
+
   - id: CUSTOM
     severity: FAILURE
     message: Custom
@@ -70,6 +88,7 @@ Rules:
       payload: "{ user: spec.user, namespace: spec.namespace }"
     tags:
       - custom
+
   - id: NETWORK
     severity: FAILURE
     message: Network policy should include from pods
