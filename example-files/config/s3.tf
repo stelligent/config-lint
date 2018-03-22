@@ -4,6 +4,9 @@ data "aws_s3_bucket" "bucket_example" {
 data "aws_s3_bucket" "bucket_name_with_underscores" {
   bucket = "my_data_lake"
 }
+data "aws_s3_bucket" "bucket_name_with_uppercase" {
+  bucket = "MYDATALAKE"
+}
 resource "aws_s3_bucket" "b1" {
   bucket = "test-bucket-1"
 }
