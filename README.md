@@ -390,8 +390,6 @@ Lots to do. This is just a proof-of-concept.
 * Add an optional YAML file for project settings, such as ignoring certain rules for certain resources
 * Figure out what other assertion types might be needed (if any)
 * Finish implementing value_from to allow for dynamic data (again, see Cloud Custodian)
-* Add ability to extend with a Lambda function
-* Add examples to this file for Kubernetes files
 * Figure out how dependency management works in go
 * The lambda function does not handle OverSizedChangeNotification
 * The lambda function name is hard-coded in the Makefile
