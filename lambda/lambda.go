@@ -10,7 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/configservice"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/lhitchon/config-lint/assertion"
+	"github.com/stelligent/config-lint/assertion"
 	"time"
 )
 

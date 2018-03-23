@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/lhitchon/config-lint/assertion"
+	"github.com/stelligent/config-lint/assertion"
 )
 
 type Linter interface {

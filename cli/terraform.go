@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/ghodss/yaml"
 	"github.com/hashicorp/hcl"
-	"github.com/lhitchon/config-lint/assertion"
+	"github.com/stelligent/config-lint/assertion"
 	"io/ioutil"
 )
 

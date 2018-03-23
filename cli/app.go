@@ -5,7 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/ghodss/yaml"
-	"github.com/lhitchon/config-lint/assertion"
+	"github.com/stelligent/config-lint/assertion"
 	"os"
 	"strings"
 )
