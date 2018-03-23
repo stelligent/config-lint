@@ -11,7 +11,6 @@ type TestCase struct {
 	Op             string
 	Value          string
 	ExpectedResult bool
-	Message        string
 }
 
 func getQuotesRight(jsonString string) string {
@@ -41,51 +40,50 @@ func TestIsMatch(t *testing.T) {
 	sliceOfTags := []string{"Foo", "Bar"}
 	emptySlice := []interface{}{}
 
-	testCases := []TestCase{
-		{SearchResult: "Foo", Op: "eq", Value: "Foo", ExpectedResult: true},
-		{SearchResult: "Foo", Op: "eq", Value: "Bar", ExpectedResult: false},
-		{SearchResult: "Foo", Op: "ne", Value: "Foo", ExpectedResult: false},
-		{SearchResult: "Foo", Op: "ne", Value: "Bar", ExpectedResult: true},
-		{SearchResult: "Foo", Op: "in", Value: "Foo,Bar,Baz", ExpectedResult: true},
-		{SearchResult: "Foo", Op: "in", Value: "Bar,Baz", ExpectedResult: false},
-		{SearchResult: "Foo", Op: "not-in", Value: "Foo,Bar,Baz", ExpectedResult: false},
-		{SearchResult: "Foo", Op: "not-in", Value: "Bar,Baz", ExpectedResult: true},
-		{SearchResult: "Foo", Op: "absent", Value: "", ExpectedResult: false},
-		{SearchResult: "", Op: "absent", Value: "", ExpectedResult: true},
-		{SearchResult: "null", Op: "absent", Value: "", ExpectedResult: true},
-		{SearchResult: "[]", Op: "absent", Value: "", ExpectedResult: true},
-		{SearchResult: "Foo", Op: "present", Value: "", ExpectedResult: true},
-		{SearchResult: "", Op: "present", Value: "", ExpectedResult: false},
-		{SearchResult: "null", Op: "present", Value: "", ExpectedResult: false},
-		{SearchResult: "[]", Op: "present", Value: "", ExpectedResult: false},
-		{SearchResult: "Foo", Op: "contains", Value: "oo", ExpectedResult: true},
-		{SearchResult: "Foo", Op: "contains", Value: "aa", ExpectedResult: false},
-		{SearchResult: sliceOfTags, Op: "contains", Value: "Foo", ExpectedResult: true},
-		{SearchResult: sliceOfTags, Op: "contains", Value: "Bar", ExpectedResult: true},
-		{SearchResult: sliceOfTags, Op: "contains", Value: "oo", ExpectedResult: false},
-		{SearchResult: "Foo", Op: "regex", Value: "o$", ExpectedResult: true},
-		{SearchResult: "Foo", Op: "regex", Value: "^F", ExpectedResult: true},
-		{SearchResult: "Foo", Op: "regex", Value: "^Bar$", ExpectedResult: false},
-		{SearchResult: "a", Op: "lt", Value: "b", ExpectedResult: true},
-		{SearchResult: "a", Op: "lt", Value: "a", ExpectedResult: false},
-		{SearchResult: "a", Op: "le", Value: "a", ExpectedResult: true},
-		{SearchResult: "b", Op: "le", Value: "a", ExpectedResult: false},
-		{SearchResult: "b", Op: "gt", Value: "a", ExpectedResult: true},
-		{SearchResult: "b", Op: "gt", Value: "b", ExpectedResult: false},
-		{SearchResult: "b", Op: "ge", Value: "b", ExpectedResult: true},
-		{SearchResult: "b", Op: "ge", Value: "c", ExpectedResult: false},
-		{SearchResult: "", Op: "null", Value: "", ExpectedResult: true},
-		{SearchResult: "1", Op: "null", Value: "", ExpectedResult: false},
-		{SearchResult: "", Op: "not-null", Value: "", ExpectedResult: false},
-		{SearchResult: "1", Op: "not-null", Value: "", ExpectedResult: true},
-		{SearchResult: "", Op: "empty", Value: "", ExpectedResult: true},
-		{SearchResult: "Foo", Op: "empty", Value: "", ExpectedResult: false},
-		{SearchResult: emptySlice, Op: "empty", Value: "", ExpectedResult: true},
-		{SearchResult: sliceOfTags, Op: "empty", Value: "", ExpectedResult: false},
-		{SearchResult: "[\"one\",\"two\"]", Op: "intersect", Value: "[\"two\",\"three\"]", ExpectedResult: true},
-		{SearchResult: "[\"one\",\"two\"]", Op: "intersect", Value: "[\"three\",\"four\"]", ExpectedResult: false},
+	testCases := map[string]TestCase{
+		"eqTrue":                        {"Foo", "eq", "Foo", true},
+		"eqFalse":                       {"Foo", "eq", "Bar", false},
+		"neFalse":                       {"Foo", "ne", "Foo", false},
+		"neTrue":                        {"Foo", "ne", "Bar", true},
+		"inTrue":                        {"Foo", "in", "Foo,Bar,Baz", true},
+		"inFalse":                       {"Foo", "in", "Bar,Baz", false},
+		"notInFalse":                    {"Foo", "not-in", "Foo,Bar,Baz", false},
+		"notInTrue":                     {"Foo", "not-in", "Bar,Baz", true},
+		"absentFalse":                   {"Foo", "absent", "", false},
+		"absentTrueForEmptyString":      {"", "absent", "", true},
+		"absentTrueForNull":             {"null", "absent", "", true},
+		"absentTrueForEmptyArray":       {"[]", "absent", "", true},
+		"presentTrue":                   {"Foo", "present", "", true},
+		"presentFalseForEmptyString":    {"", "present", "", false},
+		"presentFalseForNull":           {"null", "present", "", false},
+		"presentFalseForEmptyArray":     {"[]", "present", "", false},
+		"containsTrueForString":         {"Foo", "contains", "oo", true},
+		"containsFalseForString":        {"Foo", "contains", "aa", false},
+		"containsTrueForSlice":          {sliceOfTags, "contains", "Bar", true},
+		"containsFalseForSubstring":     {sliceOfTags, "contains", "oo", false},
+		"regexTrueForEndOfString":       {"Foo", "regex", "o$", true},
+		"regExTrueForBeginningOfString": {"Foo", "regex", "^F", true},
+		"reqExFalseForEntireString":     {"Foo", "regex", "^Bar$", false},
+		"ltTrue":                        {"a", "lt", "b", true},
+		"ltFalse":                       {"a", "lt", "a", false},
+		"leTrue":                        {"a", "le", "a", true},
+		"leFalse":                       {"b", "le", "a", false},
+		"gtTrue":                        {"b", "gt", "a", true},
+		"gtFalse":                       {"b", "gt", "b", false},
+		"geTrue":                        {"b", "ge", "b", true},
+		"geFalse":                       {"b", "ge", "c", false},
+		"nullTrue":                      {"", "null", "", true},
+		"nullFalse":                     {"1", "null", "", false},
+		"notNullFalse":                  {"", "not-null", "", false},
+		"notNullTrue":                   {"1", "not-null", "", true},
+		"emptyTrueForEmptyString":       {"", "empty", "", true},
+		"emptyFalseForString":           {"Foo", "empty", "", false},
+		"emptyTrueForEmptySlice":        {emptySlice, "empty", "", true},
+		"emptyFalseForSlice":            {sliceOfTags, "empty", "", false},
+		"intersectTrue":                 {"[\"one\",\"two\"]", "intersect", "[\"two\",\"three\"]", true},
+		"intersectFalse":                {"[\"one\",\"two\"]", "intersect", "[\"three\",\"four\"]", false},
 	}
-	for _, tc := range testCases {
+	for k, tc := range testCases {
 		var b bool
 		if s, isString := tc.SearchResult.(string); isString {
 			searchResult, err := unmarshal(s)
@@ -98,7 +96,7 @@ func TestIsMatch(t *testing.T) {
 			b = isMatch(tc.SearchResult, tc.Op, tc.Value)
 		}
 		if b != tc.ExpectedResult {
-			t.Errorf("Expected '%s' %s '%s' to be %t", tc.SearchResult, tc.Op, tc.Value, tc.ExpectedResult)
+			t.Errorf("%s Failed Expected '%s' %s '%s' to be %t", k, tc.SearchResult, tc.Op, tc.Value, tc.ExpectedResult)
 		}
 	}
 }
