@@ -73,7 +73,6 @@ Each assertion contains the following attributes:
 
 |Name       |Description                                                                         |
 |-----------|------------------------------------------------------------------------------------|
-|type       | Should always be "value" for now                                                   |
 |key        | JMES path used to find data in a resource                                          |
 |op         | Operation to perform on the data returned by searching for the key                 |
 |value      | Literal value needed for most operations                                           |
@@ -92,8 +91,7 @@ Rules:
     message: Instance type should be t2.micro or m3.medium
     resource: aws_instance
     assertions:
-      - type: value
-        key: instance_type
+      - key: instance_type
         op: in
         value: t2.micro,m3.medium
     severity: WARNING
@@ -113,12 +111,10 @@ Rules:
     resource: aws_instance
     assertions:
       or:
-        - type: value
-          key: instance_type
+        - key: instance_type
           op: eq
           value: t2.micro
-        - type: value
-          key: instance_type
+        - key: instance_type
           op: eq
           value: m3.medium
     severity: WARNING
@@ -139,8 +135,7 @@ Example:
     message: EBS Volumes must be encrypted
     severity: FAILURE
     assertions:
-      - type: value
-        key: encrypted
+      - key: encrypted
         op: eq
         value: true
 ...
@@ -156,8 +151,7 @@ Example:
     message: Security group should not allow ingress from 0.0.0.0/0
     severity: FAILURE
     assertions:
-      - type: value
-        key: "ingress[].cidr_blocks[] | [0]"
+      - key: "ingress[].cidr_blocks[] | [0]"
         op: ne
         value: "0.0.0.0/0"
 ...
@@ -172,8 +166,7 @@ Example:
     message: Instance type should be t2.micro or m3.medium
     resource: aws_instance
     assertions:
-      - type: value
-        key: instance_type
+      - key: instance_type
         op: in
         value: t2.micro,m3.medium
     severity: WARNING
@@ -191,8 +184,7 @@ Example:
     message: Department tag is required
     resource: aws_instance
     assertions:
-      - type: value
-        key: "tags[].Department | [0]"
+      - key: "tags[].Department | [0]"
         op: present
     severity: FAILURE
 ...
@@ -215,8 +207,7 @@ Example:
     severity: WARNING
     assertions:
       - not:
-        - type: value
-          key: instance_type
+        - key: instance_type
           op: eq
           value: c4.large
 ...
@@ -233,11 +224,9 @@ Example:
     severity: WARNING
     assertions:
       - and:
-        - type: value
-          key: "tags[].Department | [0]"
+        - key: "tags[].Department | [0]"
           op: present
-        - type: value
-          key: "tags[].Project | [0]"
+        - key: "tags[].Project | [0]"
           op: present
     tags:
       - and-test
@@ -256,12 +245,10 @@ Example:
     severity: WARNING
     assertions:
       - or:
-        - type: value
-          key: instance_type
+        - key: instance_type
           op: eq
           value: t2.micro
-        - type: value
-          key: instance_type
+        - key: instance_type
           op: eq
           value: m3.medium
 ...
@@ -373,12 +360,10 @@ Rules:
     assertions:
       - not:
           - and:
-              - type: value
-                key: ipPermissions[].fromPort[]
+              - key: ipPermissions[].fromPort[]
                 op: contains
                 value: "22"
-              - type: value
-                key: ipPermissions[].ipRanges[]
+              - key: ipPermissions[].ipRanges[]
                 op: contains
                 value: 0.0.0.0/0
 ```

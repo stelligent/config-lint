@@ -10,8 +10,7 @@ Rules:
     message: Allowed kinds
     resource: "*"
     assertions:
-      - type: value
-        key: kind
+      - key: kind
         op: in
         value: Pod,Policy,ServiceAccount,NetworkPolicy
     tags:
@@ -22,8 +21,7 @@ Rules:
     message: Pod must include containers
     resource: Pod
     assertions:
-      - type: value
-        key: spec.containers
+      - key: spec.containers
         op: present
     tags:
       - pod
@@ -33,8 +31,7 @@ Rules:
     message: Pod should use a service account
     resource: Pod
     assertions:
-      - type: value
-        key: serviceAccountName
+      - key: serviceAccountName
         op: present
     tags:
       - pod
@@ -44,12 +41,10 @@ Rules:
     message: Pod should set securityContent
     resource: Pod
     assertions:
-      - type: value
-        key: spec.securityContext.runAsNonRoot
+      - key: spec.securityContext.runAsNonRoot
         op: eq
         value: true
-      - type: value
-        key: spec.securityContext.readOnlyRootFilesystem
+      - key: spec.securityContext.readOnlyRootFilesystem
         op: eq
         value: true
     tags:
@@ -61,8 +56,7 @@ Rules:
     message: Policy must include a spec
     resource: Policy
     assertions:
-      - type: value
-        key: spec
+      - key: spec
         op: present
     tags:
       - policy
@@ -72,8 +66,7 @@ Rules:
     message: Policy should not use default namespace
     resource: Policy
     assertions:
-      - type: value
-        key: spec.namespace
+      - key: spec.namespace
         op: ne
         value: default
     tags:
@@ -94,8 +87,7 @@ Rules:
     message: Network policy should include from pods
     resource: NetworkPolicy
     assertions:
-      - type: value
-        key: spec.allowIncoming.from[].pods
+      - key: spec.allowIncoming.from[].pods
         op: present
     tags:
       - network

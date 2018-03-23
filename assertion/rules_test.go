@@ -37,8 +37,7 @@ var content = `Rules:
     resource: aws_instance
     severity: WARNING
     assertions:
-      - type: value
-        key: instance_type
+      - key: instance_type
         op: in
         value: t2.micro
     tags:
@@ -48,8 +47,7 @@ var content = `Rules:
     resource: aws_s3_bucket
     severity: WARNING
     assertions:
-      - type: value
-        key: name
+      - key: name
         op: eq
         value: bucket1
     tags:
@@ -91,12 +89,10 @@ var ruleWithMultipleFilters = `Rules:
     resource: aws_instance
     severity: FAILURE
     assertions:
-      - type: value
-        key: instance_type
+      - key: instance_type
         op: eq
         value: t2.micro
-      - type: value
-        key: ami
+      - key: ami
         op: eq
         value: ami-000000
 `
@@ -158,8 +154,7 @@ var ruleWithValueFrom = `Rules:
     severity: FAILURE
     resource: aws_instance
     assertions:
-      - type: value
-        key: instance_type
+      - key: instance_type
         op: in
         value_from:
           bucket: config-rules-for-lambda

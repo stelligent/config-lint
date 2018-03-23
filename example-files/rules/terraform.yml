@@ -9,8 +9,7 @@ Rules:
     message: Instance type should be t2.micro or m3.medium
     resource: aws_instance
     assertions:
-      - type: value
-        key: instance_type
+      - key: instance_type
         op: in
         value: t2.micro,m3.medium
     severity: WARNING
@@ -21,8 +20,7 @@ Rules:
     message: Not an approved AMI
     resource: aws_instance
     assertions:
-      - type: value
-        key: ami
+      - key: ami
         op: in
         value: ami-f2d3638a
     severity: FAILURE
@@ -36,8 +34,7 @@ Rules:
         - foo
         - third
     assertions:
-      - type: value
-        key: "tags[].Department | [0]"
+      - key: "tags[].Department | [0]"
         op: in
         value: Operations,Sales,Marketing,Engineering
     severity: WARNING
@@ -48,8 +45,7 @@ Rules:
     message: CostCenter tag is missing
     resource: aws_instance
     assertions:
-      - type: value
-        key: "tags[].CostCenter | [0]"
+      - key: "tags[].CostCenter | [0]"
         op: present
     severity: FAILURE
 
@@ -59,12 +55,10 @@ Rules:
     severity: WARNING
     assertions:
       - or:
-        - type: value
-          key: instance_type
+        - key: instance_type
           op: eq
           value: t2.micro
-        - type: value
-          key: instance_type
+        - key: instance_type
           op: eq
           value: m3.medium
 
@@ -74,11 +68,9 @@ Rules:
     severity: WARNING
     assertions:
       - and:
-        - type: value
-          key: "tags[].Department | [0]"
+        - key: "tags[].Department | [0]"
           op: present
-        - type: value
-          key: "tags[].Project | [0]"
+        - key: "tags[].Project | [0]"
           op: present
     tags:
       - and-test
@@ -89,8 +81,7 @@ Rules:
     severity: WARNING
     assertions:
       - not:
-        - type: value
-          key: instance_type
+        - key: instance_type
           op: eq
           value: c4.large
 
@@ -99,8 +90,7 @@ Rules:
     message: EBS Volumes must be encrypted
     severity: FAILURE
     assertions:
-      - type: value
-        key: encrypted
+      - key: encrypted
         op: eq
         value: true
     tags:
@@ -113,12 +103,10 @@ Rules:
     assertions:
       - not:
         -or:
-          - type: value
-            key: "ingress[].cidr_blocks[]"
+          - key: "ingress[].cidr_blocks[]"
             op: contains
             value: "0.0.0.0/0"
-          - type: value
-            key: "ingress[].cidr_blocks[]"
+          - key: "ingress[].cidr_blocks[]"
             op: contains
             value: "::/0"
     tags:
@@ -131,12 +119,10 @@ Rules:
     assertions:
       - not:
         -or:
-          - type: value
-            key: "egress[].cidr_blocks[]"
+          - key: "egress[].cidr_blocks[]"
             op: contains
             value: "0.0.0.0/0"
-          - type: value
-            key: "egress[].cidr_blocks[]"
+          - key: "egress[].cidr_blocks[]"
             op: contains
             value: "::/0"
     tags:
@@ -150,12 +136,10 @@ Rules:
     assertions:
       - not:
         - or:
-          - type: value
-            key: "ingress[?(from_port==`22`)].cidr_blocks[]"
+          - key: "ingress[?(from_port==`22`)].cidr_blocks[]"
             op: contains
             value: "0.0.0.0/0"
-          - type: value
-            key: "ingress[?(from_port==`22`)].cidr_blocks[]"
+          - key: "ingress[?(from_port==`22`)].cidr_blocks[]"
             op: contains
             value: "::/0"
     tags:
@@ -168,12 +152,10 @@ Rules:
     assertions:
       - not:
         - or:
-          - type: value
-            key: "ingress[?(from_port==`3389`)].cidr_blocks[]"
+          - key: "ingress[?(from_port==`3389`)].cidr_blocks[]"
             op: contains
             value: "0.0.0.0/0"
-          - type: value
-            key: "ingress[?(from_port==`3389`)].cidr_blocks[]"
+          - key: "ingress[?(from_port==`3389`)].cidr_blocks[]"
             op: contains
             value: "::/0"
     tags:
@@ -184,8 +166,7 @@ Rules:
     message: Security group should not allow ingress from CIDR block that does not end in /32
     severity: WARNING
     assertions:
-      - type: value
-        key: "ingress[].cidr_blocks[] | [0]"
+      - key: "ingress[].cidr_blocks[] | [0]"
         op: regex
         value: ".*/32$"
     tags:
@@ -196,8 +177,7 @@ Rules:
     message: Security group ingress should specify single port instead of range
     severity: WARNING
     assertions:
-      - type: value
-        key: "ingress[?(from_port!=to_port)]"
+      - key: "ingress[?(from_port!=to_port)]"
         op: empty
     tags:
       - sg
@@ -207,8 +187,7 @@ Rules:
     message: Security group egress should specify single port instead of range
     severity: WARNING
     assertions:
-      - type: value
-        key: "egress[?(from_port!=to_port)]"
+      - key: "egress[?(from_port!=to_port)]"
         op: empty
     tags:
       - sg
@@ -218,8 +197,7 @@ Rules:
     message: Security group should specify egress rules
     severity: WARNING
     assertions:
-      - type: value
-        key: "egress"
+      - key: "egress"
         op: present
     tags:
       - sg
@@ -228,8 +206,7 @@ Rules:
     message: Instance type should be in list from S3 object
     resource: aws_instance
     assertions:
-      - type: value
-        key: instance_type
+      - key: instance_type
         op: in
         value_from:
           url: s3://config-rules-for-lambda/instance-types
@@ -242,8 +219,7 @@ Rules:
     resource: s3_distribution
     severity: FAILURE
     assertions:
-      - type: value
-        key: logging_config
+      - key: logging_config
         op: present
 
   - id: POLICY_NOT_ACTION
@@ -251,8 +227,7 @@ Rules:
     resource: aws_iam_policy
     severity: WARNING
     assertions:
-      - type: value
-        key: policy.Statement[].NotAction
+      - key: policy.Statement[].NotAction
         op: absent
     tags:
       - iam
@@ -262,8 +237,7 @@ Rules:
     resource: aws_iam_policy
     severity: WARNING
     assertions:
-      - type: value
-        key: policy.Statement[].NotResource
+      - key: policy.Statement[].NotResource
         op: absent
     tags:
       - iam
@@ -274,8 +248,7 @@ Rules:
     severity: FAILURE
     assertions:
       - not:
-        - type: value
-          key: policy.Statement[].Action
+        - key: policy.Statement[].Action
           op: contains
           value: "*"
     tags:
@@ -287,8 +260,7 @@ Rules:
     severity: WARNING
     assertions:
       - not:
-        - type: value
-          key: policy.Statement[].Resource
+        - key: policy.Statement[].Resource
           op: contains
           value: "*"
     tags:
@@ -299,8 +271,7 @@ Rules:
     resource: aws_iam_role
     severity: WARNING
     assertions:
-      - type: value
-        key: assume_role_policy.Statement[].NotAction
+      - key: assume_role_policy.Statement[].NotAction
         op: absent
     tags:
       - iam
@@ -310,8 +281,7 @@ Rules:
     resource: aws_iam_role
     severity: WARNING
     assertions:
-      - type: value
-        key: assume_role_policy.Statement[].NotResource
+      - key: assume_role_policy.Statement[].NotResource
         op: absent
     tags:
       - iam
@@ -321,8 +291,7 @@ Rules:
     resource: aws_elb
     severity: WARNING
     assertions:
-      - type: value
-        key: access_logs
+      - key: access_logs
         op: present
     tags:
       - elb
@@ -331,8 +300,7 @@ Rules:
     message: Bucket name is invalid
     resource: aws_s3_bucket
     assertions:
-      - type: value
-        key: bucket
+      - key: bucket
         op: regex
         value: "^[a-z0-9.-]+$"
     severity: FAILURE
@@ -344,8 +312,7 @@ Rules:
     resource: aws_s3_bucket_policy
     severity: WARNING
     assertions:
-      - type: value
-        key: policy.Statement[].NotAction
+      - key: policy.Statement[].NotAction
         op: absent
     tags:
       - s3
@@ -355,8 +322,7 @@ Rules:
     resource: aws_s3_bucket_policy
     severity: WARNING
     assertions:
-      - type: value
-        key: policy.Statement[].NotPrincipal
+      - key: policy.Statement[].NotPrincipal
         op: absent
     tags:
       - s3
@@ -367,8 +333,7 @@ Rules:
     severity: WARNING
     assertions:
       - not:
-        - type: value
-          key: policy.Statement[].Principal
+        - key: policy.Statement[].Principal
           op: contains
           value: "*"
     tags:
@@ -380,8 +345,7 @@ Rules:
     severity: WARNING
     assertions:
       - not:
-        - type: value
-          key: policy.Statement[].Action
+        - key: policy.Statement[].Action
           op: contains
           value: "*"
     tags:
@@ -393,8 +357,7 @@ Rules:
     severity: WARNING
     assertions:
       - not:
-        - type: value
-          key: policy.Statement[].Principal
+        - key: policy.Statement[].Principal
           op: contains
           value: "*"
     tags:
@@ -405,8 +368,7 @@ Rules:
     resource: aws_sns_topic_policy
     severity: WARNING
     assertions:
-      - type: value
-        key: policy.Statement[].NotAction
+      - key: policy.Statement[].NotAction
         op: absent
     tags:
       - sns
@@ -416,8 +378,7 @@ Rules:
     resource: aws_sns_topic_policy
     severity: WARNING
     assertions:
-      - type: value
-        key: policy.Statement[].NotPrincipal
+      - key: policy.Statement[].NotPrincipal
         op: absent
     tags:
       - sns
@@ -428,8 +389,7 @@ Rules:
     severity: WARNING
     assertions:
       - not:
-        - type: value
-          key: policy.Statement[].Principal
+        - key: policy.Statement[].Principal
           op: contains
           value: "*"
     tags:
@@ -441,8 +401,7 @@ Rules:
     severity: WARNING
     assertions:
       - not:
-        - type: value
-          key: policy.Statement[].Action
+        - key: policy.Statement[].Action
           op: contains
           value: "*"
     tags:
@@ -453,8 +412,7 @@ Rules:
     resource: aws_sqs_queue_policy
     severity: WARNING
     assertions:
-      - type: value
-        key: policy.Statement[].NotAction
+      - key: policy.Statement[].NotAction
         op: absent
     tags:
       - sqs
@@ -464,8 +422,7 @@ Rules:
     resource: aws_sqs_queue_policy
     severity: WARNING
     assertions:
-      - type: value
-        key: policy.Statement[].NotPrincipal
+      - key: policy.Statement[].NotPrincipal
         op: absent
     tags:
       - sqs

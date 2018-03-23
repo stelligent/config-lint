@@ -7,8 +7,7 @@ Rules:
     resource: "AWS::EC2::SecurityGroup"
     assertions:
       - not:
-          - type: value
-            key: IpPermissions[?(FromPort==`22`)].IpRanges[].CidrIp | [0]
+          - key: IpPermissions[?(FromPort==`22`)].IpRanges[].CidrIp | [0]
             op: eq
             value: "0.0.0.0/0"
     severity: NON_COMPLIANT
