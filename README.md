@@ -370,11 +370,10 @@ Rules:
 
 # TODO
 
-Lots to do. This is just a proof-of-concept.
-
 * Add an optional YAML file for project settings, such as ignoring certain rules for certain resources
-* Figure out what other assertion types might be needed (if any)
 * Finish implementing value_from to allow for dynamic data (again, see Cloud Custodian)
 * Figure out how dependency management works in go
 * The lambda function does not handle OverSizedChangeNotification
 * The lambda function name is hard-coded in the Makefile
+* Region is hard-coded to us-east-1 for GetValueFromS3
+
