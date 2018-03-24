@@ -14,6 +14,7 @@ import (
 	"time"
 )
 
+// ConfigurationItem to hold info from Lambda event
 type ConfigurationItem struct {
 	ResourceType                 string
 	ResourceID                   string
@@ -21,6 +22,7 @@ type ConfigurationItem struct {
 	Configuration                interface{}
 }
 
+// InvokingEvent for Lambda event info
 type InvokingEvent struct {
 	ConfigurationItem ConfigurationItem
 }
@@ -43,6 +45,7 @@ func log(s string) {
 	fmt.Println(s)
 }
 
+// RuleParameters bucket and key for loading RuleSet
 type RuleParameters struct {
 	Bucket string
 	Key    string
