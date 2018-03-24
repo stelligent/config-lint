@@ -16,7 +16,7 @@ import (
 
 type ConfigurationItem struct {
 	ResourceType                 string
-	ResourceId                   string
+	ResourceID                   string
 	ConfigurationItemCaptureTime *time.Time
 	Configuration                interface{}
 }
@@ -107,7 +107,7 @@ func handler(configEvent events.ConfigEvent) (string, error) {
 	for _, rule := range resolvedRules {
 		if rule.Resource == configurationItem.ResourceType {
 			resource := assertion.Resource{
-				Id:         configurationItem.ResourceId,
+				ID:         configurationItem.ResourceID,
 				Type:       configurationItem.ResourceType,
 				Properties: configurationItem.Configuration,
 			}
@@ -131,7 +131,7 @@ func handler(configEvent events.ConfigEvent) (string, error) {
 		Evaluations: []*configservice.Evaluation{
 			&configservice.Evaluation{
 				ComplianceResourceType: aws.String(configurationItem.ResourceType),
-				ComplianceResourceId:   aws.String(configurationItem.ResourceId),
+				ComplianceResourceId:   aws.String(configurationItem.ResourceID),
 				ComplianceType:         aws.String(complianceType),
 				OrderingTimestamp:      aws.Time(time.Now()),
 			},

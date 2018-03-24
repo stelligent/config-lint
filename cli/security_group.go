@@ -9,6 +9,7 @@ import (
 	"github.com/stelligent/config-lint/assertion"
 )
 
+// SecurityGroupLinter implements a Linter for data returned by the DescribeSecurityGroups SDK call
 type SecurityGroupLinter struct {
 	BaseLinter
 	Log assertion.LoggingFunction
@@ -40,7 +41,7 @@ func loadSecurityGroupResources(log assertion.LoggingFunction) []assertion.Resou
 		}
 
 		r := assertion.Resource{
-			Id:         *securityGroup.GroupId,
+			ID:         *securityGroup.GroupId,
 			Type:       "AWS::EC2::SecurityGroup",
 			Properties: data,
 		}
@@ -49,13 +50,15 @@ func loadSecurityGroupResources(log assertion.LoggingFunction) []assertion.Resou
 	return resources
 }
 
-func (l SecurityGroupLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string) ([]string, []assertion.Violation) {
-	rules := assertion.FilterRulesById(ruleSet.Rules, ruleIds)
+// Validate applies a Ruleset to all SecurityGroups
+func (l SecurityGroupLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) ([]string, []assertion.Violation) {
+	rules := assertion.FilterRulesByID(ruleSet.Rules, ruleIDs)
 	resources := loadSecurityGroupResources(l.Log)
 	violations := l.ValidateResources(resources, rules, tags, l.Log)
 	return []string{}, violations
 }
 
+// Search applies a JMESPath to all SecurityGroups
 func (l SecurityGroupLinter) Search(filenames []string, ruleSet assertion.RuleSet, searchExpression string) {
 	resources := loadSecurityGroupResources(l.Log)
 	for _, resource := range resources {
@@ -67,7 +70,7 @@ func (l SecurityGroupLinter) Search(filenames []string, ruleSet assertion.RuleSe
 			if err != nil {
 				fmt.Println(err)
 			} else {
-				fmt.Printf("%s: %s\n", resource.Id, s)
+				fmt.Printf("%s: %s\n", resource.ID, s)
 			}
 		}
 	}

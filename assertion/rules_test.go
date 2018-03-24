@@ -26,7 +26,7 @@ func mockExternalRuleInvoker() *MockExternalRuleInvoker {
 }
 
 func (e *MockExternalRuleInvoker) Invoke(Rule, Resource) (string, []Violation) {
-	*e += 1
+	*e++
 	noViolations := make([]Violation, 0)
 	return "OK", noViolations
 }
@@ -67,19 +67,19 @@ func TestFilterRulesByTag(t *testing.T) {
 	if len(r) != 1 {
 		t.Error("Expected filterRulesByTag to return 1 rule")
 	}
-	if r[0].Id != "TEST2" {
+	if r[0].ID != "TEST2" {
 		t.Error("Expected filterRulesByTag to select correct rule")
 	}
 }
 
-func TestFilterRulesById(t *testing.T) {
+func TestFilterRulesByID(t *testing.T) {
 	ids := []string{"TEST2"}
-	r := FilterRulesById(MustParseRules(content).Rules, ids)
+	r := FilterRulesByID(MustParseRules(content).Rules, ids)
 	if len(r) != 1 {
-		t.Error("Expected filterRulesById to return 1 rule")
+		t.Error("Expected filterRulesByID to return 1 rule")
 	}
-	if r[0].Id != "TEST2" {
-		t.Error("Expected filterRulesById to select correct rule")
+	if r[0].ID != "TEST2" {
+		t.Error("Expected filterRulesByID to select correct rule")
 	}
 }
 
@@ -100,7 +100,7 @@ var ruleWithMultipleFilters = `Rules:
 func TestRuleWithMultipleFilter(t *testing.T) {
 	rules := MustParseRules(ruleWithMultipleFilters)
 	resource := Resource{
-		Id:         "a_test_resource",
+		ID:         "a_test_resource",
 		Type:       "aws_instance",
 		Properties: map[string]interface{}{"instance_type": "t2.micro", "ami": "ami-000000"},
 		Filename:   "test.tf",
@@ -117,7 +117,7 @@ func TestRuleWithMultipleFilter(t *testing.T) {
 func TestMultipleFiltersWithSingleFailure(t *testing.T) {
 	rules := MustParseRules(ruleWithMultipleFilters)
 	resource := Resource{
-		Id:         "a_test_resource",
+		ID:         "a_test_resource",
 		Type:       "aws_instance",
 		Properties: map[string]interface{}{"instance_type": "t2.micro", "ami": "ami-111111"},
 		Filename:   "test.tf",
@@ -134,7 +134,7 @@ func TestMultipleFiltersWithSingleFailure(t *testing.T) {
 func TestMultipleFiltersWithMultipleFailures(t *testing.T) {
 	rules := MustParseRules(ruleWithMultipleFilters)
 	resource := Resource{
-		Id:         "a_test_resource",
+		ID:         "a_test_resource",
 		Type:       "aws_instance",
 		Properties: map[string]interface{}{"instance_type": "c3.medium", "ami": "ami-111111"},
 		Filename:   "test.tf",
@@ -164,7 +164,7 @@ var ruleWithValueFrom = `Rules:
 func TestValueFrom(t *testing.T) {
 	rules := MustParseRules(ruleWithValueFrom)
 	resource := Resource{
-		Id:         "a_test_resource",
+		ID:         "a_test_resource",
 		Type:       "aws_instance",
 		Properties: map[string]interface{}{"instance_type": "m3.medium"},
 		Filename:   "test.tf",
@@ -191,7 +191,7 @@ var ruleWithInvoke = `Rules:
 func TestInvoke(t *testing.T) {
 	rules := MustParseRules(ruleWithInvoke)
 	resource := Resource{
-		Id:         "a_test_resource",
+		ID:         "a_test_resource",
 		Type:       "aws_instance",
 		Properties: map[string]interface{}{"instance_type": "m3.medium"},
 		Filename:   "test.tf",

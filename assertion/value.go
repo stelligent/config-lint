@@ -9,14 +9,16 @@ import (
 	"net/url"
 )
 
+// StandardValueSource can fetch values from external sources
 type StandardValueSource struct {
 	Log LoggingFunction
 }
 
+// GetValue looks up external values when an Assertion includes a ValueFrom attribute
 func (v StandardValueSource) GetValue(assertion Assertion) string {
-	if assertion.ValueFrom.Url != "" {
-		v.Log(fmt.Sprintf("Getting value_from %s", assertion.ValueFrom.Url))
-		parsedURL, err := url.Parse(assertion.ValueFrom.Url)
+	if assertion.ValueFrom.URL != "" {
+		v.Log(fmt.Sprintf("Getting value_from %s", assertion.ValueFrom.URL))
+		parsedURL, err := url.Parse(assertion.ValueFrom.URL)
 		if err != nil {
 			panic(err)
 		}
@@ -33,6 +35,7 @@ func (v StandardValueSource) GetValue(assertion Assertion) string {
 	return assertion.Value
 }
 
+// GetValueFromS3 looks up external values for an Assertion when the S3 protocol is specified
 func (v StandardValueSource) GetValueFromS3(bucket string, key string) (string, error) {
 	region := &aws.Config{Region: aws.String("us-east-1")}
 	awsSession := session.New()

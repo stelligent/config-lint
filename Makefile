@@ -5,7 +5,9 @@ LAMBDA_FILES = $(shell find lambda assertion -name \*.go)
 config-lint: $(CLI_FILES)
 	go build -o config-lint cli/*.go
 
-lambda: $(LAMBDA_FILES)
+main: $(LAMBDA_FILES)
 	GOOS=linux GOARCH=amd64 go build -o main lambda/*.go
+
+lambda: main
 	zip deployment.zip main
 	aws lambda update-function-code --region us-east-1 --function-name config-go --zip-file fileb://deployment.zip

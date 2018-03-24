@@ -75,6 +75,7 @@ func jsonListsIntersect(s1 string, s2 string) bool {
 	return listsIntersect(a1, a2)
 }
 
+// ShouldIncludeFile return true if a filename matches one of a list of patterns
 func ShouldIncludeFile(patterns []string, filename string) bool {
 	for _, pattern := range patterns {
 		_, file := filepath.Split(filename)
@@ -89,6 +90,7 @@ func ShouldIncludeFile(patterns []string, filename string) bool {
 	return false
 }
 
+// FilterResourcesByType filters a list of resources that match a single resource type
 func FilterResourcesByType(resources []Resource, resourceType string) []Resource {
 	if resourceType == "*" {
 		return resources
@@ -102,6 +104,7 @@ func FilterResourcesByType(resources []Resource, resourceType string) []Resource
 	return filtered
 }
 
+// JSONStringify converts a JSON object into an indented string suitable for printing
 func JSONStringify(data interface{}) (string, error) {
 	b, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {

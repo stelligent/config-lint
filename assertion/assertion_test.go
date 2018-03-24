@@ -10,7 +10,7 @@ func testLogging(s string) {
 
 func testsimple(t *testing.T) {
 	rule := Rule{
-		Id:       "test1",
+		ID:       "test1",
 		Message:  "test rule",
 		Severity: "failure",
 		Resource: "aws_instance",
@@ -24,7 +24,7 @@ func testsimple(t *testing.T) {
 		},
 	}
 	resource := Resource{
-		Id:         "a_test_resource",
+		ID:         "a_test_resource",
 		Type:       "aws_instance",
 		Properties: map[string]interface{}{"instance_type": "t2.micro"},
 		Filename:   "test.tf",
@@ -37,7 +37,7 @@ func testsimple(t *testing.T) {
 
 func TestOrToMatch(t *testing.T) {
 	rule := Rule{
-		Id:       "TEST1",
+		ID:       "TEST1",
 		Message:  "Test Rule",
 		Severity: "FAILURE",
 		Resource: "aws_instance",
@@ -61,7 +61,7 @@ func TestOrToMatch(t *testing.T) {
 		},
 	}
 	resource := Resource{
-		Id:         "a_test_resource",
+		ID:         "a_test_resource",
 		Type:       "aws_instance",
 		Properties: map[string]interface{}{"instance_type": "t2.micro"},
 		Filename:   "test.tf",
@@ -74,7 +74,7 @@ func TestOrToMatch(t *testing.T) {
 
 func TestOrToNotMatch(t *testing.T) {
 	rule := Rule{
-		Id:       "TEST1",
+		ID:       "TEST1",
 		Message:  "Test Rule",
 		Severity: "FAILURE",
 		Resource: "aws_instance",
@@ -98,7 +98,7 @@ func TestOrToNotMatch(t *testing.T) {
 		},
 	}
 	resource := Resource{
-		Id:         "a_test_resource",
+		ID:         "a_test_resource",
 		Type:       "aws_instance",
 		Properties: map[string]interface{}{"instance_type": "m3.medium"},
 		Filename:   "test.tf",
@@ -111,7 +111,7 @@ func TestOrToNotMatch(t *testing.T) {
 
 func TestAndToMatch(t *testing.T) {
 	rule := Rule{
-		Id:       "TEST1",
+		ID:       "TEST1",
 		Message:  "Test Rule",
 		Severity: "FAILURE",
 		Resource: "aws_instance",
@@ -135,7 +135,7 @@ func TestAndToMatch(t *testing.T) {
 		},
 	}
 	resource := Resource{
-		Id:   "a_test_resource",
+		ID:   "a_test_resource",
 		Type: "aws_instance",
 		Properties: map[string]interface{}{
 			"instance_type": "t2.micro",
@@ -151,7 +151,7 @@ func TestAndToMatch(t *testing.T) {
 
 func TestAndToNotMatch(t *testing.T) {
 	rule := Rule{
-		Id:       "TEST1",
+		ID:       "TEST1",
 		Message:  "Test Rule",
 		Severity: "FAILURE",
 		Resource: "aws_instance",
@@ -175,7 +175,7 @@ func TestAndToNotMatch(t *testing.T) {
 		},
 	}
 	resource := Resource{
-		Id:   "a_test_resource",
+		ID:   "a_test_resource",
 		Type: "aws_instance",
 		Properties: map[string]interface{}{
 			"instance_type": "m3.medium",
@@ -191,7 +191,7 @@ func TestAndToNotMatch(t *testing.T) {
 
 func TestNotToMatch(t *testing.T) {
 	rule := Rule{
-		Id:       "TEST1",
+		ID:       "TEST1",
 		Message:  "Test Rule",
 		Severity: "FAILURE",
 		Resource: "aws_instance",
@@ -209,7 +209,7 @@ func TestNotToMatch(t *testing.T) {
 		},
 	}
 	resource := Resource{
-		Id:   "a_test_resource",
+		ID:   "a_test_resource",
 		Type: "aws_instance",
 		Properties: map[string]interface{}{
 			"instance_type": "c4.large",
@@ -224,7 +224,7 @@ func TestNotToMatch(t *testing.T) {
 
 func TestNotToNotMatch(t *testing.T) {
 	rule := Rule{
-		Id:       "TEST1",
+		ID:       "TEST1",
 		Message:  "Test Rule",
 		Severity: "FAILURE",
 		Resource: "aws_instance",
@@ -242,7 +242,7 @@ func TestNotToNotMatch(t *testing.T) {
 		},
 	}
 	resource := Resource{
-		Id:   "a_test_resource",
+		ID:   "a_test_resource",
 		Type: "aws_instance",
 		Properties: map[string]interface{}{
 			"instance_type": "t2.micro",
@@ -257,7 +257,7 @@ func TestNotToNotMatch(t *testing.T) {
 
 func TestNestedNot(t *testing.T) {
 	rule := Rule{
-		Id:       "TEST1",
+		ID:       "TEST1",
 		Message:  "Test Rule",
 		Severity: "FAILURE",
 		Resource: "aws_instance",
@@ -285,7 +285,7 @@ func TestNestedNot(t *testing.T) {
 		},
 	}
 	resource := Resource{
-		Id:   "a_test_resource",
+		ID:   "a_test_resource",
 		Type: "aws_instance",
 		Properties: map[string]interface{}{
 			"instance_type": "m3.medium",
@@ -300,7 +300,7 @@ func TestNestedNot(t *testing.T) {
 
 func TestNestedBooleans(t *testing.T) {
 	rule := Rule{
-		Id:       "TEST1",
+		ID:       "TEST1",
 		Message:  "Do not allow access to port 22 from 0.0.0.0/0",
 		Severity: "NOT_COMPLIANT",
 		Resource: "aws_instance",
@@ -328,7 +328,7 @@ func TestNestedBooleans(t *testing.T) {
 		},
 	}
 	resource := Resource{
-		Id:         "a_test_resource",
+		ID:         "a_test_resource",
 		Type:       "aws_instance",
 		Properties: map[string]interface{}{},
 		Filename:   "test.tf",
@@ -364,14 +364,14 @@ func TestNestedBooleans(t *testing.T) {
 
 func TestExceptions(t *testing.T) {
 	rule := Rule{
-		Id:     "EXCEPT",
+		ID:     "EXCEPT",
 		Except: []string{"200", "300"},
 	}
 	resources := []Resource{
-		Resource{Id: "100"},
-		Resource{Id: "200"},
-		Resource{Id: "300"},
-		Resource{Id: "400"},
+		Resource{ID: "100"},
+		Resource{ID: "200"},
+		Resource{ID: "300"},
+		Resource{ID: "400"},
 	}
 	filteredResources := FilterResourceExceptions(rule, resources)
 	if len(filteredResources) != 2 {
@@ -381,14 +381,14 @@ func TestExceptions(t *testing.T) {
 
 func TestNoExceptions(t *testing.T) {
 	rule := Rule{
-		Id:     "EXCEPT",
+		ID:     "EXCEPT",
 		Except: []string{},
 	}
 	resources := []Resource{
-		Resource{Id: "100"},
-		Resource{Id: "200"},
-		Resource{Id: "300"},
-		Resource{Id: "400"},
+		Resource{ID: "100"},
+		Resource{ID: "200"},
+		Resource{ID: "300"},
+		Resource{ID: "400"},
 	}
 	filteredResources := FilterResourceExceptions(rule, resources)
 	if len(filteredResources) != 4 {

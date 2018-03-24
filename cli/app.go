@@ -45,11 +45,11 @@ func makeTagList(tags string) []string {
 	return strings.Split(tags, ",")
 }
 
-func makeRulesList(ruleIds string) []string {
-	if ruleIds == "" {
+func makeRulesList(ruleIDs string) []string {
+	if ruleIDs == "" {
 		return nil
 	}
-	return strings.Split(ruleIds, ",")
+	return strings.Split(ruleIDs, ",")
 }
 
 type arrayFlags []string

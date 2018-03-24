@@ -1,5 +1,6 @@
 package assertion
 
+// Assertion expression for a resource
 type Assertion struct {
 	Type      string
 	Key       string
@@ -8,24 +9,28 @@ type Assertion struct {
 	Or        []Assertion
 	And       []Assertion
 	Not       []Assertion
-	ValueFrom AssertionValueFrom `json:"value_from"`
+	ValueFrom ValueFrom `json:"value_from"`
 }
 
-type AssertionValueFrom struct {
-	Url string
+// ValueFrom describes source for external values
+type ValueFrom struct {
+	URL string
 }
 
+// ValueSource interface to fetch values
 type ValueSource interface {
 	GetValue(Assertion) string
 }
 
+// InvokeRuleAPI describes parameters for calling an external API
 type InvokeRuleAPI struct {
-	Url     string
+	URL     string
 	Payload string
 }
 
+// Rule for a resource
 type Rule struct {
-	Id         string
+	ID         string
 	Message    string
 	Severity   string
 	Resource   string
@@ -35,6 +40,7 @@ type Rule struct {
 	Invoke     InvokeRuleAPI
 }
 
+// RuleSet describes a collection of rules for a Linter
 type RuleSet struct {
 	Type        string
 	Description string
@@ -43,27 +49,31 @@ type RuleSet struct {
 	Version     string
 }
 
+// Violation has details for a failed assertion
 type Violation struct {
-	RuleId       string
-	ResourceId   string
+	RuleID       string
+	ResourceID   string
 	ResourceType string
 	Status       string
 	Message      string
 	Filename     string
 }
 
+// ValidationReport summarizes validation for resources and rules
 type ValidationReport struct {
 	Violations   map[string]([]Violation)
 	FilesScanned []string
 }
 
+// Resource describes a resource to be validated
 type Resource struct {
-	Id         string
+	ID         string
 	Type       string
 	Properties interface{}
 	Filename   string
 }
 
+// ExternalRuleInvoker defines an interface for invoking an external API
 type ExternalRuleInvoker interface {
 	Invoke(Rule, Resource) (string, []Violation)
 }

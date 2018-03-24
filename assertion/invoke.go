@@ -7,18 +7,22 @@ import (
 	"net/http"
 )
 
+// InvokeViolation has message describing a single validation error
 type InvokeViolation struct {
 	Message string
 }
 
+// InvokeResponse contains a collection of validation errors
 type InvokeResponse struct {
 	Violations []InvokeViolation
 }
 
+// StandardExternalRuleInvoker implements an external HTTP or HTTPS call
 type StandardExternalRuleInvoker struct {
 	Log LoggingFunction
 }
 
+// Invoke an external API to validate a Resource
 func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (string, []Violation) {
 	status := "OK"
 	violations := make([]Violation, 0)
@@ -31,14 +35,14 @@ func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (strin
 		payload = p
 	}
 	payloadJSON, err := JSONStringify(payload)
-	e.Log(fmt.Sprintf("Invoke %s on %s\n", rule.Invoke.Url, payloadJSON))
-	httpResponse, err := http.Get(rule.Invoke.Url)
+	e.Log(fmt.Sprintf("Invoke %s on %s\n", rule.Invoke.URL, payloadJSON))
+	httpResponse, err := http.Get(rule.Invoke.URL)
 	if err != nil {
 		violations := []Violation{
 			Violation{
-				RuleId:       rule.Id,
+				RuleID:       rule.ID,
 				Status:       rule.Severity,
-				ResourceId:   resource.Id,
+				ResourceID:   resource.ID,
 				ResourceType: resource.Type,
 				Filename:     resource.Filename,
 				Message:      fmt.Sprintf("Invoke failed: %s", err.Error()),
@@ -49,9 +53,9 @@ func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (strin
 	if httpResponse.StatusCode != 200 {
 		violations := []Violation{
 			Violation{
-				RuleId:       rule.Id,
+				RuleID:       rule.ID,
 				Status:       rule.Severity,
-				ResourceId:   resource.Id,
+				ResourceID:   resource.ID,
 				ResourceType: resource.Type,
 				Filename:     resource.Filename,
 				Message:      fmt.Sprintf("Invoke failed, StatusCode: %d", httpResponse.StatusCode),
@@ -64,9 +68,9 @@ func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (strin
 	if err != nil {
 		violations := []Violation{
 			Violation{
-				RuleId:       rule.Id,
+				RuleID:       rule.ID,
 				Status:       rule.Severity,
-				ResourceId:   resource.Id,
+				ResourceID:   resource.ID,
 				ResourceType: resource.Type,
 				Filename:     resource.Filename,
 				Message:      "Invoke response cannot be read",
@@ -80,9 +84,9 @@ func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (strin
 	if err != nil {
 		violations := []Violation{
 			Violation{
-				RuleId:       rule.Id,
+				RuleID:       rule.ID,
 				Status:       rule.Severity,
-				ResourceId:   resource.Id,
+				ResourceID:   resource.ID,
 				ResourceType: resource.Type,
 				Filename:     resource.Filename,
 				Message:      "Invoke response cannot be parsed",
@@ -93,9 +97,9 @@ func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (strin
 	for _, violation := range invokeResponse.Violations {
 		status = rule.Severity
 		violations = append(violations, Violation{
-			RuleId:       rule.Id,
+			RuleID:       rule.ID,
 			Status:       status,
-			ResourceId:   resource.Id,
+			ResourceID:   resource.ID,
 			ResourceType: resource.Type,
 			Filename:     resource.Filename,
 			Message:      violation.Message,

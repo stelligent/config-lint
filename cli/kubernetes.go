@@ -7,11 +7,13 @@ import (
 	"path/filepath"
 )
 
+// KubernetesLinter lints resources in Kubernets YAML files
 type KubernetesLinter struct {
 	BaseLinter
 	Log assertion.LoggingFunction
 }
 
+// KubernetesResourceLoader converts Terraform configuration files into a collection of Resource objects
 type KubernetesResourceLoader struct {
 	Log assertion.LoggingFunction
 }
@@ -31,7 +33,7 @@ func loadYAML(filename string, log assertion.LoggingFunction) []interface{} {
 	return []interface{}{m}
 }
 
-func getResourceIdFromMetadata(m map[string]interface{}) (string, bool) {
+func getResourceIDFromMetadata(m map[string]interface{}) (string, bool) {
 	if metadata, ok := m["metadata"].(map[string]interface{}); ok {
 		if name, ok := metadata["name"].(string); ok {
 			return name, true
@@ -40,24 +42,25 @@ func getResourceIdFromMetadata(m map[string]interface{}) (string, bool) {
 	return "", false
 }
 
-func getResourceIdFromFilename(filename string) string {
-	_, resourceId := filepath.Split(filename)
-	return resourceId
+func getResourceIDFromFilename(filename string) string {
+	_, resourceID := filepath.Split(filename)
+	return resourceID
 }
 
+// Load converts a text file into a collection of Resource objects
 func (l KubernetesResourceLoader) Load(filename string) []assertion.Resource {
 	yamlResources := loadYAML(filename, l.Log)
 	resources := make([]assertion.Resource, 0)
 	for _, resource := range yamlResources {
 		m := resource.(map[string]interface{})
-		var resourceId string
-		if name, ok := getResourceIdFromMetadata(m); ok {
-			resourceId = name
+		var resourceID string
+		if name, ok := getResourceIDFromMetadata(m); ok {
+			resourceID = name
 		} else {
-			resourceId = getResourceIdFromFilename(filename)
+			resourceID = getResourceIDFromFilename(filename)
 		}
 		kr := assertion.Resource{
-			Id:         resourceId,
+			ID:         resourceID,
 			Type:       m["kind"].(string),
 			Properties: m,
 			Filename:   filename,
@@ -67,11 +70,13 @@ func (l KubernetesResourceLoader) Load(filename string) []assertion.Resource {
 	return resources
 }
 
-func (l KubernetesLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIds []string) ([]string, []assertion.Violation) {
+// Validate runs validate on a collection of filenames using a RuleSet
+func (l KubernetesLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) ([]string, []assertion.Violation) {
 	loader := KubernetesResourceLoader{Log: l.Log}
-	return l.ValidateFiles(filenames, ruleSet, tags, ruleIds, loader, l.Log)
+	return l.ValidateFiles(filenames, ruleSet, tags, ruleIDs, loader, l.Log)
 }
 
+// Search evaluates a JMESPath expression against the resources in a collection of filenames
 func (l KubernetesLinter) Search(filenames []string, ruleSet assertion.RuleSet, searchExpression string) {
 	loader := KubernetesResourceLoader{Log: l.Log}
 	l.SearchFiles(filenames, ruleSet, searchExpression, loader)

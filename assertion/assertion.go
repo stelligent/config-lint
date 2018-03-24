@@ -11,8 +11,8 @@ func searchAndMatch(assertion Assertion, resource Resource, log LoggingFunction)
 	}
 	match := isMatch(v, assertion.Op, assertion.Value)
 	log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s", assertion.Key, v, assertion.Op, assertion.Value))
-	log(fmt.Sprintf("ResourceId: %s Type: %s %t",
-		resource.Id,
+	log(fmt.Sprintf("ResourceID: %s Type: %s %t",
+		resource.ID,
 		resource.Type,
 		match))
 	return match
@@ -59,15 +59,17 @@ func booleanOperation(assertion Assertion, resource Resource, log LoggingFunctio
 	return searchAndMatch(assertion, resource, log)
 }
 
+// ExcludeResource when resource.ID included in list of exceptions
 func ExcludeResource(rule Rule, resource Resource) bool {
 	for _, id := range rule.Except {
-		if id == resource.Id {
+		if id == resource.ID {
 			return true
 		}
 	}
 	return false
 }
 
+// FilterResourceExceptions filters out resources that should not be validated
 func FilterResourceExceptions(rule Rule, resources []Resource) []Resource {
 	if rule.Except == nil || len(rule.Except) == 0 {
 		return resources
@@ -81,6 +83,7 @@ func FilterResourceExceptions(rule Rule, resources []Resource) []Resource {
 	return filtered
 }
 
+// CheckAssertion validates a single Resource using a single Assertion
 func CheckAssertion(rule Rule, assertion Assertion, resource Resource, log LoggingFunction) string {
 	status := "OK"
 	if !booleanOperation(assertion, resource, log) {
