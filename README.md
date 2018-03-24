@@ -49,7 +49,7 @@ The rules file specifies what files to process, and what validations to perform.
 |-----------|------------------------------------------------------------------------------------|
 |version    |Currently ignored                                                                   |
 |description|Text description for the file, not currently used                                   |
-|type       |Should be 'Terraform' or 'Kubernetes'                                               |
+|type       |Terraform, Kubernetes, SecurityGroups, AWSConfig                                    |
 |files      |Filenames must match one of these patterns to be processed by this set of rules     |
 |rules      |A list of rules, see next section                                                   |
 
@@ -63,8 +63,9 @@ Each rule contains the following attributes:
 |message    | A string to be printed when a validation error is detected                         |
 |resource   | The resource type to which the rule will be applied                                |
 |except     | An optional list of resource ids that should not be validated                      |
-|severity   | Should be 'WARNING' or 'FAILURE'                                                   |
+|severity   | FAILURE, WARNING, NON_COMPLIANT                                                    |
 |assertions | A list of assertions used to detect validation errors, see next section            |
+|invoke     | Alternative to assertions for a custom external API call to validate, see below    |
 |tags       | Optional list of tags, command line has option to limit scans to a subset of tags  |
 
 ## Attributes for each Assertion
@@ -76,6 +77,13 @@ Each assertion contains the following attributes:
 |key        | JMES path used to find data in a resource                                          |
 |op         | Operation to perform on the data returned by searching for the key                 |
 |value      | Literal value needed for most operations                                           |
+
+## Invoke external API for validation
+
+|Name       | Description                                                                        |
+|-----------|------------------------------------------------------------------------------------|
+|Url        | HTTP endpoint to invoke                                                            |
+|Payload    | Optional JMESPATH to use for payload, default is '@'                               |
 
 ## Examples
 
@@ -377,3 +385,4 @@ Rules:
 * The lambda function name is hard-coded in the Makefile
 * Region is hard-coded to us-east-1 for GetValueFromS3
 * Replace calls to panic with better error reporting
+* Invoke should be a POST, not a GET, and it should probably include the payload
