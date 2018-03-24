@@ -376,4 +376,4 @@ Rules:
 * The lambda function does not handle OverSizedChangeNotification
 * The lambda function name is hard-coded in the Makefile
 * Region is hard-coded to us-east-1 for GetValueFromS3
-
+* Replace calls to panic with better error reporting

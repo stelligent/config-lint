@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"github.com/ghodss/yaml"
 	"github.com/stelligent/config-lint/assertion"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 )
 
@@ -18,19 +20,22 @@ type KubernetesResourceLoader struct {
 	Log assertion.LoggingFunction
 }
 
-func loadYAML(filename string, log assertion.LoggingFunction) []interface{} {
+func loadYAML(filename string, log assertion.LoggingFunction) ([]interface{}, error) {
+	empty := []interface{}{}
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {
-		panic(err)
+		fmt.Fprintln(os.Stderr, filename, err.Error())
+		return empty, err
 	}
 
 	var yamlData interface{}
 	err = yaml.Unmarshal(content, &yamlData)
 	if err != nil {
-		panic(err)
+		fmt.Fprintln(os.Stderr, filename, err.Error())
+		return empty, err
 	}
 	m := yamlData.(map[string]interface{})
-	return []interface{}{m}
+	return []interface{}{m}, nil
 }
 
 func getResourceIDFromMetadata(m map[string]interface{}) (string, bool) {
@@ -49,8 +54,8 @@ func getResourceIDFromFilename(filename string) string {
 
 // Load converts a text file into a collection of Resource objects
 func (l KubernetesResourceLoader) Load(filename string) []assertion.Resource {
-	yamlResources := loadYAML(filename, l.Log)
 	resources := make([]assertion.Resource, 0)
+	yamlResources, _ := loadYAML(filename, l.Log)
 	for _, resource := range yamlResources {
 		m := resource.(map[string]interface{})
 		var resourceID string
