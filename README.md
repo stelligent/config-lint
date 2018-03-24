@@ -384,4 +384,4 @@ Rules:
 * The lambda function does not handle OverSizedChangeNotification
 * The lambda function name is hard-coded in the Makefile
 * Region is hard-coded to us-east-1 for GetValueFromS3
-
+* Invoke should be a POST, not a GET, and it should probably include the payload
