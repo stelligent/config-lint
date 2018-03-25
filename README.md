@@ -386,3 +386,5 @@ Rules:
 * Region is hard-coded to us-east-1 for GetValueFromS3
 * Replace calls to panic with better error reporting
 * Invoke should be a POST, not a GET, and it should probably include the payload
+* Use type switch as more idiomatic way to handle multiple types in match.go
+* Start using go testing coverage tools
