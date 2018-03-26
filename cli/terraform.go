@@ -20,85 +20,91 @@ type TerraformResourceLoader struct {
 	Log assertion.LoggingFunction
 }
 
-func parsePolicy(resource assertion.Resource) assertion.Resource {
-	if resource.Properties != nil {
-		properties := resource.Properties.(map[string]interface{})
-		for _, attribute := range []string{"assume_role_policy", "policy"} {
-			if policyAttribute, hasPolicyString := properties[attribute]; hasPolicyString {
-				if policyString, isString := policyAttribute.(string); isString {
-					var policy interface{}
-					err := json.Unmarshal([]byte(policyString), &policy)
-					if err != nil {
-						panic(err)
-					}
-					properties[attribute] = policy
+// FIXME try this: type ResourceProperties map[string]interface{}
+func parsePolicy(templateResource interface{}) (map[string]interface{}, error) {
+	firstResource := templateResource.([]interface{})[0]
+	properties := firstResource.(map[string]interface{})
+	for _, attribute := range []string{"assume_role_policy", "policy"} {
+		if policyAttribute, hasPolicyString := properties[attribute]; hasPolicyString {
+			if policyString, isString := policyAttribute.(string); isString {
+				var policy interface{}
+				err := json.Unmarshal([]byte(policyString), &policy)
+				if err != nil {
+					return properties, err
 				}
+				properties[attribute] = policy
 			}
 		}
 	}
-	return resource
+	return properties, nil
 }
 
-func loadHCL(filename string, log assertion.LoggingFunction) []interface{} {
+func loadHCL(filename string, log assertion.LoggingFunction) ([]interface{}, error) {
+	results := make([]interface{}, 0)
 	template, err := ioutil.ReadFile(filename)
 	if err != nil {
-		panic(err)
+		return results, nil
 	}
 
 	var v interface{}
 	err = hcl.Unmarshal([]byte(template), &v)
 	if err != nil {
-		panic(err)
+		return results, nil
 	}
 	jsonData, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
-		panic(err)
+		return results, nil
 	}
 	log(string(jsonData))
 
 	var hclData interface{}
 	err = yaml.Unmarshal(jsonData, &hclData)
 	if err != nil {
-		panic(err)
+		return results, nil
 	}
 	m := hclData.(map[string]interface{})
-	results := make([]interface{}, 0)
 	for _, key := range []string{"resource", "data"} {
 		if m[key] != nil {
 			log(fmt.Sprintf("Adding %s", key))
 			results = append(results, m[key].([]interface{})...)
 		}
 	}
-	return results
+	return results, nil
 }
 
 // Load parses an HCL file into a collection or Resource objects
-func (l TerraformResourceLoader) Load(filename string) []assertion.Resource {
-	hclResources := loadHCL(filename, l.Log)
-
+func (l TerraformResourceLoader) Load(filename string) ([]assertion.Resource, error) {
 	resources := make([]assertion.Resource, 0)
+	hclResources, err := loadHCL(filename, l.Log)
+	if err != nil {
+		return resources, err
+	}
 	for _, resource := range hclResources {
 		for resourceType, templateResources := range resource.(map[string]interface{}) {
 			if templateResources != nil {
 				for _, templateResource := range templateResources.([]interface{}) {
-					for resourceID, resource := range templateResource.(map[string]interface{}) {
+					for resourceID, templateResource := range templateResource.(map[string]interface{}) {
+						properties, err := parsePolicy(templateResource)
+						if err != nil {
+							return resources, err
+						}
 						tr := assertion.Resource{
 							ID:         resourceID,
 							Type:       resourceType,
-							Properties: resource.([]interface{})[0],
+							Properties: properties,
 							Filename:   filename,
 						}
-						resources = append(resources, parsePolicy(tr))
+						resources = append(resources, tr)
 					}
 				}
 			}
 		}
 	}
-	return resources
+	return resources, nil
 }
 
 // Validate uses a RuleSet to validate resources in a collection of Terraform configuration files
-func (l TerraformLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) ([]string, []assertion.Violation) {
+func (l TerraformLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) ([]string, []assertion.Violation, error) {
 	loader := TerraformResourceLoader{Log: l.Log}
 	return l.ValidateFiles(filenames, ruleSet, tags, ruleIDs, loader, l.Log)
 }

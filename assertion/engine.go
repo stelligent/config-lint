@@ -19,7 +19,7 @@ type ValueFrom struct {
 
 // ValueSource interface to fetch values
 type ValueSource interface {
-	GetValue(Assertion) string
+	GetValue(Assertion) (string, error)
 }
 
 // InvokeRuleAPI describes parameters for calling an external API
@@ -75,5 +75,5 @@ type Resource struct {
 
 // ExternalRuleInvoker defines an interface for invoking an external API
 type ExternalRuleInvoker interface {
-	Invoke(Rule, Resource) (string, []Violation)
+	Invoke(Rule, Resource) (string, []Violation, error)
 }

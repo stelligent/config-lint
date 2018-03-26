@@ -7,11 +7,11 @@ import (
 type TestValueSource struct {
 }
 
-func (t TestValueSource) GetValue(assertion Assertion) string {
+func (t TestValueSource) GetValue(assertion Assertion) (string, error) {
 	if assertion.Value != "" {
-		return assertion.Value
+		return assertion.Value, nil
 	}
-	return "m3.medium"
+	return "m3.medium", nil
 }
 
 func testValueSource() ValueSource {
@@ -25,10 +25,10 @@ func mockExternalRuleInvoker() *MockExternalRuleInvoker {
 	return &m
 }
 
-func (e *MockExternalRuleInvoker) Invoke(Rule, Resource) (string, []Violation) {
+func (e *MockExternalRuleInvoker) Invoke(Rule, Resource) (string, []Violation, error) {
 	*e++
 	noViolations := make([]Violation, 0)
-	return "OK", noViolations
+	return "OK", noViolations, nil
 }
 
 var content = `Rules:
@@ -54,8 +54,16 @@ var content = `Rules:
       - s3
 `
 
+func MustParseRules(content string, t *testing.T) RuleSet {
+	r, err := ParseRules(content)
+	if err != nil {
+		t.Error("Unable to parse:" + content)
+	}
+	return r
+}
+
 func TestParseRules(t *testing.T) {
-	r := MustParseRules(content)
+	r := MustParseRules(content, t)
 	if len(r.Rules) != 2 {
 		t.Error("Expected to parse 1 rule")
 	}
@@ -63,7 +71,7 @@ func TestParseRules(t *testing.T) {
 
 func TestFilterRulesByTag(t *testing.T) {
 	tags := []string{"s3"}
-	r := FilterRulesByTag(MustParseRules(content).Rules, tags)
+	r := FilterRulesByTag(MustParseRules(content, t).Rules, tags)
 	if len(r) != 1 {
 		t.Error("Expected filterRulesByTag to return 1 rule")
 	}
@@ -74,7 +82,7 @@ func TestFilterRulesByTag(t *testing.T) {
 
 func TestFilterRulesByID(t *testing.T) {
 	ids := []string{"TEST2"}
-	r := FilterRulesByID(MustParseRules(content).Rules, ids)
+	r := FilterRulesByID(MustParseRules(content, t).Rules, ids)
 	if len(r) != 1 {
 		t.Error("Expected filterRulesByID to return 1 rule")
 	}
@@ -98,14 +106,17 @@ var ruleWithMultipleFilters = `Rules:
 `
 
 func TestRuleWithMultipleFilter(t *testing.T) {
-	rules := MustParseRules(ruleWithMultipleFilters)
+	rules := MustParseRules(ruleWithMultipleFilters, t)
 	resource := Resource{
 		ID:         "a_test_resource",
 		Type:       "aws_instance",
 		Properties: map[string]interface{}{"instance_type": "t2.micro", "ami": "ami-000000"},
 		Filename:   "test.tf",
 	}
-	status, violations := CheckRule(rules.Rules[0], resource, mockExternalRuleInvoker(), testLogging)
+	status, violations, err := CheckRule(rules.Rules[0], resource, mockExternalRuleInvoker(), testLogging)
+	if err != nil {
+		t.Error("Error in CheckRule:" + err.Error())
+	}
 	if status != "OK" {
 		t.Error("Expecting multiple rule to match")
 	}
@@ -115,14 +126,17 @@ func TestRuleWithMultipleFilter(t *testing.T) {
 }
 
 func TestMultipleFiltersWithSingleFailure(t *testing.T) {
-	rules := MustParseRules(ruleWithMultipleFilters)
+	rules := MustParseRules(ruleWithMultipleFilters, t)
 	resource := Resource{
 		ID:         "a_test_resource",
 		Type:       "aws_instance",
 		Properties: map[string]interface{}{"instance_type": "t2.micro", "ami": "ami-111111"},
 		Filename:   "test.tf",
 	}
-	status, violations := CheckRule(rules.Rules[0], resource, mockExternalRuleInvoker(), testLogging)
+	status, violations, err := CheckRule(rules.Rules[0], resource, mockExternalRuleInvoker(), testLogging)
+	if err != nil {
+		t.Error("Error in CheckRule:" + err.Error())
+	}
 	if status != "FAILURE" {
 		t.Error("Expecting multiple rule to return FAILURE")
 	}
@@ -132,14 +146,17 @@ func TestMultipleFiltersWithSingleFailure(t *testing.T) {
 }
 
 func TestMultipleFiltersWithMultipleFailures(t *testing.T) {
-	rules := MustParseRules(ruleWithMultipleFilters)
+	rules := MustParseRules(ruleWithMultipleFilters, t)
 	resource := Resource{
 		ID:         "a_test_resource",
 		Type:       "aws_instance",
 		Properties: map[string]interface{}{"instance_type": "c3.medium", "ami": "ami-111111"},
 		Filename:   "test.tf",
 	}
-	status, violations := CheckRule(rules.Rules[0], resource, mockExternalRuleInvoker(), testLogging)
+	status, violations, err := CheckRule(rules.Rules[0], resource, mockExternalRuleInvoker(), testLogging)
+	if err != nil {
+		t.Error("Error in CheckRule:" + err.Error())
+	}
 	if status != "FAILURE" {
 		t.Error("Expecting multiple rule to return FAILURE")
 	}
@@ -162,7 +179,7 @@ var ruleWithValueFrom = `Rules:
 `
 
 func TestValueFrom(t *testing.T) {
-	rules := MustParseRules(ruleWithValueFrom)
+	rules := MustParseRules(ruleWithValueFrom, t)
 	resource := Resource{
 		ID:         "a_test_resource",
 		Type:       "aws_instance",
@@ -170,7 +187,10 @@ func TestValueFrom(t *testing.T) {
 		Filename:   "test.tf",
 	}
 	resolved := ResolveRules(rules.Rules, testValueSource(), testLogging)
-	status, violations := CheckRule(resolved[0], resource, mockExternalRuleInvoker(), testLogging)
+	status, violations, err := CheckRule(resolved[0], resource, mockExternalRuleInvoker(), testLogging)
+	if err != nil {
+		t.Error("Error in CheckRule:" + err.Error())
+	}
 	if status != "OK" {
 		t.Error("Expecting value_from to match")
 	}
@@ -189,7 +209,7 @@ var ruleWithInvoke = `Rules:
 `
 
 func TestInvoke(t *testing.T) {
-	rules := MustParseRules(ruleWithInvoke)
+	rules := MustParseRules(ruleWithInvoke, t)
 	resource := Resource{
 		ID:         "a_test_resource",
 		Type:       "aws_instance",

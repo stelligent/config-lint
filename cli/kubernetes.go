@@ -53,9 +53,12 @@ func getResourceIDFromFilename(filename string) string {
 }
 
 // Load converts a text file into a collection of Resource objects
-func (l KubernetesResourceLoader) Load(filename string) []assertion.Resource {
+func (l KubernetesResourceLoader) Load(filename string) ([]assertion.Resource, error) {
 	resources := make([]assertion.Resource, 0)
-	yamlResources, _ := loadYAML(filename, l.Log)
+	yamlResources, err := loadYAML(filename, l.Log)
+	if err != nil {
+		return resources, err
+	}
 	for _, resource := range yamlResources {
 		m := resource.(map[string]interface{})
 		var resourceID string
@@ -72,11 +75,11 @@ func (l KubernetesResourceLoader) Load(filename string) []assertion.Resource {
 		}
 		resources = append(resources, kr)
 	}
-	return resources
+	return resources, nil
 }
 
 // Validate runs validate on a collection of filenames using a RuleSet
-func (l KubernetesLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) ([]string, []assertion.Violation) {
+func (l KubernetesLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) ([]string, []assertion.Violation, error) {
 	loader := KubernetesResourceLoader{Log: l.Log}
 	return l.ValidateFiles(filenames, ruleSet, tags, ruleIDs, loader, l.Log)
 }

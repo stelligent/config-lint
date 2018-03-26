@@ -85,15 +85,19 @@ func TestIsMatch(t *testing.T) {
 	}
 	for k, tc := range testCases {
 		var b bool
+		var err error
 		if s, isString := tc.SearchResult.(string); isString {
 			searchResult, err := unmarshal(s)
 			if err != nil {
 				fmt.Println(err)
 				t.Errorf("Unable to parse %s\n", tc.SearchResult)
 			}
-			b = isMatch(searchResult, tc.Op, tc.Value)
+			b, err = isMatch(searchResult, tc.Op, tc.Value)
 		} else {
-			b = isMatch(tc.SearchResult, tc.Op, tc.Value)
+			b, err = isMatch(tc.SearchResult, tc.Op, tc.Value)
+		}
+		if err != nil {
+			t.Errorf("%s Failed with error: %s", k, err.Error())
 		}
 		if b != tc.ExpectedResult {
 			t.Errorf("%s Failed Expected '%s' %s '%s' to be %t", k, tc.SearchResult, tc.Op, tc.Value, tc.ExpectedResult)

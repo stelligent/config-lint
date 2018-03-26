@@ -103,7 +103,11 @@ func handler(configEvent events.ConfigEvent) (string, error) {
 	fmt.Println("configuration:", configurationItem.Configuration)
 
 	complianceType := "NOT_APPLICABLE"
-	ruleSet := assertion.MustParseRules(rulesString)
+	ruleSet, err := assertion.ParseRules(rulesString)
+	if err != nil {
+		fmt.Println("Unable to parse rules:", err.Error())
+		return "Error", err
+	}
 	valueSource := assertion.StandardValueSource{Log: log}
 	resolvedRules := assertion.ResolveRules(ruleSet.Rules, valueSource, log)
 	externalRules := assertion.StandardExternalRuleInvoker{Log: log}
@@ -114,7 +118,10 @@ func handler(configEvent events.ConfigEvent) (string, error) {
 				Type:       configurationItem.ResourceType,
 				Properties: configurationItem.Configuration,
 			}
-			_, violations := assertion.CheckRule(rule, resource, externalRules, log)
+			_, violations, err := assertion.CheckRule(rule, resource, externalRules, log)
+			if err != nil {
+				return "Error", err
+			}
 			if len(violations) > 0 {
 				fmt.Println("Resource in NON_COMPLIANT")
 				complianceType = "NON_COMPLIANT"

@@ -76,18 +76,18 @@ func jsonListsIntersect(s1 string, s2 string) bool {
 }
 
 // ShouldIncludeFile return true if a filename matches one of a list of patterns
-func ShouldIncludeFile(patterns []string, filename string) bool {
+func ShouldIncludeFile(patterns []string, filename string) (bool, error) {
 	for _, pattern := range patterns {
 		_, file := filepath.Split(filename)
 		matched, err := filepath.Match(pattern, file)
 		if err != nil {
-			panic(err)
+			return false, err
 		}
 		if matched {
-			return true
+			return true, nil
 		}
 	}
-	return false
+	return false, nil
 }
 
 // FilterResourcesByType filters a list of resources that match a single resource type

@@ -8,7 +8,13 @@ import (
 func testLogging(s string) {
 }
 
-func testsimple(t *testing.T) {
+func failTestIfError(err error, message string, t *testing.T) {
+	if err != nil {
+		t.Error(message + ":" + err.Error())
+	}
+}
+
+func Testsimple(t *testing.T) {
 	rule := Rule{
 		ID:       "test1",
 		Message:  "test rule",
@@ -29,7 +35,8 @@ func testsimple(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "t2.micro"},
 		Filename:   "test.tf",
 	}
-	status := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
+	status, err := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
+	failTestIfError(err, "TestSimple", t)
 	if status != "OK" {
 		t.Error("Expecting simple rule to match")
 	}
@@ -66,7 +73,8 @@ func TestOrToMatch(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "t2.micro"},
 		Filename:   "test.tf",
 	}
-	status := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
+	status, err := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
+	failTestIfError(err, "TestOrToMatch", t)
 	if status != "OK" {
 		t.Error("Expecting or to return OK")
 	}
@@ -103,7 +111,8 @@ func TestOrToNotMatch(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "m3.medium"},
 		Filename:   "test.tf",
 	}
-	status := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
+	status, err := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
+	failTestIfError(err, "TestOrToNotMatch", t)
 	if status != "FAILURE" {
 		t.Error("Expecting or to return FAILURE")
 	}
@@ -143,7 +152,8 @@ func TestAndToMatch(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
+	status, err := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
+	failTestIfError(err, "TestAndToMatch", t)
 	if status != "OK" {
 		t.Error("Expecting and to return OK")
 	}
@@ -183,7 +193,8 @@ func TestAndToNotMatch(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
+	status, err := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
+	failTestIfError(err, "TestAndToNotMatch", t)
 	if status != "FAILURE" {
 		t.Error("Expecting and to return FAILURE")
 	}
@@ -216,7 +227,8 @@ func TestNotToMatch(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
+	status, err := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
+	failTestIfError(err, "TestNotToMatch", t)
 	if status != "OK" {
 		t.Error("Expecting no to return OK")
 	}
@@ -249,7 +261,8 @@ func TestNotToNotMatch(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
+	status, err := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
+	failTestIfError(err, "TestNotToNotMatch", t)
 	if status != "FAILURE" {
 		t.Error("Expecting no to return FAILURE")
 	}
@@ -292,7 +305,8 @@ func TestNestedNot(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
-	status := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
+	status, err := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
+	failTestIfError(err, "TestNestedNot", t)
 	if status != "FAILURE" {
 		t.Error("Expecting nested boolean to return FAILURE")
 	}
@@ -356,7 +370,8 @@ func TestNestedBooleans(t *testing.T) {
 	if err != nil {
 		t.Error("Error parsing resource JSON")
 	}
-	status := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
+	status, err := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
+	failTestIfError(err, "TestNestedBoolean", t)
 	if status != "NOT_COMPLIANT" {
 		t.Error("Expecting nested boolean to return NOT_COMPLIANT")
 	}

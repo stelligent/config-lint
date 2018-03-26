@@ -23,14 +23,14 @@ type StandardExternalRuleInvoker struct {
 }
 
 // Invoke an external API to validate a Resource
-func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (string, []Violation) {
+func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (string, []Violation, error) {
 	status := "OK"
 	violations := make([]Violation, 0)
 	payload := resource.Properties
 	if rule.Invoke.Payload != "" {
 		p, err := SearchData(rule.Invoke.Payload, resource.Properties)
 		if err != nil {
-			panic(err)
+			return status, violations, err
 		}
 		payload = p
 	}
@@ -48,7 +48,7 @@ func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (strin
 				Message:      fmt.Sprintf("Invoke failed: %s", err.Error()),
 			},
 		}
-		return rule.Severity, violations
+		return rule.Severity, violations, err
 	}
 	if httpResponse.StatusCode != 200 {
 		violations := []Violation{
@@ -61,7 +61,7 @@ func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (strin
 				Message:      fmt.Sprintf("Invoke failed, StatusCode: %d", httpResponse.StatusCode),
 			},
 		}
-		return rule.Severity, violations
+		return rule.Severity, violations, nil
 	}
 	defer httpResponse.Body.Close()
 	body, err := ioutil.ReadAll(httpResponse.Body)
@@ -76,7 +76,7 @@ func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (strin
 				Message:      "Invoke response cannot be read",
 			},
 		}
-		return rule.Severity, violations
+		return rule.Severity, violations, nil
 	}
 	e.Log(string(body))
 	var invokeResponse InvokeResponse
@@ -92,7 +92,7 @@ func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (strin
 				Message:      "Invoke response cannot be parsed",
 			},
 		}
-		return rule.Severity, violations
+		return rule.Severity, violations, nil
 	}
 	for _, violation := range invokeResponse.Violations {
 		status = rule.Severity
@@ -105,5 +105,5 @@ func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (strin
 			Message:      violation.Message,
 		})
 	}
-	return status, violations
+	return status, violations, nil
 }

@@ -15,24 +15,24 @@ type StandardValueSource struct {
 }
 
 // GetValue looks up external values when an Assertion includes a ValueFrom attribute
-func (v StandardValueSource) GetValue(assertion Assertion) string {
+func (v StandardValueSource) GetValue(assertion Assertion) (string, error) {
 	if assertion.ValueFrom.URL != "" {
 		v.Log(fmt.Sprintf("Getting value_from %s", assertion.ValueFrom.URL))
 		parsedURL, err := url.Parse(assertion.ValueFrom.URL)
 		if err != nil {
-			panic(err)
+			return "", err
 		}
 		if parsedURL.Scheme != "s3" && parsedURL.Scheme != "S3" {
-			panic(fmt.Sprintf("Unsupported protocol for value_from: %s", parsedURL.Scheme))
+			return "", fmt.Errorf("Unsupported protocol for value_from: %s", parsedURL.Scheme)
 		}
 		content, err := v.GetValueFromS3(parsedURL.Host, parsedURL.Path)
 		if err != nil {
-			return "Error" // FIXME
+			return "", err
 		}
 		v.Log(content)
-		return content
+		return content, nil
 	}
-	return assertion.Value
+	return assertion.Value, nil
 }
 
 // GetValueFromS3 looks up external values for an Assertion when the S3 protocol is specified

@@ -10,20 +10,20 @@ import (
 	"strings"
 )
 
-func printReport(report assertion.ValidationReport, queryExpression string) int {
+func printReport(report assertion.ValidationReport, queryExpression string) error {
 	jsonData, err := json.MarshalIndent(report, "", "  ")
 	if err != nil {
-		panic(err)
+		return err
 	}
 	if queryExpression != "" {
 		var data interface{}
 		err = yaml.Unmarshal(jsonData, &data)
 		if err != nil {
-			panic(err)
+			return err
 		}
 		v, err := assertion.SearchData(queryExpression, data)
 		if err != nil {
-			panic(err)
+			return err
 		}
 		s, err := assertion.JSONStringify(v)
 		if err == nil && s != "null" {
@@ -32,10 +32,7 @@ func printReport(report assertion.ValidationReport, queryExpression string) int 
 	} else {
 		fmt.Println(string(jsonData))
 	}
-	if len(report.Violations["FAILURE"]) > 0 {
-		return 1
-	}
-	return 0
+	return nil
 }
 
 func makeTagList(tags string) []string {
@@ -66,6 +63,13 @@ func (i *arrayFlags) Set(value string) error {
 	return nil
 }
 
+func generateExitCode(report assertion.ValidationReport) int {
+	if len(report.Violations["FAILURE"]) > 0 {
+		return 1
+	}
+	return 0
+}
+
 func main() {
 	var rulesFilenames arrayFlags
 	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
@@ -76,21 +80,31 @@ func main() {
 	searchExpression := flag.String("search", "", "JMESPath expression to evaluation against the files")
 	flag.Parse()
 
-	exitCode := 0
-
 	report := assertion.ValidationReport{
 		Violations:   make(map[string]([]assertion.Violation), 0),
 		FilesScanned: make([]string, 0),
 	}
 
 	for _, rulesFilename := range rulesFilenames {
-		ruleSet := assertion.MustParseRules(assertion.LoadRules(rulesFilename))
+		rulesContent, err := assertion.LoadRules(rulesFilename)
+		if err != nil {
+			fmt.Println("Unable to load rules from:" + rulesFilename)
+			fmt.Println(err.Error())
+		}
+		ruleSet, err := assertion.ParseRules(rulesContent)
+		if err != nil {
+			fmt.Println("Unable to parse rules in:" + rulesFilename)
+			fmt.Println(err.Error())
+		}
 		linter := makeLinter(ruleSet.Type, assertion.MakeLogger(*verboseLogging))
 		if linter != nil {
 			if *searchExpression != "" {
 				linter.Search(flag.Args(), ruleSet, *searchExpression)
 			} else {
-				filesScanned, violations := linter.Validate(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids))
+				filesScanned, violations, err := linter.Validate(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids))
+				if err != nil {
+					fmt.Println("Validate failed:", err) // FIXME
+				}
 				for _, violation := range violations {
 					report.Violations[violation.Status] = append(report.Violations[violation.Status], violation)
 				}
@@ -99,7 +113,10 @@ func main() {
 		}
 	}
 	if *searchExpression == "" {
-		exitCode = printReport(report, *queryExpression)
+		err := printReport(report, *queryExpression)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
 	}
-	os.Exit(exitCode)
+	os.Exit(generateExitCode(report))
 }

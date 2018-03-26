@@ -7,22 +7,19 @@ import (
 )
 
 // LoadRules loads the contents of a YAML file
-func LoadRules(filename string) string {
+func LoadRules(filename string) (string, error) {
 	rules, err := ioutil.ReadFile(filename)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	return string(rules)
+	return string(rules), nil
 }
 
-// MustParseRules converts YAML string content to a Result
-func MustParseRules(rules string) RuleSet {
+// ParseRules converts YAML string content to a Result
+func ParseRules(rules string) (RuleSet, error) {
 	r := RuleSet{}
 	err := yaml.Unmarshal([]byte(rules), &r)
-	if err != nil {
-		panic(err)
-	}
-	return r
+	return r, err
 }
 
 // FilterRulesByTag selects a subset of rules based on a tag
@@ -66,8 +63,9 @@ func ResolveRule(rule Rule, valueSource ValueSource, log LoggingFunction) Rule {
 	resolvedRule := rule
 	resolvedRule.Assertions = make([]Assertion, 0)
 	for _, assertion := range rule.Assertions {
+		value, _ := valueSource.GetValue(assertion) // FIXME return erro
 		resolvedAssertion := assertion
-		resolvedAssertion.Value = valueSource.GetValue(assertion)
+		resolvedAssertion.Value = value
 		resolvedAssertion.ValueFrom = ValueFrom{}
 		resolvedRule.Assertions = append(resolvedRule.Assertions, resolvedAssertion)
 	}
@@ -75,19 +73,22 @@ func ResolveRule(rule Rule, valueSource ValueSource, log LoggingFunction) Rule {
 }
 
 // CheckRule returns a list of violations for a single Rule applied to a single Resource
-func CheckRule(rule Rule, resource Resource, e ExternalRuleInvoker, log LoggingFunction) (string, []Violation) {
+func CheckRule(rule Rule, resource Resource, e ExternalRuleInvoker, log LoggingFunction) (string, []Violation, error) {
 	returnStatus := "OK"
 	violations := make([]Violation, 0)
 	if ExcludeResource(rule, resource) {
 		fmt.Println("Ignoring resource:", resource.ID)
-		return returnStatus, violations
+		return returnStatus, violations, nil
 	}
 	if rule.Invoke.URL != "" {
 		return e.Invoke(rule, resource)
 	}
 	for _, ruleAssertion := range rule.Assertions {
 		log(fmt.Sprintf("Checking resource %s", resource.ID))
-		status := CheckAssertion(rule, ruleAssertion, resource, log)
+		status, err := CheckAssertion(rule, ruleAssertion, resource, log)
+		if err != nil {
+			return "FAILURE", violations, err
+		}
 		if status != "OK" {
 			returnStatus = status
 			v := Violation{
@@ -101,5 +102,5 @@ func CheckRule(rule Rule, resource Resource, e ExternalRuleInvoker, log LoggingF
 			violations = append(violations, v)
 		}
 	}
-	return returnStatus, violations
+	return returnStatus, violations, nil
 }

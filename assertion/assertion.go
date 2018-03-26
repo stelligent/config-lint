@@ -4,49 +4,61 @@ import (
 	"fmt"
 )
 
-func searchAndMatch(assertion Assertion, resource Resource, log LoggingFunction) bool {
+func searchAndMatch(assertion Assertion, resource Resource, log LoggingFunction) (bool, error) {
 	v, err := SearchData(assertion.Key, resource.Properties)
 	if err != nil {
-		panic(err)
+		return false, err
 	}
-	match := isMatch(v, assertion.Op, assertion.Value)
+	match, err := isMatch(v, assertion.Op, assertion.Value)
 	log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s", assertion.Key, v, assertion.Op, assertion.Value))
 	log(fmt.Sprintf("ResourceID: %s Type: %s %t",
 		resource.ID,
 		resource.Type,
 		match))
-	return match
+	return match, err
 }
 
-func orOperation(assertions []Assertion, resource Resource, log LoggingFunction) bool {
+func orOperation(assertions []Assertion, resource Resource, log LoggingFunction) (bool, error) {
 	for _, childAssertion := range assertions {
-		if booleanOperation(childAssertion, resource, log) {
-			return true
+		b, err := booleanOperation(childAssertion, resource, log)
+		if err != nil {
+			return b, err
+		}
+		if b {
+			return true, nil
 		}
 	}
-	return false
+	return false, nil
 }
 
-func andOperation(assertions []Assertion, resource Resource, log LoggingFunction) bool {
+func andOperation(assertions []Assertion, resource Resource, log LoggingFunction) (bool, error) {
 	for _, childAssertion := range assertions {
-		if !booleanOperation(childAssertion, resource, log) {
-			return false
+		b, err := booleanOperation(childAssertion, resource, log)
+		if err != nil {
+			return b, err
+		}
+		if !b {
+			return false, nil
 		}
 	}
-	return true
+	return true, nil
 }
 
-func notOperation(assertions []Assertion, resource Resource, log LoggingFunction) bool {
+func notOperation(assertions []Assertion, resource Resource, log LoggingFunction) (bool, error) {
 	// more than one child filter treated as not any
 	for _, childAssertion := range assertions {
-		if booleanOperation(childAssertion, resource, log) {
-			return false
+		b, err := booleanOperation(childAssertion, resource, log)
+		if err != nil {
+			return false, err
+		}
+		if b {
+			return false, nil
 		}
 	}
-	return true
+	return true, nil
 }
 
-func booleanOperation(assertion Assertion, resource Resource, log LoggingFunction) bool {
+func booleanOperation(assertion Assertion, resource Resource, log LoggingFunction) (bool, error) {
 	if assertion.Or != nil && len(assertion.Or) > 0 {
 		return orOperation(assertion.Or, resource, log)
 	}
@@ -84,10 +96,14 @@ func FilterResourceExceptions(rule Rule, resources []Resource) []Resource {
 }
 
 // CheckAssertion validates a single Resource using a single Assertion
-func CheckAssertion(rule Rule, assertion Assertion, resource Resource, log LoggingFunction) string {
+func CheckAssertion(rule Rule, assertion Assertion, resource Resource, log LoggingFunction) (string, error) {
 	status := "OK"
-	if !booleanOperation(assertion, resource, log) {
+	b, err := booleanOperation(assertion, resource, log)
+	if err != nil {
+		return "FAILURE", err
+	}
+	if !b {
 		status = rule.Severity
 	}
-	return status
+	return status, nil
 }
