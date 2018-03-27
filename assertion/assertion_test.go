@@ -22,12 +22,22 @@ type AssertionTestCase struct {
 
 func TestCheckAssertion(t *testing.T) {
 
+	simpleTestResource := Resource{
+		ID:   "a_test_resource",
+		Type: "aws_instance",
+		Properties: map[string]interface{}{
+			"instance_type": "t2.micro",
+			"ami":           "ami-f2d3638a",
+		},
+		Filename: "test.tf",
+	}
+
 	testCases := map[string]AssertionTestCase{
 		"testEq": {
 			Rule{
 				ID:       "test1",
 				Message:  "test rule",
-				Severity: "failure",
+				Severity: "FAILURE",
 				Resource: "aws_instance",
 				Assertions: []Assertion{
 					Assertion{
@@ -38,12 +48,7 @@ func TestCheckAssertion(t *testing.T) {
 					},
 				},
 			},
-			Resource{
-				ID:         "a_test_resource",
-				Type:       "aws_instance",
-				Properties: map[string]interface{}{"instance_type": "t2.micro"},
-				Filename:   "test.tf",
-			},
+			simpleTestResource,
 			"OK",
 		},
 		"testOr": {
@@ -71,12 +76,7 @@ func TestCheckAssertion(t *testing.T) {
 					},
 				},
 			},
-			Resource{
-				ID:         "a_test_resource",
-				Type:       "aws_instance",
-				Properties: map[string]interface{}{"instance_type": "t2.micro"},
-				Filename:   "test.tf",
-			},
+			simpleTestResource,
 			"OK",
 		},
 		"testOrFails": {
@@ -104,12 +104,7 @@ func TestCheckAssertion(t *testing.T) {
 					},
 				},
 			},
-			Resource{
-				ID:         "a_test_resource",
-				Type:       "aws_instance",
-				Properties: map[string]interface{}{"instance_type": "t2.micro"},
-				Filename:   "test.tf",
-			},
+			simpleTestResource,
 			"FAILURE",
 		},
 		"testAnd": {
@@ -137,15 +132,7 @@ func TestCheckAssertion(t *testing.T) {
 					},
 				},
 			},
-			Resource{
-				ID:   "a_test_resource",
-				Type: "aws_instance",
-				Properties: map[string]interface{}{
-					"instance_type": "t2.micro",
-					"ami":           "ami-f2d3638a",
-				},
-				Filename: "test.tf",
-			},
+			simpleTestResource,
 			"OK",
 		},
 		"testAndFails": {
@@ -161,7 +148,7 @@ func TestCheckAssertion(t *testing.T) {
 								Type:  "value",
 								Key:   "instance_type",
 								Op:    "eq",
-								Value: "t2.micro",
+								Value: "m3.medium",
 							},
 							Assertion{
 								Type:  "value",
@@ -173,15 +160,7 @@ func TestCheckAssertion(t *testing.T) {
 					},
 				},
 			},
-			Resource{
-				ID:   "a_test_resource",
-				Type: "aws_instance",
-				Properties: map[string]interface{}{
-					"instance_type": "m3.medium",
-					"ami":           "ami-f2d3638a",
-				},
-				Filename: "test.tf",
-			},
+			simpleTestResource,
 			"FAILURE",
 		},
 		"testNot": {
@@ -197,20 +176,13 @@ func TestCheckAssertion(t *testing.T) {
 								Type:  "value",
 								Key:   "instance_type",
 								Op:    "eq",
-								Value: "t2.micro",
+								Value: "c4.large",
 							},
 						},
 					},
 				},
 			},
-			Resource{
-				ID:   "a_test_resource",
-				Type: "aws_instance",
-				Properties: map[string]interface{}{
-					"instance_type": "c4.large",
-				},
-				Filename: "test.tf",
-			},
+			simpleTestResource,
 			"OK",
 		},
 		"testNotFails": {
@@ -232,14 +204,7 @@ func TestCheckAssertion(t *testing.T) {
 					},
 				},
 			},
-			Resource{
-				ID:   "a_test_resource",
-				Type: "aws_instance",
-				Properties: map[string]interface{}{
-					"instance_type": "t2.micro",
-				},
-				Filename: "test.tf",
-			},
+			simpleTestResource,
 			"FAILURE",
 		},
 		"testNestedNot": {
@@ -271,14 +236,7 @@ func TestCheckAssertion(t *testing.T) {
 					},
 				},
 			},
-			Resource{
-				ID:   "a_test_resource",
-				Type: "aws_instance",
-				Properties: map[string]interface{}{
-					"instance_type": "m3.medium",
-				},
-				Filename: "test.tf",
-			},
+			simpleTestResource,
 			"FAILURE",
 		},
 	}
@@ -287,7 +245,7 @@ func TestCheckAssertion(t *testing.T) {
 		status, err := CheckAssertion(tc.Rule, tc.Rule.Assertions[0], tc.Resource, testLogging)
 		failTestIfError(err, "TestSimple", t)
 		if status != tc.ExpectedStatus {
-			t.Error("%s Failed Expected '%s' to be '%s'", k, status, tc.ExpectedStatus)
+			t.Errorf("%s Failed Expected '%s' to be '%s'", k, status, tc.ExpectedStatus)
 		}
 	}
 }
