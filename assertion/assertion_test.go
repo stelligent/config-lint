@@ -14,201 +14,22 @@ func failTestIfError(err error, message string, t *testing.T) {
 	}
 }
 
-func Testsimple(t *testing.T) {
-	rule := Rule{
-		ID:       "test1",
-		Message:  "test rule",
-		Severity: "failure",
-		Resource: "aws_instance",
-		Assertions: []Assertion{
-			Assertion{
-				Type:  "value",
-				Key:   "instance_type",
-				Op:    "eq",
-				Value: "t2.micro",
-			},
-		},
-	}
-	resource := Resource{
-		ID:         "a_test_resource",
-		Type:       "aws_instance",
-		Properties: map[string]interface{}{"instance_type": "t2.micro"},
-		Filename:   "test.tf",
-	}
-	status, err := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
-	failTestIfError(err, "TestSimple", t)
-	if status != "OK" {
-		t.Error("Expecting simple rule to match")
-	}
+type AssertionTestCase struct {
+	Rule           Rule
+	Resource       Resource
+	ExpectedStatus string
 }
 
-func TestOrToMatch(t *testing.T) {
-	rule := Rule{
-		ID:       "TEST1",
-		Message:  "Test Rule",
-		Severity: "FAILURE",
-		Resource: "aws_instance",
-		Assertions: []Assertion{
-			Assertion{
-				Or: []Assertion{
-					Assertion{
-						Type:  "value",
-						Key:   "instance_type",
-						Op:    "eq",
-						Value: "t2.micro",
-					},
-					Assertion{
-						Type:  "value",
-						Key:   "instance_type",
-						Op:    "eq",
-						Value: "m4.large",
-					},
-				},
-			},
-		},
-	}
-	resource := Resource{
-		ID:         "a_test_resource",
-		Type:       "aws_instance",
-		Properties: map[string]interface{}{"instance_type": "t2.micro"},
-		Filename:   "test.tf",
-	}
-	status, err := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
-	failTestIfError(err, "TestOrToMatch", t)
-	if status != "OK" {
-		t.Error("Expecting or to return OK")
-	}
-}
+func TestCheckAssertion(t *testing.T) {
 
-func TestOrToNotMatch(t *testing.T) {
-	rule := Rule{
-		ID:       "TEST1",
-		Message:  "Test Rule",
-		Severity: "FAILURE",
-		Resource: "aws_instance",
-		Assertions: []Assertion{
-			Assertion{
-				Or: []Assertion{
-					Assertion{
-						Type:  "value",
-						Key:   "instance_type",
-						Op:    "eq",
-						Value: "t2.micro",
-					},
-					Assertion{
-						Type:  "value",
-						Key:   "instance_type",
-						Op:    "eq",
-						Value: "m4.large",
-					},
-				},
-			},
-		},
-	}
-	resource := Resource{
-		ID:         "a_test_resource",
-		Type:       "aws_instance",
-		Properties: map[string]interface{}{"instance_type": "m3.medium"},
-		Filename:   "test.tf",
-	}
-	status, err := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
-	failTestIfError(err, "TestOrToNotMatch", t)
-	if status != "FAILURE" {
-		t.Error("Expecting or to return FAILURE")
-	}
-}
-
-func TestAndToMatch(t *testing.T) {
-	rule := Rule{
-		ID:       "TEST1",
-		Message:  "Test Rule",
-		Severity: "FAILURE",
-		Resource: "aws_instance",
-		Assertions: []Assertion{
-			Assertion{
-				And: []Assertion{
-					Assertion{
-						Type:  "value",
-						Key:   "instance_type",
-						Op:    "eq",
-						Value: "t2.micro",
-					},
-					Assertion{
-						Type:  "value",
-						Key:   "ami",
-						Op:    "eq",
-						Value: "ami-f2d3638a",
-					},
-				},
-			},
-		},
-	}
-	resource := Resource{
-		ID:   "a_test_resource",
-		Type: "aws_instance",
-		Properties: map[string]interface{}{
-			"instance_type": "t2.micro",
-			"ami":           "ami-f2d3638a",
-		},
-		Filename: "test.tf",
-	}
-	status, err := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
-	failTestIfError(err, "TestAndToMatch", t)
-	if status != "OK" {
-		t.Error("Expecting and to return OK")
-	}
-}
-
-func TestAndToNotMatch(t *testing.T) {
-	rule := Rule{
-		ID:       "TEST1",
-		Message:  "Test Rule",
-		Severity: "FAILURE",
-		Resource: "aws_instance",
-		Assertions: []Assertion{
-			Assertion{
-				And: []Assertion{
-					Assertion{
-						Type:  "value",
-						Key:   "instance_type",
-						Op:    "eq",
-						Value: "t2.micro",
-					},
-					Assertion{
-						Type:  "value",
-						Key:   "ami",
-						Op:    "eq",
-						Value: "ami-f2d3638a",
-					},
-				},
-			},
-		},
-	}
-	resource := Resource{
-		ID:   "a_test_resource",
-		Type: "aws_instance",
-		Properties: map[string]interface{}{
-			"instance_type": "m3.medium",
-			"ami":           "ami-f2d3638a",
-		},
-		Filename: "test.tf",
-	}
-	status, err := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
-	failTestIfError(err, "TestAndToNotMatch", t)
-	if status != "FAILURE" {
-		t.Error("Expecting and to return FAILURE")
-	}
-}
-
-func TestNotToMatch(t *testing.T) {
-	rule := Rule{
-		ID:       "TEST1",
-		Message:  "Test Rule",
-		Severity: "FAILURE",
-		Resource: "aws_instance",
-		Assertions: []Assertion{
-			Assertion{
-				Not: []Assertion{
+	testCases := map[string]AssertionTestCase{
+		"testEq": {
+			Rule{
+				ID:       "test1",
+				Message:  "test rule",
+				Severity: "failure",
+				Resource: "aws_instance",
+				Assertions: []Assertion{
 					Assertion{
 						Type:  "value",
 						Key:   "instance_type",
@@ -217,66 +38,21 @@ func TestNotToMatch(t *testing.T) {
 					},
 				},
 			},
-		},
-	}
-	resource := Resource{
-		ID:   "a_test_resource",
-		Type: "aws_instance",
-		Properties: map[string]interface{}{
-			"instance_type": "c4.large",
-		},
-		Filename: "test.tf",
-	}
-	status, err := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
-	failTestIfError(err, "TestNotToMatch", t)
-	if status != "OK" {
-		t.Error("Expecting no to return OK")
-	}
-}
-
-func TestNotToNotMatch(t *testing.T) {
-	rule := Rule{
-		ID:       "TEST1",
-		Message:  "Test Rule",
-		Severity: "FAILURE",
-		Resource: "aws_instance",
-		Assertions: []Assertion{
-			Assertion{
-				Not: []Assertion{
-					Assertion{
-						Type:  "value",
-						Key:   "instance_type",
-						Op:    "eq",
-						Value: "t2.micro",
-					},
-				},
+			Resource{
+				ID:         "a_test_resource",
+				Type:       "aws_instance",
+				Properties: map[string]interface{}{"instance_type": "t2.micro"},
+				Filename:   "test.tf",
 			},
+			"OK",
 		},
-	}
-	resource := Resource{
-		ID:   "a_test_resource",
-		Type: "aws_instance",
-		Properties: map[string]interface{}{
-			"instance_type": "t2.micro",
-		},
-		Filename: "test.tf",
-	}
-	status, err := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
-	failTestIfError(err, "TestNotToNotMatch", t)
-	if status != "FAILURE" {
-		t.Error("Expecting no to return FAILURE")
-	}
-}
-
-func TestNestedNot(t *testing.T) {
-	rule := Rule{
-		ID:       "TEST1",
-		Message:  "Test Rule",
-		Severity: "FAILURE",
-		Resource: "aws_instance",
-		Assertions: []Assertion{
-			Assertion{
-				Not: []Assertion{
+		"testOr": {
+			Rule{
+				ID:       "TEST1",
+				Message:  "Test Rule",
+				Severity: "FAILURE",
+				Resource: "aws_instance",
+				Assertions: []Assertion{
 					Assertion{
 						Or: []Assertion{
 							Assertion{
@@ -289,26 +65,230 @@ func TestNestedNot(t *testing.T) {
 								Type:  "value",
 								Key:   "instance_type",
 								Op:    "eq",
-								Value: "m3.medium",
+								Value: "m4.large",
 							},
 						},
 					},
 				},
 			},
+			Resource{
+				ID:         "a_test_resource",
+				Type:       "aws_instance",
+				Properties: map[string]interface{}{"instance_type": "t2.micro"},
+				Filename:   "test.tf",
+			},
+			"OK",
+		},
+		"testOrFails": {
+			Rule{
+				ID:       "TEST1",
+				Message:  "Test Rule",
+				Severity: "FAILURE",
+				Resource: "aws_instance",
+				Assertions: []Assertion{
+					Assertion{
+						Or: []Assertion{
+							Assertion{
+								Type:  "value",
+								Key:   "instance_type",
+								Op:    "eq",
+								Value: "t2.nano",
+							},
+							Assertion{
+								Type:  "value",
+								Key:   "instance_type",
+								Op:    "eq",
+								Value: "m4.large",
+							},
+						},
+					},
+				},
+			},
+			Resource{
+				ID:         "a_test_resource",
+				Type:       "aws_instance",
+				Properties: map[string]interface{}{"instance_type": "t2.micro"},
+				Filename:   "test.tf",
+			},
+			"FAILURE",
+		},
+		"testAnd": {
+			Rule{
+				ID:       "TEST1",
+				Message:  "Test Rule",
+				Severity: "FAILURE",
+				Resource: "aws_instance",
+				Assertions: []Assertion{
+					Assertion{
+						And: []Assertion{
+							Assertion{
+								Type:  "value",
+								Key:   "instance_type",
+								Op:    "eq",
+								Value: "t2.micro",
+							},
+							Assertion{
+								Type:  "value",
+								Key:   "ami",
+								Op:    "eq",
+								Value: "ami-f2d3638a",
+							},
+						},
+					},
+				},
+			},
+			Resource{
+				ID:   "a_test_resource",
+				Type: "aws_instance",
+				Properties: map[string]interface{}{
+					"instance_type": "t2.micro",
+					"ami":           "ami-f2d3638a",
+				},
+				Filename: "test.tf",
+			},
+			"OK",
+		},
+		"testAndFails": {
+			Rule{
+				ID:       "TEST1",
+				Message:  "Test Rule",
+				Severity: "FAILURE",
+				Resource: "aws_instance",
+				Assertions: []Assertion{
+					Assertion{
+						And: []Assertion{
+							Assertion{
+								Type:  "value",
+								Key:   "instance_type",
+								Op:    "eq",
+								Value: "t2.micro",
+							},
+							Assertion{
+								Type:  "value",
+								Key:   "ami",
+								Op:    "eq",
+								Value: "ami-f2d3638a",
+							},
+						},
+					},
+				},
+			},
+			Resource{
+				ID:   "a_test_resource",
+				Type: "aws_instance",
+				Properties: map[string]interface{}{
+					"instance_type": "m3.medium",
+					"ami":           "ami-f2d3638a",
+				},
+				Filename: "test.tf",
+			},
+			"FAILURE",
+		},
+		"testNot": {
+			Rule{
+				ID:       "TEST1",
+				Message:  "Test Rule",
+				Severity: "FAILURE",
+				Resource: "aws_instance",
+				Assertions: []Assertion{
+					Assertion{
+						Not: []Assertion{
+							Assertion{
+								Type:  "value",
+								Key:   "instance_type",
+								Op:    "eq",
+								Value: "t2.micro",
+							},
+						},
+					},
+				},
+			},
+			Resource{
+				ID:   "a_test_resource",
+				Type: "aws_instance",
+				Properties: map[string]interface{}{
+					"instance_type": "c4.large",
+				},
+				Filename: "test.tf",
+			},
+			"OK",
+		},
+		"testNotFails": {
+			Rule{
+				ID:       "TEST1",
+				Message:  "Test Rule",
+				Severity: "FAILURE",
+				Resource: "aws_instance",
+				Assertions: []Assertion{
+					Assertion{
+						Not: []Assertion{
+							Assertion{
+								Type:  "value",
+								Key:   "instance_type",
+								Op:    "eq",
+								Value: "t2.micro",
+							},
+						},
+					},
+				},
+			},
+			Resource{
+				ID:   "a_test_resource",
+				Type: "aws_instance",
+				Properties: map[string]interface{}{
+					"instance_type": "t2.micro",
+				},
+				Filename: "test.tf",
+			},
+			"FAILURE",
+		},
+		"testNestedNot": {
+			Rule{
+				ID:       "TEST1",
+				Message:  "Test Rule",
+				Severity: "FAILURE",
+				Resource: "aws_instance",
+				Assertions: []Assertion{
+					Assertion{
+						Not: []Assertion{
+							Assertion{
+								Or: []Assertion{
+									Assertion{
+										Type:  "value",
+										Key:   "instance_type",
+										Op:    "eq",
+										Value: "t2.micro",
+									},
+									Assertion{
+										Type:  "value",
+										Key:   "instance_type",
+										Op:    "eq",
+										Value: "m3.medium",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			Resource{
+				ID:   "a_test_resource",
+				Type: "aws_instance",
+				Properties: map[string]interface{}{
+					"instance_type": "m3.medium",
+				},
+				Filename: "test.tf",
+			},
+			"FAILURE",
 		},
 	}
-	resource := Resource{
-		ID:   "a_test_resource",
-		Type: "aws_instance",
-		Properties: map[string]interface{}{
-			"instance_type": "m3.medium",
-		},
-		Filename: "test.tf",
-	}
-	status, err := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
-	failTestIfError(err, "TestNestedNot", t)
-	if status != "FAILURE" {
-		t.Error("Expecting nested boolean to return FAILURE")
+
+	for k, tc := range testCases {
+		status, err := CheckAssertion(tc.Rule, tc.Rule.Assertions[0], tc.Resource, testLogging)
+		failTestIfError(err, "TestSimple", t)
+		if status != tc.ExpectedStatus {
+			t.Error("%s Failed Expected '%s' to be '%s'", k, status, tc.ExpectedStatus)
+		}
 	}
 }
 
