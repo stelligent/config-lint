@@ -29,23 +29,21 @@ func (l RulesResourceLoader) Load(filename string) ([]assertion.Resource, error)
 			Properties: ruleSet,
 			Filename:   filename,
 		}
-		// The LintRuleSet resources already has an attribute calls Rules
+		resources = append(resources, setResource)
+		// The LintRuleSet resources already has an attribute called Rules
 		// but also adding each of these rules as a separate LintRule resource
 		// makes writing rules a lot simpler
-		resources = append(resources, setResource)
-		for _, resource := range yamlResources {
-			m := resource.(map[string]interface{})
-			rules := m["Rules"].([]interface{})
-			for _, rule := range rules {
-				properties := rule.(map[string]interface{})
-				ruleResource := assertion.Resource{
-					ID:         properties["id"].(string),
-					Type:       "LintRule",
-					Properties: properties,
-					Filename:   filename,
-				}
-				resources = append(resources, ruleResource)
+		m := ruleSet.(map[string]interface{})
+		rules := m["Rules"].([]interface{})
+		for _, rule := range rules {
+			properties := rule.(map[string]interface{})
+			ruleResource := assertion.Resource{
+				ID:         properties["id"].(string),
+				Type:       "LintRule",
+				Properties: properties,
+				Filename:   filename,
 			}
+			resources = append(resources, ruleResource)
 		}
 	}
 	return resources, nil
