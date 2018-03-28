@@ -18,7 +18,11 @@ make config-lint
 
 # Run
 
-The program currently supports Terraform and Kubernetes files.
+The program currently supports scanning of the following types of files:
+
+* Terraform
+* Kubernetes
+* LintRules
 
 ## Validate Terraform files
 
@@ -30,6 +34,14 @@ The program currently supports Terraform and Kubernetes files.
 
 ```
 ./config-lint --rules example-files/rules/kubernetes.yml example-files/config/*
+```
+
+## Validate LintRules files
+
+This type of linting allows the tool to lint its own rules.
+
+```
+./config-lint --rules example-files/rules/lint-rules.yml example-files/rules/*
 ```
 
 ## Validate Existing Security Groups
@@ -387,3 +399,4 @@ Rules:
 * Invoke should be a POST, not a GET, and it should probably include the payload
 * Use type switch as more idiomatic way to handle multiple types in match.go
 * Start using go testing coverage tools
+* Ruleset examples have Initial upper case for top level attributes, all lower case for rules

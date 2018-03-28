@@ -1,0 +1,60 @@
+Version: 1
+Description: Rules for config-lint
+Type: LintRules
+Files:
+  - "*.yml"
+Rules:
+
+  - id: VALID_TYPE
+    message: Not a valid linter type
+    resource: LintRuleSet
+    severity: FAILURE
+    assertions:
+      - key: Type
+        op: in
+        value: Terraform,Kubernetes,SecurityGroup,AWSConfig,LintRules
+
+  - id: VERSION_PRESENT
+    message: RuleSet must have a version
+    resource: LintRuleSet
+    severity: WARNING
+    assertions:
+      - key: Version
+        op: present 
+
+  - id: ID_PRESENT
+    message: Rule must have an ID
+    resource: LintRule
+    severity: FAILURE
+    assertions:
+      - key: id
+        op: present
+
+  - id: SEVERITY_PRESENT
+    message: Rule must have a severity
+    resource: LintRule
+    severity: FAILURE
+    assertions:
+      - key: severity
+        op: present
+
+  - id: RESOURCE_PRESENT
+    message: Rule must have a resource filter
+    severity: FAILURE
+    resource: LintRule
+    assertions:
+      - key: resource
+        op: present
+    tags:
+      - resource
+
+  - id: ASSERTIONS_OR_INVOKE
+    message: Rule must have assertions or invoke
+    resource: LintRule
+    severity: FAILURE
+    assertions:
+      - or:
+          - key: assertions
+            op: present
+          - key: invoke
+            op: present

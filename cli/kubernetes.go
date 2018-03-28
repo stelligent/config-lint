@@ -1,12 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"github.com/ghodss/yaml"
 	"github.com/stelligent/config-lint/assertion"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 )
 
 // KubernetesLinter lints resources in Kubernets YAML files
@@ -15,27 +10,9 @@ type KubernetesLinter struct {
 	Log assertion.LoggingFunction
 }
 
-// KubernetesResourceLoader converts Terraform configuration files into a collection of Resource objects
+// KubernetesResourceLoader converts Kubernetes configuration files into a collection of Resource objects
 type KubernetesResourceLoader struct {
 	Log assertion.LoggingFunction
-}
-
-func loadYAML(filename string, log assertion.LoggingFunction) ([]interface{}, error) {
-	empty := []interface{}{}
-	content, err := ioutil.ReadFile(filename)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, filename, err.Error())
-		return empty, err
-	}
-
-	var yamlData interface{}
-	err = yaml.Unmarshal(content, &yamlData)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, filename, err.Error())
-		return empty, err
-	}
-	m := yamlData.(map[string]interface{})
-	return []interface{}{m}, nil
 }
 
 func getResourceIDFromMetadata(m map[string]interface{}) (string, bool) {
@@ -45,11 +22,6 @@ func getResourceIDFromMetadata(m map[string]interface{}) (string, bool) {
 		}
 	}
 	return "", false
-}
-
-func getResourceIDFromFilename(filename string) string {
-	_, resourceID := filepath.Split(filename)
-	return resourceID
 }
 
 // Load converts a text file into a collection of Resource objects

@@ -106,6 +106,8 @@ func makeLinter(linterType string, log assertion.LoggingFunction) Linter {
 		return TerraformLinter{Log: log}
 	case "SecurityGroup":
 		return SecurityGroupLinter{Log: log}
+	case "LintRules":
+		return RulesLinter{Log: log}
 	default:
 		fmt.Printf("Type not supported: %s\n", linterType)
 		return nil
