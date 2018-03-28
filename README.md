@@ -212,6 +212,10 @@ Example:
 
 * absent - Attribute is not present
 
+* empty - Attribute is empty
+
+* not-empty - Attribute is not empty
+
 * contains - Attribute contains a substring
 
 * regex - Attribute matches a regular expression

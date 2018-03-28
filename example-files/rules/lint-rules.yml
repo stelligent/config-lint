@@ -22,6 +22,14 @@ Rules:
       - key: Version
         op: present 
 
+  - id: HAS_RULES
+    message: RuleSet needs at least one rule
+    resource: LintRuleSet
+    severity: WARNING
+    assertions:
+      - key: Rules
+        op: not-empty
+
   - id: ID_PRESENT
     message: Rule must have an ID
     resource: LintRule

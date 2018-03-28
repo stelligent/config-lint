@@ -87,6 +87,8 @@ func isMatch(data interface{}, op string, value string) (bool, error) {
 		return !isNil(data), nil
 	case "empty":
 		return isEmpty(data), nil
+	case "not-empty":
+		return !isEmpty(data), nil
 	case "intersect":
 		if jsonListsIntersect(searchResult, value) {
 			return true, nil

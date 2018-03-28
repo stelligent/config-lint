@@ -82,6 +82,10 @@ func TestIsMatch(t *testing.T) {
 		"emptyFalseForString":           {"Foo", "empty", "", false},
 		"emptyTrueForEmptySlice":        {emptySlice, "empty", "", true},
 		"emptyFalseForSlice":            {sliceOfTags, "empty", "", false},
+		"notEmptyFalseForEmptyString":   {"", "not-empty", "", false},
+		"notEmptyTrueForString":         {"Foo", "not-empty", "", true},
+		"notEmptyFalseForEmptySlice":    {emptySlice, "not-empty", "", false},
+		"notEmptyTrueForSlice":          {sliceOfTags, "not-empty", "", true},
 		"intersectTrue":                 {"[\"one\",\"two\"]", "intersect", "[\"two\",\"three\"]", true},
 		"intersectFalse":                {"[\"one\",\"two\"]", "intersect", "[\"three\",\"four\"]", false},
 	}
