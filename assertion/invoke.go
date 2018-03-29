@@ -1,6 +1,7 @@
 package assertion
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -22,6 +23,22 @@ type StandardExternalRuleInvoker struct {
 	Log LoggingFunction
 }
 
+func makeViolation(rule Rule, resource Resource, message string) Violation {
+	return Violation{
+		RuleID:       rule.ID,
+		Status:       rule.Severity,
+		ResourceID:   resource.ID,
+		ResourceType: resource.Type,
+		Filename:     resource.Filename,
+		Message:      message,
+	}
+}
+
+func makeViolations(rule Rule, resource Resource, message string) []Violation {
+	v := makeViolation(rule, resource, message)
+	return []Violation{v}
+}
+
 // Invoke an external API to validate a Resource
 func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (string, []Violation, error) {
 	status := "OK"
@@ -35,75 +52,37 @@ func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (strin
 		payload = p
 	}
 	payloadJSON, err := JSONStringify(payload)
-	e.Log(fmt.Sprintf("Invoke %s on %s\n", rule.Invoke.URL, payloadJSON))
-	httpResponse, err := http.Get(rule.Invoke.URL)
 	if err != nil {
-		violations := []Violation{
-			Violation{
-				RuleID:       rule.ID,
-				Status:       rule.Severity,
-				ResourceID:   resource.ID,
-				ResourceType: resource.Type,
-				Filename:     resource.Filename,
-				Message:      fmt.Sprintf("Invoke failed: %s", err.Error()),
-			},
-		}
+		violations := makeViolations(rule, resource, fmt.Sprintf("Unable to create JSON payload: %s", err.Error()))
+		return rule.Severity, violations, err
+	}
+	e.Log(fmt.Sprintf("Invoke %s on %s\n", rule.Invoke.URL, payloadJSON))
+	httpResponse, err := http.Post(rule.Invoke.URL, "application/json", bytes.NewBuffer([]byte(payloadJSON)))
+	if err != nil {
+		violations := makeViolations(rule, resource, fmt.Sprintf("Invoke failed: %s", err.Error()))
 		return rule.Severity, violations, err
 	}
 	if httpResponse.StatusCode != 200 {
-		violations := []Violation{
-			Violation{
-				RuleID:       rule.ID,
-				Status:       rule.Severity,
-				ResourceID:   resource.ID,
-				ResourceType: resource.Type,
-				Filename:     resource.Filename,
-				Message:      fmt.Sprintf("Invoke failed, StatusCode: %d", httpResponse.StatusCode),
-			},
-		}
+		violations := makeViolations(rule, resource, fmt.Sprintf("Invoke failed, StatusCode: %d", httpResponse.StatusCode))
 		return rule.Severity, violations, nil
 	}
 	defer httpResponse.Body.Close()
 	body, err := ioutil.ReadAll(httpResponse.Body)
 	if err != nil {
-		violations := []Violation{
-			Violation{
-				RuleID:       rule.ID,
-				Status:       rule.Severity,
-				ResourceID:   resource.ID,
-				ResourceType: resource.Type,
-				Filename:     resource.Filename,
-				Message:      "Invoke response cannot be read",
-			},
-		}
+		violations := makeViolations(rule, resource, "Invoke response cannot be read")
 		return rule.Severity, violations, nil
 	}
 	e.Log(string(body))
 	var invokeResponse InvokeResponse
 	err = json.Unmarshal(body, &invokeResponse)
 	if err != nil {
-		violations := []Violation{
-			Violation{
-				RuleID:       rule.ID,
-				Status:       rule.Severity,
-				ResourceID:   resource.ID,
-				ResourceType: resource.Type,
-				Filename:     resource.Filename,
-				Message:      "Invoke response cannot be parsed",
-			},
-		}
+		violations := makeViolations(rule, resource, "Invoke response cannot be parsed")
 		return rule.Severity, violations, nil
 	}
 	for _, violation := range invokeResponse.Violations {
 		status = rule.Severity
-		violations = append(violations, Violation{
-			RuleID:       rule.ID,
-			Status:       status,
-			ResourceID:   resource.ID,
-			ResourceType: resource.Type,
-			Filename:     resource.Filename,
-			Message:      violation.Message,
-		})
+		v := makeViolation(rule, resource, violation.Message)
+		violations = append(violations, v)
 	}
 	return status, violations, nil
 }

@@ -400,7 +400,8 @@ Rules:
 * The lambda function does not handle OverSizedChangeNotification
 * The lambda function name is hard-coded in the Makefile
 * Region is hard-coded to us-east-1 for GetValueFromS3
-* Invoke should be a POST, not a GET, and it should probably include the payload
 * Use type switch as more idiomatic way to handle multiple types in match.go
 * Start using go testing coverage tools
 * Ruleset examples have Initial upper case for top level attributes, all lower case for rules
+* Use log package for error reporting
+* Move the rule examples to a separate file, and include an index of operators in a table
