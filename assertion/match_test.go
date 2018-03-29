@@ -38,8 +38,9 @@ func unmarshal(s string) (interface{}, error) {
 
 func TestIsMatch(t *testing.T) {
 
-	sliceOfTags := []string{"Foo", "Bar"}
+	sliceOfTags := []interface{}{"Foo", "Bar"}
 	emptySlice := []interface{}{}
+	anotherSlice := []interface{}{"One", "Two"}
 
 	testCases := map[string]MatchTestCase{
 		"eqTrue":                        {"Foo", "eq", "Foo", "", true},
@@ -89,8 +90,8 @@ func TestIsMatch(t *testing.T) {
 		"notEmptyTrueForSlice":          {sliceOfTags, "not-empty", "", "", true},
 		"intersectTrue":                 {"[\"one\",\"two\"]", "intersect", "[\"two\",\"three\"]", "", true},
 		"intersectFalse":                {"[\"one\",\"two\"]", "intersect", "[\"three\",\"four\"]", "", false},
-		"eqSizeTrue":                    {sliceOfTags, "eq", "2", "size", true},
-		"eqSizeFalse":                   {sliceOfTags, "eq", "3", "size", false},
+		"eqSizeTrue":                    {anotherSlice, "eq", "2", "size", true},
+		"eqSizeFalse":                   {anotherSlice, "eq", "3", "size", false},
 	}
 	for k, tc := range testCases {
 		var b bool

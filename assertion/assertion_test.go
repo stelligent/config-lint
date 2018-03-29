@@ -37,9 +37,21 @@ func TestCheckAssertion(t *testing.T) {
 		Properties: map[string]interface{}{
 			"instance_type": "t2.micro",
 			"ami":           "ami-f2d3638a",
-			"tags": map[string]string{
+			"tags": map[string]interface{}{
 				"Environment": "Development",
 				"Project":     "Web",
+			},
+		},
+		Filename: "test.tf",
+	}
+	resourceWithRootVolume := Resource{
+		ID:   "another_test_resource",
+		Type: "aws_instance",
+		Properties: map[string]interface{}{
+			"instance_type": "t2.micro",
+			"ami":           "ami-f2d3638a",
+			"root_block_device": map[string]interface{}{
+				"volume_size": "1000",
 			},
 		},
 		Filename: "test.tf",
@@ -239,7 +251,7 @@ func TestCheckAssertion(t *testing.T) {
 			simpleTestResource,
 			"FAILURE",
 		},
-		"testResourceCountFails": {
+		"testSizeFails": {
 			Rule{
 				ID:       "TESTCOUNT",
 				Message:  "Test Resource Count Fails",
@@ -257,7 +269,7 @@ func TestCheckAssertion(t *testing.T) {
 			resourceWithTags,
 			"FAILURE",
 		},
-		"testResourceCountOK": {
+		"testSizeOK": {
 			Rule{
 				ID:       "TESTCOUNT",
 				Message:  "Test Resource Count OK",
@@ -273,6 +285,42 @@ func TestCheckAssertion(t *testing.T) {
 				},
 			},
 			resourceWithTags,
+			"OK",
+		},
+		"testIntegerFails": {
+			Rule{
+				ID:       "TESTCOUNT",
+				Message:  "Test integer Fails",
+				Severity: "FAILURE",
+				Resource: "aws_instance",
+				Assertions: []Assertion{
+					Assertion{
+						Key:       "root_block_device.volume_size",
+						ValueType: "integer",
+						Op:        "le",
+						Value:     "500",
+					},
+				},
+			},
+			resourceWithRootVolume,
+			"FAILURE",
+		},
+		"testIntegerOK": {
+			Rule{
+				ID:       "TESTCOUNT",
+				Message:  "Test integer OK",
+				Severity: "FAILURE",
+				Resource: "aws_instance",
+				Assertions: []Assertion{
+					Assertion{
+						Key:       "root_block_device.volume_size",
+						ValueType: "integer",
+						Op:        "le",
+						Value:     "2000",
+					},
+				},
+			},
+			resourceWithRootVolume,
 			"OK",
 		},
 	}
@@ -319,14 +367,14 @@ func TestNestedBooleans(t *testing.T) {
 		Properties: map[string]interface{}{},
 		Filename:   "test.tf",
 	}
-	rulesJSON := `{
+	resourceJSON := `{
             "description": "2017-12-03T03:14:29.856Z",
             "groupName": "test-8246",
             "ipPermissions": [
                 {
-                    "fromPort": 22,
+                    "fromPort": "22",
                     "ipProtocol": "tcp",
-                    "toPort": 22,
+                    "toPort": "22",
                     "ipv4Ranges": [
                         {
                             "cidrIp": "0.0.0.0/0"
@@ -338,7 +386,7 @@ func TestNestedBooleans(t *testing.T) {
                 }
             ]
         }`
-	err := json.Unmarshal([]byte(rulesJSON), &resource.Properties)
+	err := json.Unmarshal([]byte(resourceJSON), &resource.Properties)
 	if err != nil {
 		t.Error("Error parsing resource JSON")
 	}

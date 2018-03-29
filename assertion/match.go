@@ -19,16 +19,6 @@ func convertToString(data interface{}) (string, bool) {
 	return s, ok
 }
 
-func convertToSliceOfStrings(data interface{}) ([]string, bool) {
-	s, ok := data.([]string)
-	return s, ok
-}
-
-func isObject(data interface{}) bool {
-	_, ok := data.(map[string]interface{})
-	return ok
-}
-
 func isMatch(data interface{}, op string, value string, valueType string) (bool, error) {
 	searchResult, err := JSONStringify(data)
 	if err != nil {
@@ -94,16 +84,19 @@ func isMatch(data interface{}, op string, value string, valueType string) (bool,
 			return true, nil
 		}
 	case "contains":
+		if c, isSlice := convertToSlice(data); isSlice {
+			for _, element := range c {
+				if stringElement, isString := element.(string); isString {
+					if stringElement == value {
+						return true, nil
+					}
+				}
+			}
+			return false, nil
+		}
 		if s, isString := convertToString(data); isString {
 			if strings.Contains(s, value) {
 				return true, nil
-			}
-		}
-		if c, isSlice := convertToSliceOfStrings(data); isSlice {
-			for _, element := range c {
-				if element == value {
-					return true, nil
-				}
 			}
 			return false, nil
 		}
