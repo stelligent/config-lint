@@ -9,7 +9,7 @@ func searchAndMatch(assertion Assertion, resource Resource, log LoggingFunction)
 	if err != nil {
 		return false, err
 	}
-	match, err := isMatch(v, assertion.Op, assertion.Value)
+	match, err := isMatch(v, assertion.Op, assertion.Value, assertion.ValueType)
 	log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s", assertion.Key, v, assertion.Op, assertion.Value))
 	log(fmt.Sprintf("ResourceID: %s Type: %s %t",
 		resource.ID,

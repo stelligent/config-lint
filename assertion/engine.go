@@ -2,10 +2,10 @@ package assertion
 
 // Assertion expression for a resource
 type Assertion struct {
-	Type      string
 	Key       string
 	Op        string
 	Value     string
+	ValueType string
 	Or        []Assertion
 	And       []Assertion
 	Not       []Assertion

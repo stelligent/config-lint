@@ -29,7 +29,7 @@ func isObject(data interface{}) bool {
 	return ok
 }
 
-func isMatch(data interface{}, op string, value string) (bool, error) {
+func isMatch(data interface{}, op string, value string, valueType string) (bool, error) {
 	searchResult, err := JSONStringify(data)
 	if err != nil {
 		return false, err
@@ -37,27 +37,27 @@ func isMatch(data interface{}, op string, value string) (bool, error) {
 	searchResult = unquoted(searchResult)
 	switch op {
 	case "eq":
-		if searchResult == value {
+		if compare(data, value, valueType) == 0 {
 			return true, nil
 		}
 	case "ne":
-		if searchResult != value {
+		if compare(data, value, valueType) != 0 {
 			return true, nil
 		}
 	case "lt":
-		if searchResult < value {
+		if compare(data, value, valueType) < 0 {
 			return true, nil
 		}
 	case "le":
-		if searchResult <= value {
+		if compare(data, value, valueType) <= 0 {
 			return true, nil
 		}
 	case "gt":
-		if searchResult > value {
+		if compare(data, value, valueType) > 0 {
 			return true, nil
 		}
 	case "ge":
-		if searchResult >= value {
+		if compare(data, value, valueType) >= 0 {
 			return true, nil
 		}
 	case "in":

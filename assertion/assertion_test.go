@@ -31,6 +31,19 @@ func TestCheckAssertion(t *testing.T) {
 		},
 		Filename: "test.tf",
 	}
+	resourceWithTags := Resource{
+		ID:   "another_test_resource",
+		Type: "aws_instance",
+		Properties: map[string]interface{}{
+			"instance_type": "t2.micro",
+			"ami":           "ami-f2d3638a",
+			"tags": map[string]string{
+				"Environment": "Development",
+				"Project":     "Web",
+			},
+		},
+		Filename: "test.tf",
+	}
 
 	testCases := map[string]AssertionTestCase{
 		"testEq": {
@@ -41,7 +54,6 @@ func TestCheckAssertion(t *testing.T) {
 				Resource: "aws_instance",
 				Assertions: []Assertion{
 					Assertion{
-						Type:  "value",
 						Key:   "instance_type",
 						Op:    "eq",
 						Value: "t2.micro",
@@ -61,13 +73,11 @@ func TestCheckAssertion(t *testing.T) {
 					Assertion{
 						Or: []Assertion{
 							Assertion{
-								Type:  "value",
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "t2.micro",
 							},
 							Assertion{
-								Type:  "value",
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "m4.large",
@@ -89,13 +99,11 @@ func TestCheckAssertion(t *testing.T) {
 					Assertion{
 						Or: []Assertion{
 							Assertion{
-								Type:  "value",
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "t2.nano",
 							},
 							Assertion{
-								Type:  "value",
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "m4.large",
@@ -117,13 +125,11 @@ func TestCheckAssertion(t *testing.T) {
 					Assertion{
 						And: []Assertion{
 							Assertion{
-								Type:  "value",
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "t2.micro",
 							},
 							Assertion{
-								Type:  "value",
 								Key:   "ami",
 								Op:    "eq",
 								Value: "ami-f2d3638a",
@@ -145,13 +151,11 @@ func TestCheckAssertion(t *testing.T) {
 					Assertion{
 						And: []Assertion{
 							Assertion{
-								Type:  "value",
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "m3.medium",
 							},
 							Assertion{
-								Type:  "value",
 								Key:   "ami",
 								Op:    "eq",
 								Value: "ami-f2d3638a",
@@ -173,7 +177,6 @@ func TestCheckAssertion(t *testing.T) {
 					Assertion{
 						Not: []Assertion{
 							Assertion{
-								Type:  "value",
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "c4.large",
@@ -195,7 +198,6 @@ func TestCheckAssertion(t *testing.T) {
 					Assertion{
 						Not: []Assertion{
 							Assertion{
-								Type:  "value",
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "t2.micro",
@@ -219,13 +221,11 @@ func TestCheckAssertion(t *testing.T) {
 							Assertion{
 								Or: []Assertion{
 									Assertion{
-										Type:  "value",
 										Key:   "instance_type",
 										Op:    "eq",
 										Value: "t2.micro",
 									},
 									Assertion{
-										Type:  "value",
 										Key:   "instance_type",
 										Op:    "eq",
 										Value: "m3.medium",
@@ -238,6 +238,42 @@ func TestCheckAssertion(t *testing.T) {
 			},
 			simpleTestResource,
 			"FAILURE",
+		},
+		"testResourceCountFails": {
+			Rule{
+				ID:       "TESTCOUNT",
+				Message:  "Test Resource Count Fails",
+				Severity: "FAILURE",
+				Resource: "aws_instance",
+				Assertions: []Assertion{
+					Assertion{
+						Key:       "tags",
+						ValueType: "size",
+						Op:        "eq",
+						Value:     "3",
+					},
+				},
+			},
+			resourceWithTags,
+			"FAILURE",
+		},
+		"testResourceCountOK": {
+			Rule{
+				ID:       "TESTCOUNT",
+				Message:  "Test Resource Count OK",
+				Severity: "FAILURE",
+				Resource: "aws_instance",
+				Assertions: []Assertion{
+					Assertion{
+						Key:       "tags",
+						ValueType: "size",
+						Op:        "eq",
+						Value:     "2",
+					},
+				},
+			},
+			resourceWithTags,
+			"OK",
 		},
 	}
 
@@ -262,13 +298,11 @@ func TestNestedBooleans(t *testing.T) {
 					Assertion{
 						And: []Assertion{
 							Assertion{
-								Type:  "value",
 								Key:   "ipPermissions[].fromPort[]",
 								Op:    "contains",
 								Value: "22",
 							},
 							Assertion{
-								Type:  "value",
 								Key:   "ipPermissions[].ipRanges[]",
 								Op:    "contains",
 								Value: "0.0.0.0/0",
