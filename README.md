@@ -241,3 +241,5 @@ Rules:
 * Use the LintRules linter to implement a -validate option
 * Should there be some pre-defined RuleSets?
 * Would it be useful to have helper utilities to send output to CloudWatch/SNS/Kinesis?
+* Consider adding -profile command line option, add this to RuleSet
+    profiles: [ { name: "profile1", ids: [ "A", "B", "C" ], tags: [ "A", "B", "C" ] ]
