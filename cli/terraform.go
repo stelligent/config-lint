@@ -20,9 +20,8 @@ type TerraformResourceLoader struct {
 	Log assertion.LoggingFunction
 }
 
-// FIXME try this: type ResourceProperties map[string]interface{}
 func parsePolicy(templateResource interface{}) (map[string]interface{}, error) {
-	firstResource := templateResource.([]interface{})[0]
+	firstResource := templateResource.([]interface{})[0] // FIXME does this array always have 1 element?
 	properties := firstResource.(map[string]interface{})
 	for _, attribute := range []string{"assume_role_policy", "policy"} {
 		if policyAttribute, hasPolicyString := properties[attribute]; hasPolicyString {
