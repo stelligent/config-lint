@@ -228,7 +228,7 @@ Rules:
 # TODO
 
 * Add an optional YAML file for project settings, such as ignoring certain rules for certain resources
-* Finish implementing value_from to allow for dynamic data (again, see Cloud Custodian)
+* Add support for http to value_from
 * Figure out how dependency management works in go
 * The lambda function does not handle OverSizedChangeNotification
 * The lambda function name is hard-coded in the Makefile
@@ -237,3 +237,8 @@ Rules:
 * Start using go testing coverage tools
 * Ruleset examples have Initial upper case for top level attributes, all lower case for rules
 * Use log package for error reporting
+* Deal with a few FIXME comments in code, mostly error handling
+* Consider adding these operators: all, any, none, one
+* Use the LintRules linter to implement a -validate option
+* Should there be some pre-defined RuleSets?
+* Would it be useful to have helper utilities to send output to CloudWatch/SNS/Kinesis?
