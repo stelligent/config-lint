@@ -49,6 +49,11 @@ func FilterRulesByID(rules []Rule, ruleIDs []string) []Rule {
 	return filteredRules
 }
 
+// FilterRulesByTagAndID filters by both tag and id
+func FilterRulesByTagAndID(rules []Rule, tags []string, ruleIds []string) []Rule {
+	return append(FilterRulesByID(rules, ruleIds), FilterRulesByTag(rules, tags)...)
+}
+
 // ResolveRules loads any dynamic values for a collection or rules
 func ResolveRules(rules []Rule, valueSource ValueSource, log LoggingFunction) []Rule {
 	resolvedRules := make([]Rule, 0)

@@ -21,11 +21,10 @@ type BaseLinter struct {
 }
 
 // ValidateResources evaluates a list of Rule objects to a list of Resource objects
-func (l BaseLinter) ValidateResources(resources []assertion.Resource, rules []assertion.Rule, tags []string, log assertion.LoggingFunction) ([]assertion.Violation, error) {
+func (l BaseLinter) ValidateResources(resources []assertion.Resource, rules []assertion.Rule, log assertion.LoggingFunction) ([]assertion.Violation, error) {
 
 	valueSource := assertion.StandardValueSource{Log: log}
-	filteredRules := assertion.FilterRulesByTag(rules, tags)
-	resolvedRules := assertion.ResolveRules(filteredRules, valueSource, log)
+	resolvedRules := assertion.ResolveRules(rules, valueSource, log)
 	externalRules := assertion.StandardExternalRuleInvoker{Log: log}
 
 	allViolations := make([]assertion.Violation, 0)
@@ -48,7 +47,7 @@ func (l BaseLinter) ValidateResources(resources []assertion.Resource, rules []as
 
 // ValidateFiles validates a collection of filenames using a RuleSet
 func (l BaseLinter) ValidateFiles(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string, loader ResourceLoader, log assertion.LoggingFunction) ([]string, []assertion.Violation, error) {
-	rules := assertion.FilterRulesByID(ruleSet.Rules, ruleIDs)
+	rules := assertion.FilterRulesByTagAndID(ruleSet.Rules, tags, ruleIDs)
 	allViolations := make([]assertion.Violation, 0)
 	filesScanned := make([]string, 0)
 	for _, filename := range filenames {
@@ -59,7 +58,7 @@ func (l BaseLinter) ValidateFiles(filenames []string, ruleSet assertion.RuleSet,
 			if err != nil {
 				return filesScanned, allViolations, err
 			}
-			violations, err := l.ValidateResources(resources, rules, tags, log)
+			violations, err := l.ValidateResources(resources, rules, log)
 			if err != nil {
 				return filesScanned, allViolations, err
 			}

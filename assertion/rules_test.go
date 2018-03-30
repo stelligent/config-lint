@@ -52,6 +52,17 @@ var content = `Rules:
         value: bucket1
     tags:
       - s3
+  - id: TEST3
+    message: Test message
+    resource: aws_ebs_volume
+    severity: WARNING
+    assertions:
+      - key: size
+        op: le
+        value: 1000
+        value_type: integer
+    tags:
+      - ebs
 `
 
 func MustParseRules(content string, t *testing.T) RuleSet {
@@ -64,8 +75,8 @@ func MustParseRules(content string, t *testing.T) RuleSet {
 
 func TestParseRules(t *testing.T) {
 	r := MustParseRules(content, t)
-	if len(r.Rules) != 2 {
-		t.Error("Expected to parse 1 rule")
+	if len(r.Rules) != 3 {
+		t.Error("Expected to parse 3 rules")
 	}
 }
 
@@ -88,6 +99,20 @@ func TestFilterRulesByID(t *testing.T) {
 	}
 	if r[0].ID != "TEST2" {
 		t.Error("Expected filterRulesByID to select correct rule")
+	}
+}
+
+func TestFilterRulesByTagAndId(t *testing.T) {
+	tags := []string{"s3"}
+	ids := []string{"TEST3"}
+	r := FilterRulesByTagAndID(MustParseRules(content, t).Rules, tags, ids)
+	if len(r) != 2 {
+		t.Error("Expected filterRulesByTag to return 2 rules")
+	}
+	for _, rule := range r {
+		if rule.ID != "TEST2" && rule.ID != "TEST3" {
+			t.Error("Expected filterRulesByTagAndID to select correct rules")
+		}
 	}
 }
 

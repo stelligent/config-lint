@@ -53,12 +53,12 @@ func loadSecurityGroupResources(log assertion.LoggingFunction) ([]assertion.Reso
 // Validate applies a Ruleset to all SecurityGroups
 func (l SecurityGroupLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) ([]string, []assertion.Violation, error) {
 	noFilenames := []string{}
-	rules := assertion.FilterRulesByID(ruleSet.Rules, ruleIDs)
+	rules := assertion.FilterRulesByTagAndID(ruleSet.Rules, tags, ruleIDs)
 	resources, err := loadSecurityGroupResources(l.Log)
 	if err != nil {
 		return noFilenames, []assertion.Violation{}, err
 	}
-	violations, err := l.ValidateResources(resources, rules, tags, l.Log)
+	violations, err := l.ValidateResources(resources, rules, l.Log)
 	return noFilenames, violations, err
 }
 
