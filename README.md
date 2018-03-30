@@ -228,7 +228,6 @@ Rules:
 # TODO
 
 * Add an optional YAML file for project settings, such as ignoring certain rules for certain resources
-* Add support for http to value_from
 * Figure out how dependency management works in go
 * The lambda function does not handle OverSizedChangeNotification
 * The lambda function name is hard-coded in the Makefile

@@ -6,7 +6,10 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"io/ioutil"
+	"net/http"
 	"net/url"
+	"strings"
 )
 
 // StandardValueSource can fetch values from external sources
@@ -22,15 +25,16 @@ func (v StandardValueSource) GetValue(assertion Assertion) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		if parsedURL.Scheme != "s3" && parsedURL.Scheme != "S3" {
+		switch strings.ToLower(parsedURL.Scheme) {
+		case "s3":
+			return v.GetValueFromS3(parsedURL.Host, parsedURL.Path)
+		case "http":
+			return v.GetValueFromHTTP(assertion.ValueFrom.URL)
+		case "https":
+			return v.GetValueFromHTTP(assertion.ValueFrom.URL)
+		default:
 			return "", fmt.Errorf("Unsupported protocol for value_from: %s", parsedURL.Scheme)
 		}
-		content, err := v.GetValueFromS3(parsedURL.Host, parsedURL.Path)
-		if err != nil {
-			return "", err
-		}
-		v.Log(content)
-		return content, nil
 	}
 	return assertion.Value, nil
 }
@@ -50,4 +54,21 @@ func (v StandardValueSource) GetValueFromS3(bucket string, key string) (string, 
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(response.Body)
 	return buf.String(), nil
+}
+
+// GetValueFromHTTP looks up external value for an Assertion when the HTTP protocol is specified
+func (v StandardValueSource) GetValueFromHTTP(url string) (string, error) {
+	httpResponse, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	if httpResponse.StatusCode != 200 {
+		return "", err
+	}
+	defer httpResponse.Body.Close()
+	body, err := ioutil.ReadAll(httpResponse.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(body), nil
 }

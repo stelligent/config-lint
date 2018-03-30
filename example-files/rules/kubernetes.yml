@@ -77,7 +77,7 @@ Rules:
     message: Custom
     resource: Policy
     invoke:
-      url: https://19kfojjbi2.execute-api.us-east-1.amazonaws.com/dev
+      url: https://19kfojjbi2.execute-api.us-east-1.amazonaws.com/dev/failure
       payload: "{ user: spec.user, namespace: spec.namespace }"
     tags:
       - custom
