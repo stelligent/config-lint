@@ -243,3 +243,5 @@ Rules:
 * Would it be useful to have helper utilities to send output to CloudWatch/SNS/Kinesis?
 * Consider adding -profile command line option, add this to RuleSet
     profiles: [ { name: "profile1", ids: [ "A", "B", "C" ], tags: [ "A", "B", "C" ] ]
+* Add variable interpolation for Terraform files
+* Update value_from to handle JSON return values
