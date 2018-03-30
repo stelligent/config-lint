@@ -1,9 +1,9 @@
-Version: 1
-Description: Rules for Kubernetes spec files
-Type: Kubernetes
-Files:
+version: 1
+description: Rules for Kubernetes spec files
+type: Kubernetes
+files:
   - "*.yml"
-Rules:
+rules:
 
   - id: ALLOW_KIND
     severity: FAILURE

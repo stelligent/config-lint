@@ -1,7 +1,7 @@
-Version: 1
-Description: Rules for AWS Config
-Type: AWSConfig
-Rules:
+version: 1
+description: Rules for AWS Config
+type: AWSConfig
+rules:
   - id: CFG1
     message: Table status must have provisionedThroughput
     resource: AWS::DynamoDB::Table

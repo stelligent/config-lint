@@ -1,9 +1,9 @@
-Version: 1
-Description: Rules for config-lint
-Type: LintRules
-Files:
+version: 1
+description: Rules for config-lint
+type: LintRules
+files:
   - "*.yml"
-Rules:
+rules:
 
   - id: VALID_TYPE
     message: Not a valid linter type

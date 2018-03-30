@@ -1,7 +1,7 @@
-Version: 1
-Description: Rules for Security Groups
-Type: SecurityGroup
-Rules:
+version: 1
+description: Rules for Security Groups
+type: SecurityGroup
+rules:
   - id: SG1
     message: Should not allow access to SSH from anywhere
     resource: "AWS::EC2::SecurityGroup"

@@ -15,6 +15,15 @@ type RulesResourceLoader struct {
 	Log assertion.LoggingFunction
 }
 
+func getAttr(m map[string]interface{}, keys ...string) []interface{} {
+	for _, key := range keys {
+		if r, ok := m[key].([]interface{}); ok {
+			return r
+		}
+	}
+	return []interface{}{}
+}
+
 // Load converts a text file into a collection of Resource objects
 func (l RulesResourceLoader) Load(filename string) ([]assertion.Resource, error) {
 	resources := make([]assertion.Resource, 0)
@@ -34,7 +43,7 @@ func (l RulesResourceLoader) Load(filename string) ([]assertion.Resource, error)
 		// but also adding each of these rules as a separate LintRule resource
 		// makes writing rules a lot simpler
 		m := ruleSet.(map[string]interface{})
-		rules := m["Rules"].([]interface{})
+		rules := getAttr(m, "rules", "Rules")
 		for _, rule := range rules {
 			properties := rule.(map[string]interface{})
 			ruleResource := assertion.Resource{

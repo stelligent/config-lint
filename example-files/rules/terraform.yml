@@ -1,9 +1,9 @@
-Version: 1
-Description: Rules for Terraform configuration files
-Type: Terraform
-Files:
+version: 1
+description: Rules for Terraform configuration files
+type: Terraform
+files:
   - "*.tf"
-Rules:
+rules:
 
   - id: R1
     message: Instance type should be t2.micro or m3.medium
