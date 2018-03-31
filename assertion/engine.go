@@ -47,6 +47,14 @@ type RuleSet struct {
 	Files       []string
 	Rules       []Rule
 	Version     string
+	Resources   []ResourceConfig
+}
+
+// ResourceConfig describes how to discover resouces in a YAML file
+type ResourceConfig struct {
+	ID   string
+	Type string
+	Key  string
 }
 
 // Violation has details for a failed assertion

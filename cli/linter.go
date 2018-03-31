@@ -26,6 +26,8 @@ func makeLinter(linterType string, log assertion.LoggingFunction) Linter {
 		return SecurityGroupLinter{Log: log}
 	case "LintRules":
 		return RulesLinter{Log: log}
+	case "YAML":
+		return YAMLLinter{Log: log}
 	default:
 		fmt.Printf("Type not supported: %s\n", linterType)
 		return nil
