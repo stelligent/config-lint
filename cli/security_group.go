@@ -11,7 +11,6 @@ import (
 
 // SecurityGroupLinter implements a Linter for data returned by the DescribeSecurityGroups SDK call
 type SecurityGroupLinter struct {
-	BaseLinter
 	Log assertion.LoggingFunction
 }
 
@@ -58,7 +57,8 @@ func (l SecurityGroupLinter) Validate(filenames []string, ruleSet assertion.Rule
 	if err != nil {
 		return noFilenames, []assertion.Violation{}, err
 	}
-	violations, err := l.ValidateResources(resources, rules, l.Log)
+	f := FileLinter{Log: l.Log}
+	violations, err := f.ValidateResources(resources, rules)
 	return noFilenames, violations, err
 }
 

@@ -9,8 +9,6 @@ import (
 	"path/filepath"
 )
 
-// FIXME - move these functions to BaseLinter?
-
 func loadYAML(filename string, log assertion.LoggingFunction) ([]interface{}, error) {
 	empty := []interface{}{}
 	content, err := ioutil.ReadFile(filename)

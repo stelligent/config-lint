@@ -6,7 +6,6 @@ import (
 
 // RulesLinter lints rules files for itself
 type RulesLinter struct {
-	BaseLinter
 	Log assertion.LoggingFunction
 }
 
@@ -61,11 +60,13 @@ func (l RulesResourceLoader) Load(filename string) ([]assertion.Resource, error)
 // Validate runs validate on a collection of filenames using a RuleSet
 func (l RulesLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) ([]string, []assertion.Violation, error) {
 	loader := RulesResourceLoader{Log: l.Log}
-	return l.ValidateFiles(filenames, ruleSet, tags, ruleIDs, loader, l.Log)
+	f := FileLinter{Log: l.Log}
+	return f.ValidateFiles(filenames, ruleSet, tags, ruleIDs, loader)
 }
 
 // Search evaluates a JMESPath expression against the resources in a collection of filenames
 func (l RulesLinter) Search(filenames []string, ruleSet assertion.RuleSet, searchExpression string) {
 	loader := RulesResourceLoader{Log: l.Log}
-	l.SearchFiles(filenames, ruleSet, searchExpression, loader)
+	f := FileLinter{Log: l.Log}
+	f.SearchFiles(filenames, ruleSet, searchExpression, loader)
 }
