@@ -83,10 +83,11 @@ func isMatch(data interface{}, op string, value string, valueType string) (bool,
 	case "not-contains":
 		return notContains(data, value)
 	case "regex":
-		if regexp.MustCompile(value).MatchString(searchResult) { // FIXME don't use MustCompile
-			return true, nil
+		re, err := regexp.Compile(value)
+		if err != nil {
+			return false, err
 		}
-		return false, nil
+		return re.MatchString(searchResult), nil
 	case "has-properties":
 		return hasProperties(data, value)
 	}
