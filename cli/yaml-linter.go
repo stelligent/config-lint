@@ -15,6 +15,15 @@ type YAMLResourceLoader struct {
 	Resources []assertion.ResourceConfig
 }
 
+func extractResourceID(expression string, properties interface{}) string {
+	resourceID := "None"
+	result, err := assertion.SearchData(expression, properties)
+	if err == nil {
+		resourceID, _ = result.(string)
+	}
+	return resourceID
+}
+
 // Load converts a text file into a collection of Resource objects
 func (l YAMLResourceLoader) Load(filename string) ([]assertion.Resource, error) {
 	resources := make([]assertion.Resource, 0)
@@ -32,7 +41,7 @@ func (l YAMLResourceLoader) Load(filename string) ([]assertion.Resource, error) 
 			for _, element := range sliceOfProperties {
 				properties := element.(map[string]interface{})
 				resource := assertion.Resource{
-					ID:         properties[resourceConfig.ID].(string), // FIXME should use JMESPath to ID, and make sure it handles numbers
+					ID:         extractResourceID(resourceConfig.ID, properties),
 					Type:       resourceConfig.Type,
 					Properties: properties,
 					Filename:   filename,

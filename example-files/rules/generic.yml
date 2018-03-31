@@ -16,7 +16,7 @@ resources:
     id: name
   - type: contraption
     key: other_stuff.contraptions[]
-    id: serial_number
+    id: ids.serial_number
 
 rules:
 
