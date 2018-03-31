@@ -1,0 +1,17 @@
+version: 1
+description: Rules for Terraform configuration files
+type: Terraform
+files:
+  - "*.tf"
+rules:
+
+  - id: TEST_1
+    message: Testing
+    resource: aws_instance
+    assertions:
+      - key: instance_type
+        op: in
+        value: t2.micro,m3.medium
+    severity: WARNING
+    tags:
+      - ec2
