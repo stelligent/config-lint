@@ -102,7 +102,7 @@ func isMatch(data interface{}, op string, value string, valueType string) (bool,
 		}
 		return false, nil
 	case "has-properties":
-		return has_properties(data, value)
+		return hasProperties(data, value)
 	}
 	return false, nil
 }
