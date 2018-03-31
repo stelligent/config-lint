@@ -9,11 +9,6 @@ func isNil(data interface{}) bool {
 	return data == nil
 }
 
-func isString(data interface{}) bool {
-	_, ok := data.(string)
-	return ok
-}
-
 func convertToString(data interface{}) (string, bool) {
 	s, ok := data.(string)
 	return s, ok
