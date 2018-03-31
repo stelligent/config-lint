@@ -37,6 +37,15 @@ rules:
         op: in
         value: red,blue,green
 
+  - id: GADGET_PROPERTIES
+    message: Gadget has missing properties
+    severity: FAILURE
+    resource: gadget
+    assertions:
+      - key: "@"
+        op: has-properties
+        value: name,color
+
   - id: CONTRAPTION_SIZE
     message: Contraption size should be less than 1000
     resource: contraption

@@ -462,13 +462,20 @@ func loadTestCasesFromFixture(filename string, t *testing.T) FixtureTestCases {
 	return testCases
 }
 
-func TestCollectionAssertion(t *testing.T) {
-	fixture := loadTestCasesFromFixture("./fixtures/collection-assertions.yaml", t)
-	for _, testCase := range fixture.TestCases {
-		status, err := CheckAssertion(testCase.Rule, testCase.Rule.Assertions[0], testCase.Resource, testLogging)
-		failTestIfError(err, testCase.Name, t)
-		if status != testCase.Result {
-			t.Errorf("Test case %s returned %s expecting %s", testCase.Name, status, testCase.Result)
+func TestUsingFixtures(t *testing.T) {
+	fixtureFilenames := []string{
+		"./fixtures/collection-assertions.yaml",
+		"./fixtures/has-properties.yaml",
+	}
+
+	for _, filename := range fixtureFilenames {
+		fixture := loadTestCasesFromFixture(filename, t)
+		for _, testCase := range fixture.TestCases {
+			status, err := CheckAssertion(testCase.Rule, testCase.Rule.Assertions[0], testCase.Resource, testLogging)
+			failTestIfError(err, testCase.Name, t)
+			if status != testCase.Result {
+				t.Errorf("Test case %s returned %s expecting %s", testCase.Name, status, testCase.Result)
+			}
 		}
 	}
 }

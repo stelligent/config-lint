@@ -1,0 +1,41 @@
+---
+description: Test has-properties operator
+test_cases:
+
+  - name: has-properties_OK
+    rule:
+      id: PROPERTIES_1
+      message: Missing properties
+      severity: FAILURE
+      resource: sample
+      assertions:
+        - key: example
+          op: has-properties
+          value: name,id
+    resource:
+      id: p1
+      type: sample
+      properties:
+        example:
+          name: first
+          id: 1
+    result: OK
+
+  - name: has-properties_FAILURE
+    rule:
+      id: PROPERTIES_2
+      message: Missing properties
+      severity: FAILURE
+      resource: sample
+      assertions:
+        - key: example
+          op: has-properties
+          value: name,id,description
+    resource:
+      id: p1
+      type: sample
+      properties:
+        example:
+          name: first
+          id: 1
+    result: FAILURE
