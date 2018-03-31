@@ -142,7 +142,7 @@ func TestRuleWithMultipleFilter(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "t2.micro", "ami": "ami-000000"},
 		Filename:   "test.tf",
 	}
-	status, violations, err := CheckRule(rules.Rules[0], resource, mockExternalRuleInvoker(), testLogging)
+	status, violations, err := CheckRule(rules.Rules[0], resource, mockExternalRuleInvoker(), TestLogging)
 	if err != nil {
 		t.Error("Error in CheckRule:" + err.Error())
 	}
@@ -162,7 +162,7 @@ func TestMultipleFiltersWithSingleFailure(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "t2.micro", "ami": "ami-111111"},
 		Filename:   "test.tf",
 	}
-	status, violations, err := CheckRule(rules.Rules[0], resource, mockExternalRuleInvoker(), testLogging)
+	status, violations, err := CheckRule(rules.Rules[0], resource, mockExternalRuleInvoker(), TestLogging)
 	if err != nil {
 		t.Error("Error in CheckRule:" + err.Error())
 	}
@@ -182,7 +182,7 @@ func TestMultipleFiltersWithMultipleFailures(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "c3.medium", "ami": "ami-111111"},
 		Filename:   "test.tf",
 	}
-	status, violations, err := CheckRule(rules.Rules[0], resource, mockExternalRuleInvoker(), testLogging)
+	status, violations, err := CheckRule(rules.Rules[0], resource, mockExternalRuleInvoker(), TestLogging)
 	if err != nil {
 		t.Error("Error in CheckRule:" + err.Error())
 	}
@@ -215,8 +215,8 @@ func TestValueFrom(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "m3.medium"},
 		Filename:   "test.tf",
 	}
-	resolved := ResolveRules(rules.Rules, testValueSource(), testLogging)
-	status, violations, err := CheckRule(resolved[0], resource, mockExternalRuleInvoker(), testLogging)
+	resolved := ResolveRules(rules.Rules, testValueSource(), TestLogging)
+	status, violations, err := CheckRule(resolved[0], resource, mockExternalRuleInvoker(), TestLogging)
 	if err != nil {
 		t.Error("Error in CheckRule:" + err.Error())
 	}
@@ -245,9 +245,9 @@ func TestInvoke(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "m3.medium"},
 		Filename:   "test.tf",
 	}
-	resolved := ResolveRules(rules.Rules, testValueSource(), testLogging)
+	resolved := ResolveRules(rules.Rules, testValueSource(), TestLogging)
 	counter := mockExternalRuleInvoker()
-	CheckRule(resolved[0], resource, counter, testLogging)
+	CheckRule(resolved[0], resource, counter, TestLogging)
 	if *counter != 1 {
 		t.Error("Expecting external rule engine to be invoked")
 	}

@@ -2,19 +2,8 @@ package assertion
 
 import (
 	"encoding/json"
-	"github.com/ghodss/yaml"
-	"io/ioutil"
 	"testing"
 )
-
-func testLogging(s string) {
-}
-
-func failTestIfError(err error, message string, t *testing.T) {
-	if err != nil {
-		t.Error(message + ":" + err.Error())
-	}
-}
 
 type AssertionTestCase struct {
 	Rule           Rule
@@ -328,8 +317,8 @@ func TestCheckAssertion(t *testing.T) {
 	}
 
 	for k, tc := range testCases {
-		status, err := CheckAssertion(tc.Rule, tc.Rule.Assertions[0], tc.Resource, testLogging)
-		failTestIfError(err, "TestSimple", t)
+		status, err := CheckAssertion(tc.Rule, tc.Rule.Assertions[0], tc.Resource, TestLogging)
+		FailTestIfError(err, "TestSimple", t)
 		if status != tc.ExpectedStatus {
 			t.Errorf("%s Failed Expected '%s' to be '%s'", k, status, tc.ExpectedStatus)
 		}
@@ -392,8 +381,8 @@ func TestNestedBooleans(t *testing.T) {
 	if err != nil {
 		t.Error("Error parsing resource JSON")
 	}
-	status, err := CheckAssertion(rule, rule.Assertions[0], resource, testLogging)
-	failTestIfError(err, "TestNestedBoolean", t)
+	status, err := CheckAssertion(rule, rule.Assertions[0], resource, TestLogging)
+	FailTestIfError(err, "TestNestedBoolean", t)
 	if status != "NOT_COMPLIANT" {
 		t.Error("Expecting nested boolean to return NOT_COMPLIANT")
 	}
@@ -433,49 +422,13 @@ func TestNoExceptions(t *testing.T) {
 	}
 }
 
-type (
-	FixtureTestCases struct {
-		Description string
-		TestCases   []FixtureTestCase `json:"test_cases"`
-	}
-
-	FixtureTestCase struct {
-		Name     string
-		Rule     Rule
-		Resource Resource
-		Result   string
-	}
-)
-
-func loadTestCasesFromFixture(filename string, t *testing.T) FixtureTestCases {
-	var testCases FixtureTestCases
-	content, err := ioutil.ReadFile(filename)
-	if err != nil {
-		t.Errorf("Unable to read fixture file: %s", filename)
-		return testCases
-	}
-	err = yaml.Unmarshal(content, &testCases)
-	if err != nil {
-		t.Errorf("Unable to parse fixture file: %s", filename)
-		return testCases
-	}
-	return testCases
-}
-
 func TestUsingFixtures(t *testing.T) {
 	fixtureFilenames := []string{
-		"./fixtures/collection-assertions.yaml",
-		"./fixtures/has-properties.yaml",
+		"./testdata/collection-assertions.yaml",
+		"./testdata/has-properties.yaml",
 	}
 
 	for _, filename := range fixtureFilenames {
-		fixture := loadTestCasesFromFixture(filename, t)
-		for _, testCase := range fixture.TestCases {
-			status, err := CheckAssertion(testCase.Rule, testCase.Rule.Assertions[0], testCase.Resource, testLogging)
-			failTestIfError(err, testCase.Name, t)
-			if status != testCase.Result {
-				t.Errorf("Test case %s returned %s expecting %s", testCase.Name, status, testCase.Result)
-			}
-		}
+		RunTestCasesFromFixture(filename, t)
 	}
 }
