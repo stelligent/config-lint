@@ -27,9 +27,20 @@ func compare(data interface{}, value string, valueType string) int {
 		}
 		return intCompare(l, n)
 	case "integer":
-		n1, _ := strconv.Atoi(data.(string))
-		n2, _ := strconv.Atoi(value)
-		return intCompare(n1, n2)
+		switch v := data.(type) {
+		case float64:
+			n1 := int(v)
+			n2, _ := strconv.Atoi(value)
+			return intCompare(n1, n2)
+		case int:
+			n2, _ := strconv.Atoi(value)
+			return intCompare(v, n2)
+		case string:
+			n1, _ := strconv.Atoi(v)
+			n2, _ := strconv.Atoi(value)
+			return intCompare(n1, n2)
+		}
+		return 0
 	default:
 		tmp, _ := JSONStringify(data)
 		s := unquoted(tmp)

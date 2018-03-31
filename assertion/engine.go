@@ -5,7 +5,7 @@ type Assertion struct {
 	Key       string
 	Op        string
 	Value     string
-	ValueType string
+	ValueType string `json:"value_type"`
 	Or        []Assertion
 	And       []Assertion
 	Not       []Assertion
