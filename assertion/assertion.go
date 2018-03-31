@@ -58,6 +58,89 @@ func notOperation(assertions []Assertion, resource Resource, log LoggingFunction
 	return true, nil
 }
 
+func collectResources(key string, resource Resource, log LoggingFunction) ([]Resource, error) {
+	resources := make([]Resource, 0)
+	value, err := SearchData(key, resource.Properties)
+	if err != nil {
+		return resources, err
+	}
+	if collection, ok := value.([]interface{}); ok {
+		for _, properties := range collection {
+			collectionResource := Resource{
+				ID:         resource.ID,
+				Type:       resource.Type,
+				Properties: properties,
+				Filename:   resource.Filename,
+			}
+			resources = append(resources, collectionResource)
+		}
+	}
+	return resources, nil
+}
+
+func everyExpression(collectionAssertion CollectionAssertion, resource Resource, log LoggingFunction) (bool, error) {
+	resources, err := collectResources(collectionAssertion.Key, resource, log)
+	if err != nil {
+		return false, err
+	}
+	for _, collectionResource := range resources {
+		for _, assertion := range collectionAssertion.Assertions {
+			b, err := booleanOperation(assertion, collectionResource, log)
+			if err != nil {
+				return false, err
+			}
+			if b != true {
+				// at least one element is false, so entire expression is false
+				return false, nil
+			}
+		}
+	}
+	// every element passes, so entire expression is true
+	return true, nil
+}
+
+func someExpression(collectionAssertion CollectionAssertion, resource Resource, log LoggingFunction) (bool, error) {
+	resources, err := collectResources(collectionAssertion.Key, resource, log)
+	if err != nil {
+		return false, err
+	}
+	for _, collectionResource := range resources {
+		for _, assertion := range collectionAssertion.Assertions {
+			b, err := booleanOperation(assertion, collectionResource, log)
+			if err != nil {
+				return false, err
+			}
+			// at least one element passes, so entire expression is true
+			if b == true {
+				return true, nil
+			}
+		}
+	}
+	// no element passes, so entire expression is false
+	return false, nil
+}
+
+func noneExpression(collectionAssertion CollectionAssertion, resource Resource, log LoggingFunction) (bool, error) {
+	resources, err := collectResources(collectionAssertion.Key, resource, log)
+	if err != nil {
+		return false, err
+	}
+	for _, collectionResource := range resources {
+		for _, assertion := range collectionAssertion.Assertions {
+			b, err := booleanOperation(assertion, collectionResource, log)
+			if err != nil {
+				return false, err
+			}
+			// at least one element passes, so entire expression is false
+			if b == true {
+				return false, nil
+			}
+		}
+	}
+	// no element passes, so entire expression is true
+	return true, nil
+}
+
 func booleanOperation(assertion Assertion, resource Resource, log LoggingFunction) (bool, error) {
 	if assertion.Or != nil && len(assertion.Or) > 0 {
 		return orOperation(assertion.Or, resource, log)
@@ -67,6 +150,15 @@ func booleanOperation(assertion Assertion, resource Resource, log LoggingFunctio
 	}
 	if assertion.Not != nil && len(assertion.Not) > 0 {
 		return notOperation(assertion.Not, resource, log)
+	}
+	if assertion.Every.Key != "" {
+		return everyExpression(assertion.Every, resource, log)
+	}
+	if assertion.Some.Key != "" {
+		return someExpression(assertion.Some, resource, log)
+	}
+	if assertion.None.Key != "" {
+		return noneExpression(assertion.None, resource, log)
 	}
 	return searchAndMatch(assertion, resource, log)
 }

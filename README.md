@@ -237,7 +237,6 @@ Rules:
 * Ruleset examples have Initial upper case for top level attributes, all lower case for rules
 * Use log package for error reporting
 * Deal with a few FIXME comments in code, mostly error handling
-* Consider adding these operators: all, any, none, one
 * Use the LintRules linter to implement a -validate option
 * Should there be some pre-defined RuleSets?
 * Would it be useful to have helper utilities to send output to CloudWatch/SNS/Kinesis?

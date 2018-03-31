@@ -30,6 +30,17 @@ rules:
       - key: rules
         op: not-empty
 
+  - id: EVERY_RULE_HAS_ID
+    message: Event rule in rule set must have an id
+    resource: LintRuleSet
+    severity: FAILURE
+    assertions:
+      - every:
+          key: rules
+          assertions:
+            - key: id
+              op: present
+
   - id: ID_PRESENT
     message: Rule must have an ID
     resource: LintRule

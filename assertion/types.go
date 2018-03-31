@@ -37,11 +37,20 @@ type (
 		Key       string
 		Op        string
 		Value     string
-		ValueType string `json:"value_type"`
+		ValueType string    `json:"value_type"`
+		ValueFrom ValueFrom `json:"value_from"`
 		Or        []Assertion
 		And       []Assertion
 		Not       []Assertion
-		ValueFrom ValueFrom `json:"value_from"`
+		Every     CollectionAssertion
+		Some      CollectionAssertion
+		None      CollectionAssertion
+	}
+
+	// CollectionAssertion assertion for every element of a collection
+	CollectionAssertion struct {
+		Key        string
+		Assertions []Assertion
 	}
 
 	// ValueFrom describes a external source for values

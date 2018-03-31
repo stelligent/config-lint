@@ -2,6 +2,8 @@ package assertion
 
 import (
 	"encoding/json"
+	"github.com/ghodss/yaml"
+	"io/ioutil"
 	"testing"
 )
 
@@ -428,5 +430,45 @@ func TestNoExceptions(t *testing.T) {
 	filteredResources := FilterResourceExceptions(rule, resources)
 	if len(filteredResources) != 4 {
 		t.Error("Expecting no exceptions to return all resources")
+	}
+}
+
+type (
+	FixtureTestCases struct {
+		Description string
+		TestCases   []FixtureTestCase `json:"test_cases"`
+	}
+
+	FixtureTestCase struct {
+		Name     string
+		Rule     Rule
+		Resource Resource
+		Result   string
+	}
+)
+
+func loadTestCasesFromFixture(filename string, t *testing.T) FixtureTestCases {
+	var testCases FixtureTestCases
+	content, err := ioutil.ReadFile(filename)
+	if err != nil {
+		t.Errorf("Unable to read fixture file: %s", filename)
+		return testCases
+	}
+	err = yaml.Unmarshal(content, &testCases)
+	if err != nil {
+		t.Errorf("Unable to parse fixture file: %s", filename)
+		return testCases
+	}
+	return testCases
+}
+
+func TestCollectionAssertion(t *testing.T) {
+	fixture := loadTestCasesFromFixture("./fixtures/collection-assertions.yaml", t)
+	for _, testCase := range fixture.TestCases {
+		status, err := CheckAssertion(testCase.Rule, testCase.Rule.Assertions[0], testCase.Resource, testLogging)
+		failTestIfError(err, testCase.Name, t)
+		if status != testCase.Result {
+			t.Errorf("Test case %s returned %s expecting %s", testCase.Name, status, testCase.Result)
+		}
 	}
 }

@@ -1,0 +1,149 @@
+---
+description: Test collection assertions
+test_cases:
+
+  - name: every_OK
+    rule:
+      id:       COLLECTION_1
+      message:  Invalid key
+      severity: FAILURE
+      resource: sample
+      assertions:
+        - every:
+            key: "keys(@)"
+            assertions:
+              - key: "@"
+                op: in
+                value: Foo,Bar
+    resource:
+      id: collection_id
+      type: example
+      properties:
+        Foo:
+          - A
+          - B
+          - C
+        Bar:
+          - D
+          - E
+    result: OK
+
+  - name: every_FAILURE
+    rule:
+      id:       COLLECTION_1
+      message:  Invalid key
+      severity: FAILURE
+      resource: sample
+      assertions:
+        - every:
+            key: "keys(@)"
+            assertions:
+              - key: "@"
+                op: in
+                value: Foo,Bar
+    resource:
+      id: collection_id
+      type: example
+      properties:
+        Foo:
+          - A
+          - B
+          - C
+        Bar:
+          - D
+          - E
+        Baz:
+          - F
+    result: FAILURE
+
+  - name: some_OK
+    rule:
+      id:       COLLECTION_3
+      message:  Invalid key
+      severity: FAILURE
+      resource: sample
+      assertions:
+        - some:
+            key: "keys(@)"
+            assertions:
+              - key: "@"
+                op: in
+                value: Foo,Bar
+    resource:
+      id: collection_id
+      type: example
+      properties:
+        Foo:
+          - A
+          - B
+          - C
+        Baz:
+          - D
+          - E
+    result: OK
+
+  - name: some_FAILURE
+    rule:
+      id:       COLLECTION_4
+      message:  Invalid key
+      severity: FAILURE
+      resource: sample
+      assertions:
+        - some:
+            key: "keys(@)"
+            assertions:
+              - key: "@"
+                op: in
+                value: Foo,Bar
+    resource:
+      id: collection_id
+      type: example
+      properties:
+        Baz:
+          - A
+    result: FAILURE
+
+  - name: none_OK
+    rule:
+      id:       COLLECTION_3
+      message:  Invalid key
+      severity: FAILURE
+      resource: sample
+      assertions:
+        - none:
+            key: "keys(@)"
+            assertions:
+              - key: "@"
+                op: in
+                value: Foo,Bar
+    resource:
+      id: collection_id
+      type: example
+      properties:
+        Baz:
+          - A
+          - B
+    result: OK
+
+  - name: none_FAILURE
+    rule:
+      id:       COLLECTION_4
+      message:  Invalid key
+      severity: FAILURE
+      resource: sample
+      assertions:
+        - none:
+            key: "keys(@)"
+            assertions:
+              - key: "@"
+                op: in
+                value: Foo,Bar
+    resource:
+      id: collection_id
+      type: example
+      properties:
+        Foo:
+          - A
+        Bar:
+          - B
+    result: FAILURE
