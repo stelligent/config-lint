@@ -80,29 +80,33 @@ func TestParseRules(t *testing.T) {
 	}
 }
 
-func TestFilterRulesByTag(t *testing.T) {
-	tags := []string{"s3"}
-	r := FilterRulesByTag(MustParseRules(content, t).Rules, tags)
-	if len(r) != 1 {
-		t.Error("Expected filterRulesByTag to return 1 rule")
+type FilterTestCase struct {
+	Tags          []string
+	Ids           []string
+	ExpectedRules []string
+}
+
+func TestFilterRules(t *testing.T) {
+
+	var emptyTags []string
+	var emptyIds []string
+
+	testCases := map[string]FilterTestCase{
+		"allRules": FilterTestCase{emptyTags, emptyIds, []string{"TEST1", "TEST2", "TEST3"}},
+		"tags":     FilterTestCase{[]string{"s3"}, emptyIds, []string{"TEST2"}},
+		"rules":    FilterTestCase{emptyTags, []string{"TEST1"}, []string{"TEST1"}},
+		"both":     FilterTestCase{[]string{"s3"}, []string{"TEST1"}, []string{"TEST1", "TEST2"}},
+		"overlap":  FilterTestCase{[]string{"s3"}, []string{"TEST2"}, []string{"TEST2"}},
 	}
-	if r[0].ID != "TEST2" {
-		t.Error("Expected filterRulesByTag to select correct rule")
+	for k, tc := range testCases {
+		r := FilterRulesByTagAndID(MustParseRules(content, t).Rules, tc.Tags, tc.Ids)
+		if len(r) != len(tc.ExpectedRules) {
+			t.Errorf("Expected %s to include %d rules not %d\n", k, len(tc.ExpectedRules), len(r))
+		}
 	}
 }
 
-func TestFilterRulesByID(t *testing.T) {
-	ids := []string{"TEST2"}
-	r := FilterRulesByID(MustParseRules(content, t).Rules, ids)
-	if len(r) != 1 {
-		t.Error("Expected filterRulesByID to return 1 rule")
-	}
-	if r[0].ID != "TEST2" {
-		t.Error("Expected filterRulesByID to select correct rule")
-	}
-}
-
-func TestFilterRulesByTagAndId(t *testing.T) {
+func TestFilterRulesByTagAndID(t *testing.T) {
 	tags := []string{"s3"}
 	ids := []string{"TEST3"}
 	r := FilterRulesByTagAndID(MustParseRules(content, t).Rules, tags, ids)

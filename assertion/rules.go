@@ -49,9 +49,30 @@ func FilterRulesByID(rules []Rule, ruleIDs []string) []Rule {
 	return filteredRules
 }
 
+func uniqueRules(list []Rule) []Rule {
+	rules := make([]Rule, 0)
+	keys := make(map[string]bool, 0)
+	for _, rule := range list {
+		if _, ok := keys[rule.ID]; !ok {
+			keys[rule.ID] = true
+			rules = append(rules, rule)
+		}
+	}
+	return rules
+}
+
 // FilterRulesByTagAndID filters by both tag and id
 func FilterRulesByTagAndID(rules []Rule, tags []string, ruleIds []string) []Rule {
-	return append(FilterRulesByID(rules, ruleIds), FilterRulesByTag(rules, tags)...)
+	if len(tags) == 0 && len(ruleIds) == 0 {
+		return rules
+	}
+	if len(tags) == 0 {
+		return FilterRulesByID(rules, ruleIds)
+	}
+	if len(ruleIds) == 0 {
+		return FilterRulesByTag(rules, tags)
+	}
+	return uniqueRules(append(FilterRulesByID(rules, ruleIds), FilterRulesByTag(rules, tags)...))
 }
 
 // ResolveRules loads any dynamic values for a collection or rules
