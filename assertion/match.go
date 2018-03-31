@@ -79,23 +79,9 @@ func isMatch(data interface{}, op string, value string, valueType string) (bool,
 			return true, nil
 		}
 	case "contains":
-		if c, isSlice := convertToSlice(data); isSlice {
-			for _, element := range c {
-				if stringElement, isString := element.(string); isString {
-					if stringElement == value {
-						return true, nil
-					}
-				}
-			}
-			return false, nil
-		}
-		if s, isString := convertToString(data); isString {
-			if strings.Contains(s, value) {
-				return true, nil
-			}
-			return false, nil
-		}
-		return strings.Contains(searchResult, value), nil
+		return contains(data, value)
+	case "not-contains":
+		return notContains(data, value)
 	case "regex":
 		if regexp.MustCompile(value).MatchString(searchResult) { // FIXME don't use MustCompile
 			return true, nil
