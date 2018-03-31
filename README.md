@@ -234,13 +234,11 @@ Rules:
 * Region is hard-coded to us-east-1 for GetValueFromS3
 * Use type switch as more idiomatic way to handle multiple types in match.go
 * Start using go testing coverage tools
-* Ruleset examples have Initial upper case for top level attributes, all lower case for rules
 * Use log package for error reporting
 * Deal with a few FIXME comments in code, mostly error handling
 * Use the LintRules linter to implement a -validate option
 * Should there be some pre-defined RuleSets?
 * Would it be useful to have helper utilities to send output to CloudWatch/SNS/Kinesis?
-* Consider adding -profile command line option, add this to RuleSet
-    profiles: [ { name: "profile1", ids: [ "A", "B", "C" ], tags: [ "A", "B", "C" ] ]
 * Add variable interpolation for Terraform files
 * Update value_from to handle JSON return values
+* Need to include the search expression result that triggered a violation, include it in the Violation
