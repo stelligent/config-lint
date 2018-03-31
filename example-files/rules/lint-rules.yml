@@ -10,7 +10,7 @@ rules:
     resource: LintRuleSet
     severity: FAILURE
     assertions:
-      - key: Type
+      - key: type
         op: in
         value: Terraform,Kubernetes,SecurityGroup,AWSConfig,LintRules
 
@@ -19,7 +19,7 @@ rules:
     resource: LintRuleSet
     severity: WARNING
     assertions:
-      - key: Version
+      - key: version
         op: present 
 
   - id: HAS_RULES
@@ -27,7 +27,7 @@ rules:
     resource: LintRuleSet
     severity: WARNING
     assertions:
-      - key: Rules
+      - key: rules
         op: not-empty
 
   - id: ID_PRESENT
