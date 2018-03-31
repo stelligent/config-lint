@@ -56,3 +56,14 @@ rules:
         value: 1000
         value_type: integer
 
+  - id: CONTRAPTION_LOCATIONS
+    message: Contraption location must have city
+    resource: contraption
+    severity: FAILURE
+    assertions:
+      - every:
+          key: locations
+          assertions:
+            - key: city
+              op: present
+
