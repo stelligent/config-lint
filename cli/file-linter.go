@@ -79,7 +79,7 @@ func (l FileLinter) SearchFiles(filenames []string, ruleSet assertion.RuleSet, s
 					if err != nil {
 						fmt.Println(err)
 					} else {
-						fmt.Printf("%s: %s\n", resource.ID, s)
+						fmt.Printf("%s (%s): %s\n", resource.ID, resource.Type, s)
 					}
 				}
 			}
