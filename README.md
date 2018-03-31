@@ -242,3 +242,4 @@ Rules:
 * Add variable interpolation for Terraform files
 * Update value_from to handle JSON return values
 * Need to include the search expression result that triggered a violation, include it in the Violation
+* Create a Provider interface for AWS calls, create a mock for testing SecurityGroupLinter

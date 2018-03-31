@@ -57,8 +57,8 @@ func (l SecurityGroupLinter) Validate(filenames []string, ruleSet assertion.Rule
 	if err != nil {
 		return noFilenames, []assertion.Violation{}, err
 	}
-	f := FileLinter{Log: l.Log}
-	violations, err := f.ValidateResources(resources, rules)
+	r := ResourceLinter{Log: l.Log}
+	violations, err := r.ValidateResources(resources, rules)
 	return noFilenames, violations, err
 }
 
