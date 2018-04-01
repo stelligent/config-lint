@@ -3,7 +3,7 @@ description: Rules for IAM Users
 type: IAMUser
 rules:
   - id: USER_POLICIES
-    message: User should not have policies
+    message: User should be part of a group instead of having inline policies
     resource: "AWS::IAM::User"
     assertions:
       - key: UserName
