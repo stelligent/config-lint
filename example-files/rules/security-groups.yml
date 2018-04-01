@@ -2,7 +2,8 @@ version: 1
 description: Rules for Security Groups
 type: SecurityGroup
 rules:
-  - id: SG1
+
+  - id: SG_WORLD_ACCESS
     message: Should not allow access to SSH from anywhere
     resource: "AWS::EC2::SecurityGroup"
     assertions:
@@ -10,4 +11,28 @@ rules:
           - key: IpPermissions[?(FromPort==`22`)].IpRanges[].CidrIp | [0]
             op: eq
             value: "0.0.0.0/0"
+    severity: NON_COMPLIANT
+
+  - id: SG_WORLD_ACCESS_ALTERNATE
+    message: Should not allow access to SSH from anywhere
+    resource: "AWS::EC2::SecurityGroup"
+    assertions:
+      - none:
+          key: IpPermissions[]
+          assertions:
+            - key: FromPort
+              op: eq
+              value: 22
+              value_type: integer
+            - key: IpRanges[].CidrIp
+              op: contains
+              value: "0.0.0.0/0"
+    severity: NON_COMPLIANT
+
+  - id: SG_VPC
+    message: Security group should be for a VPC
+    resource: AWS::EC2::SecurityGropu
+    assertions:
+      - key: VpcID
+        op: present
     severity: NON_COMPLIANT

@@ -2,7 +2,8 @@ version: 1
 description: Rules for AWS Config
 type: AWSConfig
 rules:
-  - id: DYNAMODB_THROUGHPUf
+
+  - id: DYNAMODB_THROUGHPUT
     message: Table status must have provisionedThroughput
     resource: AWS::DynamoDB::Table
     assertions:
@@ -11,7 +12,8 @@ rules:
       - key: provisionedThroughput.readCapacityUnits
         op: present
     severity: NON_COMPLIANT
-  - id: SG1
+
+  - id: SSH_ACCESS
     message: Security group should not allow ingress from 0.0.0.0/0
     resource: AWS::EC2::SecurityGroup
     except:
