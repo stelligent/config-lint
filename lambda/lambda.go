@@ -123,13 +123,13 @@ func handler(configEvent events.ConfigEvent) (string, error) {
 				return "Error", err
 			}
 			if len(violations) > 0 {
-				fmt.Println("Resource in NON_COMPLIANT")
+				fmt.Println("Resource is NON_COMPLIANT")
 				complianceType = "NON_COMPLIANT"
 				for _, violation := range violations {
 					fmt.Println(violation)
 				}
 			} else {
-				fmt.Println("Resource in COMPLIANT")
+				fmt.Println("Resource is COMPLIANT")
 				complianceType = "COMPLIANT"
 			}
 		} else {
