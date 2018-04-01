@@ -4,29 +4,33 @@ import (
 	"encoding/json"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/ec2"
+	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/stelligent/config-lint/assertion"
 )
 
 type (
-	// SecurityGroupLoader calls the AWS SDK DescribeSecurityGroups
-	SecurityGroupLoader struct{}
+	// IAMUserLoader calls the AWS SDK to get user information
+	IAMUserLoader struct{}
+	// IAMRoleLoader calls the AWS SDK to get user information
+	IAMRoleLoader struct{}
+	// IAMGroupLoader calls the AWS SDK to get user information
+	IAMGroupLoader struct{}
 )
 
-// Load gets security group information from AWS and generates Resources suitable for linting
-func (sg SecurityGroupLoader) Load() ([]assertion.Resource, error) {
+// Load gets user information from AWS and generates Resources suitable for linting
+func (u IAMUserLoader) Load() ([]assertion.Resource, error) {
 	resources := make([]assertion.Resource, 0)
 	region := &aws.Config{Region: aws.String("us-east-1")}
 	awsSession := session.New()
-	ec2Client := ec2.New(awsSession, region)
-	response, err := ec2Client.DescribeSecurityGroups(&ec2.DescribeSecurityGroupsInput{})
+	iamClient := iam.New(awsSession, region)
+	response, err := iamClient.ListUsers(&iam.ListUsersInput{})
 	if err != nil {
 		return resources, err
 	}
-	for _, securityGroup := range response.SecurityGroups {
+	for _, user := range response.Users {
 
 		// convert to JSON string
-		jsonData, err := json.Marshal(securityGroup)
+		jsonData, err := json.Marshal(user)
 		if err != nil {
 			return resources, err
 		}
@@ -40,8 +44,8 @@ func (sg SecurityGroupLoader) Load() ([]assertion.Resource, error) {
 		}
 
 		r := assertion.Resource{
-			ID:         *securityGroup.GroupId,
-			Type:       "AWS::EC2::SecurityGroup",
+			ID:         *user.UserId,
+			Type:       "AWS::IAM::User",
 			Properties: data,
 		}
 		resources = append(resources, r)

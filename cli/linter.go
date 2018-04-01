@@ -5,6 +5,8 @@ import (
 	"github.com/stelligent/config-lint/assertion"
 )
 
+// FIXME can the filenames be taken out of the Linter interface, and provided to the constructor or Linters that need them?
+
 // Linter provides the interface for all supported linters
 type Linter interface {
 	Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) ([]string, []assertion.Violation, error)
@@ -23,7 +25,9 @@ func makeLinter(linterType string, log assertion.LoggingFunction) Linter {
 	case "Terraform":
 		return TerraformLinter{Log: log}
 	case "SecurityGroup":
-		return SecurityGroupLinter{Log: log}
+		return AWSResourceLinter{Loader: SecurityGroupLoader{}, Log: log}
+	case "IAMUser":
+		return AWSResourceLinter{Loader: IAMUserLoader{}, Log: log}
 	case "LintRules":
 		return RulesLinter{Log: log}
 	case "YAML":

@@ -1,0 +1,12 @@
+version: 1
+description: Rules for IAM Users
+type: IAMUser
+rules:
+  - id: USER_USERNAME
+    message: User has a description
+    resource: "AWS::IAM::User"
+    assertions:
+      - key: UserName
+        op: present
+    severity: NON_COMPLIANT
+
