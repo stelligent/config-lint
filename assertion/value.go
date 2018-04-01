@@ -53,7 +53,7 @@ func (v StandardValueSource) GetValueFromS3(bucket string, key string) (string, 
 	}
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(response.Body)
-	return buf.String(), nil
+	return strings.TrimSpace(buf.String()), nil
 }
 
 // GetValueFromHTTP looks up external value for an Assertion when the HTTP protocol is specified
@@ -70,5 +70,5 @@ func (v StandardValueSource) GetValueFromHTTP(url string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return string(body), nil
+	return strings.TrimSpace(string(body)), nil
 }
