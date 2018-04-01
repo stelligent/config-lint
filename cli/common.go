@@ -31,3 +31,11 @@ func getResourceIDFromFilename(filename string) string {
 	_, resourceID := filepath.Split(filename)
 	return resourceID
 }
+
+func combineValidationReports(r1, r2 assertion.ValidationReport) assertion.ValidationReport {
+	return assertion.ValidationReport{
+		FilesScanned:     append(r1.FilesScanned, r2.FilesScanned...),
+		ResourcesScanned: append(r1.ResourcesScanned, r2.ResourcesScanned...),
+		Violations:       append(r1.Violations, r2.Violations...),
+	}
+}

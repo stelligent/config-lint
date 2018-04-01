@@ -64,8 +64,10 @@ func (i *arrayFlags) Set(value string) error {
 }
 
 func generateExitCode(report assertion.ValidationReport) int {
-	if len(report.Violations["FAILURE"]) > 0 {
-		return 1
+	for _, v := range report.Violations {
+		if v.Status == "FAILURE" {
+			return 1
+		}
 	}
 	return 0
 }
@@ -81,9 +83,9 @@ func main() {
 	flag.Parse()
 
 	report := assertion.ValidationReport{
-		Violations:       make(map[string]([]assertion.Violation), 0),
-		FilesScanned:     make([]string, 0),
-		ResourcesScanned: make([]assertion.ScannedResource, 0),
+		Violations:       []assertion.Violation{},
+		FilesScanned:     []string{},
+		ResourcesScanned: []assertion.ScannedResource{},
 	}
 
 	for _, rulesFilename := range rulesFilenames {
@@ -102,15 +104,11 @@ func main() {
 			if *searchExpression != "" {
 				linter.Search(flag.Args(), ruleSet, *searchExpression)
 			} else {
-				filesScanned, resourcesScanned, violations, err := linter.Validate(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids))
+				r, err := linter.Validate(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids))
 				if err != nil {
 					fmt.Println("Validate failed:", err) // FIXME
 				}
-				for _, violation := range violations {
-					report.Violations[violation.Status] = append(report.Violations[violation.Status], violation)
-				}
-				report.FilesScanned = append(report.FilesScanned, filesScanned...)
-				report.ResourcesScanned = append(report.ResourcesScanned, resourcesScanned...)
+				report = combineValidationReports(report, r)
 			}
 		}
 	}

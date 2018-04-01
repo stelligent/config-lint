@@ -11,15 +11,17 @@ type ResourceLinter struct {
 }
 
 // ValidateResources evaluates a list of Rule objects to a list of Resource objects
-func (r ResourceLinter) ValidateResources(resources []assertion.Resource, rules []assertion.Rule) ([]assertion.ScannedResource, []assertion.Violation, error) {
+func (r ResourceLinter) ValidateResources(resources []assertion.Resource, rules []assertion.Rule) (assertion.ValidationReport, error) {
 
-	scannedResources := make([]assertion.ScannedResource, 0)
+	report := assertion.ValidationReport{
+		ResourcesScanned: []assertion.ScannedResource{},
+		Violations:       []assertion.Violation{},
+	}
 
 	valueSource := assertion.StandardValueSource{Log: r.Log}
 	resolvedRules := assertion.ResolveRules(rules, valueSource, r.Log)
 	externalRules := assertion.StandardExternalRuleInvoker{Log: r.Log}
 
-	allViolations := make([]assertion.Violation, 0)
 	for _, rule := range resolvedRules {
 		r.Log(fmt.Sprintf("Rule %s: %s", rule.ID, rule.Message))
 		for _, resource := range assertion.FilterResourcesByType(resources, rule.Resource) {
@@ -28,16 +30,16 @@ func (r ResourceLinter) ValidateResources(resources []assertion.Resource, rules 
 			} else {
 				status, violations, err := assertion.CheckRule(rule, resource, externalRules, r.Log)
 				if err != nil {
-					return scannedResources, allViolations, err
+					return report, nil
 				}
-				scannedResources = append(scannedResources, assertion.ScannedResource{
+				report.ResourcesScanned = append(report.ResourcesScanned, assertion.ScannedResource{
 					ResourceID:   resource.ID,
 					ResourceType: resource.Type,
 					Status:       status,
 				})
-				allViolations = append(allViolations, violations...)
+				report.Violations = append(report.Violations, violations...)
 			}
 		}
 	}
-	return scannedResources, allViolations, nil
+	return report, nil
 }

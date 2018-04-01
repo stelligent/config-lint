@@ -50,7 +50,7 @@ func (l KubernetesResourceLoader) Load(filename string) ([]assertion.Resource, e
 }
 
 // Validate runs validate on a collection of filenames using a RuleSet
-func (l KubernetesLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) ([]string, []assertion.ScannedResource, []assertion.Violation, error) {
+func (l KubernetesLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) (assertion.ValidationReport, error) {
 	loader := KubernetesResourceLoader{Log: l.Log}
 	f := FileLinter{Log: l.Log}
 	return f.ValidateFiles(filenames, ruleSet, tags, ruleIDs, loader)

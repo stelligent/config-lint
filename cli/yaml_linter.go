@@ -54,7 +54,7 @@ func (l YAMLResourceLoader) Load(filename string) ([]assertion.Resource, error) 
 }
 
 // Validate runs validate on a collection of filenames using a RuleSet
-func (l YAMLLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) ([]string, []assertion.ScannedResource, []assertion.Violation, error) {
+func (l YAMLLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) (assertion.ValidationReport, error) {
 	loader := YAMLResourceLoader{Log: l.Log, Resources: ruleSet.Resources}
 	f := FileLinter{Log: l.Log}
 	return f.ValidateFiles(filenames, ruleSet, tags, ruleIDs, loader)

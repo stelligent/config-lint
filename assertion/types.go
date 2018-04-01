@@ -73,8 +73,8 @@ type (
 
 	// ValidationReport summarizes validation for resources using rules
 	ValidationReport struct {
-		Violations       map[string]([]Violation)
 		FilesScanned     []string
+		Violations       []Violation
 		ResourcesScanned []ScannedResource
 	}
 
