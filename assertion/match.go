@@ -6,14 +6,6 @@ import (
 	"strings"
 )
 
-type (
-	// MatchResult has a true/false result, but also includes a message for better reporting
-	MatchResult struct {
-		Match   bool
-		Message string
-	}
-)
-
 func matches() (MatchResult, error) {
 	return MatchResult{Match: true, Message: ""}, nil
 }
@@ -32,7 +24,7 @@ func matchError(err error) (MatchResult, error) {
 	}, err
 }
 
-func isMatch(data interface{}, op string, value string, valueType string) (MatchResult, error) {
+func isMatch(data interface{}, assertion Assertion) (MatchResult, error) {
 	// FIXME eliminate searchResult this when all operations converted to use data
 	// individual ops can call JSONStringify as needed
 	searchResult, err := JSONStringify(data)
@@ -40,48 +32,53 @@ func isMatch(data interface{}, op string, value string, valueType string) (Match
 		return matchError(err)
 	}
 	searchResult = unquoted(searchResult)
+	key := assertion.Key
+	op := assertion.Op
+	value := assertion.Value
+	valueType := assertion.ValueType
+
 	switch op {
 	case "eq":
 		if compare(data, value, valueType) == 0 {
 			return matches()
 		}
-		return doesNotMatch("should equal to %v", value)
+		return doesNotMatch("%v should equal to %v", key, value)
 	case "ne":
 		if compare(data, value, valueType) != 0 {
 			return matches()
 		}
-		return doesNotMatch("should not equal to %v", value)
+		return doesNotMatch("%v should not be equal to %v", key, value)
 	case "lt":
 		if compare(data, value, valueType) < 0 {
 			return matches()
 		}
-		return doesNotMatch("should be less than %v", value)
+		return doesNotMatch("%v should be less than %v", key, value)
 	case "le":
 		if compare(data, value, valueType) <= 0 {
 			return matches()
 		}
-		return doesNotMatch("should be less than or equal to %v", value)
+		return doesNotMatch("%v should be less than or equal to %v", key, value)
 	case "gt":
 		if compare(data, value, valueType) > 0 {
 			return matches()
 		}
-		return doesNotMatch("should be greater than %v", value)
+		return doesNotMatch("%v should be greater than %v", key, value)
 	case "ge":
 		if compare(data, value, valueType) >= 0 {
 			return matches()
 		}
-		return doesNotMatch("should be greater than or equal to %v", value)
+		return doesNotMatch("%v should be greater than or equal to %v", key, value)
 	case "in":
 		for _, v := range strings.Split(value, ",") {
 			if v == searchResult {
 				return matches()
 			}
 		}
-		return doesNotMatch("should be in %v", value)
+		return doesNotMatch("%v should be in %v", key, value)
 	case "not-in":
 		for _, v := range strings.Split(value, ",") {
 			if v == searchResult {
-				return doesNotMatch("should not be in %v", value)
+				return doesNotMatch("%v should not be in %v", key, value)
 			}
 		}
 		return matches()
@@ -89,41 +86,41 @@ func isMatch(data interface{}, op string, value string, valueType string) (Match
 		if isAbsent(searchResult) {
 			return matches()
 		}
-		return doesNotMatch("should be absent")
+		return doesNotMatch("%v should be absent", key)
 	case "present":
 		if isPresent(searchResult) {
 			return matches()
 		}
-		return doesNotMatch("should be present")
+		return doesNotMatch("%v should be present", key)
 	case "null":
 		if data == nil {
 			return matches()
 		}
-		return doesNotMatch("should be null")
+		return doesNotMatch("%v should be null", key)
 	case "not-null":
 		if data != nil {
 			return matches()
 		}
-		return doesNotMatch("should not be null")
+		return doesNotMatch("%v should not be null", key)
 	case "empty":
 		if isEmpty(data) {
 			return matches()
 		}
-		return doesNotMatch("should be empty")
+		return doesNotMatch("%v should be empty", key)
 	case "not-empty":
 		if !isEmpty(data) {
 			return matches()
 		}
-		return doesNotMatch("should not be empty")
+		return doesNotMatch("%v should not be empty", key)
 	case "intersect":
 		if jsonListsIntersect(searchResult, value) {
 			return matches()
 		}
-		return doesNotMatch("should intersect", value)
+		return doesNotMatch("%v should intersect with %v", key, value)
 	case "contains":
-		return contains(data, value)
+		return contains(data, key, value)
 	case "not-contains":
-		return notContains(data, value)
+		return notContains(data, key, value)
 	case "regex":
 		re, err := regexp.Compile(value)
 		if err != nil {
@@ -132,7 +129,7 @@ func isMatch(data interface{}, op string, value string, valueType string) (Match
 		if re.MatchString(searchResult) {
 			return matches()
 		}
-		return doesNotMatch("should match %v", value)
+		return doesNotMatch("%v should match %v", key, value)
 	case "has-properties":
 		return hasProperties(data, value)
 	}

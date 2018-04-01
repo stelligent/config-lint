@@ -317,10 +317,10 @@ func TestCheckAssertion(t *testing.T) {
 	}
 
 	for k, tc := range testCases {
-		status, err := CheckAssertion(tc.Rule, tc.Rule.Assertions[0], tc.Resource, TestLogging)
+		assertionResult, err := CheckAssertion(tc.Rule, tc.Rule.Assertions[0], tc.Resource, TestLogging)
 		FailTestIfError(err, "TestSimple", t)
-		if status != tc.ExpectedStatus {
-			t.Errorf("%s Failed Expected '%s' to be '%s'", k, status, tc.ExpectedStatus)
+		if assertionResult.Status != tc.ExpectedStatus {
+			t.Errorf("%s Failed Expected '%s' to be '%s'", k, assertionResult.Status, tc.ExpectedStatus)
 		}
 	}
 }
@@ -381,9 +381,9 @@ func TestNestedBooleans(t *testing.T) {
 	if err != nil {
 		t.Error("Error parsing resource JSON")
 	}
-	status, err := CheckAssertion(rule, rule.Assertions[0], resource, TestLogging)
+	assertionResult, err := CheckAssertion(rule, rule.Assertions[0], resource, TestLogging)
 	FailTestIfError(err, "TestNestedBoolean", t)
-	if status != "NOT_COMPLIANT" {
+	if assertionResult.Status != "NOT_COMPLIANT" {
 		t.Error("Expecting nested boolean to return NOT_COMPLIANT")
 	}
 }

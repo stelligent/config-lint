@@ -104,15 +104,21 @@ func TestIsMatch(t *testing.T) {
 	for k, tc := range testCases {
 		var m MatchResult
 		var err error
+		assertion := Assertion{
+			Key:       "key",
+			Op:        tc.Op,
+			Value:     tc.Value,
+			ValueType: tc.ValueType,
+		}
 		if s, isString := tc.SearchResult.(string); isString {
 			searchResult, err := unmarshal(s)
 			if err != nil {
 				fmt.Println(err)
 				t.Errorf("Unable to parse %s\n", tc.SearchResult)
 			}
-			m, err = isMatch(searchResult, tc.Op, tc.Value, tc.ValueType)
+			m, err = isMatch(searchResult, assertion)
 		} else {
-			m, err = isMatch(tc.SearchResult, tc.Op, tc.Value, tc.ValueType)
+			m, err = isMatch(tc.SearchResult, assertion)
 		}
 		if err != nil {
 			t.Errorf("%s Failed with error: %s", k, err.Error())

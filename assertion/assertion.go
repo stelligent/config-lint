@@ -9,7 +9,7 @@ func searchAndMatch(assertion Assertion, resource Resource, log LoggingFunction)
 	if err != nil {
 		return matchError(err)
 	}
-	match, err := isMatch(v, assertion.Op, assertion.Value, assertion.ValueType)
+	match, err := isMatch(v, assertion)
 	log(fmt.Sprintf("Key: %s Output: %v Looking for %v %v", assertion.Key, v, assertion.Op, assertion.Value))
 	log(fmt.Sprintf("ResourceID: %s Type: %s %v",
 		resource.ID,
@@ -52,7 +52,7 @@ func notExpression(assertions []Assertion, resource Resource, log LoggingFunctio
 			return matchError(err)
 		}
 		if match.Match {
-			return doesNotMatch("Not expression failsL %s", match.Message)
+			return doesNotMatch("Not expression fails") // TODO needs more information
 		}
 	}
 	return matches()
@@ -182,14 +182,20 @@ func FilterResourceExceptions(rule Rule, resources []Resource) []Resource {
 }
 
 // CheckAssertion validates a single Resource using a single Assertion
-func CheckAssertion(rule Rule, assertion Assertion, resource Resource, log LoggingFunction) (string, error) {
-	status := "OK"
+func CheckAssertion(rule Rule, assertion Assertion, resource Resource, log LoggingFunction) (Result, error) {
+	result := Result{
+		Status:  "OK",
+		Message: "",
+	}
 	match, err := booleanExpression(assertion, resource, log)
 	if err != nil {
-		return "FAILURE", err
+		result.Status = "FAILURE"
+		result.Message = err.Error()
+		return result, err
 	}
 	if !match.Match {
-		status = rule.Severity
+		result.Status = rule.Severity
+		result.Message = match.Message
 	}
-	return status, nil
+	return result, nil
 }

@@ -25,12 +25,13 @@ type StandardExternalRuleInvoker struct {
 
 func makeViolation(rule Rule, resource Resource, message string) Violation {
 	return Violation{
-		RuleID:       rule.ID,
-		Status:       rule.Severity,
-		ResourceID:   resource.ID,
-		ResourceType: resource.Type,
-		Filename:     resource.Filename,
-		Message:      message,
+		RuleID:           rule.ID,
+		Status:           rule.Severity,
+		ResourceID:       resource.ID,
+		ResourceType:     resource.Type,
+		Filename:         resource.Filename,
+		RuleMessage:      rule.Message,
+		AssertionMessage: message,
 	}
 }
 

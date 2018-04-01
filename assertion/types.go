@@ -79,12 +79,13 @@ type (
 
 	// Violation has details for a failed assertion
 	Violation struct {
-		RuleID       string
-		ResourceID   string
-		ResourceType string
-		Status       string
-		Message      string
-		Filename     string
+		RuleID           string
+		ResourceID       string
+		ResourceType     string
+		Status           string
+		RuleMessage      string
+		AssertionMessage string
+		Filename         string
 	}
 
 	// ValueSource interface to fetch dynamic values
@@ -95,5 +96,17 @@ type (
 	// ExternalRuleInvoker defines an interface for invoking an external API
 	ExternalRuleInvoker interface {
 		Invoke(Rule, Resource) (string, []Violation, error)
+	}
+
+	// MatchResult has a true/false result, but also includes a message for better reporting
+	MatchResult struct {
+		Match   bool
+		Message string
+	}
+
+	// Result returns a status, along with a message
+	Result struct {
+		Status  string
+		Message string
 	}
 )

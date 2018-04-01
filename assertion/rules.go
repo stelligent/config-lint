@@ -111,19 +111,20 @@ func CheckRule(rule Rule, resource Resource, e ExternalRuleInvoker, log LoggingF
 	}
 	for _, ruleAssertion := range rule.Assertions {
 		log(fmt.Sprintf("Checking resource %s", resource.ID))
-		status, err := CheckAssertion(rule, ruleAssertion, resource, log)
+		assertionResult, err := CheckAssertion(rule, ruleAssertion, resource, log)
 		if err != nil {
 			return "FAILURE", violations, err
 		}
-		if status != "OK" {
-			returnStatus = status
+		if assertionResult.Status != "OK" {
+			returnStatus = assertionResult.Status
 			v := Violation{
-				RuleID:       rule.ID,
-				ResourceID:   resource.ID,
-				ResourceType: resource.Type,
-				Status:       status,
-				Message:      rule.Message,
-				Filename:     resource.Filename,
+				RuleID:           rule.ID,
+				ResourceID:       resource.ID,
+				ResourceType:     resource.Type,
+				Status:           assertionResult.Status,
+				RuleMessage:      rule.Message,
+				AssertionMessage: assertionResult.Message,
+				Filename:         resource.Filename,
 			}
 			violations = append(violations, v)
 		}

@@ -55,10 +55,10 @@ func LoadTestCasesFromFixture(filename string, t *testing.T) FixtureTestCases {
 func RunTestCasesFromFixture(filename string, t *testing.T) {
 	fixture := LoadTestCasesFromFixture(filename, t)
 	for _, testCase := range fixture.TestCases {
-		status, err := CheckAssertion(testCase.Rule, testCase.Rule.Assertions[0], testCase.Resource, TestLogging)
+		assertionResult, err := CheckAssertion(testCase.Rule, testCase.Rule.Assertions[0], testCase.Resource, TestLogging)
 		FailTestIfError(err, testCase.Name, t)
-		if status != testCase.Result {
-			t.Errorf("Test case %s returned %s expecting %s", testCase.Name, status, testCase.Result)
+		if assertionResult.Status != testCase.Result {
+			t.Errorf("Test case %s returned %s expecting %s", testCase.Name, assertionResult.Status, testCase.Result)
 		}
 	}
 }
