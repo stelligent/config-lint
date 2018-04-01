@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/iam"
 	"github.com/stelligent/config-lint/assertion"
+	"net/url"
 )
 
 type (
@@ -23,6 +24,7 @@ func (u IAMUserLoader) Load() ([]assertion.Resource, error) {
 	region := &aws.Config{Region: aws.String("us-east-1")}
 	awsSession := session.New()
 	iamClient := iam.New(awsSession, region)
+
 	response, err := iamClient.ListUsers(&iam.ListUsersInput{})
 	if err != nil {
 		return resources, err
@@ -43,12 +45,42 @@ func (u IAMUserLoader) Load() ([]assertion.Resource, error) {
 			return resources, err
 		}
 
+		userPolicyResponse, err := iamClient.ListUserPolicies(&iam.ListUserPoliciesInput{
+			UserName: aws.String(*user.UserName),
+		})
+		if err != nil {
+			return resources, err
+		}
+		policies := make([]map[string]interface{}, 0)
+		for _, policyName := range userPolicyResponse.PolicyNames {
+
+			policyResponse, err := iamClient.GetUserPolicy(&iam.GetUserPolicyInput{
+				UserName:   aws.String(*user.UserName),
+				PolicyName: aws.String(*policyName),
+			})
+			if err != nil {
+				return resources, err
+			}
+			decoded, err := url.QueryUnescape(*policyResponse.PolicyDocument)
+			if err != nil {
+				return resources, err
+			}
+			policies = append(policies, map[string]interface{}{
+				"PolicyName":     *policyName,
+				"PolicyDocument": decoded,
+			})
+		}
+		m := data.(map[string]interface{})
+		m["Policies"] = policies
+
 		r := assertion.Resource{
-			ID:         *user.UserId,
+			ID:         *user.UserName,
 			Type:       "AWS::IAM::User",
 			Properties: data,
 		}
 		resources = append(resources, r)
+
 	}
+
 	return resources, nil
 }
