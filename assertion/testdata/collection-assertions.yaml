@@ -56,6 +56,30 @@ test_cases:
           - F
     result: FAILURE
 
+  - name: every_multiple_assertions_FAILURE
+    rule:
+      id:       COLLECTION_1
+      message:  Invalid key
+      severity: FAILURE
+      resource: sample
+      assertions:
+        - every:
+            key: locations
+            assertions:
+              - key: city
+                op: present
+              - key: state
+                op: present
+    resource:
+      id: collection_id
+      type: example
+      properties:
+        locations:
+          - city: Seattle
+            state: WA
+          - city: San Francisco
+    result: FAILURE
+
   - name: some_OK
     rule:
       id:       COLLECTION_3
@@ -125,6 +149,33 @@ test_cases:
           - B
     result: OK
 
+  - name: none_with_multiple_assertions_OK
+    rule:
+      id: COLLECTION_3
+      message: Invalid key
+      severity: FAILURE
+      resource: sample
+      assertions:
+        - none:
+            key: "ipPermissions[]"
+            assertions:
+              - key: "fromPort"
+                op: eq
+                value: 22
+                value_type: integer
+              - key: "ipRanges[]"
+                op: contains
+                value: 0.0.0.0/0
+    resource:
+      id: collection_id
+      type: sample
+      properties:
+        ipPermissions:
+          - fromPort: 80
+            ipRanges:
+              - 0.0.0.0/0
+    result: OK
+
   - name: none_FAILURE
     rule:
       id:       COLLECTION_4
@@ -147,3 +198,31 @@ test_cases:
         Bar:
           - B
     result: FAILURE
+
+  - name: none_with_multiple_assertions_FAILURE
+    rule:
+      id: COLLECTION_3
+      message: Invalid key
+      severity: FAILURE
+      resource: sample
+      assertions:
+        - none:
+            key: "ipPermissions[]"
+            assertions:
+              - key: "fromPort"
+                op: eq
+                value: 22
+                value_type: integer
+              - key: "ipRanges[]"
+                op: contains
+                value: 0.0.0.0/0
+    resource:
+      id: collection_id
+      type: sample
+      properties:
+        ipPermissions:
+          - fromPort: 22
+            ipRanges:
+              - 0.0.0.0/0
+    result: FAILURE
+

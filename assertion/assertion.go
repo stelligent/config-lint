@@ -10,7 +10,7 @@ func searchAndMatch(assertion Assertion, resource Resource, log LoggingFunction)
 		return false, err
 	}
 	match, err := isMatch(v, assertion.Op, assertion.Value, assertion.ValueType)
-	log(fmt.Sprintf("Key: %s Output: %s Looking for %s %s", assertion.Key, v, assertion.Op, assertion.Value))
+	log(fmt.Sprintf("Key: %s Output: %v Looking for %v %v", assertion.Key, v, assertion.Op, assertion.Value))
 	log(fmt.Sprintf("ResourceID: %s Type: %s %t",
 		resource.ID,
 		resource.Type,
@@ -84,15 +84,13 @@ func everyExpression(collectionAssertion CollectionAssertion, resource Resource,
 		return false, err
 	}
 	for _, collectionResource := range resources {
-		for _, assertion := range collectionAssertion.Assertions {
-			b, err := booleanOperation(assertion, collectionResource, log)
-			if err != nil {
-				return false, err
-			}
-			if b != true {
-				// at least one element is false, so entire expression is false
-				return false, nil
-			}
+		b, err := andOperation(collectionAssertion.Assertions, collectionResource, log)
+		if err != nil {
+			return false, err
+		}
+		if b != true {
+			// at least one element is false, so entire expression is false
+			return false, nil
 		}
 	}
 	// every element passes, so entire expression is true
@@ -105,15 +103,13 @@ func someExpression(collectionAssertion CollectionAssertion, resource Resource, 
 		return false, err
 	}
 	for _, collectionResource := range resources {
-		for _, assertion := range collectionAssertion.Assertions {
-			b, err := booleanOperation(assertion, collectionResource, log)
-			if err != nil {
-				return false, err
-			}
-			// at least one element passes, so entire expression is true
-			if b == true {
-				return true, nil
-			}
+		b, err := andOperation(collectionAssertion.Assertions, collectionResource, log)
+		if err != nil {
+			return false, err
+		}
+		// at least one element passes, so entire expression is true
+		if b == true {
+			return true, nil
 		}
 	}
 	// no element passes, so entire expression is false
@@ -126,15 +122,13 @@ func noneExpression(collectionAssertion CollectionAssertion, resource Resource, 
 		return false, err
 	}
 	for _, collectionResource := range resources {
-		for _, assertion := range collectionAssertion.Assertions {
-			b, err := booleanOperation(assertion, collectionResource, log)
-			if err != nil {
-				return false, err
-			}
-			// at least one element passes, so entire expression is false
-			if b == true {
-				return false, nil
-			}
+		b, err := andOperation(collectionAssertion.Assertions, collectionResource, log)
+		if err != nil {
+			return false, err
+		}
+		// at least one element passes, so entire expression is false
+		if b == true {
+			return false, nil
 		}
 	}
 	// no element passes, so entire expression is true

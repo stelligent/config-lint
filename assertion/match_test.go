@@ -45,6 +45,8 @@ func TestIsMatch(t *testing.T) {
 	testCases := map[string]MatchTestCase{
 		"eqTrue":                         {"Foo", "eq", "Foo", "", true},
 		"eqFalse":                        {"Foo", "eq", "Bar", "", false},
+		"eqIntegerTrue":                  {22, "eq", "22", "integer", true},
+		"eqIntegerFalse":                 {80, "eq", "22", "integer", false},
 		"neFalse":                        {"Foo", "ne", "Foo", "", false},
 		"neTrue":                         {"Foo", "ne", "Bar", "", true},
 		"inTrue":                         {"Foo", "in", "Foo,Bar,Baz", "", true},
