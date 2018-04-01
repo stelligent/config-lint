@@ -4,10 +4,10 @@ import (
 	"fmt"
 )
 
-func searchAndMatch(assertion Assertion, resource Resource, log LoggingFunction) (bool, error) {
+func searchAndMatch(assertion Assertion, resource Resource, log LoggingFunction) (MatchResult, error) {
 	v, err := SearchData(assertion.Key, resource.Properties)
 	if err != nil {
-		return false, err
+		return matchError(err)
 	}
 	match, err := isMatch(v, assertion.Op, assertion.Value, assertion.ValueType)
 	log(fmt.Sprintf("Key: %s Output: %v Looking for %v %v", assertion.Key, v, assertion.Op, assertion.Value))
@@ -15,47 +15,47 @@ func searchAndMatch(assertion Assertion, resource Resource, log LoggingFunction)
 		resource.ID,
 		resource.Type,
 		match))
-	return match.Match, err
+	return match, err
 }
 
-func orOperation(assertions []Assertion, resource Resource, log LoggingFunction) (bool, error) {
+func orExpression(assertions []Assertion, resource Resource, log LoggingFunction) (MatchResult, error) {
 	for _, childAssertion := range assertions {
-		b, err := booleanOperation(childAssertion, resource, log)
+		match, err := booleanExpression(childAssertion, resource, log)
 		if err != nil {
-			return b, err
+			return matchError(err)
 		}
-		if b {
-			return true, nil
+		if match.Match {
+			return matches()
 		}
 	}
-	return false, nil
+	return doesNotMatch("Or expression fails") // TODO needs more information
 }
 
-func andOperation(assertions []Assertion, resource Resource, log LoggingFunction) (bool, error) {
+func andExpression(assertions []Assertion, resource Resource, log LoggingFunction) (MatchResult, error) {
 	for _, childAssertion := range assertions {
-		b, err := booleanOperation(childAssertion, resource, log)
+		match, err := booleanExpression(childAssertion, resource, log)
 		if err != nil {
-			return b, err
+			return matchError(err)
 		}
-		if !b {
-			return false, nil
+		if !match.Match {
+			return doesNotMatch("And expression fails: %s", match.Message)
 		}
 	}
-	return true, nil
+	return matches()
 }
 
-func notOperation(assertions []Assertion, resource Resource, log LoggingFunction) (bool, error) {
+func notExpression(assertions []Assertion, resource Resource, log LoggingFunction) (MatchResult, error) {
 	// more than one child filter treated as not any
 	for _, childAssertion := range assertions {
-		b, err := booleanOperation(childAssertion, resource, log)
+		match, err := booleanExpression(childAssertion, resource, log)
 		if err != nil {
-			return false, err
+			return matchError(err)
 		}
-		if b {
-			return false, nil
+		if match.Match {
+			return doesNotMatch("Not expression failsL %s", match.Message)
 		}
 	}
-	return true, nil
+	return matches()
 }
 
 func collectResources(key string, resource Resource, log LoggingFunction) ([]Resource, error) {
@@ -78,72 +78,72 @@ func collectResources(key string, resource Resource, log LoggingFunction) ([]Res
 	return resources, nil
 }
 
-func everyExpression(collectionAssertion CollectionAssertion, resource Resource, log LoggingFunction) (bool, error) {
+func everyExpression(collectionAssertion CollectionAssertion, resource Resource, log LoggingFunction) (MatchResult, error) {
 	resources, err := collectResources(collectionAssertion.Key, resource, log)
 	if err != nil {
-		return false, err
+		return matchError(err)
 	}
 	for _, collectionResource := range resources {
-		b, err := andOperation(collectionAssertion.Assertions, collectionResource, log)
+		match, err := andExpression(collectionAssertion.Assertions, collectionResource, log)
 		if err != nil {
-			return false, err
+			return matchError(err)
 		}
-		if b != true {
+		if !match.Match {
 			// at least one element is false, so entire expression is false
-			return false, nil
+			return doesNotMatch("Every expression fails: %s", match.Message)
 		}
 	}
 	// every element passes, so entire expression is true
-	return true, nil
+	return matches()
 }
 
-func someExpression(collectionAssertion CollectionAssertion, resource Resource, log LoggingFunction) (bool, error) {
+func someExpression(collectionAssertion CollectionAssertion, resource Resource, log LoggingFunction) (MatchResult, error) {
 	resources, err := collectResources(collectionAssertion.Key, resource, log)
 	if err != nil {
-		return false, err
+		return matchError(err)
 	}
 	for _, collectionResource := range resources {
-		b, err := andOperation(collectionAssertion.Assertions, collectionResource, log)
+		match, err := andExpression(collectionAssertion.Assertions, collectionResource, log)
 		if err != nil {
-			return false, err
+			return matchError(err)
 		}
 		// at least one element passes, so entire expression is true
-		if b == true {
-			return true, nil
+		if match.Match {
+			return matches()
 		}
 	}
 	// no element passes, so entire expression is false
-	return false, nil
+	return doesNotMatch("Some expression fails") // TODO needs more information
 }
 
-func noneExpression(collectionAssertion CollectionAssertion, resource Resource, log LoggingFunction) (bool, error) {
+func noneExpression(collectionAssertion CollectionAssertion, resource Resource, log LoggingFunction) (MatchResult, error) {
 	resources, err := collectResources(collectionAssertion.Key, resource, log)
 	if err != nil {
-		return false, err
+		return matchError(err)
 	}
 	for _, collectionResource := range resources {
-		b, err := andOperation(collectionAssertion.Assertions, collectionResource, log)
+		match, err := andExpression(collectionAssertion.Assertions, collectionResource, log)
 		if err != nil {
-			return false, err
+			return matchError(err)
 		}
 		// at least one element passes, so entire expression is false
-		if b == true {
-			return false, nil
+		if match.Match {
+			return doesNotMatch("None expression fails: %s", match.Message)
 		}
 	}
 	// no element passes, so entire expression is true
-	return true, nil
+	return matches()
 }
 
-func booleanOperation(assertion Assertion, resource Resource, log LoggingFunction) (bool, error) {
+func booleanExpression(assertion Assertion, resource Resource, log LoggingFunction) (MatchResult, error) {
 	if assertion.Or != nil && len(assertion.Or) > 0 {
-		return orOperation(assertion.Or, resource, log)
+		return orExpression(assertion.Or, resource, log)
 	}
 	if assertion.And != nil && len(assertion.And) > 0 {
-		return andOperation(assertion.And, resource, log)
+		return andExpression(assertion.And, resource, log)
 	}
 	if assertion.Not != nil && len(assertion.Not) > 0 {
-		return notOperation(assertion.Not, resource, log)
+		return notExpression(assertion.Not, resource, log)
 	}
 	if assertion.Every.Key != "" {
 		return everyExpression(assertion.Every, resource, log)
@@ -184,11 +184,11 @@ func FilterResourceExceptions(rule Rule, resources []Resource) []Resource {
 // CheckAssertion validates a single Resource using a single Assertion
 func CheckAssertion(rule Rule, assertion Assertion, resource Resource, log LoggingFunction) (string, error) {
 	status := "OK"
-	b, err := booleanOperation(assertion, resource, log)
+	match, err := booleanExpression(assertion, resource, log)
 	if err != nil {
 		return "FAILURE", err
 	}
-	if !b {
+	if !match.Match {
 		status = rule.Severity
 	}
 	return status, nil
