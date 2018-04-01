@@ -11,7 +11,9 @@ type ResourceLinter struct {
 }
 
 // ValidateResources evaluates a list of Rule objects to a list of Resource objects
-func (r ResourceLinter) ValidateResources(resources []assertion.Resource, rules []assertion.Rule) ([]assertion.Violation, error) {
+func (r ResourceLinter) ValidateResources(resources []assertion.Resource, rules []assertion.Rule) ([]assertion.ScannedResource, []assertion.Violation, error) {
+
+	scannedResources := make([]assertion.ScannedResource, 0)
 
 	valueSource := assertion.StandardValueSource{Log: r.Log}
 	resolvedRules := assertion.ResolveRules(rules, valueSource, r.Log)
@@ -24,13 +26,18 @@ func (r ResourceLinter) ValidateResources(resources []assertion.Resource, rules 
 			if assertion.ExcludeResource(rule, resource) {
 				r.Log(fmt.Sprintf("Ignoring resource %s", resource.ID))
 			} else {
-				_, violations, err := assertion.CheckRule(rule, resource, externalRules, r.Log)
+				status, violations, err := assertion.CheckRule(rule, resource, externalRules, r.Log)
 				if err != nil {
-					return allViolations, err
+					return scannedResources, allViolations, err
 				}
+				scannedResources = append(scannedResources, assertion.ScannedResource{
+					ResourceID:   resource.ID,
+					ResourceType: resource.Type,
+					Status:       status,
+				})
 				allViolations = append(allViolations, violations...)
 			}
 		}
 	}
-	return allViolations, nil
+	return scannedResources, allViolations, nil
 }

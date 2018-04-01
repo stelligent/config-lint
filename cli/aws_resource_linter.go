@@ -19,16 +19,17 @@ type (
 )
 
 // Validate applies a Ruleset to all SecurityGroups
-func (l AWSResourceLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) ([]string, []assertion.Violation, error) {
+func (l AWSResourceLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) ([]string, []assertion.ScannedResource, []assertion.Violation, error) {
 	noFilenames := []string{}
+	noScannedResources := []assertion.ScannedResource{}
 	rules := assertion.FilterRulesByTagAndID(ruleSet.Rules, tags, ruleIDs)
 	resources, err := l.Loader.Load()
 	if err != nil {
-		return noFilenames, []assertion.Violation{}, err
+		return noFilenames, noScannedResources, []assertion.Violation{}, err
 	}
 	r := ResourceLinter{Log: l.Log}
-	violations, err := r.ValidateResources(resources, rules)
-	return noFilenames, violations, err
+	scannedResources, violations, err := r.ValidateResources(resources, rules)
+	return noFilenames, scannedResources, violations, err
 }
 
 // Search applies a JMESPath to all SecurityGroups

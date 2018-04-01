@@ -10,9 +10,12 @@ func TestYAMLLinter(t *testing.T) {
 	linter := YAMLLinter{Log: testLogger}
 	ruleSet := loadRulesForTest("./testdata/rules/generic.yml", t)
 	filenames := []string{"./testdata/resources/generic.config"}
-	filesScanned, violations, err := linter.Validate(filenames, ruleSet, emptyTags, emptyIds)
+	filesScanned, resourcesScanned, violations, err := linter.Validate(filenames, ruleSet, emptyTags, emptyIds)
 	if err != nil {
 		t.Error("Expecting TestYAMLLinter to not return an error")
+	}
+	if len(resourcesScanned) != 17 {
+		t.Errorf("TestTerraformLinter scanned %d resources, expecting 17", len(resourcesScanned))
 	}
 	if len(filesScanned) != 1 {
 		t.Errorf("TestYAMLLinter scanned %d files, expecting 1", len(filesScanned))

@@ -9,7 +9,7 @@ import (
 
 // Linter provides the interface for all supported linters
 type Linter interface {
-	Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) ([]string, []assertion.Violation, error)
+	Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) ([]string, []assertion.ScannedResource, []assertion.Violation, error)
 	Search(filenames []string, ruleSet assertion.RuleSet, searchExpression string)
 }
 

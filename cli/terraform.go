@@ -102,7 +102,7 @@ func (l TerraformResourceLoader) Load(filename string) ([]assertion.Resource, er
 }
 
 // Validate uses a RuleSet to validate resources in a collection of Terraform configuration files
-func (l TerraformLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) ([]string, []assertion.Violation, error) {
+func (l TerraformLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) ([]string, []assertion.ScannedResource, []assertion.Violation, error) {
 	loader := TerraformResourceLoader{Log: l.Log}
 	f := FileLinter{Log: l.Log}
 	return f.ValidateFiles(filenames, ruleSet, tags, ruleIDs, loader)

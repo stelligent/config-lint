@@ -73,8 +73,9 @@ type (
 
 	// ValidationReport summarizes validation for resources using rules
 	ValidationReport struct {
-		Violations   map[string]([]Violation)
-		FilesScanned []string
+		Violations       map[string]([]Violation)
+		FilesScanned     []string
+		ResourcesScanned []ScannedResource
 	}
 
 	// Violation has details for a failed assertion
@@ -86,6 +87,13 @@ type (
 		RuleMessage      string
 		AssertionMessage string
 		Filename         string
+	}
+
+	// ScannedResource has details for each resource scanned
+	ScannedResource struct {
+		ResourceID   string
+		ResourceType string
+		Status       string
 	}
 
 	// ValueSource interface to fetch dynamic values

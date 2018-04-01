@@ -81,8 +81,9 @@ func main() {
 	flag.Parse()
 
 	report := assertion.ValidationReport{
-		Violations:   make(map[string]([]assertion.Violation), 0),
-		FilesScanned: make([]string, 0),
+		Violations:       make(map[string]([]assertion.Violation), 0),
+		FilesScanned:     make([]string, 0),
+		ResourcesScanned: make([]assertion.ScannedResource, 0),
 	}
 
 	for _, rulesFilename := range rulesFilenames {
@@ -101,7 +102,7 @@ func main() {
 			if *searchExpression != "" {
 				linter.Search(flag.Args(), ruleSet, *searchExpression)
 			} else {
-				filesScanned, violations, err := linter.Validate(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids))
+				filesScanned, resourcesScanned, violations, err := linter.Validate(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids))
 				if err != nil {
 					fmt.Println("Validate failed:", err) // FIXME
 				}
@@ -109,6 +110,7 @@ func main() {
 					report.Violations[violation.Status] = append(report.Violations[violation.Status], violation)
 				}
 				report.FilesScanned = append(report.FilesScanned, filesScanned...)
+				report.ResourcesScanned = append(report.ResourcesScanned, resourcesScanned...)
 			}
 		}
 	}
