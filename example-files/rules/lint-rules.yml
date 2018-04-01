@@ -14,13 +14,14 @@ rules:
         op: in
         value: Terraform,Kubernetes,SecurityGroup,IAMUser,AWSConfig,LintRules,YAML
 
-  - id: VERSION_PRESENT
-    message: RuleSet must have a version
+  - id: VALID_VERSION
+    message: RuleSet must have a supported version
     resource: LintRuleSet
     severity: WARNING
     assertions:
       - key: version
-        op: present 
+        op: eq
+        value: 1
 
   - id: HAS_RULES
     message: RuleSet needs at least one rule
