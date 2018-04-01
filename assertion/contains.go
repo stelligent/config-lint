@@ -4,42 +4,48 @@ import (
 	"strings"
 )
 
-func contains(data interface{}, value string) (bool, error) {
+func contains(data interface{}, value string) (MatchResult, error) {
 	switch v := data.(type) {
 	case []interface{}:
 		for _, element := range v {
 			if stringElement, isString := element.(string); isString {
 				if stringElement == value {
-					return true, nil
+					return matches()
 				}
 			}
 		}
-		return false, nil
+		return doesNotMatch("does not contain %v", value)
 	case []string:
 		for _, stringElement := range v {
 			if stringElement == value {
-				return true, nil
+				return matches()
 			}
 		}
-		return false, nil
+		return doesNotMatch("does not contain %v", value)
 	case string:
 		if strings.Contains(v, value) {
-			return true, nil
+			return matches()
 		}
-		return false, nil
+		return doesNotMatch("does not contain %v", value)
 	default:
 		searchResult, err := JSONStringify(data)
 		if err != nil {
-			return false, err
+			return matches()
 		}
-		return strings.Contains(searchResult, value), nil
+		if strings.Contains(searchResult, value) {
+			return matches()
+		}
+		return doesNotMatch("does not contain %v", value)
 	}
 }
 
-func notContains(data interface{}, value string) (bool, error) {
-	b, err := contains(data, value)
+func notContains(data interface{}, value string) (MatchResult, error) {
+	m, err := contains(data, value)
 	if err != nil {
-		return false, err
+		return matchError(err)
 	}
-	return !b, nil
+	if m.Match {
+		return doesNotMatch("should not contain %v", value)
+	}
+	return matches()
 }

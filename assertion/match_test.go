@@ -102,7 +102,7 @@ func TestIsMatch(t *testing.T) {
 		"eqSizeFalse":                    {anotherSlice, "eq", "3", "size", false},
 	}
 	for k, tc := range testCases {
-		var b bool
+		var m MatchResult
 		var err error
 		if s, isString := tc.SearchResult.(string); isString {
 			searchResult, err := unmarshal(s)
@@ -110,14 +110,14 @@ func TestIsMatch(t *testing.T) {
 				fmt.Println(err)
 				t.Errorf("Unable to parse %s\n", tc.SearchResult)
 			}
-			b, err = isMatch(searchResult, tc.Op, tc.Value, tc.ValueType)
+			m, err = isMatch(searchResult, tc.Op, tc.Value, tc.ValueType)
 		} else {
-			b, err = isMatch(tc.SearchResult, tc.Op, tc.Value, tc.ValueType)
+			m, err = isMatch(tc.SearchResult, tc.Op, tc.Value, tc.ValueType)
 		}
 		if err != nil {
 			t.Errorf("%s Failed with error: %s", k, err.Error())
 		}
-		if b != tc.ExpectedResult {
+		if m.Match != tc.ExpectedResult {
 			t.Errorf("%s Failed Expected '%s' %s '%s' to be %t", k, tc.SearchResult, tc.Op, tc.Value, tc.ExpectedResult)
 		}
 	}

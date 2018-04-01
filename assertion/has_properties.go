@@ -4,13 +4,13 @@ import (
 	"strings"
 )
 
-func hasProperties(data interface{}, list string) (bool, error) {
+func hasProperties(data interface{}, list string) (MatchResult, error) {
 	for _, key := range strings.Split(list, ",") {
 		if m, ok := data.(map[string]interface{}); ok {
 			if _, ok := m[key]; !ok {
-				return false, nil
+				return doesNotMatch("should have property %v", key)
 			}
 		}
 	}
-	return true, nil
+	return matches()
 }

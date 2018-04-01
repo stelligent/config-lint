@@ -11,11 +11,11 @@ func searchAndMatch(assertion Assertion, resource Resource, log LoggingFunction)
 	}
 	match, err := isMatch(v, assertion.Op, assertion.Value, assertion.ValueType)
 	log(fmt.Sprintf("Key: %s Output: %v Looking for %v %v", assertion.Key, v, assertion.Op, assertion.Value))
-	log(fmt.Sprintf("ResourceID: %s Type: %s %t",
+	log(fmt.Sprintf("ResourceID: %s Type: %s %v",
 		resource.ID,
 		resource.Type,
 		match))
-	return match, err
+	return match.Match, err
 }
 
 func orOperation(assertions []Assertion, resource Resource, log LoggingFunction) (bool, error) {
