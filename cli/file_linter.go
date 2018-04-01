@@ -5,34 +5,9 @@ import (
 	"github.com/stelligent/config-lint/assertion"
 )
 
-// FileLinter provides implmenation for some common functions that are used by multiple Linter implementations
+// FileLinter provides implementation for some common functions that are used by multiple Linter implementations
 type FileLinter struct {
 	Log assertion.LoggingFunction
-}
-
-// ValidateResources evaluates a list of Rule objects to a list of Resource objects
-func (l FileLinter) ValidateResources(resources []assertion.Resource, rules []assertion.Rule) ([]assertion.Violation, error) {
-
-	valueSource := assertion.StandardValueSource{Log: l.Log}
-	resolvedRules := assertion.ResolveRules(rules, valueSource, l.Log)
-	externalRules := assertion.StandardExternalRuleInvoker{Log: l.Log}
-
-	allViolations := make([]assertion.Violation, 0)
-	for _, rule := range resolvedRules {
-		l.Log(fmt.Sprintf("Rule %s: %s", rule.ID, rule.Message))
-		for _, resource := range assertion.FilterResourcesByType(resources, rule.Resource) {
-			if assertion.ExcludeResource(rule, resource) {
-				l.Log(fmt.Sprintf("Ignoring resource %s", resource.ID))
-			} else {
-				_, violations, err := assertion.CheckRule(rule, resource, externalRules, l.Log)
-				if err != nil {
-					return allViolations, err
-				}
-				allViolations = append(allViolations, violations...)
-			}
-		}
-	}
-	return allViolations, nil
 }
 
 // ValidateFiles validates a collection of filenames using a RuleSet
@@ -40,15 +15,16 @@ func (l FileLinter) ValidateFiles(filenames []string, ruleSet assertion.RuleSet,
 	rules := assertion.FilterRulesByTagAndID(ruleSet.Rules, tags, ruleIDs)
 	allViolations := make([]assertion.Violation, 0)
 	filesScanned := make([]string, 0)
+	r := ResourceLinter{Log: l.Log}
 	for _, filename := range filenames {
-		include, _ := assertion.ShouldIncludeFile(ruleSet.Files, filename) // FIXME what about error?
-		if include {
+		include, err := assertion.ShouldIncludeFile(ruleSet.Files, filename)
+		if err == nil && include {
 			l.Log(fmt.Sprintf("Processing %s", filename))
 			resources, err := loader.Load(filename)
 			if err != nil {
 				return filesScanned, allViolations, err
 			}
-			violations, err := l.ValidateResources(resources, rules)
+			violations, err := r.ValidateResources(resources, rules)
 			if err != nil {
 				return filesScanned, allViolations, err
 			}

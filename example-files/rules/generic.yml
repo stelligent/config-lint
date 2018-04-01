@@ -6,6 +6,7 @@ files:
 
 # For generic YAML linting, we need a list of resources
 # Each entry in the list describes the resource type, how to discover it in the file, and how to get its ID
+# The key attribute is a JMESPath expression that should return an array
 
 resources:
   - type: widget
@@ -17,8 +18,24 @@ resources:
   - type: contraption
     key: other_stuff.contraptions[]
     id: ids.serial_number
+  # include the root document in a single element array with a literal id
+  - type: document
+    key: '[@]'
+    id: '`"Document"`'
 
 rules:
+
+  - id: DOCUMENT_KEYS
+    message: Unexpected document key
+    severity: FAILURE
+    resource: document
+    assertions:
+      - every:
+          key: "keys(@)"
+          assertions:
+            - key: "@"
+              op: in
+              value: widgets,gadgets,other_stuff
 
   - id: WIDGET_NAME
     message: Widget needs a name

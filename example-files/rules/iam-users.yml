@@ -1,0 +1,14 @@
+version: 1
+description: Rules for IAM Users
+type: IAMUser
+rules:
+  - id: USER_POLICIES
+    message: User should not have policies
+    resource: "AWS::IAM::User"
+    assertions:
+      - key: UserName
+        op: present
+      - key: Policies
+        op: empty
+    severity: NON_COMPLIANT
+

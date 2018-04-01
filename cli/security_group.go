@@ -2,19 +2,19 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/stelligent/config-lint/assertion"
 )
 
-// SecurityGroupLinter implements a Linter for data returned by the DescribeSecurityGroups SDK call
-type SecurityGroupLinter struct {
-	Log assertion.LoggingFunction
-}
+type (
+	// SecurityGroupLoader calls the AWS SDK DescribeSecurityGroups
+	SecurityGroupLoader struct{}
+)
 
-func loadSecurityGroupResources(log assertion.LoggingFunction) ([]assertion.Resource, error) {
+// Load gets security group information from AWS and generates Resources suitable for linting
+func (sg SecurityGroupLoader) Load() ([]assertion.Resource, error) {
 	resources := make([]assertion.Resource, 0)
 	region := &aws.Config{Region: aws.String("us-east-1")}
 	awsSession := session.New()
@@ -47,35 +47,4 @@ func loadSecurityGroupResources(log assertion.LoggingFunction) ([]assertion.Reso
 		resources = append(resources, r)
 	}
 	return resources, nil
-}
-
-// Validate applies a Ruleset to all SecurityGroups
-func (l SecurityGroupLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) ([]string, []assertion.Violation, error) {
-	noFilenames := []string{}
-	rules := assertion.FilterRulesByTagAndID(ruleSet.Rules, tags, ruleIDs)
-	resources, err := loadSecurityGroupResources(l.Log)
-	if err != nil {
-		return noFilenames, []assertion.Violation{}, err
-	}
-	f := FileLinter{Log: l.Log}
-	violations, err := f.ValidateResources(resources, rules)
-	return noFilenames, violations, err
-}
-
-// Search applies a JMESPath to all SecurityGroups
-func (l SecurityGroupLinter) Search(filenames []string, ruleSet assertion.RuleSet, searchExpression string) {
-	resources, _ := loadSecurityGroupResources(l.Log) // FIXME what about error?
-	for _, resource := range resources {
-		v, err := assertion.SearchData(searchExpression, resource.Properties)
-		if err != nil {
-			fmt.Println(err)
-		} else {
-			s, err := assertion.JSONStringify(v)
-			if err != nil {
-				fmt.Println(err)
-			} else {
-				fmt.Printf("%s: %s\n", resource.ID, s)
-			}
-		}
-	}
 }

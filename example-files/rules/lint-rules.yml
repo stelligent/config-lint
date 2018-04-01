@@ -12,7 +12,7 @@ rules:
     assertions:
       - key: type
         op: in
-        value: Terraform,Kubernetes,SecurityGroup,AWSConfig,LintRules,YAML
+        value: Terraform,Kubernetes,SecurityGroup,IAMUser,AWSConfig,LintRules,YAML
 
   - id: VERSION_PRESENT
     message: RuleSet must have a version
