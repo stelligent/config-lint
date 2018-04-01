@@ -202,7 +202,7 @@ rules:
     tags:
       - sg
 
-  - id: VALUEFROM1
+  - id: VALUE_FROM_S3
     message: Instance type should be in list from S3 object
     resource: aws_instance
     assertions:
@@ -214,8 +214,8 @@ rules:
     tags:
       - ec2
 
-  - id: VALUEFROM2
-    message: Instance type should be in list from S3 object
+  - id: VALUE_FROM_HTTPS
+    message: Instance type should be in list from https endpoint
     resource: aws_instance
     assertions:
       - key: instance_type
