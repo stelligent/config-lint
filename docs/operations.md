@@ -1,20 +1,25 @@
 ## Assertion Operations
 
-| Operation               | Description |
-|-------------------------|-------------|
-| [eq](#eq)               | Equal       |
-| [ne](#ne)               | Not equal   |
-| [in](#in)               | In          |
-| [not-in](#not-in)       | Not In      | 
-| [present](#present)     | Present     |
-| [absent](#absent)       | Absent      |
-| [empty](#empty)         | Empty       |
-| [not-empty](#not-empty) | Not Empty   |
-| [contains](#contains)   | Contains    |
-| [regex](#regex)         | Regex       |
-| [and](#and)             | And         |
-| [or](#or)               | Or          |
-| [not](#not)             | Not         |
+| Operation                         | Description    |
+|-----------------------------------|----------------|
+| [and](#and)                       | And            |
+| [absent](#absent)                 | Absent         |
+| [contains](#contains)             | Contains       |
+| [empty](#empty)                   | Empty          |
+| [every](#every)                   | Every          |
+| [eq](#eq)                         | Equal          |
+| [in](#in)                         | In             |
+| [has-properties](#has-properties) | Has Properties |
+| [ne](#ne)                         | Not equal      |
+| [none](#none)                     | None           |
+| [not](#not)                       | Not            |
+| [not-contains](#not-contains)     | Not Contains   |
+| [not-empty](#not-empty)           | Not Empty      |
+| [not-in](#not-in)                 | Not In         |
+| [or](#or)                         | Or             |
+| [present](#present)               | Present        |
+| [regex](#regex)                   | Regex          |
+| [some](#some)                     | Some           |
 
 ## eq
 
@@ -110,6 +115,10 @@ Attribute is not empty
 
 Attribute contains a substring, or array contains an element
 
+## not-contains
+
+Attribute contains a substring, or array contains an element
+
 ## regex
 
 Attribute matches a regular expression
@@ -177,5 +186,106 @@ Example:
         - key: instance_type
           op: eq
           value: c4.large
+...
+```
+
+## has-properties
+
+Checks for the present of every property in a comma separated list. This could also be done using the [and](#and) expression,
+but this will often be more convenient.
+
+Example:
+
+```
+...
+  - id: VALID_ADDRESS
+    message: Every address needs city, state and zip
+    severity: FAILURE
+    resource: address
+    assertions:
+      - key: address
+        op: has-properties
+        value: city,state,zip
+...
+```
+
+## every
+
+Select an array from a resource, and run assertions against each element. All of the sub assertions must pass for the test to pass.
+The key is a JMESPath expression that should return an array of objects. The key used in each sub assertion is relative to the selected objects.
+
+This provides a simple looping mechanism that is easier to write and understand than a complex JMESPath expression.
+
+Example:
+
+```
+...
+  - id: LOCATIONS_NEED_LAT_LONG
+    message:  Every location requires a latitude and longitude
+    severity: FAILURE
+    resource: sample
+    assertions:
+      - every:
+          key: Location
+          assertions:
+            - key: latitude
+              op: present
+            - key: longitude
+              op: present
+...
+```
+
+## some
+
+Select an array from a resource, and run assertions against each element. At least one sub assertion must pass for the test to pass.
+The key is a JMESPath expression that should return an array of objects. The key used in each sub assertion is relative to the selected objects.
+
+This provides a simple looping mechanism that is easier to write and understand than a complex JMESPath expression.
+
+Example:
+
+```
+...
+  - id: LOCATION_REQUIRES_LAT_LONG
+    message:  At least one location requires a latitude and longitude
+    severity: FAILURE
+    resource: sample
+    assertions:
+      - some:
+          key: Location
+          assertions:
+            - key: latitude
+              op: present
+            - key: longitude
+              op: present
+...
+```
+
+## none
+
+Select an array from a resource, and run assertions against each element. All of the sub assertions must fail for the test to pass.
+The key is a JMESPath expression that should return an array of objects. The key used in each sub assertion is relative to the selected objects.
+
+This provides a simple looping mechanism that is easier to write and understand than a complex JMESPath expression.
+
+Example:
+
+```
+...
+  - id: PORT_22_INGRESS
+    message:  No ingress for port 22 should be open to the world
+    severity: FAILURE
+    resource: sample
+    assertions:
+      - none:
+          key: "ipPermissions[]"
+          assertions:
+            - key: "fromPort"
+              op: eq
+              value: 22
+              value_type: integer
+            - key: "ipRanges[]"
+              op: contains
+              value: 0.0.0.0/0
 ...
 ```
