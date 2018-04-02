@@ -93,6 +93,7 @@ type (
 	ScannedResource struct {
 		ResourceID   string
 		ResourceType string
+		RuleID       string
 		Status       string
 	}
 

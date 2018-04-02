@@ -35,6 +35,7 @@ func (r ResourceLinter) ValidateResources(resources []assertion.Resource, rules 
 				report.ResourcesScanned = append(report.ResourcesScanned, assertion.ScannedResource{
 					ResourceID:   resource.ID,
 					ResourceType: resource.Type,
+					RuleID:       rule.ID,
 					Status:       status,
 				})
 				report.Violations = append(report.Violations, violations...)
