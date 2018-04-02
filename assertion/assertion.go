@@ -31,6 +31,23 @@ func orExpression(assertions []Assertion, resource Resource, log LoggingFunction
 	return doesNotMatch("Or expression fails") // TODO needs more information
 }
 
+func xorExpression(assertions []Assertion, resource Resource, log LoggingFunction) (MatchResult, error) {
+	matchCount := 0
+	for _, childAssertion := range assertions {
+		match, err := booleanExpression(childAssertion, resource, log)
+		if err != nil {
+			return matchError(err)
+		}
+		if match.Match {
+			matchCount++
+		}
+	}
+	if matchCount == 1 {
+		return matches()
+	}
+	return doesNotMatch("Xor expression fails") // TODO needs more information
+}
+
 func andExpression(assertions []Assertion, resource Resource, log LoggingFunction) (MatchResult, error) {
 	for _, childAssertion := range assertions {
 		match, err := booleanExpression(childAssertion, resource, log)
@@ -138,6 +155,9 @@ func noneExpression(collectionAssertion CollectionAssertion, resource Resource, 
 func booleanExpression(assertion Assertion, resource Resource, log LoggingFunction) (MatchResult, error) {
 	if assertion.Or != nil && len(assertion.Or) > 0 {
 		return orExpression(assertion.Or, resource, log)
+	}
+	if assertion.Xor != nil && len(assertion.Xor) > 0 {
+		return xorExpression(assertion.Xor, resource, log)
 	}
 	if assertion.And != nil && len(assertion.And) > 0 {
 		return andExpression(assertion.And, resource, log)

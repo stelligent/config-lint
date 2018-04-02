@@ -1,0 +1,25 @@
+version: 1
+description: Rules for config-lint with an error
+type: LintRules
+files:
+  - "*.yml"
+rules:
+
+  - id: VALID_TYPE
+    message: This has a single assertion with both and, or keywords, which is an error
+    resource: LintRuleSet
+    severity: FAILURE
+    assertions:
+      - and:
+        - key: type
+          op: in
+          value: Terraform,Kubernetes,SecurityGroup,IAMUser,AWSConfig,LintRules,YAML
+        - key: rules
+          op: not-empty
+        or:
+        - key: version
+          op: eq
+          value: 1
+        - key: version
+          op: eq
+          value: 2

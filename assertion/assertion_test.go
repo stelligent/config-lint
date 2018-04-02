@@ -118,6 +118,84 @@ func TestCheckAssertion(t *testing.T) {
 			simpleTestResource,
 			"FAILURE",
 		},
+		"testXor": {
+			Rule{
+				ID:       "TEST1",
+				Message:  "Test Rule",
+				Severity: "FAILURE",
+				Resource: "aws_instance",
+				Assertions: []Assertion{
+					Assertion{
+						Xor: []Assertion{
+							Assertion{
+								Key:   "instance_type",
+								Op:    "eq",
+								Value: "t2.micro",
+							},
+							Assertion{
+								Key:   "instance_type",
+								Op:    "eq",
+								Value: "m4.large",
+							},
+						},
+					},
+				},
+			},
+			simpleTestResource,
+			"OK",
+		},
+		"testXorFails": {
+			Rule{
+				ID:       "TEST1",
+				Message:  "Test Rule",
+				Severity: "FAILURE",
+				Resource: "aws_instance",
+				Assertions: []Assertion{
+					Assertion{
+						Xor: []Assertion{
+							Assertion{
+								Key:   "instance_type",
+								Op:    "eq",
+								Value: "t2.micro",
+							},
+							Assertion{
+								Key:   "instance_type",
+								Op:    "eq",
+								Value: "t2.micro",
+							},
+						},
+					},
+				},
+			},
+			simpleTestResource,
+			"FAILURE",
+		},
+		"testXorFailsAgain": {
+			Rule{
+				ID:       "TEST1",
+				Message:  "Test Rule",
+				Severity: "FAILURE",
+				Resource: "aws_instance",
+				Assertions: []Assertion{
+					Assertion{
+						Xor: []Assertion{
+							Assertion{
+								Key:   "instance_type",
+								Op:    "eq",
+								Value: "m3.large",
+							},
+							Assertion{
+								Key:   "instance_type",
+								Op:    "eq",
+								Value: "c4.large",
+							},
+						},
+					},
+				},
+			},
+			simpleTestResource,
+			"FAILURE",
+		},
 		"testAnd": {
 			Rule{
 				ID:       "TEST1",

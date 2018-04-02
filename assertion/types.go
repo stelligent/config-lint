@@ -40,6 +40,7 @@ type (
 		ValueType string    `json:"value_type"`
 		ValueFrom ValueFrom `json:"value_from"`
 		Or        []Assertion
+		Xor       []Assertion
 		And       []Assertion
 		Not       []Assertion
 		Every     CollectionAssertion

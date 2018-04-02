@@ -78,3 +78,37 @@ rules:
             op: present
           - key: invoke
             op: present
+
+  - id: VALID_EXPRESSION
+    message: "There are mutually exclusive in the same expression: key,or,xor,and,not,every,some,none"
+    resource: LintRule
+    severity: FAILURE
+    assertions:
+      - every:
+          key: "assertions[]"
+          assertions:
+            - xor:
+              - key: "@"
+                op: has-properties
+                value: key,op
+              - key: "@"
+                op: has-properties
+                value: or
+              - key: "@"
+                op: has-properties
+                value: xor
+              - key: "@"
+                op: has-properties
+                value: and
+              - key: "@"
+                op: has-properties
+                value: not
+              - key: "@"
+                op: has-properties
+                value: every
+              - key: "@"
+                op: has-properties
+                value: some
+              - key: "@"
+                op: has-properties
+                value: none

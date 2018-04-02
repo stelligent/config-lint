@@ -20,6 +20,7 @@
 | [present](#present)               | Present        |
 | [regex](#regex)                   | Regex          |
 | [some](#some)                     | Some           |
+| [xor](#xor)                       | Xor            |
 
 ## eq
 
@@ -166,6 +167,27 @@ Logical or of a list of assertions
         - key: instance_type
           op: eq
           value: m3.medium
+...
+```
+
+## xor
+
+Logical xor of a list of assertions. The assertion is true when exactly one test passes
+
+### Example:
+
+```
+...
+  - id: ORTEST
+    resource: lint_rule
+    message: Can have value or value_from, but not both
+    severity: WARNING
+    assertions:
+      - xor:
+        - key: value
+          op: present
+        - key: value_from
+          op: present
 ...
 ```
 
