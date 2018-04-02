@@ -100,6 +100,10 @@ func TestIsMatch(t *testing.T) {
 		"intersectFalse":                 {"[\"one\",\"two\"]", "intersect", "[\"three\",\"four\"]", "", false},
 		"eqSizeTrue":                     {anotherSlice, "eq", "2", "size", true},
 		"eqSizeFalse":                    {anotherSlice, "eq", "3", "size", false},
+		"isTrue":                         {"true", "is-true", "", "", true},
+		"isNotTrue":                      {"false", "is-true", "", "", false},
+		"isFalse":                        {"false", "is-false", "", "", true},
+		"isNotFalse":                     {"100", "is-false", "", "", false},
 	}
 	for k, tc := range testCases {
 		var m MatchResult

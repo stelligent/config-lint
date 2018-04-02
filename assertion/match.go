@@ -132,6 +132,16 @@ func isMatch(data interface{}, assertion Assertion) (MatchResult, error) {
 		return doesNotMatch("%v should match %v", key, value)
 	case "has-properties":
 		return hasProperties(data, value)
+	case "is-true":
+		if searchResult == "true" {
+			return matches()
+		}
+		return doesNotMatch("%v should be 'true', not '%v'", key, value)
+	case "is-false":
+		if searchResult == "false" {
+			return matches()
+		}
+		return doesNotMatch("%v should be 'false', not '%v'", key, value)
 	}
 	return doesNotMatch("unknown op %v", op)
 }

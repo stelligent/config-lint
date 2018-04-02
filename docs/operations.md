@@ -9,6 +9,8 @@
 | [every](#every)                   | Every          |
 | [eq](#eq)                         | Equal          |
 | [in](#in)                         | In             |
+| [is-false](#is-false)             | Is False       |
+| [is-true](#is-true)               | Is True        |
 | [has-properties](#has-properties) | Has Properties |
 | [ne](#ne)                         | Not equal      |
 | [none](#none)                     | None           |
@@ -309,5 +311,41 @@ Example:
             - key: "ipRanges[]"
               op: contains
               value: 0.0.0.0/0
+...
+```
+
+## is-true
+
+Check that the data has a true value. Shorthand for using { op: "eq" , "value": true }
+
+Example:
+
+```
+...
+  - id: ENCRYPTION_TRUE
+    message: Encryption should be true
+    severity: FAILURE
+    resource: ebs_volume
+    assertions:
+       - key: encrypted
+         op: is-true
+...
+```
+
+## is-false
+
+Check that the data has a false value. Shorthand for using { op: "eq" , "value": false }
+
+Example:
+
+```
+...
+  - id: ALLOW_PUBLIC_ACCESS
+    message: Should not allow public access
+    severity: FAILURE
+    resource: some_resource
+    assertions:
+       - key: public_access
+         op: is-false
 ...
 ```
