@@ -102,7 +102,7 @@ rules:
     severity: WARNING
     assertions:
       - not:
-        -or:
+        - or:
           - key: "ingress[].cidr_blocks[]"
             op: contains
             value: "0.0.0.0/0"

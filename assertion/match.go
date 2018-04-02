@@ -74,7 +74,7 @@ func isMatch(data interface{}, assertion Assertion) (MatchResult, error) {
 				return matches()
 			}
 		}
-		return doesNotMatch("%v should be in %v", key, value)
+		return doesNotMatch("%v(%v) should be in %v", key, searchResult, value)
 	case "not-in":
 		for _, v := range strings.Split(value, ",") {
 			if v == searchResult {
