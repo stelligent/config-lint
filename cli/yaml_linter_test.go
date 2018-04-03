@@ -7,10 +7,10 @@ import (
 func TestYAMLLinter(t *testing.T) {
 	emptyTags := []string{}
 	emptyIds := []string{}
-	linter := YAMLLinter{Log: testLogger}
-	ruleSet := loadRulesForTest("./testdata/rules/generic.yml", t)
 	filenames := []string{"./testdata/resources/generic.config"}
-	report, err := linter.Validate(filenames, ruleSet, emptyTags, emptyIds)
+	linter := YAMLLinter{Filenames: filenames, Log: testLogger}
+	ruleSet := loadRulesForTest("./testdata/rules/generic.yml", t)
+	report, err := linter.Validate(ruleSet, emptyTags, emptyIds)
 	if err != nil {
 		t.Error("Expecting TestYAMLLinter to not return an error")
 	}

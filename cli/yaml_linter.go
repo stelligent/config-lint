@@ -6,7 +6,8 @@ import (
 
 // YAMLLinter lints rules from a generic YAML file
 type YAMLLinter struct {
-	Log assertion.LoggingFunction
+	Filenames []string
+	Log       assertion.LoggingFunction
 }
 
 // YAMLResourceLoader loads a list of Resource objects based on the list of ResourceConfig objects
@@ -54,15 +55,15 @@ func (l YAMLResourceLoader) Load(filename string) ([]assertion.Resource, error) 
 }
 
 // Validate runs validate on a collection of filenames using a RuleSet
-func (l YAMLLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) (assertion.ValidationReport, error) {
+func (l YAMLLinter) Validate(ruleSet assertion.RuleSet, tags []string, ruleIDs []string) (assertion.ValidationReport, error) {
 	loader := YAMLResourceLoader{Log: l.Log, Resources: ruleSet.Resources}
-	f := FileLinter{Log: l.Log}
-	return f.ValidateFiles(filenames, ruleSet, tags, ruleIDs, loader)
+	f := FileLinter{Filenames: l.Filenames, Log: l.Log}
+	return f.ValidateFiles(ruleSet, tags, ruleIDs, loader)
 }
 
 // Search evaluates a JMESPath expression against the resources in a collection of filenames
-func (l YAMLLinter) Search(filenames []string, ruleSet assertion.RuleSet, searchExpression string) {
+func (l YAMLLinter) Search(ruleSet assertion.RuleSet, searchExpression string) {
 	loader := YAMLResourceLoader{Log: l.Log, Resources: ruleSet.Resources}
-	f := FileLinter{Log: l.Log}
-	f.SearchFiles(filenames, ruleSet, searchExpression, loader)
+	f := FileLinter{Filenames: l.Filenames, Log: l.Log}
+	f.SearchFiles(ruleSet, searchExpression, loader)
 }

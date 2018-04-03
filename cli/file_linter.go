@@ -7,11 +7,12 @@ import (
 
 // FileLinter provides implementation for some common functions that are used by multiple Linter implementations
 type FileLinter struct {
-	Log assertion.LoggingFunction
+	Filenames []string
+	Log       assertion.LoggingFunction
 }
 
 // ValidateFiles validates a collection of filenames using a RuleSet
-func (l FileLinter) ValidateFiles(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string, loader ResourceLoader) (assertion.ValidationReport, error) {
+func (l FileLinter) ValidateFiles(ruleSet assertion.RuleSet, tags []string, ruleIDs []string, loader ResourceLoader) (assertion.ValidationReport, error) {
 
 	report := assertion.ValidationReport{
 		FilesScanned:     []string{},
@@ -20,7 +21,7 @@ func (l FileLinter) ValidateFiles(filenames []string, ruleSet assertion.RuleSet,
 	}
 	rules := assertion.FilterRulesByTagAndID(ruleSet.Rules, tags, ruleIDs)
 	r := ResourceLinter{Log: l.Log}
-	for _, filename := range filenames {
+	for _, filename := range l.Filenames {
 		include, err := assertion.ShouldIncludeFile(ruleSet.Files, filename)
 		if err == nil && include {
 			l.Log(fmt.Sprintf("Processing %s", filename))
@@ -40,8 +41,8 @@ func (l FileLinter) ValidateFiles(filenames []string, ruleSet assertion.RuleSet,
 }
 
 // SearchFiles evaluates a JMESPath expression against resources in a collection of filenames
-func (l FileLinter) SearchFiles(filenames []string, ruleSet assertion.RuleSet, searchExpression string, loader ResourceLoader) {
-	for _, filename := range filenames {
+func (l FileLinter) SearchFiles(ruleSet assertion.RuleSet, searchExpression string, loader ResourceLoader) {
+	for _, filename := range l.Filenames {
 		include, _ := assertion.ShouldIncludeFile(ruleSet.Files, filename) // FIXME what about error?
 		if include {
 			fmt.Printf("Searching %s:\n", filename)

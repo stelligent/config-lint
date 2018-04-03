@@ -6,7 +6,8 @@ import (
 
 // KubernetesLinter lints resources in Kubernets YAML files
 type KubernetesLinter struct {
-	Log assertion.LoggingFunction
+	Filenames []string
+	Log       assertion.LoggingFunction
 }
 
 // KubernetesResourceLoader converts Kubernetes configuration files into a collection of Resource objects
@@ -50,15 +51,15 @@ func (l KubernetesResourceLoader) Load(filename string) ([]assertion.Resource, e
 }
 
 // Validate runs validate on a collection of filenames using a RuleSet
-func (l KubernetesLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) (assertion.ValidationReport, error) {
+func (l KubernetesLinter) Validate(ruleSet assertion.RuleSet, tags []string, ruleIDs []string) (assertion.ValidationReport, error) {
 	loader := KubernetesResourceLoader{Log: l.Log}
-	f := FileLinter{Log: l.Log}
-	return f.ValidateFiles(filenames, ruleSet, tags, ruleIDs, loader)
+	f := FileLinter{Filenames: l.Filenames, Log: l.Log}
+	return f.ValidateFiles(ruleSet, tags, ruleIDs, loader)
 }
 
 // Search evaluates a JMESPath expression against the resources in a collection of filenames
-func (l KubernetesLinter) Search(filenames []string, ruleSet assertion.RuleSet, searchExpression string) {
+func (l KubernetesLinter) Search(ruleSet assertion.RuleSet, searchExpression string) {
 	loader := KubernetesResourceLoader{Log: l.Log}
-	f := FileLinter{Log: l.Log}
-	f.SearchFiles(filenames, ruleSet, searchExpression, loader)
+	f := FileLinter{Filenames: l.Filenames, Log: l.Log}
+	f.SearchFiles(ruleSet, searchExpression, loader)
 }

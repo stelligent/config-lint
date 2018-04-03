@@ -7,10 +7,10 @@ import (
 func TestTerraformLinter(t *testing.T) {
 	emptyTags := []string{}
 	emptyIds := []string{}
-	linter := TerraformLinter{Log: testLogger}
-	ruleSet := loadRulesForTest("./testdata/rules/terraform_instance.yml", t)
 	filenames := []string{"./testdata/resources/terraform_instance.tf"}
-	report, err := linter.Validate(filenames, ruleSet, emptyTags, emptyIds)
+	linter := TerraformLinter{Filenames: filenames, Log: testLogger}
+	ruleSet := loadRulesForTest("./testdata/rules/terraform_instance.yml", t)
+	report, err := linter.Validate(ruleSet, emptyTags, emptyIds)
 	if err != nil {
 		t.Error("Expecting TestTerraformLinter to not return an error")
 	}

@@ -99,12 +99,12 @@ func main() {
 			fmt.Println("Unable to parse rules in:" + rulesFilename)
 			fmt.Println(err.Error())
 		}
-		linter := makeLinter(ruleSet.Type, assertion.MakeLogger(*verboseLogging))
+		linter := makeLinter(ruleSet.Type, flag.Args(), assertion.MakeLogger(*verboseLogging))
 		if linter != nil {
 			if *searchExpression != "" {
-				linter.Search(flag.Args(), ruleSet, *searchExpression)
+				linter.Search(ruleSet, *searchExpression)
 			} else {
-				r, err := linter.Validate(flag.Args(), ruleSet, makeTagList(*tags), makeRulesList(*ids))
+				r, err := linter.Validate(ruleSet, makeTagList(*tags), makeRulesList(*ids))
 				if err != nil {
 					fmt.Println("Validate failed:", err) // FIXME
 				}

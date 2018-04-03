@@ -11,7 +11,8 @@ import (
 
 // TerraformLinter implements a Linter for Terraform configuration files
 type TerraformLinter struct {
-	Log assertion.LoggingFunction
+	Filenames []string
+	Log       assertion.LoggingFunction
 }
 
 // TerraformResourceLoader converts Terraform configuration files into JSON objects
@@ -102,15 +103,15 @@ func (l TerraformResourceLoader) Load(filename string) ([]assertion.Resource, er
 }
 
 // Validate uses a RuleSet to validate resources in a collection of Terraform configuration files
-func (l TerraformLinter) Validate(filenames []string, ruleSet assertion.RuleSet, tags []string, ruleIDs []string) (assertion.ValidationReport, error) {
+func (l TerraformLinter) Validate(ruleSet assertion.RuleSet, tags []string, ruleIDs []string) (assertion.ValidationReport, error) {
 	loader := TerraformResourceLoader{Log: l.Log}
-	f := FileLinter{Log: l.Log}
-	return f.ValidateFiles(filenames, ruleSet, tags, ruleIDs, loader)
+	f := FileLinter{Filenames: l.Filenames, Log: l.Log}
+	return f.ValidateFiles(ruleSet, tags, ruleIDs, loader)
 }
 
 // Search applies a JMESPath expression to the resources in a collection of Terraform configuration files
-func (l TerraformLinter) Search(filenames []string, ruleSet assertion.RuleSet, searchExpression string) {
+func (l TerraformLinter) Search(ruleSet assertion.RuleSet, searchExpression string) {
 	loader := TerraformResourceLoader{Log: l.Log}
-	f := FileLinter{Log: l.Log}
-	f.SearchFiles(filenames, ruleSet, searchExpression, loader)
+	f := FileLinter{Filenames: l.Filenames, Log: l.Log}
+	f.SearchFiles(ruleSet, searchExpression, loader)
 }
