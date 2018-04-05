@@ -104,10 +104,10 @@ func (l TerraformResourceLoader) Load(filename string) ([]assertion.Resource, er
 }
 
 // Validate uses a RuleSet to validate resources in a collection of Terraform configuration files
-func (l TerraformLinter) Validate(ruleSet assertion.RuleSet, tags []string, ruleIDs []string) (assertion.ValidationReport, error) {
+func (l TerraformLinter) Validate(ruleSet assertion.RuleSet, options LinterOptions) (assertion.ValidationReport, error) {
 	loader := TerraformResourceLoader{Log: l.Log}
 	f := FileLinter{Filenames: l.Filenames, Log: l.Log, ValueSource: l.ValueSource, Loader: loader}
-	return f.ValidateFiles(ruleSet, tags, ruleIDs)
+	return f.ValidateFiles(ruleSet, options)
 }
 
 // Search applies a JMESPath expression to the resources in a collection of Terraform configuration files

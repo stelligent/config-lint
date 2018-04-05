@@ -19,14 +19,14 @@ type FileLinter struct {
 }
 
 // ValidateFiles validates a collection of filenames using a RuleSet
-func (fl FileLinter) ValidateFiles(ruleSet assertion.RuleSet, tags []string, ruleIDs []string) (assertion.ValidationReport, error) {
+func (fl FileLinter) ValidateFiles(ruleSet assertion.RuleSet, options LinterOptions) (assertion.ValidationReport, error) {
 
 	report := assertion.ValidationReport{
 		FilesScanned:     []string{},
 		ResourcesScanned: []assertion.ScannedResource{},
 		Violations:       []assertion.Violation{},
 	}
-	rules := assertion.FilterRulesByTagAndID(ruleSet.Rules, tags, ruleIDs)
+	rules := assertion.FilterRulesByTagAndID(ruleSet.Rules, options.Tags, options.RuleIDs)
 	rl := ResourceLinter{Log: fl.Log, ValueSource: fl.ValueSource}
 	for _, filename := range fl.Filenames {
 		include, err := assertion.ShouldIncludeFile(ruleSet.Files, filename)

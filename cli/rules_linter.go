@@ -60,10 +60,10 @@ func (l RulesResourceLoader) Load(filename string) ([]assertion.Resource, error)
 }
 
 // Validate runs validate on a collection of filenames using a RuleSet
-func (l RulesLinter) Validate(ruleSet assertion.RuleSet, tags []string, ruleIDs []string) (assertion.ValidationReport, error) {
+func (l RulesLinter) Validate(ruleSet assertion.RuleSet, options LinterOptions) (assertion.ValidationReport, error) {
 	loader := RulesResourceLoader{Log: l.Log}
 	f := FileLinter{Filenames: l.Filenames, Log: l.Log, Loader: loader}
-	return f.ValidateFiles(ruleSet, tags, ruleIDs)
+	return f.ValidateFiles(ruleSet, options)
 }
 
 // Search evaluates a JMESPath expression against the resources in a collection of filenames

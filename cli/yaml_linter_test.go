@@ -5,12 +5,14 @@ import (
 )
 
 func TestYAMLLinter(t *testing.T) {
-	emptyTags := []string{}
-	emptyIds := []string{}
+	options := LinterOptions{
+		Tags:    []string{},
+		RuleIDs: []string{},
+	}
 	filenames := []string{"./testdata/resources/generic.config"}
 	linter := YAMLLinter{Filenames: filenames, Log: testLogger, ValueSource: TestingValueSource{}}
 	ruleSet := loadRulesForTest("./testdata/rules/generic.yml", t)
-	report, err := linter.Validate(ruleSet, emptyTags, emptyIds)
+	report, err := linter.Validate(ruleSet, options)
 	if err != nil {
 		t.Error("Expecting TestYAMLLinter to not return an error")
 	}

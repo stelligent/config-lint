@@ -104,7 +104,11 @@ func main() {
 			if *searchExpression != "" {
 				linter.Search(ruleSet, *searchExpression)
 			} else {
-				r, err := linter.Validate(ruleSet, makeTagList(*tags), makeRulesList(*ids))
+				options := LinterOptions{
+					Tags:    makeTagList(*tags),
+					RuleIDs: makeRulesList(*ids),
+				}
+				r, err := linter.Validate(ruleSet, options)
 				if err != nil {
 					fmt.Println("Validate failed:", err) // FIXME
 				}

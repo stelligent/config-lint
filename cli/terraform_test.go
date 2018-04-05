@@ -6,12 +6,14 @@ import (
 )
 
 func TestTerraformLinter(t *testing.T) {
-	emptyTags := []string{}
-	emptyIds := []string{}
+	options := LinterOptions{
+		Tags:    []string{},
+		RuleIDs: []string{},
+	}
 	filenames := []string{"./testdata/resources/terraform_instance.tf"}
 	linter := TerraformLinter{Filenames: filenames, Log: testLogger, ValueSource: TestingValueSource{}}
 	ruleSet := loadRulesForTest("./testdata/rules/terraform_instance.yml", t)
-	report, err := linter.Validate(ruleSet, emptyTags, emptyIds)
+	report, err := linter.Validate(ruleSet, options)
 	if err != nil {
 		t.Error("Expecting TestTerraformLinter to not return an error")
 	}
