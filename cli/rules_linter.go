@@ -6,8 +6,9 @@ import (
 
 // RulesLinter lints rules files for itself
 type RulesLinter struct {
-	Filenames []string
-	Log       assertion.LoggingFunction
+	Filenames   []string
+	Log         assertion.LoggingFunction
+	ValueSource assertion.ValueSource
 }
 
 // RulesResourceLoader converts a YAML configuration file into a collection with Resource objects

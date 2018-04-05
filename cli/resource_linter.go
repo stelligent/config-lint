@@ -7,7 +7,8 @@ import (
 
 // ResourceLinter provides the basic validation logic used by all linters
 type ResourceLinter struct {
-	Log assertion.LoggingFunction
+	Log         assertion.LoggingFunction
+	ValueSource assertion.ValueSource
 }
 
 // ValidateResources evaluates a list of Rule objects to a list of Resource objects
@@ -18,8 +19,7 @@ func (r ResourceLinter) ValidateResources(resources []assertion.Resource, rules 
 		Violations:       []assertion.Violation{},
 	}
 
-	valueSource := assertion.StandardValueSource{Log: r.Log}
-	resolvedRules := assertion.ResolveRules(rules, valueSource, r.Log)
+	resolvedRules := assertion.ResolveRules(rules, r.ValueSource, r.Log)
 	externalRules := assertion.StandardExternalRuleInvoker{Log: r.Log}
 
 	for _, rule := range resolvedRules {

@@ -7,12 +7,13 @@ import (
 
 // FileLinter provides implementation for some common functions that are used by multiple Linter implementations
 type FileLinter struct {
-	Filenames []string
-	Log       assertion.LoggingFunction
+	Filenames   []string
+	Log         assertion.LoggingFunction
+	ValueSource assertion.ValueSource
 }
 
 // ValidateFiles validates a collection of filenames using a RuleSet
-func (l FileLinter) ValidateFiles(ruleSet assertion.RuleSet, tags []string, ruleIDs []string, loader ResourceLoader) (assertion.ValidationReport, error) {
+func (fl FileLinter) ValidateFiles(ruleSet assertion.RuleSet, tags []string, ruleIDs []string, loader ResourceLoader) (assertion.ValidationReport, error) {
 
 	report := assertion.ValidationReport{
 		FilesScanned:     []string{},
@@ -20,16 +21,16 @@ func (l FileLinter) ValidateFiles(ruleSet assertion.RuleSet, tags []string, rule
 		Violations:       []assertion.Violation{},
 	}
 	rules := assertion.FilterRulesByTagAndID(ruleSet.Rules, tags, ruleIDs)
-	r := ResourceLinter{Log: l.Log}
-	for _, filename := range l.Filenames {
+	rl := ResourceLinter{Log: fl.Log, ValueSource: fl.ValueSource}
+	for _, filename := range fl.Filenames {
 		include, err := assertion.ShouldIncludeFile(ruleSet.Files, filename)
 		if err == nil && include {
-			l.Log(fmt.Sprintf("Processing %s", filename))
+			fl.Log(fmt.Sprintf("Processing %s", filename))
 			resources, err := loader.Load(filename)
 			if err != nil {
 				return report, err
 			}
-			r, err := r.ValidateResources(resources, rules)
+			r, err := rl.ValidateResources(resources, rules)
 			r.FilesScanned = []string{filename}
 			report = combineValidationReports(report, r)
 			if err != nil {

@@ -8,7 +8,7 @@ func TestYAMLLinter(t *testing.T) {
 	emptyTags := []string{}
 	emptyIds := []string{}
 	filenames := []string{"./testdata/resources/generic.config"}
-	linter := YAMLLinter{Filenames: filenames, Log: testLogger}
+	linter := YAMLLinter{Filenames: filenames, Log: testLogger, ValueSource: TestingValueSource{}}
 	ruleSet := loadRulesForTest("./testdata/rules/generic.yml", t)
 	report, err := linter.Validate(ruleSet, emptyTags, emptyIds)
 	if err != nil {

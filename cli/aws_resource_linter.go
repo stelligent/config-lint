@@ -13,8 +13,9 @@ type (
 
 	// AWSResourceLinter implements a Linter for data returned by the calls to the AWS SDK
 	AWSResourceLinter struct {
-		Loader AWSResourceLoader
-		Log    assertion.LoggingFunction
+		Loader      AWSResourceLoader
+		Log         assertion.LoggingFunction
+		ValueSource assertion.ValueSource
 	}
 )
 
