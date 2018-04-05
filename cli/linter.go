@@ -11,11 +11,6 @@ type Linter interface {
 	Search(ruleSet assertion.RuleSet, searchExpression string)
 }
 
-// ResourceLoader provides the interface that a Linter needs to load a collection of Resource objects
-type ResourceLoader interface {
-	Load(filename string) ([]assertion.Resource, error)
-}
-
 func makeLinter(linterType string, args []string, log assertion.LoggingFunction) Linter {
 	vs := assertion.StandardValueSource{}
 	switch linterType {
