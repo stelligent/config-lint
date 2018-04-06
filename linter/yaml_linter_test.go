@@ -1,11 +1,11 @@
-package main
+package linter
 
 import (
 	"testing"
 )
 
 func TestYAMLLinter(t *testing.T) {
-	options := LinterOptions{
+	options := Options{
 		Tags:    []string{},
 		RuleIDs: []string{},
 	}

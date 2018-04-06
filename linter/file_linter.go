@@ -1,4 +1,4 @@
-package main
+package linter
 
 import (
 	"fmt"
@@ -18,7 +18,7 @@ type FileLinter struct {
 }
 
 // ValidateFiles validates a collection of filenames using a RuleSet
-func (fl FileLinter) ValidateFiles(ruleSet assertion.RuleSet, options LinterOptions) (assertion.ValidationReport, error) {
+func (fl FileLinter) ValidateFiles(ruleSet assertion.RuleSet, options Options) (assertion.ValidationReport, error) {
 
 	report := assertion.ValidationReport{
 		FilesScanned:     []string{},
@@ -37,7 +37,7 @@ func (fl FileLinter) ValidateFiles(ruleSet assertion.RuleSet, options LinterOpti
 			}
 			r, err := rl.ValidateResources(resources, rules)
 			r.FilesScanned = []string{filename}
-			report = combineValidationReports(report, r)
+			report = CombineValidationReports(report, r)
 			if err != nil {
 				return report, err
 			}

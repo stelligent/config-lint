@@ -1,4 +1,4 @@
-package main
+package linter
 
 import (
 	"github.com/stelligent/config-lint/assertion"
@@ -54,7 +54,7 @@ func (l YAMLResourceLoader) Load(filename string) ([]assertion.Resource, error) 
 }
 
 // Validate runs validate on a collection of filenames using a RuleSet
-func (l YAMLLinter) Validate(ruleSet assertion.RuleSet, options LinterOptions) (assertion.ValidationReport, error) {
+func (l YAMLLinter) Validate(ruleSet assertion.RuleSet, options Options) (assertion.ValidationReport, error) {
 	loader := YAMLResourceLoader{Resources: ruleSet.Resources}
 	f := FileLinter{Filenames: l.Filenames, ValueSource: l.ValueSource, Loader: loader}
 	return f.ValidateFiles(ruleSet, options)

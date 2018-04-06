@@ -1,4 +1,4 @@
-package main
+package linter
 
 import (
 	"github.com/stelligent/config-lint/assertion"
@@ -49,7 +49,7 @@ func (l KubernetesResourceLoader) Load(filename string) ([]assertion.Resource, e
 }
 
 // Validate runs validate on a collection of filenames using a RuleSet
-func (l KubernetesLinter) Validate(ruleSet assertion.RuleSet, options LinterOptions) (assertion.ValidationReport, error) {
+func (l KubernetesLinter) Validate(ruleSet assertion.RuleSet, options Options) (assertion.ValidationReport, error) {
 	loader := KubernetesResourceLoader{}
 	f := FileLinter{Filenames: l.Filenames, ValueSource: l.ValueSource, Loader: loader}
 	return f.ValidateFiles(ruleSet, options)

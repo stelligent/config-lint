@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/ghodss/yaml"
 	"github.com/stelligent/config-lint/assertion"
+	"github.com/stelligent/config-lint/linter"
 	"os"
 	"strings"
 )
@@ -77,24 +78,24 @@ func applyRules(rulesFilenames arrayFlags, args arrayFlags, options ApplyOptions
 			fmt.Println("Unable to parse rules in:" + rulesFilename)
 			fmt.Println(err.Error())
 		}
-		linter, err := makeLinter(ruleSet.Type, args)
+		l, err := linter.NewLinter(ruleSet.Type, args)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		if linter != nil {
+		if l != nil {
 			if options.SearchExpression != "" {
-				linter.Search(ruleSet, options.SearchExpression)
+				l.Search(ruleSet, options.SearchExpression)
 			} else {
-				linterOptions := LinterOptions{
+				options := linter.Options{
 					Tags:    options.Tags,
 					RuleIDs: options.RuleIDs,
 				}
-				r, err := linter.Validate(ruleSet, linterOptions)
+				r, err := l.Validate(ruleSet, options)
 				if err != nil {
 					fmt.Println("Validate failed:", err)
 				}
-				report = combineValidationReports(report, r)
+				report = linter.CombineValidationReports(report, r)
 			}
 		}
 	}

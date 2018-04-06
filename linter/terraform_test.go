@@ -1,4 +1,4 @@
-package main
+package linter
 
 import (
 	"github.com/stelligent/config-lint/assertion"
@@ -6,7 +6,7 @@ import (
 )
 
 func TestTerraformLinter(t *testing.T) {
-	options := LinterOptions{
+	options := Options{
 		Tags:    []string{},
 		RuleIDs: []string{},
 	}

@@ -1,4 +1,4 @@
-package main
+package linter
 
 import (
 	"github.com/stelligent/config-lint/assertion"

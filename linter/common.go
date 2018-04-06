@@ -1,4 +1,4 @@
-package main
+package linter
 
 import (
 	"fmt"
@@ -32,7 +32,7 @@ func getResourceIDFromFilename(filename string) string {
 	return resourceID
 }
 
-func combineValidationReports(r1, r2 assertion.ValidationReport) assertion.ValidationReport {
+func CombineValidationReports(r1, r2 assertion.ValidationReport) assertion.ValidationReport {
 	return assertion.ValidationReport{
 		FilesScanned:     append(r1.FilesScanned, r2.FilesScanned...),
 		ResourcesScanned: append(r1.ResourcesScanned, r2.ResourcesScanned...),

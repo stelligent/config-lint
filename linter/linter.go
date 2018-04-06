@@ -1,4 +1,4 @@
-package main
+package linter
 
 import (
 	"fmt"
@@ -8,18 +8,18 @@ import (
 type (
 	// Linter provides the interface for all supported linters
 	Linter interface {
-		Validate(ruleSet assertion.RuleSet, options LinterOptions) (assertion.ValidationReport, error)
+		Validate(ruleSet assertion.RuleSet, options Options) (assertion.ValidationReport, error)
 		Search(ruleSet assertion.RuleSet, searchExpression string)
 	}
 
-	// LinterOptions configures what resources will be linted
-	LinterOptions struct {
+	// Options configures what resources will be linted
+	Options struct {
 		Tags    []string
 		RuleIDs []string
 	}
 )
 
-func makeLinter(linterType string, args []string) (Linter, error) {
+func NewLinter(linterType string, args []string) (Linter, error) {
 	vs := assertion.StandardValueSource{}
 	switch linterType {
 	case "Kubernetes":

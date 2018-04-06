@@ -1,4 +1,4 @@
-package main
+package linter
 
 import (
 	"encoding/json"
@@ -113,7 +113,7 @@ func (l TerraformResourceLoader) Load(filename string) ([]assertion.Resource, er
 }
 
 // Validate uses a RuleSet to validate resources in a collection of Terraform configuration files
-func (l TerraformLinter) Validate(ruleSet assertion.RuleSet, options LinterOptions) (assertion.ValidationReport, error) {
+func (l TerraformLinter) Validate(ruleSet assertion.RuleSet, options Options) (assertion.ValidationReport, error) {
 	loader := TerraformResourceLoader{}
 	f := FileLinter{Filenames: l.Filenames, ValueSource: l.ValueSource, Loader: loader}
 	return f.ValidateFiles(ruleSet, options)

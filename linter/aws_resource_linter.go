@@ -1,4 +1,4 @@
-package main
+package linter
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ type (
 )
 
 // Validate applies a Ruleset to all SecurityGroups
-func (l AWSResourceLinter) Validate(ruleSet assertion.RuleSet, options LinterOptions) (assertion.ValidationReport, error) {
+func (l AWSResourceLinter) Validate(ruleSet assertion.RuleSet, options Options) (assertion.ValidationReport, error) {
 	rules := assertion.FilterRulesByTagAndID(ruleSet.Rules, options.Tags, options.RuleIDs)
 	resources, err := l.Loader.Load()
 	if err != nil {
