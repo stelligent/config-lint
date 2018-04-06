@@ -4,12 +4,6 @@ import (
 	"github.com/stelligent/config-lint/assertion"
 )
 
-// RulesLinter lints rules files for itself
-type RulesLinter struct {
-	Filenames   []string
-	ValueSource assertion.ValueSource
-}
-
 // RulesResourceLoader converts a YAML configuration file into a collection with Resource objects
 type RulesResourceLoader struct{}
 
@@ -54,18 +48,4 @@ func (l RulesResourceLoader) Load(filename string) ([]assertion.Resource, error)
 		}
 	}
 	return resources, nil
-}
-
-// Validate runs validate on a collection of filenames using a RuleSet
-func (l RulesLinter) Validate(ruleSet assertion.RuleSet, options Options) (assertion.ValidationReport, error) {
-	loader := RulesResourceLoader{}
-	f := FileLinter{Filenames: l.Filenames, ValueSource: l.ValueSource, Loader: loader}
-	return f.ValidateFiles(ruleSet, options)
-}
-
-// Search evaluates a JMESPath expression against the resources in a collection of filenames
-func (l RulesLinter) Search(ruleSet assertion.RuleSet, searchExpression string) {
-	loader := RulesResourceLoader{}
-	f := FileLinter{Filenames: l.Filenames, ValueSource: l.ValueSource, Loader: loader}
-	f.SearchFiles(ruleSet, searchExpression)
 }

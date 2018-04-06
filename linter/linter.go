@@ -19,22 +19,23 @@ type (
 	}
 )
 
-func NewLinter(linterType string, args []string) (Linter, error) {
+// NewLinter create the right kind of Linter based on the type argument
+func NewLinter(ruleSet assertion.RuleSet, args []string) (Linter, error) {
 	vs := assertion.StandardValueSource{}
-	switch linterType {
+	switch ruleSet.Type {
 	case "Kubernetes":
-		return KubernetesLinter{Filenames: args, ValueSource: vs}, nil
+		return FileLinter{Filenames: args, ValueSource: vs, Loader: KubernetesResourceLoader{}}, nil
 	case "Terraform":
-		return TerraformLinter{Filenames: args, ValueSource: vs}, nil
+		return FileLinter{Filenames: args, ValueSource: vs, Loader: TerraformResourceLoader{}}, nil
 	case "SecurityGroup":
 		return AWSResourceLinter{Loader: SecurityGroupLoader{}, ValueSource: vs}, nil
 	case "IAMUser":
 		return AWSResourceLinter{Loader: IAMUserLoader{}, ValueSource: vs}, nil
 	case "LintRules":
-		return RulesLinter{Filenames: args, ValueSource: vs}, nil
+		return FileLinter{Filenames: args, ValueSource: vs, Loader: RulesResourceLoader{}}, nil
 	case "YAML":
-		return YAMLLinter{Filenames: args, ValueSource: vs}, nil
+		return FileLinter{Filenames: args, ValueSource: vs, Loader: YAMLResourceLoader{Resources: ruleSet.Resources}}, nil
 	default:
-		return nil, fmt.Errorf("Type not supported: %s", linterType)
+		return nil, fmt.Errorf("Type not supported: %s", ruleSet.Type)
 	}
 }

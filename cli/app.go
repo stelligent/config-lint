@@ -78,7 +78,7 @@ func applyRules(rulesFilenames arrayFlags, args arrayFlags, options ApplyOptions
 			fmt.Println("Unable to parse rules in:" + rulesFilename)
 			fmt.Println(err.Error())
 		}
-		l, err := linter.NewLinter(ruleSet.Type, args)
+		l, err := linter.NewLinter(ruleSet, args)
 		if err != nil {
 			fmt.Println(err)
 			return

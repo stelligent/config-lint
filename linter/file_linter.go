@@ -17,8 +17,8 @@ type FileLinter struct {
 	Loader      FileResourceLoader
 }
 
-// ValidateFiles validates a collection of filenames using a RuleSet
-func (fl FileLinter) ValidateFiles(ruleSet assertion.RuleSet, options Options) (assertion.ValidationReport, error) {
+// Validate validates a collection of filenames using a RuleSet
+func (fl FileLinter) Validate(ruleSet assertion.RuleSet, options Options) (assertion.ValidationReport, error) {
 
 	report := assertion.ValidationReport{
 		FilesScanned:     []string{},
@@ -46,8 +46,8 @@ func (fl FileLinter) ValidateFiles(ruleSet assertion.RuleSet, options Options) (
 	return report, nil
 }
 
-// SearchFiles evaluates a JMESPath expression against resources in a collection of filenames
-func (fl FileLinter) SearchFiles(ruleSet assertion.RuleSet, searchExpression string) {
+// Search evaluates a JMESPath expression against resources in a collection of filenames
+func (fl FileLinter) Search(ruleSet assertion.RuleSet, searchExpression string) {
 	for _, filename := range fl.Filenames {
 		include, _ := assertion.ShouldIncludeFile(ruleSet.Files, filename) // FIXME what about error?
 		if include {

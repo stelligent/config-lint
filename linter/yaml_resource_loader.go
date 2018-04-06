@@ -4,12 +4,6 @@ import (
 	"github.com/stelligent/config-lint/assertion"
 )
 
-// YAMLLinter lints rules from a generic YAML file
-type YAMLLinter struct {
-	Filenames   []string
-	ValueSource assertion.ValueSource
-}
-
 // YAMLResourceLoader loads a list of Resource objects based on the list of ResourceConfig objects
 type YAMLResourceLoader struct {
 	Resources []assertion.ResourceConfig
@@ -51,18 +45,4 @@ func (l YAMLResourceLoader) Load(filename string) ([]assertion.Resource, error) 
 		}
 	}
 	return resources, nil
-}
-
-// Validate runs validate on a collection of filenames using a RuleSet
-func (l YAMLLinter) Validate(ruleSet assertion.RuleSet, options Options) (assertion.ValidationReport, error) {
-	loader := YAMLResourceLoader{Resources: ruleSet.Resources}
-	f := FileLinter{Filenames: l.Filenames, ValueSource: l.ValueSource, Loader: loader}
-	return f.ValidateFiles(ruleSet, options)
-}
-
-// Search evaluates a JMESPath expression against the resources in a collection of filenames
-func (l YAMLLinter) Search(ruleSet assertion.RuleSet, searchExpression string) {
-	loader := YAMLResourceLoader{Resources: ruleSet.Resources}
-	f := FileLinter{Filenames: l.Filenames, ValueSource: l.ValueSource, Loader: loader}
-	f.SearchFiles(ruleSet, searchExpression)
 }

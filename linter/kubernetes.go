@@ -47,17 +47,3 @@ func (l KubernetesResourceLoader) Load(filename string) ([]assertion.Resource, e
 	}
 	return resources, nil
 }
-
-// Validate runs validate on a collection of filenames using a RuleSet
-func (l KubernetesLinter) Validate(ruleSet assertion.RuleSet, options Options) (assertion.ValidationReport, error) {
-	loader := KubernetesResourceLoader{}
-	f := FileLinter{Filenames: l.Filenames, ValueSource: l.ValueSource, Loader: loader}
-	return f.ValidateFiles(ruleSet, options)
-}
-
-// Search evaluates a JMESPath expression against the resources in a collection of filenames
-func (l KubernetesLinter) Search(ruleSet assertion.RuleSet, searchExpression string) {
-	loader := KubernetesResourceLoader{}
-	f := FileLinter{Filenames: l.Filenames, ValueSource: l.ValueSource, Loader: loader}
-	f.SearchFiles(ruleSet, searchExpression)
-}

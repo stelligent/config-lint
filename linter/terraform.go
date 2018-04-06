@@ -10,12 +10,6 @@ import (
 	"io/ioutil"
 )
 
-// TerraformLinter implements a Linter for Terraform configuration files
-type TerraformLinter struct {
-	Filenames   []string
-	ValueSource assertion.ValueSource
-}
-
 // TerraformResourceLoader converts Terraform configuration files into JSON objects
 type TerraformResourceLoader struct{}
 
@@ -110,18 +104,4 @@ func (l TerraformResourceLoader) Load(filename string) ([]assertion.Resource, er
 		}
 	}
 	return resources, nil
-}
-
-// Validate uses a RuleSet to validate resources in a collection of Terraform configuration files
-func (l TerraformLinter) Validate(ruleSet assertion.RuleSet, options Options) (assertion.ValidationReport, error) {
-	loader := TerraformResourceLoader{}
-	f := FileLinter{Filenames: l.Filenames, ValueSource: l.ValueSource, Loader: loader}
-	return f.ValidateFiles(ruleSet, options)
-}
-
-// Search applies a JMESPath expression to the resources in a collection of Terraform configuration files
-func (l TerraformLinter) Search(ruleSet assertion.RuleSet, searchExpression string) {
-	loader := TerraformResourceLoader{}
-	f := FileLinter{Filenames: l.Filenames, ValueSource: l.ValueSource, Loader: loader}
-	f.SearchFiles(ruleSet, searchExpression)
 }
