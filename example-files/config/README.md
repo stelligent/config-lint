@@ -14,6 +14,8 @@ Done:
 
 * IamRoleNotActionOnPermissionsPolicyRule
 * IamRoleNotResourceOnPermissionsPolicyRule
+* IamRoleWildcardActionOnPermissionsPolicyRule
+* IamRoleWildcardResourceOnPermissionsPolicyRule
 
 * S3BucketPolicyNotActionRule
 * S3BucketPolicyNotPrincipalRule
@@ -22,7 +24,7 @@ Done:
 
 * SecurityGroupEgressOpenToWorldRule
 * SecurityGroupEgressPortRangeRule
-* SecurityGroupIngressCidrNon32Rule - but what is standalong ingress in cfn_nag?
+* SecurityGroupIngressCidrNon32Rule - but what is standalone ingress in cfn_nag?
 * SecurityGroupIngressOpenToWorldRule
 * SecurityGroupIngressPortRangeRule
 * SecurityGroupMissingEgressRule
@@ -36,6 +38,14 @@ Done:
 * SqsQueuePolicyWildcardActionRule
 * SqsQueuePolicyWildcardPrincipalRule
 
+* S3BucketPublicReadAclRule
+* S3BucketPublicReadWriteAclRule
+
+* LambdaPermissionInvokeFunctionActionRule
+* LambdaPermissionWildcardPrincipalRule
+
+* WafWebAclDefaultActionRule
+
 TODO
 * CloudFront resource !Metadata['AWS::CloudFront::Authentication'].nil?  How to specify in Terraform?
 
@@ -46,21 +56,11 @@ TODO
 
 * IamRoleNotActionOnTrustPolicyRule
 * IamRoleNotPrincipalOnTrustPolicyRule
-* IamRoleWildcardActionOnPermissionsPolicyRule
 * IamRoleWildcardActionOnTrustPolicyRule
-* IamRoleWildcardResourceOnPermissionsPolicyRule
-
-* LambdaPermissionInvokeFunctionActionRule
-* LambdaPermissionWildcardPrincipalRule
 
 * ManagedPolicyOnUserRule
 * PolicyOnUserRule
 
-* S3BucketPublicReadAclRule
-* S3BucketPublicReadWriteAclRule
-
-
 * UserHasInlinePolicyRule
 * UserMissingGroupRule
 
-* WafWebAclDefaultActionRule

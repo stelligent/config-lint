@@ -198,4 +198,5 @@ It is also possible to use a rules files in a Lambda that handles events from AW
 * Create a Provider interface for AWS calls, create a mock for testing SecurityGroupLinter
 * Maybe assertions for every,some,none expressions should be renamed to expressions
 * Starting to have inconsistent naming in ops: is-true, is-false, has-properties vs. present, absent, empty, null
-* Add options to Assertion type, for things like 'ignore-case' for string compares?
+* Add options to Assertion type, for things like 'ignore-case' for string compares? Or just use a regex?
+* Make FAILURE the default severity
