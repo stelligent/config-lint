@@ -120,12 +120,60 @@ rules:
     tags:
       - cf
 
+  - id: ROLE_POLICY_NOT_ACTION
+    message: Should not use NotAction in IAM policy
+    resource: aws_iam_role_policy
+    severity: WARNING
+    assertions:
+      - key: policy.Statement[].NotAction
+        op: absent
+    tags:
+      - iam
+      - policy
+
+  - id: ROLE_POLICY_NOT_RESOURCE
+    message: Should not use NotResource in IAM policy
+    resource: aws_iam_role_policy
+    severity: WARNING
+    assertions:
+      - key: policy.Statement[].NotResource
+        op: absent
+    tags:
+      - iam
+      - policy
+
+  - id: ROLE_POLICY_WILDCARD_ACTION
+    message: Should not use wildcard action in IAM policy
+    resource: aws_iam_role_policy
+    severity: FAILURE
+    assertions:
+      - not:
+        - key: policy.Statement[].Action
+          op: contains
+          value: "*"
+    tags:
+      - iam
+      - policy
+
+  - id: ROLE_POLICY_WILDCARD_RESOURCE
+    message: Should not use wildcard resource in IAM policy
+    resource: aws_iam_role_policy
+    severity: WARNING
+    assertions:
+      - not:
+        - key: policy.Statement[].Resource
+          op: contains
+          value: "*"
+    tags:
+      - iam
+      - policy
+
   - id: POLICY_NOT_ACTION
     message: Should not use NotAction in IAM policy
     resource: aws_iam_policy
     severity: WARNING
     assertions:
-      - key: policy.Statement[].NotAction
+      - key: assume_role_policy.Statement[].NotAction
         op: absent
     tags:
       - iam
@@ -136,7 +184,7 @@ rules:
     resource: aws_iam_policy
     severity: WARNING
     assertions:
-      - key: policy.Statement[].NotResource
+      - key: assume_role_policy.Statement[].NotResource
         op: absent
     tags:
       - iam
@@ -148,20 +196,7 @@ rules:
     severity: FAILURE
     assertions:
       - not:
-        - key: policy.Statement[].Action
-          op: contains
-          value: "*"
-    tags:
-      - iam
-      - policy
-
-  - id: POLICY_WILDCARD_RESOURCE
-    message: Should not use wildcard resource in IAM policy
-    resource: aws_iam_policy
-    severity: WARNING
-    assertions:
-      - not:
-        - key: policy.Statement[].Resource
+        - key: assume_role_policy.Statement[].Action
           op: contains
           value: "*"
     tags:
@@ -361,6 +396,16 @@ rules:
     severity: FAILURE
     assertions:
       - key: policy
+        op: absent
+    tags:
+      - iam
+
+  - id: IAM_USER_POLICY_ATTACHMENT
+    message: IAM should not have policies attached (make user a member of a group instead)
+    resource: aws_iam_user_policy_attachment
+    severity: FAILURE
+    assertions:
+      - key: "@"
         op: absent
     tags:
       - iam
