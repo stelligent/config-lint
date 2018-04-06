@@ -7,13 +7,11 @@ import (
 // YAMLLinter lints rules from a generic YAML file
 type YAMLLinter struct {
 	Filenames   []string
-	Log         assertion.LoggingFunction
 	ValueSource assertion.ValueSource
 }
 
 // YAMLResourceLoader loads a list of Resource objects based on the list of ResourceConfig objects
 type YAMLResourceLoader struct {
-	Log       assertion.LoggingFunction
 	Resources []assertion.ResourceConfig
 }
 
@@ -29,7 +27,7 @@ func extractResourceID(expression string, properties interface{}) string {
 // Load converts a text file into a collection of Resource objects
 func (l YAMLResourceLoader) Load(filename string) ([]assertion.Resource, error) {
 	resources := make([]assertion.Resource, 0)
-	yamlResources, err := loadYAML(filename, l.Log)
+	yamlResources, err := loadYAML(filename)
 	if err != nil {
 		return resources, err
 	}
@@ -57,14 +55,14 @@ func (l YAMLResourceLoader) Load(filename string) ([]assertion.Resource, error) 
 
 // Validate runs validate on a collection of filenames using a RuleSet
 func (l YAMLLinter) Validate(ruleSet assertion.RuleSet, options LinterOptions) (assertion.ValidationReport, error) {
-	loader := YAMLResourceLoader{Log: l.Log, Resources: ruleSet.Resources}
-	f := FileLinter{Filenames: l.Filenames, Log: l.Log, ValueSource: l.ValueSource, Loader: loader}
+	loader := YAMLResourceLoader{Resources: ruleSet.Resources}
+	f := FileLinter{Filenames: l.Filenames, ValueSource: l.ValueSource, Loader: loader}
 	return f.ValidateFiles(ruleSet, options)
 }
 
 // Search evaluates a JMESPath expression against the resources in a collection of filenames
 func (l YAMLLinter) Search(ruleSet assertion.RuleSet, searchExpression string) {
-	loader := YAMLResourceLoader{Log: l.Log, Resources: ruleSet.Resources}
-	f := FileLinter{Filenames: l.Filenames, Log: l.Log, ValueSource: l.ValueSource, Loader: loader}
+	loader := YAMLResourceLoader{Resources: ruleSet.Resources}
+	f := FileLinter{Filenames: l.Filenames, ValueSource: l.ValueSource, Loader: loader}
 	f.SearchFiles(ruleSet, searchExpression)
 }

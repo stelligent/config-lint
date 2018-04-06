@@ -5,7 +5,7 @@ import (
 	"github.com/stelligent/config-lint/assertion"
 )
 
-// ResourceLoader provides the interface that a Linter needs to load a collection of Resource objects
+// FileResourceLoader provides the interface that a Linter needs to load a collection of Resource objects
 type FileResourceLoader interface {
 	Load(filename string) ([]assertion.Resource, error)
 }
@@ -13,7 +13,6 @@ type FileResourceLoader interface {
 // FileLinter provides implementation for some common functions that are used by multiple Linter implementations
 type FileLinter struct {
 	Filenames   []string
-	Log         assertion.LoggingFunction
 	ValueSource assertion.ValueSource
 	Loader      FileResourceLoader
 }
@@ -27,11 +26,11 @@ func (fl FileLinter) ValidateFiles(ruleSet assertion.RuleSet, options LinterOpti
 		Violations:       []assertion.Violation{},
 	}
 	rules := assertion.FilterRulesByTagAndID(ruleSet.Rules, options.Tags, options.RuleIDs)
-	rl := ResourceLinter{Log: fl.Log, ValueSource: fl.ValueSource}
+	rl := ResourceLinter{ValueSource: fl.ValueSource}
 	for _, filename := range fl.Filenames {
 		include, err := assertion.ShouldIncludeFile(ruleSet.Files, filename)
 		if err == nil && include {
-			fl.Log(fmt.Sprintf("Processing %s", filename))
+			assertion.Debugf("Processing %s\n", filename)
 			resources, err := fl.Loader.Load(filename)
 			if err != nil {
 				return report, err
@@ -48,12 +47,12 @@ func (fl FileLinter) ValidateFiles(ruleSet assertion.RuleSet, options LinterOpti
 }
 
 // SearchFiles evaluates a JMESPath expression against resources in a collection of filenames
-func (l FileLinter) SearchFiles(ruleSet assertion.RuleSet, searchExpression string) {
-	for _, filename := range l.Filenames {
+func (fl FileLinter) SearchFiles(ruleSet assertion.RuleSet, searchExpression string) {
+	for _, filename := range fl.Filenames {
 		include, _ := assertion.ShouldIncludeFile(ruleSet.Files, filename) // FIXME what about error?
 		if include {
 			fmt.Printf("Searching %s:\n", filename)
-			resources, err := l.Loader.Load(filename)
+			resources, err := fl.Loader.Load(filename)
 			if err != nil {
 				fmt.Println("Error for file:", filename)
 				fmt.Println(err.Error())

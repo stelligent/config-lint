@@ -20,7 +20,6 @@ type InvokeResponse struct {
 
 // StandardExternalRuleInvoker implements an external HTTP or HTTPS call
 type StandardExternalRuleInvoker struct {
-	Log LoggingFunction
 }
 
 func makeViolation(rule Rule, resource Resource, message string) Violation {
@@ -57,7 +56,7 @@ func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (strin
 		violations := makeViolations(rule, resource, fmt.Sprintf("Unable to create JSON payload: %s", err.Error()))
 		return rule.Severity, violations, err
 	}
-	e.Log(fmt.Sprintf("Invoke %s on %s\n", rule.Invoke.URL, payloadJSON))
+	Debugf("Invoke %s on %s\n", rule.Invoke.URL, payloadJSON)
 	httpResponse, err := http.Post(rule.Invoke.URL, "application/json", bytes.NewBuffer([]byte(payloadJSON)))
 	if err != nil {
 		violations := makeViolations(rule, resource, fmt.Sprintf("Invoke failed: %s", err.Error()))
@@ -73,7 +72,7 @@ func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (strin
 		violations := makeViolations(rule, resource, "Invoke response cannot be read")
 		return rule.Severity, violations, nil
 	}
-	e.Log(string(body))
+	Debugf("Invoke body: %s\n", string(body))
 	var invokeResponse InvokeResponse
 	err = json.Unmarshal(body, &invokeResponse)
 	if err != nil {

@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 )
 
-func loadYAML(filename string, log assertion.LoggingFunction) ([]interface{}, error) {
+func loadYAML(filename string) ([]interface{}, error) {
 	empty := []interface{}{}
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {

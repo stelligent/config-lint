@@ -1,13 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"github.com/stelligent/config-lint/assertion"
 )
 
 // ResourceLinter provides the basic validation logic used by all linters
 type ResourceLinter struct {
-	Log         assertion.LoggingFunction
 	ValueSource assertion.ValueSource
 }
 
@@ -19,16 +17,16 @@ func (r ResourceLinter) ValidateResources(resources []assertion.Resource, rules 
 		Violations:       []assertion.Violation{},
 	}
 
-	resolvedRules := assertion.ResolveRules(rules, r.ValueSource, r.Log)
-	externalRules := assertion.StandardExternalRuleInvoker{Log: r.Log}
+	resolvedRules := assertion.ResolveRules(rules, r.ValueSource)
+	externalRules := assertion.StandardExternalRuleInvoker{}
 
 	for _, rule := range resolvedRules {
-		r.Log(fmt.Sprintf("Rule %s: %s", rule.ID, rule.Message))
+		assertion.Debugf("Rule: ID: %v Message: %s\n", rule.ID, rule.Message)
 		for _, resource := range assertion.FilterResourcesByType(resources, rule.Resource) {
 			if assertion.ExcludeResource(rule, resource) {
-				r.Log(fmt.Sprintf("Ignoring resource %s", resource.ID))
+				assertion.Debugf("Ignoring resource %s\n", resource.ID)
 			} else {
-				status, violations, err := assertion.CheckRule(rule, resource, externalRules, r.Log)
+				status, violations, err := assertion.CheckRule(rule, resource, externalRules)
 				if err != nil {
 					return report, nil
 				}

@@ -2,15 +2,19 @@ package assertion
 
 import "fmt"
 
-// LoggingFunction used to control verbosity of output
-type LoggingFunction func(string)
+var (
+	isVerbose = false
+)
 
-// MakeLogger returns a logging function with appropriate level of logging
-func MakeLogger(verbose bool) LoggingFunction {
-	if verbose {
-		return func(message string) {
-			fmt.Println(message)
-		}
+// SetVerbose turns verbose logging on or off
+func SetVerbose(b bool) {
+	isVerbose = b
+}
+
+// Debugf prints a formatted string when verbose logging is turned on
+func Debugf(format string, args ...interface{}) {
+	if isVerbose == false {
+		return
 	}
-	return func(message string) {}
+	fmt.Printf(format, args...)
 }

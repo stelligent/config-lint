@@ -1,7 +1,6 @@
 package assertion
 
 import (
-	"fmt"
 	"github.com/ghodss/yaml"
 	"io/ioutil"
 )
@@ -76,20 +75,20 @@ func FilterRulesByTagAndID(rules []Rule, tags []string, ruleIds []string) []Rule
 }
 
 // ResolveRules loads any dynamic values for a collection or rules
-func ResolveRules(rules []Rule, valueSource ValueSource, log LoggingFunction) []Rule {
+func ResolveRules(rules []Rule, valueSource ValueSource) []Rule {
 	resolvedRules := make([]Rule, 0)
 	for _, rule := range rules {
-		resolvedRules = append(resolvedRules, ResolveRule(rule, valueSource, log))
+		resolvedRules = append(resolvedRules, ResolveRule(rule, valueSource))
 	}
 	return resolvedRules
 }
 
 // ResolveRule loads any dynamic values for a single Rule
-func ResolveRule(rule Rule, valueSource ValueSource, log LoggingFunction) Rule {
+func ResolveRule(rule Rule, valueSource ValueSource) Rule {
 	resolvedRule := rule
 	resolvedRule.Assertions = make([]Assertion, 0)
 	for _, assertion := range rule.Assertions {
-		value, _ := valueSource.GetValue(assertion) // FIXME return erro
+		value, _ := valueSource.GetValue(assertion) // FIXME return error
 		resolvedAssertion := assertion
 		resolvedAssertion.Value = value
 		resolvedAssertion.ValueFrom = ValueFrom{}
@@ -99,19 +98,19 @@ func ResolveRule(rule Rule, valueSource ValueSource, log LoggingFunction) Rule {
 }
 
 // CheckRule returns a list of violations for a single Rule applied to a single Resource
-func CheckRule(rule Rule, resource Resource, e ExternalRuleInvoker, log LoggingFunction) (string, []Violation, error) {
+func CheckRule(rule Rule, resource Resource, e ExternalRuleInvoker) (string, []Violation, error) {
 	returnStatus := "OK"
 	violations := make([]Violation, 0)
 	if ExcludeResource(rule, resource) {
-		fmt.Println("Ignoring resource:", resource.ID)
+		Debugf("Ignoring resource: %s", resource.ID)
 		return returnStatus, violations, nil
 	}
 	if rule.Invoke.URL != "" {
 		return e.Invoke(rule, resource)
 	}
 	for _, ruleAssertion := range rule.Assertions {
-		log(fmt.Sprintf("Checking resource %s", resource.ID))
-		assertionResult, err := CheckAssertion(rule, ruleAssertion, resource, log)
+		Debugf("Checking resource %s\n", resource.ID)
+		assertionResult, err := CheckAssertion(rule, ruleAssertion, resource)
 		if err != nil {
 			return "FAILURE", violations, err
 		}

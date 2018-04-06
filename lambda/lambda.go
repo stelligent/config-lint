@@ -14,54 +14,30 @@ import (
 	"time"
 )
 
-// ConfigurationItem to hold info from Lambda event
-type ConfigurationItem struct {
-	ResourceType                 string
-	ResourceID                   string
-	ConfigurationItemCaptureTime *time.Time
-	Configuration                interface{}
-}
+type (
 
-// InvokingEvent for Lambda event info
-type InvokingEvent struct {
-	ConfigurationItem ConfigurationItem
-}
-
-func printValue(expression string, data interface{}) {
-	fmt.Println("expression:", expression)
-	value, err := assertion.SearchData(expression, data)
-	if err != nil {
-		fmt.Println("err:", err)
+	// ConfigurationItem to hold info from Lambda event
+	ConfigurationItem struct {
+		ResourceType                 string
+		ResourceID                   string
+		ConfigurationItemCaptureTime *time.Time
+		Configuration                interface{}
 	}
-	s, err := assertion.JSONStringify(value)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Printf("Value: %s\n", s)
+
+	// InvokingEvent for Lambda event info
+	InvokingEvent struct {
+		ConfigurationItem ConfigurationItem
 	}
-}
 
-func log(s string) {
-	fmt.Println(s)
-}
-
-// RuleParameters bucket and key for loading RuleSet
-type RuleParameters struct {
-	Bucket string
-	Key    string
-}
-
-func loadRulesFromS3(s3Client *s3.S3, bucket string, key string) (string, error) {
-	response, err := s3Client.GetObject(&s3.GetObjectInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(key),
-	})
-	if err != nil {
-		return "", err
+	// RuleParameters bucket and key for loading RuleSet
+	RuleParameters struct {
+		Bucket string
+		Key    string
 	}
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(response.Body)
-	return buf.String(), nil
+)
+
+func main() {
+	lambda.Start(handler)
 }
 
 func handler(configEvent events.ConfigEvent) (string, error) {
@@ -78,22 +54,22 @@ func handler(configEvent events.ConfigEvent) (string, error) {
 	var invokingEvent InvokingEvent
 	err := json.Unmarshal([]byte(configEvent.InvokingEvent), &invokingEvent)
 	if err != nil {
-		fmt.Println(err)
-		return "Error parsing JSON for invokingEvent", nil
+		fmt.Printf("Parse InvokingEvent failed: %b\n", err)
+		return err.Error(), nil
 	}
 
 	var ruleParameters RuleParameters
 	err = json.Unmarshal([]byte(configEvent.RuleParameters), &ruleParameters)
 	if err != nil {
-		fmt.Println(err)
-		return "Error parsing JSON for RuleParameters", nil
+		fmt.Printf("Parse RuleParameters failed: %v\n", err)
+		return err.Error(), nil
 	}
 	fmt.Printf("Rules object in bucket: %s key: %s\n", ruleParameters.Bucket, ruleParameters.Key)
 
 	rulesString, err := loadRulesFromS3(s3Client, ruleParameters.Bucket, ruleParameters.Key)
 	if err != nil {
-		fmt.Println(err)
-		return "Cannot GetObject", nil
+		fmt.Printf("loadRulesFromS3 failed: %v\n", err)
+		return err.Error(), nil
 	}
 	fmt.Println("rulesString:", rulesString)
 
@@ -102,39 +78,19 @@ func handler(configEvent events.ConfigEvent) (string, error) {
 	fmt.Println("configurationItem:", configurationItem)
 	fmt.Println("configuration:", configurationItem.Configuration)
 
-	complianceType := "NOT_APPLICABLE"
 	ruleSet, err := assertion.ParseRules(rulesString)
 	if err != nil {
-		fmt.Println("Unable to parse rules:", err.Error())
-		return "Error", err
+		fmt.Printf("Unable to parse rules: %v\n", err.Error())
+		return "checkCompliance failed", err
 	}
-	valueSource := assertion.StandardValueSource{Log: log}
-	resolvedRules := assertion.ResolveRules(ruleSet.Rules, valueSource, log)
-	externalRules := assertion.StandardExternalRuleInvoker{Log: log}
-	for _, rule := range resolvedRules {
-		if rule.Resource == configurationItem.ResourceType {
-			resource := assertion.Resource{
-				ID:         configurationItem.ResourceID,
-				Type:       configurationItem.ResourceType,
-				Properties: configurationItem.Configuration,
-			}
-			_, violations, err := assertion.CheckRule(rule, resource, externalRules, log)
-			if err != nil {
-				return "Error", err
-			}
-			if len(violations) > 0 {
-				fmt.Println("Resource is NON_COMPLIANT")
-				complianceType = "NON_COMPLIANT"
-				for _, violation := range violations {
-					fmt.Println(violation)
-				}
-			} else {
-				fmt.Println("Resource is COMPLIANT")
-				complianceType = "COMPLIANT"
-			}
-		} else {
-			fmt.Println("Ignoring Resource")
-		}
+	valueSource := assertion.StandardValueSource{}
+	resolvedRules := assertion.ResolveRules(ruleSet.Rules, valueSource)
+	externalRules := assertion.StandardExternalRuleInvoker{}
+
+	complianceType, err := checkCompliance(resolvedRules, configurationItem, externalRules)
+	if err != nil {
+		fmt.Printf("checkCompliance failed: %v\n", err)
+		return err.Error(), nil
 	}
 
 	params := &configservice.PutEvaluationsInput{
@@ -151,12 +107,52 @@ func handler(configEvent events.ConfigEvent) (string, error) {
 	fmt.Println("params:", params)
 	response, err := config.PutEvaluations(params)
 	if err != nil {
-		fmt.Println("err:", err)
+		fmt.Printf("PutEvaluations failed: %v\n", err)
+		return err.Error(), nil
 	}
-	fmt.Println("response:", response)
+	fmt.Printf("PutEvaluations response: %v\n", response)
 	return "Done", nil
 }
 
-func main() {
-	lambda.Start(handler)
+func checkCompliance(rules []assertion.Rule, configurationItem ConfigurationItem, invoker assertion.ExternalRuleInvoker) (string, error) {
+	complianceType := "NOT_APPLICABLE"
+	for _, rule := range rules {
+		if rule.Resource == configurationItem.ResourceType {
+			resource := assertion.Resource{
+				ID:         configurationItem.ResourceID,
+				Type:       configurationItem.ResourceType,
+				Properties: configurationItem.Configuration,
+			}
+			_, violations, err := assertion.CheckRule(rule, resource, invoker)
+			if err != nil {
+				return "NOT_APPLICABLE", err
+			}
+			if len(violations) > 0 {
+				fmt.Println("Resource is NON_COMPLIANT")
+				complianceType = "NON_COMPLIANT"
+				for _, violation := range violations {
+					fmt.Println(violation)
+				}
+			} else {
+				fmt.Println("Resource is COMPLIANT")
+				complianceType = "COMPLIANT"
+			}
+		} else {
+			fmt.Println("Ignoring Resource")
+		}
+	}
+	return complianceType, nil
+}
+
+func loadRulesFromS3(s3Client *s3.S3, bucket string, key string) (string, error) {
+	response, err := s3Client.GetObject(&s3.GetObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		return "", err
+	}
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(response.Body)
+	return buf.String(), nil
 }

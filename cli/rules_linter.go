@@ -7,14 +7,11 @@ import (
 // RulesLinter lints rules files for itself
 type RulesLinter struct {
 	Filenames   []string
-	Log         assertion.LoggingFunction
 	ValueSource assertion.ValueSource
 }
 
 // RulesResourceLoader converts a YAML configuration file into a collection with Resource objects
-type RulesResourceLoader struct {
-	Log assertion.LoggingFunction
-}
+type RulesResourceLoader struct{}
 
 func getAttr(m map[string]interface{}, keys ...string) []interface{} {
 	for _, key := range keys {
@@ -28,7 +25,7 @@ func getAttr(m map[string]interface{}, keys ...string) []interface{} {
 // Load converts a text file into a collection of Resource objects
 func (l RulesResourceLoader) Load(filename string) ([]assertion.Resource, error) {
 	resources := make([]assertion.Resource, 0)
-	yamlResources, err := loadYAML(filename, l.Log)
+	yamlResources, err := loadYAML(filename)
 	if err != nil {
 		return resources, err
 	}
@@ -61,14 +58,14 @@ func (l RulesResourceLoader) Load(filename string) ([]assertion.Resource, error)
 
 // Validate runs validate on a collection of filenames using a RuleSet
 func (l RulesLinter) Validate(ruleSet assertion.RuleSet, options LinterOptions) (assertion.ValidationReport, error) {
-	loader := RulesResourceLoader{Log: l.Log}
-	f := FileLinter{Filenames: l.Filenames, Log: l.Log, Loader: loader}
+	loader := RulesResourceLoader{}
+	f := FileLinter{Filenames: l.Filenames, ValueSource: l.ValueSource, Loader: loader}
 	return f.ValidateFiles(ruleSet, options)
 }
 
 // Search evaluates a JMESPath expression against the resources in a collection of filenames
 func (l RulesLinter) Search(ruleSet assertion.RuleSet, searchExpression string) {
-	loader := RulesResourceLoader{Log: l.Log}
-	f := FileLinter{Filenames: l.Filenames, Log: l.Log, Loader: loader}
+	loader := RulesResourceLoader{}
+	f := FileLinter{Filenames: l.Filenames, ValueSource: l.ValueSource, Loader: loader}
 	f.SearchFiles(ruleSet, searchExpression)
 }

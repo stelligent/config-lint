@@ -82,6 +82,10 @@ func main() {
 	searchExpression := flag.String("search", "", "JMESPath expression to evaluation against the files")
 	flag.Parse()
 
+	if *verboseLogging == true {
+		assertion.SetVerbose(true)
+	}
+
 	report := assertion.ValidationReport{
 		Violations:       []assertion.Violation{},
 		FilesScanned:     []string{},
@@ -99,7 +103,11 @@ func main() {
 			fmt.Println("Unable to parse rules in:" + rulesFilename)
 			fmt.Println(err.Error())
 		}
-		linter := makeLinter(ruleSet.Type, flag.Args(), assertion.MakeLogger(*verboseLogging))
+		linter, err := makeLinter(ruleSet.Type, flag.Args())
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 		if linter != nil {
 			if *searchExpression != "" {
 				linter.Search(ruleSet, *searchExpression)

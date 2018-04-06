@@ -22,10 +22,6 @@ type (
 	}
 )
 
-// NullLogging suppress log message when running tests
-func NullLogging(s string) {
-}
-
 // FailTestIfError is a helper to check err and call test Error if it is not nil
 func FailTestIfError(err error, message string, t *testing.T) {
 	if err != nil {
@@ -53,7 +49,7 @@ func LoadTestCasesFromFixture(filename string, t *testing.T) FixtureTestCases {
 func RunTestCasesFromFixture(filename string, t *testing.T) {
 	fixture := LoadTestCasesFromFixture(filename, t)
 	for _, testCase := range fixture.TestCases {
-		assertionResult, err := CheckAssertion(testCase.Rule, testCase.Rule.Assertions[0], testCase.Resource, NullLogging)
+		assertionResult, err := CheckAssertion(testCase.Rule, testCase.Rule.Assertions[0], testCase.Resource)
 		FailTestIfError(err, testCase.Name, t)
 		if assertionResult.Status != testCase.Result {
 			t.Errorf("Test case %s returned %s expecting %s", testCase.Name, assertionResult.Status, testCase.Result)

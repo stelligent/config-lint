@@ -43,7 +43,7 @@ func isEmpty(data interface{}) bool {
 	case []map[string]interface{}:
 		return len(v) == 0
 	default:
-		fmt.Printf("%v %T\n", data, data)
+		Debugf("isEmpty default: %v %T\n", data, data)
 		return false
 	}
 }

@@ -13,14 +13,12 @@ import (
 )
 
 // StandardValueSource can fetch values from external sources
-type StandardValueSource struct {
-	Log LoggingFunction
-}
+type StandardValueSource struct{}
 
 // GetValue looks up external values when an Assertion includes a ValueFrom attribute
 func (v StandardValueSource) GetValue(assertion Assertion) (string, error) {
 	if assertion.ValueFrom.URL != "" {
-		v.Log(fmt.Sprintf("Getting value_from %s", assertion.ValueFrom.URL))
+		Debugf("Getting value_from %s\n", assertion.ValueFrom.URL)
 		parsedURL, err := url.Parse(assertion.ValueFrom.URL)
 		if err != nil {
 			return "", err

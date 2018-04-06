@@ -11,7 +11,7 @@ func TestTerraformLinter(t *testing.T) {
 		RuleIDs: []string{},
 	}
 	filenames := []string{"./testdata/resources/terraform_instance.tf"}
-	linter := TerraformLinter{Filenames: filenames, Log: testLogger, ValueSource: TestingValueSource{}}
+	linter := TerraformLinter{Filenames: filenames, ValueSource: TestingValueSource{}}
 	ruleSet := loadRulesForTest("./testdata/rules/terraform_instance.yml", t)
 	report, err := linter.Validate(ruleSet, options)
 	if err != nil {

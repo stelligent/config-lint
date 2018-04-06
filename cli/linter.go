@@ -19,23 +19,22 @@ type (
 	}
 )
 
-func makeLinter(linterType string, args []string, log assertion.LoggingFunction) Linter {
+func makeLinter(linterType string, args []string) (Linter, error) {
 	vs := assertion.StandardValueSource{}
 	switch linterType {
 	case "Kubernetes":
-		return KubernetesLinter{Filenames: args, Log: log, ValueSource: vs}
+		return KubernetesLinter{Filenames: args, ValueSource: vs}, nil
 	case "Terraform":
-		return TerraformLinter{Filenames: args, Log: log, ValueSource: vs}
+		return TerraformLinter{Filenames: args, ValueSource: vs}, nil
 	case "SecurityGroup":
-		return AWSResourceLinter{Loader: SecurityGroupLoader{}, Log: log, ValueSource: vs}
+		return AWSResourceLinter{Loader: SecurityGroupLoader{}, ValueSource: vs}, nil
 	case "IAMUser":
-		return AWSResourceLinter{Loader: IAMUserLoader{}, Log: log, ValueSource: vs}
+		return AWSResourceLinter{Loader: IAMUserLoader{}, ValueSource: vs}, nil
 	case "LintRules":
-		return RulesLinter{Filenames: args, Log: log, ValueSource: vs}
+		return RulesLinter{Filenames: args, ValueSource: vs}, nil
 	case "YAML":
-		return YAMLLinter{Filenames: args, Log: log, ValueSource: vs}
+		return YAMLLinter{Filenames: args, ValueSource: vs}, nil
 	default:
-		fmt.Printf("Type not supported: %s\n", linterType)
-		return nil
+		return nil, fmt.Errorf("Type not supported: %s", linterType)
 	}
 }

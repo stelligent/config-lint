@@ -5,8 +5,6 @@ import (
 	"testing"
 )
 
-func testLogger(string) {}
-
 func loadRulesForTest(filename string, t *testing.T) assertion.RuleSet {
 	rulesContent, err := assertion.LoadRules(filename)
 	if err != nil {

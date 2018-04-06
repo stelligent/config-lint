@@ -14,7 +14,6 @@ type (
 	// AWSResourceLinter implements a Linter for data returned by the calls to the AWS SDK
 	AWSResourceLinter struct {
 		Loader      AWSResourceLoader
-		Log         assertion.LoggingFunction
 		ValueSource assertion.ValueSource
 	}
 )
@@ -26,7 +25,7 @@ func (l AWSResourceLinter) Validate(ruleSet assertion.RuleSet, options LinterOpt
 	if err != nil {
 		return assertion.ValidationReport{}, err
 	}
-	r := ResourceLinter{Log: l.Log}
+	r := ResourceLinter{ValueSource: l.ValueSource}
 	return r.ValidateResources(resources, rules)
 }
 
