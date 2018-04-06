@@ -190,7 +190,6 @@ It is also possible to use a rules files in a Lambda that handles events from AW
 * Start using go testing coverage tools
 * Use log package for error reporting
 * Deal with a few FIXME comments in code, mostly error handling
-* Use the LintRules linter to implement a -validate option
 * Should there be some pre-defined RuleSets?
 * Would it be useful to have helper utilities to send output to CloudWatch/SNS/Kinesis?
 * Add variable interpolation for Terraform files
@@ -200,3 +199,4 @@ It is also possible to use a rules files in a Lambda that handles events from AW
 * Starting to have inconsistent naming in ops: is-true, is-false, has-properties vs. present, absent, empty, null
 * Add options to Assertion type, for things like 'ignore-case' for string compares? Or just use a regex?
 * Make FAILURE the default severity
+* Provide a default -query of 'Violations[]', and add an option for a full report

@@ -10,6 +10,103 @@ import (
 	"strings"
 )
 
+type (
+	// ApplyOptions for applying rules
+	ApplyOptions struct {
+		Tags             []string
+		RuleIDs          []string
+		QueryExpression  string
+		SearchExpression string
+	}
+)
+
+func main() {
+	var rulesFilenames arrayFlags
+	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
+	flag.Var(&rulesFilenames, "rules", "Rules file, can be specified multiple times")
+	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
+	ids := flag.String("ids", "", "Run only the rules in this comma separated list")
+	queryExpression := flag.String("query", "", "JMESPath expression to query the results")
+	searchExpression := flag.String("search", "", "JMESPath expression to evaluation against the files")
+	validate := flag.Bool("validate", false, "Validate rules file")
+	flag.Parse()
+
+	if *verboseLogging == true {
+		assertion.SetVerbose(true)
+	}
+
+	if *validate {
+		validateRules(flag.Args())
+		return
+	}
+
+	applyOptions := ApplyOptions{
+		Tags:             makeTagList(*tags),
+		RuleIDs:          makeRulesList(*ids),
+		QueryExpression:  *queryExpression,
+		SearchExpression: *searchExpression,
+	}
+	applyRules(rulesFilenames, flag.Args(), applyOptions)
+
+}
+
+func validateRules(filenames []string) {
+	rulesFilenames := []string{"./builtin-rules/lint-rules.yml"} // FIXME how to embed this file in the binary?
+	applyOptions := ApplyOptions{
+		QueryExpression: "Violations[]",
+	}
+	applyRules(rulesFilenames, filenames, applyOptions)
+}
+
+func applyRules(rulesFilenames arrayFlags, args arrayFlags, options ApplyOptions) {
+
+	report := assertion.ValidationReport{
+		Violations:       []assertion.Violation{},
+		FilesScanned:     []string{},
+		ResourcesScanned: []assertion.ScannedResource{},
+	}
+
+	for _, rulesFilename := range rulesFilenames {
+		rulesContent, err := assertion.LoadRules(rulesFilename)
+		if err != nil {
+			fmt.Println("Unable to load rules from:" + rulesFilename)
+			fmt.Println(err.Error())
+		}
+		ruleSet, err := assertion.ParseRules(rulesContent)
+		if err != nil {
+			fmt.Println("Unable to parse rules in:" + rulesFilename)
+			fmt.Println(err.Error())
+		}
+		linter, err := makeLinter(ruleSet.Type, args)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		if linter != nil {
+			if options.SearchExpression != "" {
+				linter.Search(ruleSet, options.SearchExpression)
+			} else {
+				linterOptions := LinterOptions{
+					Tags:    options.Tags,
+					RuleIDs: options.RuleIDs,
+				}
+				r, err := linter.Validate(ruleSet, linterOptions)
+				if err != nil {
+					fmt.Println("Validate failed:", err)
+				}
+				report = combineValidationReports(report, r)
+			}
+		}
+	}
+	if options.SearchExpression == "" {
+		err := printReport(report, options.QueryExpression)
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+	}
+	os.Exit(generateExitCode(report))
+}
+
 func printReport(report assertion.ValidationReport, queryExpression string) error {
 	jsonData, err := json.MarshalIndent(report, "", "  ")
 	if err != nil {
@@ -70,65 +167,4 @@ func generateExitCode(report assertion.ValidationReport) int {
 		}
 	}
 	return 0
-}
-
-func main() {
-	var rulesFilenames arrayFlags
-	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
-	flag.Var(&rulesFilenames, "rules", "Rules file, can be specified multiple times")
-	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
-	ids := flag.String("ids", "", "Run only the rules in this comma separated list")
-	queryExpression := flag.String("query", "", "JMESPath expression to query the results")
-	searchExpression := flag.String("search", "", "JMESPath expression to evaluation against the files")
-	flag.Parse()
-
-	if *verboseLogging == true {
-		assertion.SetVerbose(true)
-	}
-
-	report := assertion.ValidationReport{
-		Violations:       []assertion.Violation{},
-		FilesScanned:     []string{},
-		ResourcesScanned: []assertion.ScannedResource{},
-	}
-
-	for _, rulesFilename := range rulesFilenames {
-		rulesContent, err := assertion.LoadRules(rulesFilename)
-		if err != nil {
-			fmt.Println("Unable to load rules from:" + rulesFilename)
-			fmt.Println(err.Error())
-		}
-		ruleSet, err := assertion.ParseRules(rulesContent)
-		if err != nil {
-			fmt.Println("Unable to parse rules in:" + rulesFilename)
-			fmt.Println(err.Error())
-		}
-		linter, err := makeLinter(ruleSet.Type, flag.Args())
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		if linter != nil {
-			if *searchExpression != "" {
-				linter.Search(ruleSet, *searchExpression)
-			} else {
-				options := LinterOptions{
-					Tags:    makeTagList(*tags),
-					RuleIDs: makeRulesList(*ids),
-				}
-				r, err := linter.Validate(ruleSet, options)
-				if err != nil {
-					fmt.Println("Validate failed:", err) // FIXME
-				}
-				report = combineValidationReports(report, r)
-			}
-		}
-	}
-	if *searchExpression == "" {
-		err := printReport(report, *queryExpression)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-	}
-	os.Exit(generateExitCode(report))
 }
