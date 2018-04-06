@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"github.com/ghodss/yaml"
 	"github.com/hashicorp/hcl"
+	"github.com/hashicorp/hcl/hcl/ast"
+	"github.com/hashicorp/hcl/hcl/parser"
 	"github.com/stelligent/config-lint/assertion"
 	"io/ioutil"
 )
@@ -35,43 +37,57 @@ func parsePolicy(templateResource interface{}) (map[string]interface{}, error) {
 	return properties, nil
 }
 
-func loadHCL(filename string) ([]interface{}, error) {
+func loadHCL(filename string) ([]interface{}, *ast.File, error) {
 	results := make([]interface{}, 0)
 	template, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return results, nil
+		return results, nil, nil
 	}
+
+	root, _ := parser.Parse(template)
 
 	var v interface{}
 	err = hcl.Unmarshal([]byte(template), &v)
 	if err != nil {
-		return results, nil
+		return results, root, nil
 	}
 	jsonData, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
-		return results, nil
+		return results, root, nil
 	}
 	assertion.Debugf("LoadHCL: %s\n", string(jsonData))
 
 	var hclData interface{}
 	err = yaml.Unmarshal(jsonData, &hclData)
 	if err != nil {
-		return results, nil
+		return results, root, nil
 	}
 	m := hclData.(map[string]interface{})
 	for _, key := range []string{"resource", "data"} {
+		assertion.Debugf("Loading %s\n", key)
 		if m[key] != nil {
-			assertion.Debugf("Adding %s\n", key)
 			results = append(results, m[key].([]interface{})...)
 		}
 	}
-	return results, nil
+	return results, root, nil
+}
+
+func getResourceLineNumber(resourceType, resourceID, filename string, root *ast.File) int {
+
+	// FIXME "data" items are loaded as well as "resource" items, is that necessary?
+	resourceItems := root.Node.(*ast.ObjectList).Filter("resource", resourceType, resourceID).Items
+	if len(resourceItems) > 0 {
+		resourcePos := resourceItems[0].Val.Pos()
+		assertion.Debugf("Position %s %s:%d\n", resourceID, filename, resourcePos.Line)
+		return resourcePos.Line
+	}
+	return 0
 }
 
 // Load parses an HCL file into a collection or Resource objects
 func (l TerraformResourceLoader) Load(filename string) ([]assertion.Resource, error) {
 	resources := make([]assertion.Resource, 0)
-	hclResources, err := loadHCL(filename)
+	hclResources, root, err := loadHCL(filename)
 	if err != nil {
 		return resources, err
 	}
@@ -84,11 +100,13 @@ func (l TerraformResourceLoader) Load(filename string) ([]assertion.Resource, er
 						if err != nil {
 							return resources, err
 						}
+						lineNumber := getResourceLineNumber(resourceType, resourceID, filename, root)
 						tr := assertion.Resource{
 							ID:         resourceID,
 							Type:       resourceType,
 							Properties: properties,
 							Filename:   filename,
+							LineNumber: lineNumber,
 						}
 						resources = append(resources, tr)
 					}

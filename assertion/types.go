@@ -8,6 +8,7 @@ type (
 		Type       string
 		Properties interface{}
 		Filename   string
+		LineNumber int
 	}
 
 	// RuleSet describes a collection of rules for a Linter
@@ -88,6 +89,7 @@ type (
 		RuleMessage      string
 		AssertionMessage string
 		Filename         string
+		LineNumber       int
 	}
 
 	// ScannedResource has details for each resource scanned
@@ -96,6 +98,8 @@ type (
 		ResourceType string
 		RuleID       string
 		Status       string
+		Filename     string
+		LineNumber   int
 	}
 
 	// ValueSource interface to fetch dynamic values

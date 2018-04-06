@@ -35,6 +35,8 @@ func (r ResourceLinter) ValidateResources(resources []assertion.Resource, rules 
 					ResourceType: resource.Type,
 					RuleID:       rule.ID,
 					Status:       status,
+					Filename:     resource.Filename,
+					LineNumber:   resource.LineNumber,
 				})
 				report.Violations = append(report.Violations, violations...)
 			}

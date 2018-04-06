@@ -124,6 +124,7 @@ func CheckRule(rule Rule, resource Resource, e ExternalRuleInvoker) (string, []V
 				RuleMessage:      rule.Message,
 				AssertionMessage: assertionResult.Message,
 				Filename:         resource.Filename,
+				LineNumber:       resource.LineNumber,
 			}
 			violations = append(violations, v)
 		}
