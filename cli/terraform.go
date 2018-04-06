@@ -63,18 +63,13 @@ func loadHCL(filename string) ([]interface{}, *ast.File, error) {
 		return results, root, nil
 	}
 	m := hclData.(map[string]interface{})
-	for _, key := range []string{"resource", "data"} {
-		assertion.Debugf("Loading %s\n", key)
-		if m[key] != nil {
-			results = append(results, m[key].([]interface{})...)
-		}
+	if m["resource"] != nil {
+		results = append(results, m["resource"].([]interface{})...)
 	}
 	return results, root, nil
 }
 
 func getResourceLineNumber(resourceType, resourceID, filename string, root *ast.File) int {
-
-	// FIXME "data" items are loaded as well as "resource" items, is that necessary?
 	resourceItems := root.Node.(*ast.ObjectList).Filter("resource", resourceType, resourceID).Items
 	if len(resourceItems) > 0 {
 		resourcePos := resourceItems[0].Val.Pos()

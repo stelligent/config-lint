@@ -41,7 +41,7 @@ rules:
         op: is-true
       - key: ebs_block_device.kms_key_id
         op: present
-        
+
   - id: AMI_COPY
     message: AMI security checks
     resource: aws_ami_copy
@@ -71,7 +71,7 @@ rules:
             op: absent
           - key: ebs_block_device.encrypted
             op: is-true
-        
+
   - id: CLOUDFRONT_DISTRIBUTION
     message: CloudFront Distribution checks
     resource: aws_cloudfront_distribution
@@ -141,7 +141,7 @@ rules:
     message: DMS Replication Instance checks
     resource: aws_dms_replication_instance
     severity: FAILURE
-    assertions: 
+    assertions:
       - key: kms_key_arn
         op: present
 
@@ -164,7 +164,7 @@ rules:
         op: is-true
       - key: kms_key_id
         op: present
- 
+
   - id: ELASTICTRANSCODE_PIPELINE
     message: ElasticTranscoderPipeline checks
     resource: aws_elastictranscoder_pipeline
@@ -174,7 +174,7 @@ rules:
         op: present
 
   - id: KINESIS_FIREHOSE_DELIVERY_STREAM
-    message: KinesisFirehoseDeliveryStream checks 
+    message: KinesisFirehoseDeliveryStream checks
     resource: aws_kinesis_firehose_delivery_stream
     severity: FAILURE
     assertions:
@@ -229,10 +229,10 @@ rules:
         op: present
 
   - id: SQS_QUEUE
-    message: SQSQueue checks    
+    message: SQSQueue checks
     resource: aws_sqs_queue
     severity: FAILURE
     assertions:
       - key: "@"
-        op: has-properties 
+        op: has-properties
         value: kms_master_key_id,kms_data_key_reuse_period_seconds

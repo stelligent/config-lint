@@ -1,12 +1,15 @@
-data "aws_s3_bucket" "bucket_example" {
+resource "aws_s3_bucket" "bucket_example" {
   bucket = "my-data-lake"
 }
-data "aws_s3_bucket" "bucket_name_with_underscores" {
+
+resource "aws_s3_bucket" "bucket_name_with_underscores" {
   bucket = "my_data_lake"
 }
-data "aws_s3_bucket" "bucket_name_with_uppercase" {
+
+resource "aws_s3_bucket" "bucket_name_with_uppercase" {
   bucket = "MYDATALAKE"
 }
+
 resource "aws_s3_bucket" "b1" {
   bucket = "test-bucket-1"
 }
@@ -26,8 +29,8 @@ resource "aws_s3_bucket_policy" "b1" {
       "Resource": "arn:aws:s3:::my_tf_test_bucket/*",
       "Condition": {
          "IpAddress": {"aws:SourceIp": "8.8.8.8/32"}
-      } 
-    } 
+      }
+    }
   ]
 }
 POLICY
@@ -52,8 +55,8 @@ resource "aws_s3_bucket_policy" "bucket_with_not" {
       "Resource": "arn:aws:s3:::my_tf_test_bucket/*",
       "Condition": {
          "IpAddress": {"aws:SourceIp": "8.8.8.8/32"}
-      } 
-    } 
+      }
+    }
   ]
 }
 POLICY
@@ -74,8 +77,8 @@ resource "aws_s3_bucket_policy" "bucket_with_wildcards" {
       "Resource": "arn:aws:s3:::my_tf_test_bucket/*",
       "Condition": {
          "IpAddress": {"aws:SourceIp": "8.8.8.8/32"}
-      } 
-    } 
+      }
+    }
   ]
 }
 POLICY
