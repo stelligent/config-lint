@@ -12,11 +12,19 @@ import (
 
 func main() {
 	r := gin.Default()
-	r.LoadHTMLGlob("web/templates/*.tmpl")
-	r.Static("/public", "./web/public")
+	r.LoadHTMLGlob(webPath("templates/*.tmpl"))
+	r.Static("/public", webPath("public"))
 	r.GET("/", homePage)
 	r.POST("/", lintResults)
 	r.Run()
+}
+
+func webPath(s string) string {
+	if r := os.Getenv("WEB_ROOT"); r != "" {
+		return r + "/" + s
+	}
+	return "./" + s
+
 }
 
 func homePage(c *gin.Context) {
