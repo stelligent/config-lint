@@ -18,7 +18,7 @@
 </style>
 </head>
 <body>
-  <form action="/" method="POST">
+  <form id="config-lint-form" action="/" method="POST">
     <div class="container-fluid">
       <h1>config-lint</h1>
     </div>
@@ -47,24 +47,7 @@
       <div class="row">
         <div class="col-12">
           <h4>Results</h4>
-          <table class="table">
-            <thead>
-              <th>Resource Type</th>
-              <th>Resource ID</th>
-              <th>Rule Message</th>
-              <th>Assert Message</th>
-            </thead>
-            <tbody>
-              {{range $index, $element := .Violations}}
-              <tr>
-                <td>{{.ResourceType}}</td>
-                <td>{{.ResourceID}}</td>
-                <td>{{.RuleMessage}}</td>
-                <td>{{.AssertionMessage}}</td>
-              </tr>
-              {{end}}
-            </tbody>
-          </table>
+          <pre id="results"></pre>
         </div>
       </div>
     </div>
@@ -77,6 +60,21 @@ $(function() {
     };
     var configEditor = CodeMirror.fromTextArea(document.getElementById("config"), editorConfig);
     var rulesEditor = CodeMirror.fromTextArea(document.getElementById("rules"), editorConfig);
+    $('#config-lint-form').on('submit', function(e) {
+        e.preventDefault();
+        var data = $(this).serialize();
+        $.ajax({
+            type: "POST",
+            url: "/lint",
+            data: data,
+            success: function(results) {
+                $("#results").text(JSON.stringify(results, null, '  '));
+            },
+            error: function(response) {
+                $("#results").text(JSON.stringify(response.responseJSON, null, '  '));
+            }
+        });
+    });
 });
 </script>
 </html>

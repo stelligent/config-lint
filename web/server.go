@@ -15,7 +15,7 @@ func main() {
 	r.LoadHTMLGlob(webPath("templates/*.tmpl"))
 	r.Static("/public", webPath("public"))
 	r.GET("/", homePage)
-	r.POST("/", lintResults)
+	r.POST("/lint", lintResults)
 	r.Run()
 }
 
@@ -40,14 +40,14 @@ func lintResults(c *gin.Context) {
 	var rules = c.PostForm("rules")
 	ruleSet, err := assertion.ParseRules(rules)
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{"Message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"Message": err.Error()})
 		return
 	}
 	var config = c.PostForm("config")
 	fmt.Println("config:", config)
 	f, err := ioutil.TempFile("/tmp", "lint")
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{"Message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"Message": err.Error()})
 		return
 	}
 	defer os.Remove(f.Name())
@@ -56,21 +56,16 @@ func lintResults(c *gin.Context) {
 	f.Close()
 	l, err := linter.NewLinter(ruleSet, []string{f.Name()})
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{"Message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"Message": err.Error()})
 		return
 	}
 	options := linter.Options{}
 	report, err := l.Validate(ruleSet, options)
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{"Message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"Message": err.Error()})
 		return
 	}
-	c.HTML(http.StatusOK, "index.tmpl", gin.H{
-		"Title":      "config-lint",
-		"Config":     config,
-		"Rules":      rules,
-		"Violations": report.Violations,
-	})
+	c.JSON(http.StatusOK, gin.H{"Violations": report.Violations})
 }
 
 // these resources are embedded here so all you need is the webserver executable
