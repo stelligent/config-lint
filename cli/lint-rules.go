@@ -1,3 +1,7 @@
+package main
+
+// LintRules string containing YAML for -validate option
+var LintRules = `---
 version: 1
 description: Rules for config-lint
 type: LintRules
@@ -112,3 +116,4 @@ rules:
               - key: "@"
                 op: has-properties
                 value: none
+`

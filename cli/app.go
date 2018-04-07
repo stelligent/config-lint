@@ -37,7 +37,7 @@ func main() {
 	}
 
 	if *validate {
-		validateRules(flag.Args())
+		validateRules(flag.Args(), LintRules)
 		return
 	}
 
@@ -47,19 +47,49 @@ func main() {
 		QueryExpression:  *queryExpression,
 		SearchExpression: *searchExpression,
 	}
-	applyRules(rulesFilenames, flag.Args(), applyOptions)
-
+	ruleSets, err := loadRuleSets(rulesFilenames)
+	if err != nil {
+		fmt.Errorf("Failed to load rules: %v", err)
+		return
+	}
+	applyRules(ruleSets, flag.Args(), applyOptions)
 }
 
-func validateRules(filenames []string) {
-	rulesFilenames := []string{"./builtin-rules/lint-rules.yml"} // FIXME how to embed this file in the binary?
+func validateRules(filenames []string, rules string) {
+	ruleSet, err := assertion.ParseRules(rules)
+	if err != nil {
+		fmt.Println("Unable to parse validation rules")
+		fmt.Println(err.Error())
+		return
+	}
+	ruleSets := []assertion.RuleSet{ruleSet}
 	applyOptions := ApplyOptions{
 		QueryExpression: "Violations[]",
 	}
-	applyRules(rulesFilenames, filenames, applyOptions)
+	applyRules(ruleSets, filenames, applyOptions)
 }
 
-func applyRules(rulesFilenames arrayFlags, args arrayFlags, options ApplyOptions) {
+func loadRuleSets(rulesFilenames arrayFlags) ([]assertion.RuleSet, error) {
+	ruleSets := []assertion.RuleSet{}
+	for _, rulesFilename := range rulesFilenames {
+		rulesContent, err := assertion.LoadRules(rulesFilename)
+		if err != nil {
+			fmt.Println("Unable to load rules from:" + rulesFilename)
+			fmt.Println(err.Error())
+			return ruleSets, err
+		}
+		ruleSet, err := assertion.ParseRules(rulesContent)
+		if err != nil {
+			fmt.Println("Unable to parse rules in:" + rulesFilename)
+			fmt.Println(err.Error())
+			return ruleSets, err
+		}
+		ruleSets = append(ruleSets, ruleSet)
+	}
+	return ruleSets, nil
+}
+
+func applyRules(ruleSets []assertion.RuleSet, args arrayFlags, options ApplyOptions) {
 
 	report := assertion.ValidationReport{
 		Violations:       []assertion.Violation{},
@@ -67,17 +97,7 @@ func applyRules(rulesFilenames arrayFlags, args arrayFlags, options ApplyOptions
 		ResourcesScanned: []assertion.ScannedResource{},
 	}
 
-	for _, rulesFilename := range rulesFilenames {
-		rulesContent, err := assertion.LoadRules(rulesFilename)
-		if err != nil {
-			fmt.Println("Unable to load rules from:" + rulesFilename)
-			fmt.Println(err.Error())
-		}
-		ruleSet, err := assertion.ParseRules(rulesContent)
-		if err != nil {
-			fmt.Println("Unable to parse rules in:" + rulesFilename)
-			fmt.Println(err.Error())
-		}
+	for _, ruleSet := range ruleSets {
 		l, err := linter.NewLinter(ruleSet, args)
 		if err != nil {
 			fmt.Println(err)
