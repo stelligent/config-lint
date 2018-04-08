@@ -1,0 +1,24 @@
+---
+version: 1
+description: Terraform rules for demo
+type: Terraform
+files:
+  - "*"
+rules:
+  - id: S3_BUCKET_ACL
+    message: S3 Bucket should not be public
+    resource: aws_s3_bucket
+    severity: FAILURE
+    assertions:
+      - key: acl
+        op: not-in
+        value: public-read,public-read-write
+
+  - id: S3_BUCKET_ENCRYPTION
+    message: S3 Bucket should be encrypted
+    resource: aws_s3_bucket
+    severity: FAILURE
+    assertions:
+      - key: encrypted
+        op: eq
+        value: true

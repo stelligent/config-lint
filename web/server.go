@@ -26,11 +26,22 @@ func webPath(s string) string {
 
 }
 
+//go:generate go-bindata -pkg $GOPACKAGE -o assets.go assets/
 func homePage(c *gin.Context) {
+	rules, err := Asset("assets/terraform-rules.yml")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"Message": err.Error()})
+		return
+	}
+	config, err := Asset("assets/sample-terraform-config.tf")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"Message": err.Error()})
+		return
+	}
 	c.HTML(http.StatusOK, "index.tmpl", gin.H{
 		"Title":      "config-lint",
-		"Config":     defaultConfig,
-		"Rules":      defaultRules,
+		"Config":     string(config[:]),
+		"Rules":      string(rules[:]),
 		"Violations": []assertion.Violation{},
 	})
 }
@@ -65,42 +76,3 @@ func lintResults(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"Violations": report.Violations})
 }
-
-// these resources are embedded here so all you need is the webserver executable
-
-var defaultConfig = `resource "aws_s3_bucket" "bucket_example_1" {
-  bucket = "my-bucket-1"
-  acl = "public-read"
-}
-
-resource "aws_s3_bucket" "bucket_example_2" {
-  bucket = "my-bucket-2"
-  acl = "public-read-write"
-  encrypted = false
-}`
-
-var defaultRules = `---
-version: 1
-description: Rules for demo
-type: Terraform
-files:
-  - "lint*"
-rules:
-  - id: S3_BUCKET_ACL
-    message: S3 Bucket should not be public
-    resource: aws_s3_bucket
-    severity: FAILURE
-    assertions:
-      - key: acl
-        op: not-in
-        value: public-read,public-read-write
-
-  - id: S3_BUCKET_ENCRYPTION
-    message: S3 Bucket should be encrypted
-    resource: aws_s3_bucket
-    severity: FAILURE
-    assertions:
-      - key: encrypted
-        op: eq
-        value: true
-`
