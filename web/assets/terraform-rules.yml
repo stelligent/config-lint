@@ -5,6 +5,263 @@ type: Terraform
 files:
   - "*"
 rules:
+
+  - id: SG_WORLD_INGRESS
+    resource: aws_security_group
+    message: Security group should not allow ingress from 0.0.0.0/0 or ::/0
+    severity: WARNING
+    assertions:
+      - not:
+        - or:
+          - key: "ingress[].cidr_blocks[]"
+            op: contains
+            value: "0.0.0.0/0"
+          - key: "ingress[].cidr_blocks[]"
+            op: contains
+            value: "::/0"
+    tags:
+      - sg
+
+  - id: SG_WORLD_EGRESS
+    resource: aws_security_group
+    message: Security group should not allow egress to 0.0.0.0/0 or ::/0
+    severity: WARNING
+    assertions:
+      - not:
+        - or:
+          - key: "egress[].cidr_blocks[]"
+            op: contains
+            value: "0.0.0.0/0"
+          - key: "egress[].cidr_blocks[]"
+            op: contains
+            value: "::/0"
+    tags:
+      - sg
+
+  - id: SG_SSH_WORLD_INGRESS
+    resource: aws_security_group
+    message: Security group should not allow ingress from 0.0.0.0/0 or ::/0
+    severity: FAILURE
+    assertions:
+      - not:
+        - or:
+          - key: "ingress[?(from_port==`22`)].cidr_blocks[]"
+            op: contains
+            value: "0.0.0.0/0"
+          - key: "ingress[?(from_port==`22`)].cidr_blocks[]"
+            op: contains
+            value: "::/0"
+    tags:
+      - sg
+
+  - id: SG_RD_WORLD_INGRESS
+    resource: aws_security_group
+    message: Security group should not allow ingress from 0.0.0.0/0 or ::/0
+    severity: FAILURE
+    assertions:
+      - not:
+        - or:
+          - key: "ingress[?(from_port==`3389`)].cidr_blocks[]"
+            op: contains
+            value: "0.0.0.0/0"
+          - key: "ingress[?(from_port==`3389`)].cidr_blocks[]"
+            op: contains
+            value: "::/0"
+    tags:
+      - sg
+
+  - id: SG_NON_32_INGRESS
+    resource: aws_security_group
+    message: Security group should not allow ingress from CIDR block that does not end in /32
+    severity: WARNING
+    assertions:
+      - key: "ingress[].cidr_blocks[] | [0]"
+        op: regex
+        value: ".*/32$"
+    tags:
+      - sg
+
+  - id: SG_INGRESS_PORT_RANGE
+    resource: aws_security_group
+    message: Security group ingress should specify single port instead of range
+    severity: WARNING
+    assertions:
+      - key: "ingress[?(from_port!=to_port)]"
+        op: empty
+    tags:
+      - sg
+
+  - id: SG_EGRESS_PORT_RANGE
+    resource: aws_security_group
+    message: Security group egress should specify single port instead of range
+    severity: WARNING
+    assertions:
+      - key: "egress[?(from_port!=to_port)]"
+        op: empty
+    tags:
+      - sg
+
+  - id: SG_MISSING_EGRESS
+    resource: aws_security_group
+    message: Security group should specify egress rules
+    severity: WARNING
+    assertions:
+      - key: "egress"
+        op: present
+    tags:
+      - sg
+
+  - id: CLOUDFRONT_LOGGING
+    message: CloudFront Distribution must configure logging
+    resource: s3_distribution
+    severity: FAILURE
+    assertions:
+      - key: logging_config
+        op: present
+    tags:
+      - cf
+
+  - id: ROLE_POLICY_NOT_ACTION
+    message: Should not use NotAction in IAM policy
+    resource: aws_iam_role_policy
+    severity: WARNING
+    assertions:
+      - key: policy.Statement[].NotAction
+        op: absent
+    tags:
+      - iam
+      - policy
+
+  - id: ROLE_POLICY_NOT_RESOURCE
+    message: Should not use NotResource in IAM policy
+    resource: aws_iam_role_policy
+    severity: WARNING
+    assertions:
+      - key: policy.Statement[].NotResource
+        op: absent
+    tags:
+      - iam
+      - policy
+
+  - id: ROLE_POLICY_WILDCARD_ACTION
+    message: Should not use wildcard action in IAM policy
+    resource: aws_iam_role_policy
+    severity: FAILURE
+    assertions:
+      - not:
+        - key: policy.Statement[].Action
+          op: contains
+          value: "*"
+    tags:
+      - iam
+      - policy
+
+  - id: ROLE_POLICY_WILDCARD_RESOURCE
+    message: Should not use wildcard resource in IAM policy
+    resource: aws_iam_role_policy
+    severity: WARNING
+    assertions:
+      - not:
+        - key: policy.Statement[].Resource
+          op: contains
+          value: "*"
+    tags:
+      - iam
+      - policy
+
+  - id: POLICY_NOT_ACTION
+    message: Should not use NotAction in IAM policy
+    resource: aws_iam_policy
+    severity: WARNING
+    assertions:
+      - key: assume_role_policy.Statement[].NotAction
+        op: absent
+    tags:
+      - iam
+      - policy
+
+  - id: POLICY_NOT_RESOURCE
+    message: Should not use NotResource in IAM policy
+    resource: aws_iam_policy
+    severity: WARNING
+    assertions:
+      - key: assume_role_policy.Statement[].NotResource
+        op: absent
+    tags:
+      - iam
+      - policy
+
+  - id: POLICY_WILDCARD_ACTION
+    message: Should not use wildcard action in IAM policy
+    resource: aws_iam_policy
+    severity: FAILURE
+    assertions:
+      - not:
+        - key: assume_role_policy.Statement[].Action
+          op: contains
+          value: "*"
+    tags:
+      - iam
+      - policy
+
+  - id: ROLE_NOT_ACTION
+    message: Should not use NotAction in IAM role
+    resource: aws_iam_role
+    severity: WARNING
+    assertions:
+      - key: assume_role_policy.Statement[].NotAction
+        op: absent
+    tags:
+      - iam
+      - role
+
+  - id: ROLE_NOT_RESOURCE
+    message: Should not use NotResource in IAM role
+    resource: aws_iam_role
+    severity: WARNING
+    assertions:
+      - key: assume_role_policy.Statement[].NotResource
+        op: absent
+    tags:
+      - iam
+      - role
+
+  - id: ROLE_WILDCARD_ACTION
+    message: Should not use wildcard action in IAM role
+    resource: aws_iam_role
+    severity: FAILURE
+    assertions:
+      - not:
+        - key: assume_role_policy.Statement[].Action
+          op: contains
+          value: "*"
+    tags:
+      - iam
+      - role
+
+  - id: ROLE_WILDCARD_RESOURCE
+    message: Should not use wildcard action in IAM role
+    resource: aws_iam_role
+    severity: FAILURE
+    assertions:
+      - not:
+        - key: assume_role_policy.Statement[].Resource
+          op: contains
+          value: "*"
+    tags:
+      - iam
+      - role
+
+  - id: ELB_ACCESS_LOGGING
+    message: ELB should enable access logging
+    resource: aws_elb
+    severity: WARNING
+    assertions:
+      - key: access_logs
+        op: present
+    tags:
+      - elb
+
   - id: S3_BUCKET_ACL
     message: S3 Bucket should not be public
     resource: aws_s3_bucket
@@ -22,3 +279,419 @@ rules:
       - key: encrypted
         op: eq
         value: true
+
+  - id: S3_NOT_ACTION
+    message: Should not use NotAction in S3 bucket policy
+    resource: aws_s3_bucket_policy
+    severity: WARNING
+    assertions:
+      - key: policy.Statement[].NotAction
+        op: absent
+    tags:
+      - s3
+
+  - id: S3_NOT_PRINCIPAL
+    message: Should not use NotPrincipal in S3 bucket policy
+    resource: aws_s3_bucket_policy
+    severity: WARNING
+    assertions:
+      - key: policy.Statement[].NotPrincipal
+        op: absent
+    tags:
+      - s3
+
+  - id: S3_BUCKET_POLICY_WILDCARD_PRINCIPAL
+    message: Should not use wildcard principal in S3 bucket policy
+    resource: aws_s3_bucket_policy
+    severity: WARNING
+    assertions:
+      - not:
+        - key: policy.Statement[].Principal
+          op: contains
+          value: "*"
+    tags:
+      - s3
+
+  - id: S3_BUCKET_POLICY_WILDCARD_ACTION
+    message: Should not use wildcard Principal in S3 bucket policy
+    resource: aws_s3_bucket_policy
+    severity: WARNING
+    assertions:
+      - not:
+        - key: policy.Statement[].Action
+          op: contains
+          value: "*"
+    tags:
+      - s3
+
+  - id: SNS_TOPIC_POLICY_WILDCARD_PRINCIPAL
+    message: Should not use wildcard Principal in SNS topic policy
+    resource: aws_sns_topic_policy
+    severity: WARNING
+    assertions:
+      - not:
+        - key: policy.Statement[].Principal
+          op: contains
+          value: "*"
+    tags:
+      - sns
+
+  - id: SNS_TOPIC_POLICY_NOT_ACTION
+    message: Should not use NotAction in SNS topic policy
+    resource: aws_sns_topic_policy
+    severity: WARNING
+    assertions:
+      - key: policy.Statement[].NotAction
+        op: absent
+    tags:
+      - sns
+
+  - id: SNS_TOPIC_POLICY_NOT_PRINCIPAL
+    message: Should not use NotPrincipal in SNS topic policy
+    resource: aws_sns_topic_policy
+    severity: WARNING
+    assertions:
+      - key: policy.Statement[].NotPrincipal
+        op: absent
+    tags:
+      - sns
+
+  - id: SQS_QUEUE_POLICY_WILDCARD_PRINCIPAL
+    message: Should not use wildcard principal in SQS queue policy
+    resource: aws_sqs_queue_policy
+    severity: WARNING
+    assertions:
+      - not:
+        - key: policy.Statement[].Principal
+          op: contains
+          value: "*"
+    tags:
+      - sqs
+
+  - id: SQS_QUEUE_POLICY_WILDCARD_ACTION
+    message: Should not use wildcard action in SQS queue policy
+    resource: aws_sqs_queue_policy
+    severity: WARNING
+    assertions:
+      - not:
+        - key: policy.Statement[].Action
+          op: contains
+          value: "*"
+    tags:
+      - sqs
+
+  - id: SQS_QUEUE_POLICY_NOT_ACTION
+    message: Should not use NotAction in SQS queue policy
+    resource: aws_sqs_queue_policy
+    severity: WARNING
+    assertions:
+      - key: policy.Statement[].NotAction
+        op: absent
+    tags:
+      - sqs
+
+  - id: SQS_QUEUE_POLICY_NOT_PRINCIPAL
+    message: Should not use NotPrincipal in SQS queue policy
+    resource: aws_sqs_queue_policy
+    severity: WARNING
+    assertions:
+      - key: policy.Statement[].NotPrincipal
+        op: absent
+    tags:
+      - sqs
+
+  - id: IAM_USER
+    message: IAM User should not have an inline policy (make member of group instead)
+    resource: aws_iam_user
+    severity: FAILURE
+    assertions:
+      - key: policy
+        op: absent
+    tags:
+      - iam
+
+  - id: IAM_USER_POLICY_ATTACHMENT
+    message: IAM should not have policies attached (make user a member of a group instead)
+    resource: aws_iam_user_policy_attachment
+    severity: FAILURE
+    assertions:
+      - key: "@"
+        op: absent
+    tags:
+      - iam
+
+  # FIXME really want to check that each user appears in at least one group
+  - id: IAM_USER_GROUP
+    message: IAM User should be in at least one group
+    resource: aws_iam_group_membership
+    severity: FAILURE
+    assertions:
+      - key: group
+        op: present
+      - key: users
+        op: not-empty
+
+  - id: LAMBDA_PERMISSION_INVOKE_ACTION
+    message: Lambda permission should not allow lambda:InvokeAction 
+    resource: aws_lambda_permission
+    severity: WARNING
+    assertions:
+      - key: action
+        op: ne
+        value: lambda:InvokeFunction
+    tags:
+     - lambda
+
+  - id: LAMBDA_PERMISSION_WILDCARD_PRINCIPAL
+    message: Lambda permission should not have wildcard principal
+    resource: aws_lambda_permission
+    severity: FAILURE
+    assertions:
+      - key: action
+        op: ne
+        value: "*"
+    tags:
+     - lambda
+
+  - id: WAF_WEB_ACL
+    message: Default action for WAF should not be ALLOW
+    resource: aws_waf_web_acl
+    severity: FAILURE
+    assertions:
+      - key: default_action.type
+        op: ne
+        value: ALLOW
+    tags:
+      - waf
+
+  - id: ALB_LISTENER
+    message: ALB listener security checks
+    resource: aws_alb_listener
+    severity: FAILURE
+    assertions:
+      - key: port
+        op: eq
+        value: 443
+      - key: protocol
+        op: ne
+        value: http
+        options: ignore-case
+      - key: ssl_policy
+        op: present
+      - key: ssl_policy
+        op: ne
+        value: ELBSecurityPolicy-2015-05
+      - key: ssl_policy
+        op: ne
+        value: ELBSecurityPolicy-TLS-1-0-2015-04
+      - key: certificate_arn
+        op: present
+      - key: access_logs
+        op: present
+      - key: internal  # TODO if the default is true, then add an or that checks absent or is-true
+        op: is-true
+
+  - id: AMI
+    message: AMI security checks
+    resource: aws_ami
+    severity: FAILURE
+    assertions:
+      - key: ebs_block_device.encrypted
+        op: is-true
+      - key: ebs_block_device.kms_key_id
+        op: present
+
+  - id: AMI_COPY
+    message: AMI security checks
+    resource: aws_ami_copy
+    severity: FAILURE
+    assertions:
+      - key: ebs_block_device.encrypted
+        op: is-true
+      - key: ebs_block_device.kms_key_id
+        op: present
+
+  - id: API_GATEWAY_DOMAIN_NAME
+    message: API Gateway checks
+    resource: aws_api_gateway_domain_name
+    severity: FAILURE
+    assertions:
+      - key: "@"
+        op: has-properties
+        value: certificate_name,certificate_body,certificate_change,certificate_private_key
+
+  - id: INSTANCE
+    message: Instance checks
+    resource: aws_instance
+    severity: FAILURE
+    assertions:
+      - or:
+          - key: ebs_block_device
+            op: absent
+          - key: ebs_block_device.encrypted
+            op: is-true
+
+  - id: CLOUDFRONT_DISTRIBUTION
+    message: CloudFront Distribution checks
+    resource: aws_cloudfront_distribution
+    severity: FAILURE
+    assertions:
+      - or:
+        - key: origin.custom_origin_policy
+          op: absent
+        - key: origin.custom_origin_policy.origin_protocol_policy
+          op: eq
+          value: https-only
+      - key: default_cache_behavior.viewer_protocol_policy
+        op: ne
+        value: allow-all
+      - key: cache_behavior.viewer_protocol_policy
+        op: ne
+        value: allow-all
+      - key: logging_config
+        op: present
+
+  - id: CLOUDTRAIL
+    message: CloudTrail checks
+    resource: aws_cloudtrail
+    severity: FAILURE
+    assertions:
+      - key: kms_key_id
+        op: present
+
+  - id: CODEBUILD_PROJECT
+    message: CodeBuild Project checks
+    resource: aws_codebuild_project
+    severity: FAILURE
+    assertions:
+      - key: encryption_key
+        op: present
+
+  - id: CODEPIPELINE
+    message: CodePipeline checks
+    resource: aws_codepipeline
+    severity: FAILURE
+    assertions:
+      - key: encryption_key
+        op: present
+
+  - id: DB_INSTANCE
+    message: DB Instance checks
+    resource: aws_db_instance
+    severity: FAILURE
+    assertions:
+      - key: storage_encrypted
+        op: is-true
+      - key: kms_key_id
+        op: present
+
+  - id: ELB
+    message: ELB checks
+    resource: aws_elb
+    severity: FAILURE
+    assertions:
+      - key: access_logs
+        op: present
+      - key: listener.lb_port
+        op: not-in
+        value: 80,21,23,5900
+
+  - id: DMS_REPLICATION_INSTANCE
+    message: DMS Replication Instance checks
+    resource: aws_dms_replication_instance
+    severity: FAILURE
+    assertions:
+      - key: kms_key_arn
+        op: present
+
+  - id: EBS_VOLUME
+    message: EBS Volume checks
+    resource: aws_ebs_volume
+    severity: FAILURE
+    assertions:
+      - key: encrypted
+        op: is-true
+      - key: kms_key_id
+        op: present
+
+  - id: EFS
+    message: EFS Checks
+    resource: aws_efs_file_system
+    severity: FAILURE
+    assertions:
+      - key: encrypted
+        op: is-true
+      - key: kms_key_id
+        op: present
+
+  - id: ELASTICTRANSCODE_PIPELINE
+    message: ElasticTranscoderPipeline checks
+    resource: aws_elastictranscoder_pipeline
+    severity: FAILURE
+    assertions:
+      - key: aws_kms_key_arn
+        op: present
+
+  - id: KINESIS_FIREHOSE_DELIVERY_STREAM
+    message: KinesisFirehoseDeliveryStream checks
+    resource: aws_kinesis_firehose_delivery_stream
+    severity: FAILURE
+    assertions:
+      - or:
+        - key: s3_configuration.kms_key_arn
+          op: present
+        - key: extended_s3_configuration.kms_key_arn
+          op: present
+
+  - id: LAMBDA_FUNCTION
+    message: Lambda checks
+    resource: aws_lambda_function
+    severity: FAILURE
+    assertions:
+      - key: kms_key_arn
+        op: present
+
+  - id: OPSWORKS_APPLICATION
+    message: OpsWorks Application checks
+    resource: aws_opsworks_application
+    severity: FAILURE
+    assertions:
+      - key: enable_ssl
+        op: is-true
+
+  - id: RDS_CLUSTER
+    message: RDSCluster checks
+    resource: aws_rds_cluster
+    severity: FAILURE
+    assertions:
+      - key: storage_encrypted
+        op: is-true
+      - key: kms_key_id
+        op: present
+
+  - id: REDSHIFT_CLUSTER
+    message: RedshiftCluster checks
+    resource: aws_redshift_cluster
+    severity: FAILURE
+    assertions:
+      - key: encrypted
+        op: is-true
+      - key: kms_key_id
+        op: present
+
+  - id: S3_BUCKET_OBJECT
+    message: S3 Bucket Object checks
+    resource: aws_s3_bucket_object
+    severity: FAILURE
+    assertions:
+      - key: kms_key_id
+        op: present
+
+  - id: SQS_QUEUE
+    message: SQSQueue checks
+    resource: aws_sqs_queue
+    severity: FAILURE
+    assertions:
+      - key: "@"
+        op: has-properties
+        value: kms_master_key_id,kms_data_key_reuse_period_seconds
