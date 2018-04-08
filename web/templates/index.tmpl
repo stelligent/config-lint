@@ -12,6 +12,9 @@
     <script src="public/js/codemirror.js"></script>
 <title>{{.Title}}</title>
 <style>
+body {
+  background: #eaeaea;
+}
 #config {
   min-height: 400px;
 }
@@ -47,7 +50,7 @@
       <div class="row">
         <div class="col-12">
           <h4>Results</h4>
-          <pre id="results"></pre>
+          <textarea class="form-control" id="results" name="rules"></textarea>
         </div>
       </div>
     </div>
@@ -60,6 +63,11 @@ $(function() {
     };
     var configEditor = CodeMirror.fromTextArea(document.getElementById("config"), editorConfig);
     var rulesEditor = CodeMirror.fromTextArea(document.getElementById("rules"), editorConfig);
+    var readOnlyConfig = {
+        lineNumbers: true,
+        readOnly: true
+    };
+    var resultsEditor = CodeMirror.fromTextArea(document.getElementById("results"), readOnlyConfig);
     $('#config-lint-form').on('submit', function(e) {
         e.preventDefault();
         var data = $(this).serialize();
@@ -68,10 +76,10 @@ $(function() {
             url: "/lint",
             data: data,
             success: function(results) {
-                $("#results").text(JSON.stringify(results, null, '  '));
+                resultsEditor.setValue(JSON.stringify(results, null, '  '));
             },
             error: function(response) {
-                $("#results").text(JSON.stringify(response.responseJSON, null, '  '));
+                resultsEditor.setValue(JSON.stringify(response.responseJSON, null, '  '));
             }
         });
     });
