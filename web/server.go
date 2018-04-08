@@ -39,7 +39,7 @@ func lintResults(c *gin.Context) {
 	var rules = c.PostForm("rules")
 	ruleSet, err := assertion.ParseRules(rules)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"Message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"Message": "Cannot parse rules", "Error": err.Error()})
 		return
 	}
 	var config = c.PostForm("config")
@@ -60,7 +60,7 @@ func lintResults(c *gin.Context) {
 	options := linter.Options{}
 	report, err := l.Validate(ruleSet, options)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"Message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"Message": "Cannot validate", "Error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"Violations": report.Violations})
