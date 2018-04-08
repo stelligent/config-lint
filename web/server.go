@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/stelligent/config-lint/assertion"
 	"github.com/stelligent/config-lint/linter"
@@ -44,7 +43,6 @@ func lintResults(c *gin.Context) {
 		return
 	}
 	var config = c.PostForm("config")
-	fmt.Println("config:", config)
 	f, err := ioutil.TempFile("/tmp", "lint")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"Message": err.Error()})

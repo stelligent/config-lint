@@ -1,0 +1,21 @@
+FROM golang:1.8.3 as builder
+WORKDIR /go/src/github.com/stelligent/config-lint
+RUN go get github.com/gin-gonic/gin
+RUN go get github.com/aws/aws-sdk-go
+RUN go get github.com/jmespath/go-jmespath
+RUN go get github.com/ghodss/yaml
+RUN go get github.com/hashicorp/hcl
+COPY assertion/ assertion/
+COPY linter/ linter/
+COPY web/ web/
+RUN CGO_ENABLED=0 GOOS=linux go build -o web/webserver web/*.go
+
+FROM alpine:latest
+RUN apk --no-cache add ca-certificates
+WORKDIR /root/
+COPY --from=builder /go/src/github.com/stelligent/config-lint/web/webserver .
+COPY --from=builder /go/src/github.com/stelligent/config-lint/web/templates/ templates/
+COPY --from=builder /go/src/github.com/stelligent/config-lint/web/public/ public/
+ENTRYPOINT ["./webserver"]
+EXPOSE 8080
+
