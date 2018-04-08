@@ -59,7 +59,15 @@ body {
 <script>
 $(function() {
     var editorConfig = {
-        lineNumbers: true
+        lineNumbers: true,
+        indentWithTabs: false,
+        tabSize: 2,
+        extraKeys: {
+            Tab: function(cm) {
+                var spaces = Array(cm.getOption("indentUnit") + 1).join(" ");
+                cm.replaceSelection(spaces);
+            }
+        }
     };
     var configEditor = CodeMirror.fromTextArea(document.getElementById("config"), editorConfig);
     var rulesEditor = CodeMirror.fromTextArea(document.getElementById("rules"), editorConfig);
