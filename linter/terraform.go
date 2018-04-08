@@ -35,7 +35,7 @@ func loadHCL(filename string) ([]interface{}, *ast.File, error) {
 	results := make([]interface{}, 0)
 	template, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return results, nil, nil
+		return results, nil, err
 	}
 
 	root, _ := parser.Parse(template)
@@ -43,18 +43,18 @@ func loadHCL(filename string) ([]interface{}, *ast.File, error) {
 	var v interface{}
 	err = hcl.Unmarshal([]byte(template), &v)
 	if err != nil {
-		return results, root, nil
+		return results, root, err
 	}
 	jsonData, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
-		return results, root, nil
+		return results, root, err
 	}
 	assertion.Debugf("LoadHCL: %s\n", string(jsonData))
 
 	var hclData interface{}
 	err = yaml.Unmarshal(jsonData, &hclData)
 	if err != nil {
-		return results, root, nil
+		return results, root, err
 	}
 	m := hclData.(map[string]interface{})
 	if m["resource"] != nil {
