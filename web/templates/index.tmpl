@@ -84,10 +84,16 @@ $(function() {
             url: "/lint",
             data: data,
             success: function(results) {
+                var height = 200;
+                if (results && results.Violations ) {
+                    height = 100 + ( 200 * results.Violations.length)
+                }
                 resultsEditor.setValue(JSON.stringify(results, null, '  '));
+                resultsEditor.setSize("100%", height);
             },
             error: function(response) {
                 resultsEditor.setValue(JSON.stringify(response.responseJSON, null, '  '));
+                resultsEditor.setSize("100%", 200);
             }
         });
     });
