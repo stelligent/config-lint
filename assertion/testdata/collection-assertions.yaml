@@ -11,7 +11,7 @@ test_cases:
       assertions:
         - every:
             key: "keys(@)"
-            assertions:
+            expressions:
               - key: "@"
                 op: in
                 value: Foo,Bar
@@ -37,7 +37,7 @@ test_cases:
       assertions:
         - every:
             key: "keys(@)"
-            assertions:
+            expressions:
               - key: "@"
                 op: in
                 value: Foo,Bar
@@ -65,7 +65,7 @@ test_cases:
       assertions:
         - every:
             key: locations
-            assertions:
+            expressions:
               - key: city
                 op: present
               - key: state
@@ -89,7 +89,7 @@ test_cases:
       assertions:
         - some:
             key: "keys(@)"
-            assertions:
+            expressions:
               - key: "@"
                 op: in
                 value: Foo,Bar
@@ -115,7 +115,7 @@ test_cases:
       assertions:
         - some:
             key: "keys(@)"
-            assertions:
+            expressions:
               - key: "@"
                 op: in
                 value: Foo,Bar
@@ -136,7 +136,7 @@ test_cases:
       assertions:
         - none:
             key: "keys(@)"
-            assertions:
+            expressions:
               - key: "@"
                 op: in
                 value: Foo,Bar
@@ -158,7 +158,7 @@ test_cases:
       assertions:
         - none:
             key: "ipPermissions[]"
-            assertions:
+            expressions:
               - key: "fromPort"
                 op: eq
                 value: 22
@@ -185,7 +185,7 @@ test_cases:
       assertions:
         - none:
             key: "keys(@)"
-            assertions:
+            expressions:
               - key: "@"
                 op: in
                 value: Foo,Bar
@@ -208,7 +208,7 @@ test_cases:
       assertions:
         - none:
             key: "ipPermissions[]"
-            assertions:
+            expressions:
               - key: "fromPort"
                 op: eq
                 value: 22

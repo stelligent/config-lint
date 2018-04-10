@@ -31,7 +31,7 @@ func TestTerraformLinter(t *testing.T) {
 type TestingValueSource struct {
 }
 
-func (s TestingValueSource) GetValue(a assertion.Assertion) (string, error) {
+func (s TestingValueSource) GetValue(a assertion.Expression) (string, error) {
 	if a.ValueFrom.URL != "" {
 		return "TEST", nil
 	}

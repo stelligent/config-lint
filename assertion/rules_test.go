@@ -7,9 +7,9 @@ import (
 type TestValueSource struct {
 }
 
-func (t TestValueSource) GetValue(assertion Assertion) (string, error) {
-	if assertion.Value != "" {
-		return assertion.Value, nil
+func (t TestValueSource) GetValue(expression Expression) (string, error) {
+	if expression.Value != "" {
+		return expression.Value, nil
 	}
 	return "m3.medium", nil
 }
@@ -36,7 +36,7 @@ var content = `Rules:
     message: Test message
     resource: aws_instance
     severity: WARNING
-    assertions:
+    expressions:
       - key: instance_type
         op: in
         value: t2.micro
@@ -46,7 +46,7 @@ var content = `Rules:
     message: Test message
     resource: aws_s3_bucket
     severity: WARNING
-    assertions:
+    expressions:
       - key: name
         op: eq
         value: bucket1
@@ -56,7 +56,7 @@ var content = `Rules:
     message: Test message
     resource: aws_ebs_volume
     severity: WARNING
-    assertions:
+    expressions:
       - key: size
         op: le
         value: 1000
@@ -199,7 +199,7 @@ var ruleWithValueFrom = `Rules:
     message: Test value_from
     severity: FAILURE
     resource: aws_instance
-    assertions:
+    expressions:
       - key: instance_type
         op: in
         value_from:

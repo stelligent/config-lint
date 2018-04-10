@@ -27,32 +27,32 @@ type (
 		Message    string
 		Severity   string
 		Resource   string
-		Assertions []Assertion
+		Assertions []Expression
 		Except     []string
 		Tags       []string
 		Invoke     InvokeRuleAPI
 	}
 
-	// Assertion expression for a Rule
-	Assertion struct {
+	// Expression expression for a Rule
+	Expression struct {
 		Key       string
 		Op        string
 		Value     string
 		ValueType string    `json:"value_type"`
 		ValueFrom ValueFrom `json:"value_from"`
-		Or        []Assertion
-		Xor       []Assertion
-		And       []Assertion
-		Not       []Assertion
-		Every     CollectionAssertion
-		Some      CollectionAssertion
-		None      CollectionAssertion
+		Or        []Expression
+		Xor       []Expression
+		And       []Expression
+		Not       []Expression
+		Every     CollectionExpression
+		Some      CollectionExpression
+		None      CollectionExpression
 	}
 
-	// CollectionAssertion assertion for every element of a collection
-	CollectionAssertion struct {
-		Key        string
-		Assertions []Assertion
+	// CollectionExpression assertion for every element of a collection
+	CollectionExpression struct {
+		Key         string
+		Expressions []Expression
 	}
 
 	// ValueFrom describes a external source for values
@@ -104,7 +104,7 @@ type (
 
 	// ValueSource interface to fetch dynamic values
 	ValueSource interface {
-		GetValue(Assertion) (string, error)
+		GetValue(Expression) (string, error)
 	}
 
 	// ExternalRuleInvoker defines an interface for invoking an external API

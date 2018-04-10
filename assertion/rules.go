@@ -86,7 +86,7 @@ func ResolveRules(rules []Rule, valueSource ValueSource) []Rule {
 // ResolveRule loads any dynamic values for a single Rule
 func ResolveRule(rule Rule, valueSource ValueSource) Rule {
 	resolvedRule := rule
-	resolvedRule.Assertions = make([]Assertion, 0)
+	resolvedRule.Assertions = make([]Expression, 0)
 	for _, assertion := range rule.Assertions {
 		value, _ := valueSource.GetValue(assertion) // FIXME return error
 		resolvedAssertion := assertion
@@ -110,19 +110,19 @@ func CheckRule(rule Rule, resource Resource, e ExternalRuleInvoker) (string, []V
 	}
 	for _, ruleAssertion := range rule.Assertions {
 		Debugf("Checking resource %s\n", resource.ID)
-		assertionResult, err := CheckAssertion(rule, ruleAssertion, resource)
+		expressionResult, err := CheckExpression(rule, ruleAssertion, resource)
 		if err != nil {
 			return "FAILURE", violations, err
 		}
-		if assertionResult.Status != "OK" {
-			returnStatus = assertionResult.Status
+		if expressionResult.Status != "OK" {
+			returnStatus = expressionResult.Status
 			v := Violation{
 				RuleID:           rule.ID,
 				ResourceID:       resource.ID,
 				ResourceType:     resource.Type,
-				Status:           assertionResult.Status,
+				Status:           expressionResult.Status,
 				RuleMessage:      rule.Message,
-				AssertionMessage: assertionResult.Message,
+				AssertionMessage: expressionResult.Message,
 				Filename:         resource.Filename,
 				LineNumber:       resource.LineNumber,
 			}

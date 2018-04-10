@@ -5,13 +5,13 @@ import (
 	"testing"
 )
 
-type AssertionTestCase struct {
+type ExpressionTestCase struct {
 	Rule           Rule
 	Resource       Resource
 	ExpectedStatus string
 }
 
-func TestCheckAssertion(t *testing.T) {
+func TestCheckExpression(t *testing.T) {
 
 	simpleTestResource := Resource{
 		ID:   "a_test_resource",
@@ -48,15 +48,15 @@ func TestCheckAssertion(t *testing.T) {
 		Filename: "test.tf",
 	}
 
-	testCases := map[string]AssertionTestCase{
+	testCases := map[string]ExpressionTestCase{
 		"testEq": {
 			Rule{
 				ID:       "test1",
 				Message:  "test rule",
 				Severity: "FAILURE",
 				Resource: "aws_instance",
-				Assertions: []Assertion{
-					Assertion{
+				Assertions: []Expression{
+					Expression{
 						Key:   "instance_type",
 						Op:    "eq",
 						Value: "t2.micro",
@@ -72,15 +72,15 @@ func TestCheckAssertion(t *testing.T) {
 				Message:  "Test Rule",
 				Severity: "FAILURE",
 				Resource: "aws_instance",
-				Assertions: []Assertion{
-					Assertion{
-						Or: []Assertion{
-							Assertion{
+				Assertions: []Expression{
+					Expression{
+						Or: []Expression{
+							Expression{
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "t2.micro",
 							},
-							Assertion{
+							Expression{
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "m4.large",
@@ -98,15 +98,15 @@ func TestCheckAssertion(t *testing.T) {
 				Message:  "Test Rule",
 				Severity: "FAILURE",
 				Resource: "aws_instance",
-				Assertions: []Assertion{
-					Assertion{
-						Or: []Assertion{
-							Assertion{
+				Assertions: []Expression{
+					Expression{
+						Or: []Expression{
+							Expression{
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "t2.nano",
 							},
-							Assertion{
+							Expression{
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "m4.large",
@@ -124,15 +124,15 @@ func TestCheckAssertion(t *testing.T) {
 				Message:  "Test Rule",
 				Severity: "FAILURE",
 				Resource: "aws_instance",
-				Assertions: []Assertion{
-					Assertion{
-						Xor: []Assertion{
-							Assertion{
+				Assertions: []Expression{
+					Expression{
+						Xor: []Expression{
+							Expression{
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "t2.micro",
 							},
-							Assertion{
+							Expression{
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "m4.large",
@@ -150,15 +150,15 @@ func TestCheckAssertion(t *testing.T) {
 				Message:  "Test Rule",
 				Severity: "FAILURE",
 				Resource: "aws_instance",
-				Assertions: []Assertion{
-					Assertion{
-						Xor: []Assertion{
-							Assertion{
+				Assertions: []Expression{
+					Expression{
+						Xor: []Expression{
+							Expression{
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "t2.micro",
 							},
-							Assertion{
+							Expression{
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "t2.micro",
@@ -176,15 +176,15 @@ func TestCheckAssertion(t *testing.T) {
 				Message:  "Test Rule",
 				Severity: "FAILURE",
 				Resource: "aws_instance",
-				Assertions: []Assertion{
-					Assertion{
-						Xor: []Assertion{
-							Assertion{
+				Assertions: []Expression{
+					Expression{
+						Xor: []Expression{
+							Expression{
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "m3.large",
 							},
-							Assertion{
+							Expression{
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "c4.large",
@@ -202,15 +202,15 @@ func TestCheckAssertion(t *testing.T) {
 				Message:  "Test Rule",
 				Severity: "FAILURE",
 				Resource: "aws_instance",
-				Assertions: []Assertion{
-					Assertion{
-						And: []Assertion{
-							Assertion{
+				Assertions: []Expression{
+					Expression{
+						And: []Expression{
+							Expression{
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "t2.micro",
 							},
-							Assertion{
+							Expression{
 								Key:   "ami",
 								Op:    "eq",
 								Value: "ami-f2d3638a",
@@ -228,15 +228,15 @@ func TestCheckAssertion(t *testing.T) {
 				Message:  "Test Rule",
 				Severity: "FAILURE",
 				Resource: "aws_instance",
-				Assertions: []Assertion{
-					Assertion{
-						And: []Assertion{
-							Assertion{
+				Assertions: []Expression{
+					Expression{
+						And: []Expression{
+							Expression{
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "m3.medium",
 							},
-							Assertion{
+							Expression{
 								Key:   "ami",
 								Op:    "eq",
 								Value: "ami-f2d3638a",
@@ -254,10 +254,10 @@ func TestCheckAssertion(t *testing.T) {
 				Message:  "Test Rule",
 				Severity: "FAILURE",
 				Resource: "aws_instance",
-				Assertions: []Assertion{
-					Assertion{
-						Not: []Assertion{
-							Assertion{
+				Assertions: []Expression{
+					Expression{
+						Not: []Expression{
+							Expression{
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "c4.large",
@@ -275,10 +275,10 @@ func TestCheckAssertion(t *testing.T) {
 				Message:  "Test Rule",
 				Severity: "FAILURE",
 				Resource: "aws_instance",
-				Assertions: []Assertion{
-					Assertion{
-						Not: []Assertion{
-							Assertion{
+				Assertions: []Expression{
+					Expression{
+						Not: []Expression{
+							Expression{
 								Key:   "instance_type",
 								Op:    "eq",
 								Value: "t2.micro",
@@ -296,17 +296,17 @@ func TestCheckAssertion(t *testing.T) {
 				Message:  "Test Rule",
 				Severity: "FAILURE",
 				Resource: "aws_instance",
-				Assertions: []Assertion{
-					Assertion{
-						Not: []Assertion{
-							Assertion{
-								Or: []Assertion{
-									Assertion{
+				Assertions: []Expression{
+					Expression{
+						Not: []Expression{
+							Expression{
+								Or: []Expression{
+									Expression{
 										Key:   "instance_type",
 										Op:    "eq",
 										Value: "t2.micro",
 									},
-									Assertion{
+									Expression{
 										Key:   "instance_type",
 										Op:    "eq",
 										Value: "m3.medium",
@@ -326,8 +326,8 @@ func TestCheckAssertion(t *testing.T) {
 				Message:  "Test Resource Count Fails",
 				Severity: "FAILURE",
 				Resource: "aws_instance",
-				Assertions: []Assertion{
-					Assertion{
+				Assertions: []Expression{
+					Expression{
 						Key:       "tags",
 						ValueType: "size",
 						Op:        "eq",
@@ -344,8 +344,8 @@ func TestCheckAssertion(t *testing.T) {
 				Message:  "Test Resource Count OK",
 				Severity: "FAILURE",
 				Resource: "aws_instance",
-				Assertions: []Assertion{
-					Assertion{
+				Assertions: []Expression{
+					Expression{
 						Key:       "tags",
 						ValueType: "size",
 						Op:        "eq",
@@ -362,8 +362,8 @@ func TestCheckAssertion(t *testing.T) {
 				Message:  "Test integer Fails",
 				Severity: "FAILURE",
 				Resource: "aws_instance",
-				Assertions: []Assertion{
-					Assertion{
+				Assertions: []Expression{
+					Expression{
 						Key:       "root_block_device.volume_size",
 						ValueType: "integer",
 						Op:        "le",
@@ -380,8 +380,8 @@ func TestCheckAssertion(t *testing.T) {
 				Message:  "Test integer OK",
 				Severity: "FAILURE",
 				Resource: "aws_instance",
-				Assertions: []Assertion{
-					Assertion{
+				Assertions: []Expression{
+					Expression{
 						Key:       "root_block_device.volume_size",
 						ValueType: "integer",
 						Op:        "le",
@@ -395,10 +395,10 @@ func TestCheckAssertion(t *testing.T) {
 	}
 
 	for k, tc := range testCases {
-		assertionResult, err := CheckAssertion(tc.Rule, tc.Rule.Assertions[0], tc.Resource)
+		expressionResult, err := CheckExpression(tc.Rule, tc.Rule.Assertions[0], tc.Resource)
 		FailTestIfError(err, "TestSimple", t)
-		if assertionResult.Status != tc.ExpectedStatus {
-			t.Errorf("%s Failed Expected '%s' to be '%s'", k, assertionResult.Status, tc.ExpectedStatus)
+		if expressionResult.Status != tc.ExpectedStatus {
+			t.Errorf("%s Failed Expected '%s' to be '%s'", k, expressionResult.Status, tc.ExpectedStatus)
 		}
 	}
 }
@@ -409,17 +409,17 @@ func TestNestedBooleans(t *testing.T) {
 		Message:  "Do not allow access to port 22 from 0.0.0.0/0",
 		Severity: "NOT_COMPLIANT",
 		Resource: "aws_instance",
-		Assertions: []Assertion{
-			Assertion{
-				Not: []Assertion{
-					Assertion{
-						And: []Assertion{
-							Assertion{
+		Assertions: []Expression{
+			Expression{
+				Not: []Expression{
+					Expression{
+						And: []Expression{
+							Expression{
 								Key:   "ipPermissions[].fromPort[]",
 								Op:    "contains",
 								Value: "22",
 							},
-							Assertion{
+							Expression{
 								Key:   "ipPermissions[].ipRanges[]",
 								Op:    "contains",
 								Value: "0.0.0.0/0",
@@ -459,9 +459,9 @@ func TestNestedBooleans(t *testing.T) {
 	if err != nil {
 		t.Error("Error parsing resource JSON")
 	}
-	assertionResult, err := CheckAssertion(rule, rule.Assertions[0], resource)
+	expressionResult, err := CheckExpression(rule, rule.Assertions[0], resource)
 	FailTestIfError(err, "TestNestedBoolean", t)
-	if assertionResult.Status != "NOT_COMPLIANT" {
+	if expressionResult.Status != "NOT_COMPLIANT" {
 		t.Error("Expecting nested boolean to return NOT_COMPLIANT")
 	}
 }

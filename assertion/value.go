@@ -15,11 +15,11 @@ import (
 // StandardValueSource can fetch values from external sources
 type StandardValueSource struct{}
 
-// GetValue looks up external values when an Assertion includes a ValueFrom attribute
-func (v StandardValueSource) GetValue(assertion Assertion) (string, error) {
-	if assertion.ValueFrom.URL != "" {
-		Debugf("Getting value_from %s\n", assertion.ValueFrom.URL)
-		parsedURL, err := url.Parse(assertion.ValueFrom.URL)
+// GetValue looks up external values when an Expression includes a ValueFrom attribute
+func (v StandardValueSource) GetValue(expression Expression) (string, error) {
+	if expression.ValueFrom.URL != "" {
+		Debugf("Getting value_from %s\n", expression.ValueFrom.URL)
+		parsedURL, err := url.Parse(expression.ValueFrom.URL)
 		if err != nil {
 			return "", err
 		}
@@ -27,17 +27,17 @@ func (v StandardValueSource) GetValue(assertion Assertion) (string, error) {
 		case "s3":
 			return v.GetValueFromS3(parsedURL.Host, parsedURL.Path)
 		case "http":
-			return v.GetValueFromHTTP(assertion.ValueFrom.URL)
+			return v.GetValueFromHTTP(expression.ValueFrom.URL)
 		case "https":
-			return v.GetValueFromHTTP(assertion.ValueFrom.URL)
+			return v.GetValueFromHTTP(expression.ValueFrom.URL)
 		default:
 			return "", fmt.Errorf("Unsupported protocol for value_from: %s", parsedURL.Scheme)
 		}
 	}
-	return assertion.Value, nil
+	return expression.Value, nil
 }
 
-// GetValueFromS3 looks up external values for an Assertion when the S3 protocol is specified
+// GetValueFromS3 looks up external values for an Expression when the S3 protocol is specified
 func (v StandardValueSource) GetValueFromS3(bucket string, key string) (string, error) {
 	region := &aws.Config{Region: aws.String("us-east-1")}
 	awsSession := session.New()
@@ -54,7 +54,7 @@ func (v StandardValueSource) GetValueFromS3(bucket string, key string) (string, 
 	return strings.TrimSpace(buf.String()), nil
 }
 
-// GetValueFromHTTP looks up external value for an Assertion when the HTTP protocol is specified
+// GetValueFromHTTP looks up external value for an Expression when the HTTP protocol is specified
 func (v StandardValueSource) GetValueFromHTTP(url string) (string, error) {
 	httpResponse, err := http.Get(url)
 	if err != nil {

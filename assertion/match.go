@@ -24,7 +24,7 @@ func matchError(err error) (MatchResult, error) {
 	}, err
 }
 
-func isMatch(data interface{}, assertion Assertion) (MatchResult, error) {
+func isMatch(data interface{}, expression Expression) (MatchResult, error) {
 	// FIXME eliminate searchResult this when all operations converted to use data
 	// individual ops can call JSONStringify as needed
 	searchResult, err := JSONStringify(data)
@@ -32,10 +32,10 @@ func isMatch(data interface{}, assertion Assertion) (MatchResult, error) {
 		return matchError(err)
 	}
 	searchResult = unquoted(searchResult)
-	key := assertion.Key
-	op := assertion.Op
-	value := assertion.Value
-	valueType := assertion.ValueType
+	key := expression.Key
+	op := expression.Op
+	value := expression.Value
+	valueType := expression.ValueType
 
 	switch op {
 	case "eq":
