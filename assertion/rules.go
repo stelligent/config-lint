@@ -108,6 +108,15 @@ func CheckRule(rule Rule, resource Resource, e ExternalRuleInvoker) (string, []V
 	if rule.Invoke.URL != "" {
 		return e.Invoke(rule, resource)
 	}
+	for _, ruleCondition := range rule.Conditions {
+		expressionResult, err := CheckExpression(rule, ruleCondition, resource)
+		if err != nil {
+			return "FAILURE", violations, err
+		}
+		if expressionResult.Status != "OK" {
+			return returnStatus, violations, nil
+		}
+	}
 	for _, ruleAssertion := range rule.Assertions {
 		Debugf("Checking resource %s\n", resource.ID)
 		expressionResult, err := CheckExpression(rule, ruleAssertion, resource)

@@ -27,6 +27,7 @@ type (
 		Message    string
 		Severity   string
 		Resource   string
+		Conditions []Expression
 		Assertions []Expression
 		Except     []string
 		Tags       []string

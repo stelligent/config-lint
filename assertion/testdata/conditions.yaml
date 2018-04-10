@@ -1,0 +1,71 @@
+---
+description: Test conditions
+test_cases:
+
+  - name: conditions_false
+    rule:
+      id: CONDITIONS_1
+      message: Missing properties
+      severity: FAILURE
+      resource: sample
+      conditions:
+        - key: example.name
+          eq: first
+      assertions:
+        - key: example
+          op: has-properties
+          value: name,id
+    resource:
+      id: p1
+      type: sample
+      properties:
+        example:
+          name: first
+          id: 1
+    result: OK
+
+  - name: conditions_ignore
+    rule:
+      id: PROPERTIES_2
+      message: Ignore using condition
+      severity: FAILURE
+      resource: sample
+      conditions:
+        - key: example.name
+          op: eq
+          value: second
+      assertions:
+        - key: example
+          op: has-properties
+          value: name,id,description
+    resource:
+      id: p1
+      type: sample
+      properties:
+        example:
+          name: first
+          id: 1
+    result: OK
+
+  - name: conditions_FAILURE
+    rule:
+      id: PROPERTIES_2
+      message: Missing properties
+      severity: FAILURE
+      resource: sample
+      conditions:
+        - key: example.name
+          op: eq
+          value: first
+      assertions:
+        - key: example
+          op: has-properties
+          value: name,id,description
+    resource:
+      id: p1
+      type: sample
+      properties:
+        example:
+          name: first
+          id: 1
+    result: FAILURE
