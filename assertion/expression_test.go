@@ -505,6 +505,7 @@ func TestUsingFixtures(t *testing.T) {
 		"./testdata/collection-assertions.yaml",
 		"./testdata/has-properties.yaml",
 		"./testdata/conditions.yaml",
+		"./testdata/default-severity.yaml",
 	}
 
 	for _, filename := range fixtureFilenames {

@@ -210,7 +210,11 @@ func CheckExpression(rule Rule, expression Expression, resource Resource) (Resul
 		return result, err
 	}
 	if !match.Match {
-		result.Status = rule.Severity
+		if rule.Severity == "" {
+			result.Status = "FAILURE"
+		} else {
+			result.Status = rule.Severity
+		}
 		result.Message = match.Message
 	}
 	return result, nil

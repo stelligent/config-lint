@@ -1,0 +1,20 @@
+---
+description: Test uses default severity
+test_cases:
+
+  - name: default-severity-FAILURE
+    rule:
+      id: PROPERTIES_1
+      message: Missing properties
+      resource: sample
+      assertions:
+        - key: example
+          op: has-properties
+          value: name,id
+    resource:
+      id: p1
+      type: sample
+      properties:
+        example:
+          name: first
+    result: FAILURE

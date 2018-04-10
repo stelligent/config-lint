@@ -197,5 +197,4 @@ It is also possible to use a rules files in a Lambda that handles events from AW
 * Create a Provider interface for AWS calls, create a mock for testing SecurityGroupLinter
 * Starting to have inconsistent naming in ops: is-true, is-false, has-properties vs. present, absent, empty, null
 * Add options to Assertion type, for things like 'ignore-case' for string compares? Or just use a regex?
-* Make FAILURE the default severity
 * Provide a default -query of 'Violations[]', and add an option for a full report
