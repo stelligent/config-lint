@@ -1,0 +1,72 @@
+---
+version: 1
+description: Terraform rules for demo
+type: Terraform
+files:
+  - "*.tf"
+rules:
+  
+  - id: NO_IAM_ROLES
+    message: Creating an IAM role is not allowed
+    resource: "aws_iam_role"
+    severity: FAILURE
+    assertions:
+      - key: "@"
+        op: absent
+
+  - id: NO_IAM_ROLE_POLICIES
+    message: Creating an IAM role policy is not allowed
+    resource: "aws_iam_role_policy"
+    severity: FAILURE
+    assertions:
+      - key: "@"
+        op: absent
+
+  - id: NO_IAM_GROUPS
+    message: Creating an IAM group is not allowed
+    resource: "aws_iam_group"
+    severity: FAILURE
+    assertions:
+      - key: "@"
+        op: absent
+
+  - id: NO_IAM_GROUP_POLICIES
+    message: Creating an IAM group policy is not allowed
+    resource: "aws_iam_group_policy"
+    severity: FAILURE
+    assertions:
+      - key: "@"
+        op: absent
+
+  - id: NO_IAM_POLICIES
+    message: Creating an IAM policy is not allowed
+    resource: "aws_iam_policy"
+    severity: FAILURE
+    assertions:
+      - key: "@"
+        op: absent
+
+  - id: NO_IAM_USERS
+    message: Creating an IAM user is not allowed
+    resource: "aws_iam_user"
+    severity: FAILURE
+    assertions:
+      - key: "@"
+        op: absent
+
+  - id: NO_IAM_USER_POLICIES
+    message: Creating an IAM user policy is not allowed
+    resource: "aws_iam_user_policy"
+    severity: FAILURE
+    assertions:
+      - key: "@"
+        op: absent
+
+  - id: NO_IAM_INSTANCE_PROFILE
+    message: Creating an IAM instance profile is not allowed
+    resource: "aws_iam_instance_profile"
+    severity: FAILURE
+    assertions:
+      - key: "@"
+        op: absent
+

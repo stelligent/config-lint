@@ -1,0 +1,19 @@
+version: 1
+description: Rules for Terraform configuration files
+type: Terraform
+files:
+  - "*.tf"
+rules:
+
+  - id: S3_BUCKET_ENCRYPTION
+    message: S3 Bucket should be encrypted
+    resource: aws_s3_bucket
+    severity: FAILURE
+    conditions:
+      - key: "tags[].classification[] | [0]"
+        op: in
+        value: PII,HIPAA
+    assertions:
+      - key: server_side_encryption_configuration
+        op: present
+
