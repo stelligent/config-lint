@@ -35,6 +35,18 @@ rules:
       - key: rules
         op: not-empty
 
+  - id: YAML_RULES_HAVE_RESOURCES_SECTION
+    message: RuleSet for YAML required resources section
+    resource: LintRuleSet
+    severity: FAILURE
+    conditions:
+      - key: type
+        op: eq
+        value: YAML
+    assertions:
+      - key: resources
+        op: present
+
   - id: EVERY_RULE_HAS_ID
     message: Event rule in rule set must have an id
     resource: LintRuleSet
@@ -52,14 +64,6 @@ rules:
     severity: FAILURE
     assertions:
       - key: id
-        op: present
-
-  - id: SEVERITY_PRESENT
-    message: Rule must have a severity
-    resource: LintRule
-    severity: FAILURE
-    assertions:
-      - key: severity
         op: present
 
   - id: RESOURCE_PRESENT

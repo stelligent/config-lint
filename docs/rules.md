@@ -21,13 +21,14 @@ Each rule contains the following attributes:
 |resource   | The resource type to which the rule will be applied                                |
 |except     | An optional list of resource ids that should not be validated                      |
 |severity   | FAILURE, WARNING, NON_COMPLIANT                                                    |
-|assertions | A list of assertions used to detect validation errors, see next section            |
+|assertions | A list of expressions used to detect validation errors, see next section           |
 |invoke     | Alternative to assertions for a custom external API call to validate, see below    |
 |tags       | Optional list of tags, command line has option to limit scans to a subset of tags  |
+|conditions | Optional expressions that must be true for the rule to be applied                  |
 
-## Attributes for each Assertion
+## Attributes for each Expression
 
-Each assertion contains the following attributes:
+Each expression contains the following attributes:
 
 |Name       |Description                                                                         |
 |-----------|------------------------------------------------------------------------------------|
