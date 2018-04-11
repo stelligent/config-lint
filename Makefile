@@ -18,7 +18,6 @@ deps:
 	go get "github.com/jteeuwen/go-bindata/..."
 	go get "github.com/golang/lint/golint"
 	go get "github.com/fzipp/gocyclo"
-	go get "github.com/goreleaser/goreleaser"
 	dep ensure
 
 gen:
