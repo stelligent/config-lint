@@ -1,4 +1,5 @@
-files/.terraform/*
-config-lint
-main
-*.zip
+coverage.out
+*/coverage.out
+web/assets.go
+.release/
+vendor/

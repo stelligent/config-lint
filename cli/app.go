@@ -11,6 +11,8 @@ import (
 	"strings"
 )
 
+var version string
+
 type (
 	// ApplyOptions for applying rules
 	ApplyOptions struct {
@@ -30,7 +32,13 @@ func main() {
 	queryExpression := flag.String("query", "", "JMESPath expression to query the results")
 	searchExpression := flag.String("search", "", "JMESPath expression to evaluation against the files")
 	validate := flag.Bool("validate", false, "Validate rules file")
+	versionFlag := flag.Bool("version", false, "Get program version")
 	flag.Parse()
+
+	if *versionFlag == true {
+		fmt.Println(version)
+		return
+	}
 
 	if *verboseLogging == true {
 		assertion.SetVerbose(true)
