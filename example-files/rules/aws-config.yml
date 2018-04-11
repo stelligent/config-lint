@@ -22,7 +22,7 @@ rules:
     assertions:
       - none:
          key: "ipPermissions[]"
-         assertions:
+         expressions:
            - key: fromPort
              op: eq
              value: 22
