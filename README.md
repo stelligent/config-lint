@@ -12,6 +12,16 @@ YAML is stored in an S3 object, and the bucket and key of the object are passed 
 parameters to the AWS Config fule
 
 
+# Installation 
+You can use [Homebrew](https://brew.sh/) to install the latest version:
+
+```
+brew tap stelligent/tap
+brew install config-lint
+```
+
+Alternatively, you can install manually from the [releases](https://github.com/stelligent/config-lint/releases).
+
 # Build Command Line tool
 
 ```
@@ -181,6 +191,10 @@ The files will *not* be scanned for violations.
 It is also possible to use a rules files in a Lambda that handles events from AWS Config.
 
 [Documented Here](docs/lambda.md)
+
+# Releasing
+To release a new version, run `make bumpversion` to increment the patch version and push a tag to GitHub to start the release process.
+
 # TODO
 
 * Add an optional YAML file for project settings, such as ignoring certain rules for certain resources
