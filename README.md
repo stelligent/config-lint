@@ -1,3 +1,5 @@
+[![Build Status](https://circleci.com/gh/stelligent/config-lint.svg?style=shield)](https://circleci.com/gh/stelligent/config-lint)
+
 # config-lint
 
 A command line tool to validate configurations using rules specified in a YAML file.
