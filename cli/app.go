@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/ghodss/yaml"
 	"github.com/stelligent/config-lint/assertion"
 	"github.com/stelligent/config-lint/linter"
-	"os"
-	"strings"
 )
 
 var version string
@@ -57,7 +58,7 @@ func main() {
 	}
 	ruleSets, err := loadRuleSets(rulesFilenames)
 	if err != nil {
-		fmt.Errorf("Failed to load rules: %v", err)
+		fmt.Printf("Failed to load rules: %v", err)
 		return
 	}
 	applyRules(ruleSets, flag.Args(), applyOptions)

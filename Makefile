@@ -1,15 +1,11 @@
-ORG := stelligent
-PACKAGE := config-lint
-TARGET_OS := darwin
-SRC_PACKAGES = assertion cli lambda linter web
+VERSION = $(shell git tag -l --sort=creatordate | grep "^v[0-9]*.[0-9]*.[0-9]*$$" | tail -1)
+MAJOR_VERSION := $(word 1, $(subst ., ,$(VERSION)))
+MINOR_VERSION := $(word 2, $(subst ., ,$(VERSION)))
+PATCH_VERSION := $(word 3, $(subst ., ,$(VERSION)))
+NEXT_VERSION := $(MAJOR_VERSION).$(MINOR_VERSION).$(shell echo $(PATCH_VERSION)+1|bc)
 
-BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
-IS_MASTER := $(filter master, $(BRANCH))
-VERSION := $(shell cat VERSION)$(if $(IS_MASTER),,-$(BRANCH))
-ARCH := $(shell go env GOARCH)
-OS := $(shell go env GOOS)
 BUILD_DIR = .release
-GOLDFLAGS = "-X main.version=$(VERSION)"
+GOLDFLAGS = "-X main.version=$(NEXT_VERSION)"
 
 CLI_FILES = $(shell find cli linter assertion -name \*.go)
 LAMBDA_FILES = $(shell find lambda assertion -name \*.go)
@@ -24,14 +20,31 @@ deps:
 	go get "github.com/fzipp/gocyclo"
 	dep ensure
 
+gen:
+	@echo "=== generating ==="
+	@go generate ./...
+
+lint: gen
+	@echo "=== linting ==="
+	@go vet ./...
+	@golint $(go list ./... | grep -v /vendor/) 
+
+test: lint
+	@echo "=== testing ==="
+	@go test ./...
+
+bumpversion:
+	@echo "=== promoting $(NEXT_VERSION) ==="
+	@git tag -a -m "$(VERSION) -> $(NEXT_VERSION)" $(NEXT_VERSION)
+	@git push --follow-tags origin
 
 $(BUILD_DIR)/config-lint: $(CLI_FILES)
-	@echo "=== building config-lint $(VERSION) - $@ ==="
+	@echo "=== building config-lint - $@ ==="
 	mkdir -p $(BUILD_DIR)
 	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -ldflags=$(GOLDFLAGS) -o $(BUILD_DIR)/config-lint cli/*.go
 
 $(BUILD_DIR)/lambda: $(LAMBDA_FILES)
-	@echo "=== building lambda $(VERSION) - $@ ==="
+	@echo "=== building lambda - $@ ==="
 	mkdir -p $(BUILD_DIR)
 	GOOS=linux GOARCH=amd64 go build -ldflags=$(GOLDFLAGS) -o $(BUILD_DIR)/lambda lambda/*.go
 	cd $(BUILD_DIR) && zip lambda.zip lambda
@@ -39,28 +52,11 @@ $(BUILD_DIR)/lambda: $(LAMBDA_FILES)
 lambda-deploy: $(BUILD_DIR)/lambda
 	aws lambda update-function-code --region us-east-1 --function-name config-go --zip-file fileb://$(BUILD_DIR)/lambda.zip
 
-$(BUILD_DIR)/webserver: webserver-gen $(WEB_FILES)
+$(BUILD_DIR)/webserver: gen $(WEB_FILES)
 	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -ldflags=$(GOLDFLAGS) -o $(BUILD_DIR)/webserver web/*.go
-
-webserver-gen: $(WEB_FILES)
-	cd web && go generate *.go
 
 webserver-docker:
 	docker build -t lhitchon/config-lint-web -f Dockerfile-web .
-
-test:
-	@echo "=== testing ==="
-	cd assertion && go test
-	cd linter && go test
-	cd lambda && go test
-
-lint:
-	@echo "=== linting ==="
-	cd assertion && golint
-	cd linter && golint
-	cd cli && golint
-	cd lambda && golint
-	cd web && golint
 
 build: $(BUILD_DIR)/config-lint $(BUILD_DIR)/lambda $(BUILD_DIR)/webserver
 
