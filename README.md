@@ -6,12 +6,6 @@ A command line tool to validate configurations using rules specified in a YAML f
 The data being validated can come from template files, such as a Terraform file.
 There is also an example of a Linter that runs agains data returned from an AWS API call.
 
-There is also the ability to deploy an AWS Lambda that can be used as a custom rule
-AWS Config. The compliance tests are written in YAML, using the same format. This
-YAML is stored in an S3 object, and the bucket and key of the object are passed as 
-parameters to the AWS Config fule
-
-
 # Installation 
 You can use [Homebrew](https://brew.sh/) to install the latest version:
 

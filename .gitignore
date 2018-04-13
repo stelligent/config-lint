@@ -1,6 +1,5 @@
 coverage.out
 */coverage.out
-web/assets.go
 .release/
 vendor/
 dist/

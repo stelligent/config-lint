@@ -1,4 +1,4 @@
-VERSION = $(shell git tag -l --sort=creatordate | grep "^v[0-9]*.[0-9]*.[0-9]*$$" | tail -1)
+VERSION := $(shell git tag -l --sort=creatordate | grep "^v[0-9]*.[0-9]*.[0-9]*$$" | tail -1)
 MAJOR_VERSION := $(word 1, $(subst ., ,$(VERSION)))
 MINOR_VERSION := $(word 2, $(subst ., ,$(VERSION)))
 PATCH_VERSION := $(word 3, $(subst ., ,$(VERSION)))
@@ -8,8 +8,6 @@ BUILD_DIR = .release
 GOLDFLAGS = "-X main.version=$(NEXT_VERSION)"
 
 CLI_FILES = $(shell find cli linter assertion -name \*.go)
-LAMBDA_FILES = $(shell find lambda assertion -name \*.go)
-WEB_FILES = $(shell find web linter assertion -name \*.go)
 
 default: all
 
@@ -43,22 +41,7 @@ $(BUILD_DIR)/config-lint: $(CLI_FILES)
 	mkdir -p $(BUILD_DIR)
 	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -ldflags=$(GOLDFLAGS) -o $(BUILD_DIR)/config-lint cli/*.go
 
-$(BUILD_DIR)/lambda: $(LAMBDA_FILES)
-	@echo "=== building lambda - $@ ==="
-	mkdir -p $(BUILD_DIR)
-	GOOS=linux GOARCH=amd64 go build -ldflags=$(GOLDFLAGS) -o $(BUILD_DIR)/lambda lambda/*.go
-	cd $(BUILD_DIR) && zip lambda.zip lambda
-
-lambda-deploy: $(BUILD_DIR)/lambda
-	aws lambda update-function-code --region us-east-1 --function-name config-go --zip-file fileb://$(BUILD_DIR)/lambda.zip
-
-$(BUILD_DIR)/webserver: gen $(WEB_FILES)
-	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -ldflags=$(GOLDFLAGS) -o $(BUILD_DIR)/webserver web/*.go
-
-webserver-docker:
-	docker build -t lhitchon/config-lint-web -f Dockerfile-web .
-
-build: $(BUILD_DIR)/config-lint $(BUILD_DIR)/lambda $(BUILD_DIR)/webserver
+build: $(BUILD_DIR)/config-lint
 
 all: clean deps test build
 
