@@ -31,16 +31,18 @@ func (l YAMLResourceLoader) Load(filename string) ([]assertion.Resource, error) 
 			if err != nil {
 				return resources, nil
 			}
-			sliceOfProperties := matches.([]interface{})
-			for _, element := range sliceOfProperties {
-				properties := element.(map[string]interface{})
-				resource := assertion.Resource{
-					ID:         extractResourceID(resourceConfig.ID, properties),
-					Type:       resourceConfig.Type,
-					Properties: properties,
-					Filename:   filename,
+			sliceOfProperties, ok := matches.([]interface{})
+			if ok {
+				for _, element := range sliceOfProperties {
+					properties := element.(map[string]interface{})
+					resource := assertion.Resource{
+						ID:         extractResourceID(resourceConfig.ID, properties),
+						Type:       resourceConfig.Type,
+						Properties: properties,
+						Filename:   filename,
+					}
+					resources = append(resources, resource)
 				}
-				resources = append(resources, resource)
 			}
 		}
 	}
