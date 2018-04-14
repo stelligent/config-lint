@@ -147,13 +147,38 @@ func (l TerraformResourceLoader) Load(filename string) ([]assertion.Resource, er
 	return resources, nil
 }
 
-func replaceVariables(templateResource map[string]interface{}, variables map[string]interface{}) map[string]interface{} {
+func replaceVariables(templateResource interface{}, variables map[string]interface{}) interface{} {
+	switch v := templateResource.(type) {
+	case map[string]interface{}:
+		return replaceVariablesInMap(v, variables)
+	default:
+		assertion.Debugf("replaceVariables cannot process type %T\n", v)
+		return templateResource
+	}
+}
+
+func replaceVariablesInMap(templateResource map[string]interface{}, variables map[string]interface{}) interface{} {
 	for key, value := range templateResource {
-		if s, ok := value.(string); ok { // FIXME is not a string, need to recurse
-			templateResource[key] = resolveValue(s, variables)
+		switch v := value.(type) {
+		case string:
+			templateResource[key] = resolveValue(v, variables)
+		case map[string]interface{}:
+			templateResource[key] = replaceVariablesInMap(v, variables)
+		case []interface{}:
+			templateResource[key] = replaceVariablesInList(v, variables)
+		default:
+			assertion.Debugf("replaceVariablesInMap cannot process type %T\n", v)
 		}
 	}
 	return templateResource
+}
+
+func replaceVariablesInList(list []interface{}, variables map[string]interface{}) []interface{} {
+	result := []interface{}{}
+	for _, e := range list {
+		result = append(result, replaceVariables(e, variables))
+	}
+	return result
 }
 
 func resolveValue(s string, variables map[string]interface{}) string {
