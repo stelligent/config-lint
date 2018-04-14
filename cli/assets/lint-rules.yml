@@ -1,7 +1,4 @@
-package main
-
-// LintRules string containing YAML for -validate option
-var LintRules = `---
+---
 version: 1
 description: Rules for config-lint
 type: LintRules
@@ -54,7 +51,7 @@ rules:
     assertions:
       - every:
           key: rules
-          assertions:
+          expressions:
             - key: id
               op: present
 
@@ -88,13 +85,13 @@ rules:
             op: present
 
   - id: VALID_EXPRESSION
-    message: "There are mutually exclusive in the same expression: key,or,xor,and,not,every,some,none"
+    message: "These are mutually exclusive in the same expression: key,or,xor,and,not,every,some,none"
     resource: LintRule
     severity: FAILURE
     assertions:
       - every:
           key: "assertions[]"
-          assertions:
+          expressions:
             - xor:
               - key: "@"
                 op: has-properties
@@ -120,4 +117,3 @@ rules:
               - key: "@"
                 op: has-properties
                 value: none
-`

@@ -48,7 +48,7 @@ func main() {
 	}
 
 	if *validate {
-		validateRules(flag.Args(), LintRules)
+		validateRules(flag.Args())
 		return
 	}
 
@@ -74,14 +74,13 @@ func main() {
 	applyRules(ruleSets, flag.Args(), applyOptions)
 }
 
-func validateRules(filenames []string, rules string) {
-	ruleSet, err := assertion.ParseRules(rules)
+func validateRules(filenames []string) {
+	builtInRuleSet, err := loadBuiltInRuleSet("assets/lint-rules.yml")
 	if err != nil {
-		fmt.Println("Unable to parse validation rules")
-		fmt.Println(err.Error())
+		fmt.Printf("Unable to load build-in rules for validation: %v\n", err)
 		return
 	}
-	ruleSets := []assertion.RuleSet{ruleSet}
+	ruleSets := []assertion.RuleSet{builtInRuleSet}
 	applyOptions := ApplyOptions{
 		QueryExpression: "Violations[]",
 	}
