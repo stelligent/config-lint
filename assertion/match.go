@@ -42,32 +42,32 @@ func isMatch(data interface{}, expression Expression) (MatchResult, error) {
 		if compare(data, value, valueType) == 0 {
 			return matches()
 		}
-		return doesNotMatch("%v should equal to %v", key, value)
+		return doesNotMatch("%v(%v) should equal to %v", key, searchResult, value)
 	case "ne":
 		if compare(data, value, valueType) != 0 {
 			return matches()
 		}
-		return doesNotMatch("%v should not be equal to %v", key, value)
+		return doesNotMatch("%v(%v) should not be equal to %v", key, searchResult, value)
 	case "lt":
 		if compare(data, value, valueType) < 0 {
 			return matches()
 		}
-		return doesNotMatch("%v should be less than %v", key, value)
+		return doesNotMatch("%v(%v) should be less than %v", key, searchResult, value)
 	case "le":
 		if compare(data, value, valueType) <= 0 {
 			return matches()
 		}
-		return doesNotMatch("%v should be less than or equal to %v", key, value)
+		return doesNotMatch("%v(%v) should be less than or equal to %v", key, searchResult, value)
 	case "gt":
 		if compare(data, value, valueType) > 0 {
 			return matches()
 		}
-		return doesNotMatch("%v should be greater than %v", key, value)
+		return doesNotMatch("%v(%v) should be greater than %v", key, searchResult, value)
 	case "ge":
 		if compare(data, value, valueType) >= 0 {
 			return matches()
 		}
-		return doesNotMatch("%v should be greater than or equal to %v", key, value)
+		return doesNotMatch("%v(%v) should be greater than or equal to %v", key, searchResult, value)
 	case "in":
 		for _, v := range strings.Split(value, ",") {
 			if v == searchResult {
@@ -78,7 +78,7 @@ func isMatch(data interface{}, expression Expression) (MatchResult, error) {
 	case "not-in":
 		for _, v := range strings.Split(value, ",") {
 			if v == searchResult {
-				return doesNotMatch("%v should not be in %v", key, value)
+				return doesNotMatch("%v(%v) should not be in %v", key, searchResult, value)
 			}
 		}
 		return matches()
