@@ -8,10 +8,20 @@ import (
 	"github.com/hashicorp/hcl/hcl/parser"
 	"github.com/stelligent/config-lint/assertion"
 	"io/ioutil"
+	"regexp"
 )
 
-// TerraformResourceLoader converts Terraform configuration files into JSON objects
-type TerraformResourceLoader struct{}
+type (
+	// TerraformResourceLoader converts Terraform configuration files into JSON objects
+	TerraformResourceLoader struct{}
+
+	// TerraformLoadResult collects all the returns value for parsing an HCL string
+	TerraformLoadResult struct {
+		Resources []interface{}
+		Variables map[string]interface{}
+		AST       *ast.File
+	}
+)
 
 func parsePolicy(templateResource interface{}) (map[string]interface{}, error) {
 	firstResource := templateResource.([]interface{})[0] // FIXME does this array always have 1 element?
@@ -31,36 +41,66 @@ func parsePolicy(templateResource interface{}) (map[string]interface{}, error) {
 	return properties, nil
 }
 
-func loadHCL(filename string) ([]interface{}, *ast.File, error) {
-	results := make([]interface{}, 0)
+func loadHCL(filename string) (TerraformLoadResult, error) {
+	result := TerraformLoadResult{
+		Resources: []interface{}{},
+		Variables: map[string]interface{}{},
+	}
 	template, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return results, nil, err
+		return result, nil
 	}
 
-	root, _ := parser.Parse(template)
+	result.AST, _ = parser.Parse(template)
 
 	var v interface{}
 	err = hcl.Unmarshal([]byte(template), &v)
 	if err != nil {
-		return results, root, err
+		return result, err
 	}
 	jsonData, err := json.MarshalIndent(v, "", "  ")
 	if err != nil {
-		return results, root, err
+		return result, err
 	}
 	assertion.Debugf("LoadHCL: %s\n", string(jsonData))
 
 	var hclData interface{}
 	err = yaml.Unmarshal(jsonData, &hclData)
 	if err != nil {
-		return results, root, err
+		return result, err
 	}
 	m := hclData.(map[string]interface{})
+	result.Variables = loadVariables(m["variable"])
+	assertion.Debugf("Variables: %v\n", result.Variables)
 	if m["resource"] != nil {
-		results = append(results, m["resource"].([]interface{})...)
+		result.Resources = append(result.Resources, m["resource"].([]interface{})...)
 	}
-	return results, root, nil
+	return result, nil
+}
+
+func loadVariables(data interface{}) map[string]interface{} {
+	variables := map[string]interface{}{}
+	if data == nil {
+		return variables
+	}
+	list := data.([]interface{})
+	for _, entry := range list {
+		m := entry.(map[string]interface{})
+		for key, value := range m {
+			variables[key] = extractDefault(value)
+		}
+	}
+	return variables
+}
+
+func extractDefault(value interface{}) interface{} {
+	list := value.([]interface{})
+	var defaultValue interface{} = ""
+	for _, entry := range list {
+		m := entry.(map[string]interface{})
+		defaultValue = m["default"]
+	}
+	return defaultValue
 }
 
 func getResourceLineNumber(resourceType, resourceID, filename string, root *ast.File) int {
@@ -76,11 +116,11 @@ func getResourceLineNumber(resourceType, resourceID, filename string, root *ast.
 // Load parses an HCL file into a collection or Resource objects
 func (l TerraformResourceLoader) Load(filename string) ([]assertion.Resource, error) {
 	resources := make([]assertion.Resource, 0)
-	hclResources, root, err := loadHCL(filename)
+	result, err := loadHCL(filename)
 	if err != nil {
 		return resources, err
 	}
-	for _, resource := range hclResources {
+	for _, resource := range result.Resources {
 		for resourceType, templateResources := range resource.(map[string]interface{}) {
 			if templateResources != nil {
 				for _, templateResource := range templateResources.([]interface{}) {
@@ -89,11 +129,12 @@ func (l TerraformResourceLoader) Load(filename string) ([]assertion.Resource, er
 						if err != nil {
 							return resources, err
 						}
-						lineNumber := getResourceLineNumber(resourceType, resourceID, filename, root)
+						resolvedProperties := replaceVariables(properties, result.Variables)
+						lineNumber := getResourceLineNumber(resourceType, resourceID, filename, result.AST)
 						tr := assertion.Resource{
 							ID:         resourceID,
 							Type:       resourceType,
-							Properties: properties,
+							Properties: resolvedProperties,
 							Filename:   filename,
 							LineNumber: lineNumber,
 						}
@@ -104,4 +145,27 @@ func (l TerraformResourceLoader) Load(filename string) ([]assertion.Resource, er
 		}
 	}
 	return resources, nil
+}
+
+func replaceVariables(templateResource map[string]interface{}, variables map[string]interface{}) map[string]interface{} {
+	for key, value := range templateResource {
+		if s, ok := value.(string); ok { // FIXME is not a string, need to recurse
+			templateResource[key] = resolveValue(s, variables)
+		}
+	}
+	return templateResource
+}
+
+func resolveValue(s string, variables map[string]interface{}) string {
+	pattern := "[$][{]var[.](?P<name>.*)[}]"
+	re, _ := regexp.Compile(pattern)
+	match := re.FindStringSubmatch(s)
+	if len(match) == 0 {
+		return s
+	}
+	if replacementValue, ok := variables[match[1]].(string); ok {
+		assertion.Debugf("Replacing %s with %v\n", s, variables[match[1]])
+		return re.ReplaceAllString(s, replacementValue)
+	}
+	return s
 }
