@@ -24,8 +24,10 @@ type (
 	}
 )
 
+//go:generate go-bindata -pkg $GOPACKAGE -o assets.go assets/
 func main() {
 	var rulesFilenames arrayFlags
+	terraformBuiltInRules := flag.Bool("terraform", false, "Use built-in rules for Terraform")
 	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
 	flag.Var(&rulesFilenames, "rules", "Rules file, can be specified multiple times")
 	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
@@ -58,8 +60,16 @@ func main() {
 	}
 	ruleSets, err := loadRuleSets(rulesFilenames)
 	if err != nil {
-		fmt.Printf("Failed to load rules: %v", err)
+		fmt.Printf("Failed to load rules: %v\n", err)
 		return
+	}
+	if *terraformBuiltInRules {
+		builtInRuleSet, err := loadBuiltInRuleSet("assets/terraform.yml")
+		if err != nil {
+			fmt.Printf("Failed to load built-in rules for Terraform: %v\n", err)
+			return
+		}
+		ruleSets = append(ruleSets, builtInRuleSet)
 	}
 	applyRules(ruleSets, flag.Args(), applyOptions)
 }
@@ -96,6 +106,23 @@ func loadRuleSets(rulesFilenames arrayFlags) ([]assertion.RuleSet, error) {
 		ruleSets = append(ruleSets, ruleSet)
 	}
 	return ruleSets, nil
+}
+
+func loadBuiltInRuleSet(name string) (assertion.RuleSet, error) {
+	emptyRuleSet := assertion.RuleSet{}
+	rulesContent, err := Asset(name)
+	if err != nil {
+		fmt.Println("Unable to find built-in rules:", name)
+		fmt.Println(err.Error())
+		return emptyRuleSet, err
+	}
+	ruleSet, err := assertion.ParseRules(string(rulesContent))
+	if err != nil {
+		fmt.Println("Unable to parse built-in rules:" + name)
+		fmt.Println(err.Error())
+		return emptyRuleSet, err
+	}
+	return ruleSet, nil
 }
 
 func applyRules(ruleSets []assertion.RuleSet, args arrayFlags, options ApplyOptions) {

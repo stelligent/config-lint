@@ -3,3 +3,4 @@ coverage.out
 .release/
 vendor/
 dist/
+cli/assets.go

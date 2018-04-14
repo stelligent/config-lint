@@ -41,7 +41,7 @@ $(BUILD_DIR)/config-lint: $(CLI_FILES)
 	mkdir -p $(BUILD_DIR)
 	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -ldflags=$(GOLDFLAGS) -o $(BUILD_DIR)/config-lint cli/*.go
 
-build: $(BUILD_DIR)/config-lint
+build: gen $(BUILD_DIR)/config-lint
 
 all: clean deps test build
 
