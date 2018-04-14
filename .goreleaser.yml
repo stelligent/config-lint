@@ -4,18 +4,6 @@ builds:
 - main: ./cli
   env:
   - CGO_ENABLED=0
-- main: ./lambda
-  binary: lambda
-  goos:
-  - linux
-  goarch:
-  - amd64
-- main: ./web
-  binary: webserver
-  goos:
-  - linux
-  goarch:
-  - amd64
 archive:
   replacements:
     darwin: Darwin
