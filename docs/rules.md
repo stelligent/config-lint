@@ -19,6 +19,7 @@ Each rule contains the following attributes:
 |id         | A unique identifier for the rule                                                   |
 |message    | A string to be printed when a validation error is detected                         |
 |resource   | The resource type to which the rule will be applied                                |
+|conditions | Expressions (in addition to resource) that determine if a rule should apply        |
 |except     | An optional list of resource ids that should not be validated                      |
 |severity   | FAILURE, WARNING, NON_COMPLIANT                                                    |
 |assertions | A list of expressions used to detect validation errors, see next section           |
@@ -42,5 +43,4 @@ Each expression contains the following attributes:
 |-----------|------------------------------------------------------------------------------------|
 |Url        | HTTP endpoint to invoke                                                            |
 |Payload    | Optional JMESPATH to use for payload, default is '@'                               |
-
 
