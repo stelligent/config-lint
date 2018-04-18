@@ -251,7 +251,7 @@ Example:
     assertions:
       - every:
           key: Location
-          assertions:
+          expresssions:
             - key: latitude
               op: present
             - key: longitude
@@ -277,7 +277,7 @@ Example:
     assertions:
       - some:
           key: Location
-          assertions:
+          expresssions:
             - key: latitude
               op: present
             - key: longitude
@@ -303,7 +303,7 @@ Example:
     assertions:
       - none:
           key: "ipPermissions[]"
-          assertions:
+          expresssions:
             - key: "fromPort"
               op: eq
               value: 22
