@@ -13,3 +13,4 @@
 * Provide a default -query of 'Violations[]', and add an option for a full report
 * Document conditions
 * For Terraform, variables are currently parsed per file, but should be across all files provided
+* Terraform converter wraps every map in an array - apparently it is valid HCL to have, e.g. "tags" appear multiple times in a resource
