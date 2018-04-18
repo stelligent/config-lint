@@ -28,8 +28,29 @@ func TestTerraformLinter(t *testing.T) {
 	}
 }
 
-type TestingValueSource struct {
+func TestTerraformVariables(t *testing.T) {
+	loader := TerraformResourceLoader{}
+	resources, err := loader.Load("./testdata/resources/uses_variables.tf")
+	if err != nil {
+		t.Error("Expecting TestTerraformLinter to not return an error")
+	}
+	if len(resources) != 1 {
+		t.Errorf("Expecting to load 1 resources, not %d", len(resources))
+	}
+	properties := resources[0].Properties.(map[string]interface{})
+	if properties["ami"] != "ami-f2d3638a" {
+		t.Errorf("Unexpected value for variable: %s", properties["ami"])
+	}
+	// this test covers string, map, and slice cases
+	tags := properties["tags"].([]interface{})
+	tag := tags[0].(map[string]interface{})
+	project := tag["project"].(string)
+	if project != "demo" {
+		t.Errorf("Expected project tag to be 'demo', got: %s", project)
+	}
 }
+
+type TestingValueSource struct{}
 
 func (s TestingValueSource) GetValue(a assertion.Expression) (string, error) {
 	if a.ValueFrom.URL != "" {
