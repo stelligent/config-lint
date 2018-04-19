@@ -35,7 +35,6 @@ func TestTerraformVariables(t *testing.T) {
 		t.Error("Expecting TestTerraformLinter.Load to not return an error")
 	}
 	resources, err := loader.ReplaceVariables(loaded.Resources, loaded.Variables)
-	assertion.SetVerbose(false)
 	if err != nil {
 		t.Error("Expecting TestTerraformLinter.ReplaceVariables to not return an error")
 	}

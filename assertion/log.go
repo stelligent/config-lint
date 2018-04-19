@@ -3,17 +3,17 @@ package assertion
 import "fmt"
 
 var (
-	isVerbose = false
+	isDebug = false
 )
 
-// SetVerbose turns verbose logging on or off
-func SetVerbose(b bool) {
-	isVerbose = b
+// SetDebug turns verbose logging on or off
+func SetDebug(b bool) {
+	isDebug = b
 }
 
 // Debugf prints a formatted string when verbose logging is turned on
 func Debugf(format string, args ...interface{}) {
-	if isVerbose == false {
+	if isDebug == false {
 		return
 	}
 	fmt.Printf(format, args...)

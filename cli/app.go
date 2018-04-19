@@ -28,7 +28,7 @@ type (
 func main() {
 	var rulesFilenames arrayFlags
 	terraformBuiltInRules := flag.Bool("terraform", false, "Use built-in rules for Terraform")
-	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
+	debug := flag.Bool("debug", false, "Debug logging")
 	flag.Var(&rulesFilenames, "rules", "Rules file, can be specified multiple times")
 	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
 	ids := flag.String("ids", "", "Run only the rules in this comma separated list")
@@ -43,8 +43,8 @@ func main() {
 		return
 	}
 
-	if *verboseLogging == true {
-		assertion.SetVerbose(true)
+	if *debug == true {
+		assertion.SetDebug(true)
 	}
 
 	if *validate {
