@@ -30,12 +30,17 @@ func TestTerraformLinter(t *testing.T) {
 
 func TestTerraformVariables(t *testing.T) {
 	loader := TerraformResourceLoader{}
-	resources, err := loader.Load("./testdata/resources/uses_variables.tf")
+	loaded, err := loader.Load("./testdata/resources/uses_variables.tf")
 	if err != nil {
-		t.Error("Expecting TestTerraformLinter to not return an error")
+		t.Error("Expecting TestTerraformLinter.Load to not return an error")
+	}
+	resources, err := loader.ReplaceVariables(loaded.Resources, loaded.Variables)
+	assertion.SetVerbose(false)
+	if err != nil {
+		t.Error("Expecting TestTerraformLinter.ReplaceVariables to not return an error")
 	}
 	if len(resources) != 1 {
-		t.Errorf("Expecting to load 1 resources, not %d", len(resources))
+		t.Errorf("Expecting to load 1 resources, not %d", len(loaded.Resources))
 	}
 	properties := resources[0].Properties.(map[string]interface{})
 	if properties["ami"] != "ami-f2d3638a" {
@@ -47,6 +52,32 @@ func TestTerraformVariables(t *testing.T) {
 	project := tag["project"].(string)
 	if project != "demo" {
 		t.Errorf("Expected project tag to be 'demo', got: %s", project)
+	}
+}
+
+func TestTerraformVariablesInDifferentFile(t *testing.T) {
+	options := Options{
+		Tags:    []string{},
+		RuleIDs: []string{},
+	}
+	filenames := []string{
+		"./testdata/resources/defines_variables.tf",
+		"./testdata/resources/reference_variables.tf",
+	}
+	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: TerraformResourceLoader{}}
+	ruleSet := loadRulesForTest("./testdata/rules/terraform_instance.yml", t)
+	report, err := linter.Validate(ruleSet, options)
+	if err != nil {
+		t.Error("Expecting TestTerraformVariablesInDifferentFile to not return an error")
+	}
+	if len(report.ResourcesScanned) != 1 {
+		t.Errorf("TestTerraformVariablesInDifferentFile scanned %d resources, expecting 1", len(report.ResourcesScanned))
+	}
+	if len(report.FilesScanned) != 2 {
+		t.Errorf("TestTerraformVariablesInDifferentFile scanned %d files, expecting 2", len(report.FilesScanned))
+	}
+	if len(report.Violations) != 0 {
+		t.Errorf("TestTerraformVariablesInDifferentFile expecting no violations, found %v", report.Violations)
 	}
 }
 

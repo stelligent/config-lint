@@ -23,11 +23,13 @@ func getResourceIDFromMetadata(m map[string]interface{}) (string, bool) {
 }
 
 // Load converts a text file into a collection of Resource objects
-func (l KubernetesResourceLoader) Load(filename string) ([]assertion.Resource, error) {
-	resources := make([]assertion.Resource, 0)
+func (l KubernetesResourceLoader) Load(filename string) (FileResources, error) {
+	loaded := FileResources{
+		Resources: make([]assertion.Resource, 0),
+	}
 	yamlResources, err := loadYAML(filename)
 	if err != nil {
-		return resources, err
+		return loaded, err
 	}
 	for _, resource := range yamlResources {
 		m := resource.(map[string]interface{})
@@ -43,7 +45,11 @@ func (l KubernetesResourceLoader) Load(filename string) ([]assertion.Resource, e
 			Properties: m,
 			Filename:   filename,
 		}
-		resources = append(resources, kr)
+		loaded.Resources = append(loaded.Resources, kr)
 	}
+	return loaded, nil
+}
+
+func (l KubernetesResourceLoader) ReplaceVariables(resources []assertion.Resource, variables []Variable) ([]assertion.Resource, error) {
 	return resources, nil
 }

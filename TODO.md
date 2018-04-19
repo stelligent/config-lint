@@ -11,6 +11,4 @@
 * Starting to have inconsistent naming in ops: is-true, is-false, has-properties vs. present, absent, empty, null
 * Add options to Assertion type, for things like 'ignore-case' for string compares? Or just use a regex?
 * Provide a default -query of 'Violations[]', and add an option for a full report
-* Document conditions
-* For Terraform, variables are currently parsed per file, but should be across all files provided
 * Terraform converter wraps every map in an array - apparently it is valid HCL to have, e.g. "tags" appear multiple times in a resource

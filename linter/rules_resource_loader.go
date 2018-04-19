@@ -17,11 +17,13 @@ func getAttr(m map[string]interface{}, keys ...string) []interface{} {
 }
 
 // Load converts a text file into a collection of Resource objects
-func (l RulesResourceLoader) Load(filename string) ([]assertion.Resource, error) {
-	resources := make([]assertion.Resource, 0)
+func (l RulesResourceLoader) Load(filename string) (FileResources, error) {
+	loaded := FileResources{
+		Resources: make([]assertion.Resource, 0),
+	}
 	yamlResources, err := loadYAML(filename)
 	if err != nil {
-		return resources, err
+		return loaded, err
 	}
 	for _, ruleSet := range yamlResources {
 		setResource := assertion.Resource{
@@ -30,7 +32,7 @@ func (l RulesResourceLoader) Load(filename string) ([]assertion.Resource, error)
 			Properties: ruleSet,
 			Filename:   filename,
 		}
-		resources = append(resources, setResource)
+		loaded.Resources = append(loaded.Resources, setResource)
 		// The LintRuleSet resources already has an attribute called Rules
 		// but also adding each of these rules as a separate LintRule resource
 		// makes writing rules a lot simpler
@@ -44,8 +46,12 @@ func (l RulesResourceLoader) Load(filename string) ([]assertion.Resource, error)
 				Properties: properties,
 				Filename:   filename,
 			}
-			resources = append(resources, ruleResource)
+			loaded.Resources = append(loaded.Resources, ruleResource)
 		}
 	}
+	return loaded, nil
+}
+
+func (l RulesResourceLoader) ReplaceVariables(resources []assertion.Resource, variables []Variable) ([]assertion.Resource, error) {
 	return resources, nil
 }
