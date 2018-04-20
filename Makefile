@@ -2,7 +2,7 @@ VERSION := $(shell git tag -l --sort=creatordate | grep "^v[0-9]*.[0-9]*.[0-9]*$
 MAJOR_VERSION := $(word 1, $(subst ., ,$(VERSION)))
 MINOR_VERSION := $(word 2, $(subst ., ,$(VERSION)))
 PATCH_VERSION := $(word 3, $(subst ., ,$(VERSION)))
-NEXT_VERSION := $(MAJOR_VERSION).$(MINOR_VERSION).$(shell echo $(PATCH_VERSION)+1|bc)
+NEXT_VERSION ?= $(MAJOR_VERSION).$(MINOR_VERSION).$(shell echo $(PATCH_VERSION)+1|bc)
 
 BUILD_DIR = .release
 GOLDFLAGS = "-X main.version=$(NEXT_VERSION)"
