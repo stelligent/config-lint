@@ -18,7 +18,7 @@ type (
 	// TerraformLoadResult collects all the returns value for parsing an HCL string
 	TerraformLoadResult struct {
 		Resources []interface{}
-		Variables map[string]interface{}
+		Variables []Variable
 		AST       *ast.File
 	}
 )
@@ -44,11 +44,11 @@ func parsePolicy(templateResource interface{}) (map[string]interface{}, error) {
 func loadHCL(filename string) (TerraformLoadResult, error) {
 	result := TerraformLoadResult{
 		Resources: []interface{}{},
-		Variables: map[string]interface{}{},
+		Variables: []Variable{},
 	}
 	template, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return result, nil
+		return result, err
 	}
 
 	result.AST, _ = parser.Parse(template)
@@ -71,15 +71,15 @@ func loadHCL(filename string) (TerraformLoadResult, error) {
 	}
 	m := hclData.(map[string]interface{})
 	result.Variables = loadVariables(m["variable"])
-	assertion.Debugf("Variables: %v\n", result.Variables)
 	if m["resource"] != nil {
 		result.Resources = append(result.Resources, m["resource"].([]interface{})...)
 	}
+	assertion.Debugf("LoadHCL Variables: %v\n", result.Variables)
 	return result, nil
 }
 
-func loadVariables(data interface{}) map[string]interface{} {
-	variables := map[string]interface{}{}
+func loadVariables(data interface{}) []Variable {
+	variables := []Variable{}
 	if data == nil {
 		return variables
 	}
@@ -87,7 +87,7 @@ func loadVariables(data interface{}) map[string]interface{} {
 	for _, entry := range list {
 		m := entry.(map[string]interface{})
 		for key, value := range m {
-			variables[key] = extractDefault(value)
+			variables = append(variables, Variable{Name: key, Value: extractDefault(value)})
 		}
 	}
 	return variables
@@ -114,12 +114,15 @@ func getResourceLineNumber(resourceType, resourceID, filename string, root *ast.
 }
 
 // Load parses an HCL file into a collection or Resource objects
-func (l TerraformResourceLoader) Load(filename string) ([]assertion.Resource, error) {
-	resources := make([]assertion.Resource, 0)
+func (l TerraformResourceLoader) Load(filename string) (FileResources, error) {
+	loaded := FileResources{
+		Resources: []assertion.Resource{},
+	}
 	result, err := loadHCL(filename)
 	if err != nil {
-		return resources, err
+		return loaded, err
 	}
+	loaded.Variables = result.Variables
 	for _, resource := range result.Resources {
 		for resourceType, templateResources := range resource.(map[string]interface{}) {
 			if templateResources != nil {
@@ -127,27 +130,33 @@ func (l TerraformResourceLoader) Load(filename string) ([]assertion.Resource, er
 					for resourceID, templateResource := range templateResource.(map[string]interface{}) {
 						properties, err := parsePolicy(templateResource)
 						if err != nil {
-							return resources, err
+							return loaded, err
 						}
-						resolvedProperties := replaceVariables(properties, result.Variables)
 						lineNumber := getResourceLineNumber(resourceType, resourceID, filename, result.AST)
 						tr := assertion.Resource{
 							ID:         resourceID,
 							Type:       resourceType,
-							Properties: resolvedProperties,
+							Properties: properties,
 							Filename:   filename,
 							LineNumber: lineNumber,
 						}
-						resources = append(resources, tr)
+						loaded.Resources = append(loaded.Resources, tr)
 					}
 				}
 			}
 		}
 	}
+	return loaded, nil
+}
+
+func (l TerraformResourceLoader) ReplaceVariables(resources []assertion.Resource, variables []Variable) ([]assertion.Resource, error) {
+	for _, resource := range resources {
+		resource.Properties = replaceVariables(resource.Properties, variables)
+	}
 	return resources, nil
 }
 
-func replaceVariables(templateResource interface{}, variables map[string]interface{}) interface{} {
+func replaceVariables(templateResource interface{}, variables []Variable) interface{} {
 	switch v := templateResource.(type) {
 	case map[string]interface{}:
 		return replaceVariablesInMap(v, variables)
@@ -157,7 +166,7 @@ func replaceVariables(templateResource interface{}, variables map[string]interfa
 	}
 }
 
-func replaceVariablesInMap(templateResource map[string]interface{}, variables map[string]interface{}) interface{} {
+func replaceVariablesInMap(templateResource map[string]interface{}, variables []Variable) interface{} {
 	for key, value := range templateResource {
 		switch v := value.(type) {
 		case string:
@@ -173,7 +182,7 @@ func replaceVariablesInMap(templateResource map[string]interface{}, variables ma
 	return templateResource
 }
 
-func replaceVariablesInList(list []interface{}, variables map[string]interface{}) []interface{} {
+func replaceVariablesInList(list []interface{}, variables []Variable) []interface{} {
 	result := []interface{}{}
 	for _, e := range list {
 		result = append(result, replaceVariables(e, variables))
@@ -181,16 +190,20 @@ func replaceVariablesInList(list []interface{}, variables map[string]interface{}
 	return result
 }
 
-func resolveValue(s string, variables map[string]interface{}) string {
+func resolveValue(s string, variables []Variable) string {
 	pattern := "[$][{]var[.](?P<name>.*)[}]"
 	re, _ := regexp.Compile(pattern)
 	match := re.FindStringSubmatch(s)
 	if len(match) == 0 {
 		return s
 	}
-	if replacementValue, ok := variables[match[1]].(string); ok {
-		assertion.Debugf("Replacing %s with %v\n", s, variables[match[1]])
-		return re.ReplaceAllString(s, replacementValue)
+	for _, v := range variables {
+		if v.Name == match[1] {
+			if replacementValue, ok := v.Value.(string); ok {
+				assertion.Debugf("Replacing %s with %v\n", s, replacementValue)
+				return re.ReplaceAllString(s, replacementValue)
+			}
+		}
 	}
 	return s
 }

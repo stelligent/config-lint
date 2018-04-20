@@ -1,0 +1,17 @@
+version: 1
+description: Do not allow IAM actions
+type: Terraform
+files:
+  - "*.tf"
+rules:
+
+  - id: NO_IAM_ACTIONS
+    message: IAM roles should not allow IAM actions
+    resource: aws_iam_role
+    assertions:
+      - key: assume_role_policy.Statement[].Action[]
+        op: not-contains
+        value: "iam:*"
+    severity: FAILURE
+    tags:
+      - iam

@@ -28,11 +28,12 @@ type (
 func main() {
 	var rulesFilenames arrayFlags
 	terraformBuiltInRules := flag.Bool("terraform", false, "Use built-in rules for Terraform")
-	verboseLogging := flag.Bool("verbose", false, "Verbose logging")
+	debug := flag.Bool("debug", false, "Debug logging")
 	flag.Var(&rulesFilenames, "rules", "Rules file, can be specified multiple times")
 	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
 	ids := flag.String("ids", "", "Run only the rules in this comma separated list")
 	queryExpression := flag.String("query", "", "JMESPath expression to query the results")
+	verboseReport := flag.Bool("verbose", false, "Output a verbose report")
 	searchExpression := flag.String("search", "", "JMESPath expression to evaluation against the files")
 	validate := flag.Bool("validate", false, "Validate rules file")
 	versionFlag := flag.Bool("version", false, "Get program version")
@@ -43,8 +44,8 @@ func main() {
 		return
 	}
 
-	if *verboseLogging == true {
-		assertion.SetVerbose(true)
+	if *debug == true {
+		assertion.SetDebug(true)
 	}
 
 	if *validate {
@@ -55,7 +56,7 @@ func main() {
 	applyOptions := ApplyOptions{
 		Tags:             makeTagList(*tags),
 		RuleIDs:          makeRulesList(*ids),
-		QueryExpression:  *queryExpression,
+		QueryExpression:  makeQueryExpression(*queryExpression, *verboseReport),
 		SearchExpression: *searchExpression,
 	}
 	ruleSets, err := loadRuleSets(rulesFilenames)
@@ -223,4 +224,16 @@ func generateExitCode(report assertion.ValidationReport) int {
 		}
 	}
 	return 0
+}
+
+func makeQueryExpression(queryExpression string, verboseReport bool) string {
+	if queryExpression != "" {
+		return queryExpression
+	}
+	// return complete report when -verbose option is used
+	if verboseReport {
+		return ""
+	}
+	// default is to only report Violations
+	return "Violations[]"
 }

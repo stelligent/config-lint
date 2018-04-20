@@ -1,0 +1,49 @@
+version: 1
+description: Rules for generic YAML file
+type: YAML
+files:
+  - "*.config"
+
+# some anchors to keep rules DRY
+
+has_name: &has_name
+  key: name
+  op: present
+
+has_name: &has_description
+  key: description
+  op: present
+
+has_name_and_description: &has_name_and_description
+  and:
+    - <<: *has_name
+    - <<: *has_description
+
+# resources to find in the config file
+
+resources:
+  - type: widget
+    key: widgets[]
+    id: id
+  - type: gadget
+    key: gadgets[]
+    id: name
+
+# rules to apply
+
+rules:
+
+  - id: WIDGET_PROPERTIES
+    message: Widget needs name and description
+    severity: FAILURE
+    resource: widget
+    assertions:
+      - <<: *has_name_and_description
+
+  - id: GADGET_PROPERTIES
+    message: Gadget needs name a description
+    severity: FAILURE
+    resource: gadget
+    assertions:
+      - <<: *has_name_and_description
+

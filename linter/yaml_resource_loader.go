@@ -19,17 +19,19 @@ func extractResourceID(expression string, properties interface{}) string {
 }
 
 // Load converts a text file into a collection of Resource objects
-func (l YAMLResourceLoader) Load(filename string) ([]assertion.Resource, error) {
-	resources := make([]assertion.Resource, 0)
+func (l YAMLResourceLoader) Load(filename string) (FileResources, error) {
+	loaded := FileResources{
+		Resources: make([]assertion.Resource, 0),
+	}
 	yamlResources, err := loadYAML(filename)
 	if err != nil {
-		return resources, err
+		return loaded, err
 	}
 	for _, document := range yamlResources {
 		for _, resourceConfig := range l.Resources {
 			matches, err := assertion.SearchData(resourceConfig.Key, document)
 			if err != nil {
-				return resources, nil
+				return loaded, nil
 			}
 			sliceOfProperties, ok := matches.([]interface{})
 			if ok {
@@ -41,10 +43,14 @@ func (l YAMLResourceLoader) Load(filename string) ([]assertion.Resource, error) 
 						Properties: properties,
 						Filename:   filename,
 					}
-					resources = append(resources, resource)
+					loaded.Resources = append(loaded.Resources, resource)
 				}
 			}
 		}
 	}
+	return loaded, nil
+}
+
+func (l YAMLResourceLoader) ReplaceVariables(resources []assertion.Resource, variables []Variable) ([]assertion.Resource, error) {
 	return resources, nil
 }

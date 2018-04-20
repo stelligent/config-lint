@@ -87,7 +87,7 @@ A YAML file that specifies what kinds of files to process, and what validations 
 
 # Operations
 
-The rules contain expressions that can use expresssions [documented here](docs/operations.md).
+The rules contain a list of expressions that use operations that are [documented here](docs/operations.md).
 
 ## Examples
 
