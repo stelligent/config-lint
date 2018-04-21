@@ -3,6 +3,7 @@ package linter
 import (
 	"fmt"
 	"github.com/stelligent/config-lint/assertion"
+	"io"
 )
 
 type (
@@ -30,18 +31,18 @@ func (l AWSResourceLinter) Validate(ruleSet assertion.RuleSet, options Options) 
 }
 
 // Search applies a JMESPath to all SecurityGroups
-func (l AWSResourceLinter) Search(ruleSet assertion.RuleSet, searchExpression string) {
+func (l AWSResourceLinter) Search(ruleSet assertion.RuleSet, searchExpression string, w io.Writer) {
 	resources, _ := l.Loader.Load()
 	for _, resource := range resources {
 		v, err := assertion.SearchData(searchExpression, resource.Properties)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(w, err)
 		} else {
 			s, err := assertion.JSONStringify(v)
 			if err != nil {
-				fmt.Println(err)
+				fmt.Fprintln(w, err)
 			} else {
-				fmt.Printf("%s: %s\n", resource.ID, s)
+				fmt.Fprintf(w, "%s: %s\n", resource.ID, s)
 			}
 		}
 	}

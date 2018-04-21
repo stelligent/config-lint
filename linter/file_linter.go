@@ -3,6 +3,7 @@ package linter
 import (
 	"fmt"
 	"github.com/stelligent/config-lint/assertion"
+	"io"
 )
 
 type (
@@ -65,26 +66,26 @@ func (fl FileLinter) Validate(ruleSet assertion.RuleSet, options Options) (asser
 }
 
 // Search evaluates a JMESPath expression against resources in a collection of filenames
-func (fl FileLinter) Search(ruleSet assertion.RuleSet, searchExpression string) {
+func (fl FileLinter) Search(ruleSet assertion.RuleSet, searchExpression string, w io.Writer) {
 	for _, filename := range fl.Filenames {
 		include, _ := assertion.ShouldIncludeFile(ruleSet.Files, filename) // FIXME what about error?
 		if include {
-			fmt.Printf("Searching %s:\n", filename)
+			fmt.Fprintf(w, "Searching %s:\n", filename)
 			loaded, err := fl.Loader.Load(filename)
 			if err != nil {
-				fmt.Println("Error for file:", filename)
-				fmt.Println(err.Error())
+				fmt.Fprintln(w, "Error for file:", filename)
+				fmt.Fprintln(w, err.Error())
 			}
 			for _, resource := range loaded.Resources {
 				v, err := assertion.SearchData(searchExpression, resource.Properties)
 				if err != nil {
-					fmt.Println(err)
+					fmt.Fprintln(w, err)
 				} else {
 					s, err := assertion.JSONStringify(v)
 					if err != nil {
-						fmt.Println(err)
+						fmt.Fprintln(w, err)
 					} else {
-						fmt.Printf("%s (%s): %s\n", resource.ID, resource.Type, s)
+						fmt.Fprintf(w, "%s (%s): %s\n", resource.ID, resource.Type, s)
 					}
 				}
 			}

@@ -1,7 +1,9 @@
 package linter
 
 import (
+	"bytes"
 	"github.com/stelligent/config-lint/assertion"
+	"strings"
 	"testing"
 )
 
@@ -22,6 +24,17 @@ func TestAWSResourceLinterValidate(t *testing.T) {
 	}
 	if len(report.Violations) != 0 {
 		t.Errorf("AWSResourceLinter returned %d violations, expecting 0", len(report.Violations))
+	}
+}
+
+func TestAWSResourceLinterSearch(t *testing.T) {
+	ruleSet := loadRulesForTest("./testdata/rules/aws_resource.yml", t)
+	mockLoader := AWSMockLoader{}
+	linter := AWSResourceLinter{Loader: mockLoader, ValueSource: TestingValueSource{}}
+	var b bytes.Buffer
+	linter.Search(ruleSet, "@", &b)
+	if !strings.Contains(b.String(), "Name") {
+		t.Errorf("Expecting Search to find Name in %s", b.String())
 	}
 }
 

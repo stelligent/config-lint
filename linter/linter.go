@@ -3,13 +3,14 @@ package linter
 import (
 	"fmt"
 	"github.com/stelligent/config-lint/assertion"
+	"io"
 )
 
 type (
 	// Linter provides the interface for all supported linters
 	Linter interface {
 		Validate(ruleSet assertion.RuleSet, options Options) (assertion.ValidationReport, error)
-		Search(ruleSet assertion.RuleSet, searchExpression string)
+		Search(ruleSet assertion.RuleSet, searchExpression string, w io.Writer)
 	}
 
 	// Options configures what resources will be linted

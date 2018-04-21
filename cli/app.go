@@ -142,7 +142,7 @@ func applyRules(ruleSets []assertion.RuleSet, args arrayFlags, options ApplyOpti
 		}
 		if l != nil {
 			if options.SearchExpression != "" {
-				l.Search(ruleSet, options.SearchExpression)
+				l.Search(ruleSet, options.SearchExpression, os.Stdout)
 			} else {
 				options := linter.Options{
 					Tags:    options.Tags,
