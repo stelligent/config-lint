@@ -1,10 +1,12 @@
 package linter
 
 import (
+	"bytes"
+	"strings"
 	"testing"
 )
 
-func TestYAMLLinter(t *testing.T) {
+func TestYAMLLinterValidate(t *testing.T) {
 	options := Options{
 		Tags:    []string{},
 		RuleIDs: []string{},
@@ -25,5 +27,17 @@ func TestYAMLLinter(t *testing.T) {
 	}
 	if len(report.Violations) != 3 {
 		t.Errorf("TestYAMLLinter returned %d violations, expecting 3", len(report.Violations))
+	}
+}
+
+func TestYAMLLinterSearch(t *testing.T) {
+	ruleSet := loadRulesForTest("./testdata/rules/generic.yml", t)
+	filenames := []string{"./testdata/resources/generic.config"}
+	loader := YAMLResourceLoader{Resources: ruleSet.Resources}
+	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: loader}
+	var b bytes.Buffer
+	linter.Search(ruleSet, "name", &b)
+	if !strings.Contains(b.String(), "gadget") {
+		t.Error("Expecting TestYAMLLinterSearch to find string in output")
 	}
 }
