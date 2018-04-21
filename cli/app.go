@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 
@@ -91,13 +92,13 @@ func validateRules(filenames []string) {
 func loadRuleSets(rulesFilenames arrayFlags) ([]assertion.RuleSet, error) {
 	ruleSets := []assertion.RuleSet{}
 	for _, rulesFilename := range rulesFilenames {
-		rulesContent, err := assertion.LoadRules(rulesFilename)
+		rulesContent, err := ioutil.ReadFile(rulesFilename)
 		if err != nil {
 			fmt.Println("Unable to load rules from:" + rulesFilename)
 			fmt.Println(err.Error())
 			return ruleSets, err
 		}
-		ruleSet, err := assertion.ParseRules(rulesContent)
+		ruleSet, err := assertion.ParseRules(string(rulesContent))
 		if err != nil {
 			fmt.Println("Unable to parse rules in:" + rulesFilename)
 			fmt.Println(err.Error())

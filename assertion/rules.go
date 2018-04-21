@@ -2,17 +2,7 @@ package assertion
 
 import (
 	"github.com/ghodss/yaml"
-	"io/ioutil"
 )
-
-// LoadRules loads the contents of a YAML file
-func LoadRules(filename string) (string, error) {
-	rules, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return "", err
-	}
-	return string(rules), nil
-}
 
 // ParseRules converts YAML string content to a Result
 func ParseRules(rules string) (RuleSet, error) {
