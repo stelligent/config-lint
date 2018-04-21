@@ -1,0 +1,18 @@
+version: 1
+description: Rules for Terraform configuration files
+type: Terraform
+files:
+  - "*.tf"
+rules:
+
+  - id: TEST_POLICY
+    message: Testing
+    resource: aws_iam_role
+    assertions:
+      - every:
+          key: assume_role_policy.Statement
+          expressions:
+            - key: Effect
+              op: eq
+              value: Deny
+    severity: FAILURE

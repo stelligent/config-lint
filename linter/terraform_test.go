@@ -88,3 +88,26 @@ func (s TestingValueSource) GetValue(a assertion.Expression) (string, error) {
 	}
 	return a.Value, nil
 }
+
+func TestTerraformPolicies(t *testing.T) {
+	options := Options{
+		Tags:    []string{},
+		RuleIDs: []string{},
+	}
+	filenames := []string{"./testdata/resources/terraform_policy.tf"}
+	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: TerraformResourceLoader{}}
+	ruleSet := loadRulesForTest("./testdata/rules/terraform_policy.yml", t)
+	report, err := linter.Validate(ruleSet, options)
+	if err != nil {
+		t.Error("Expecting TestTerraformPolicies to not return an error")
+	}
+	if len(report.ResourcesScanned) != 1 {
+		t.Errorf("TestTerraformPolicies scanned %d resources, expecting 1", len(report.ResourcesScanned))
+	}
+	if len(report.FilesScanned) != 1 {
+		t.Errorf("TestTerraformPolicies scanned %d files, expecting 1", len(report.FilesScanned))
+	}
+	if len(report.Violations) != 1 {
+		t.Errorf("TestTerraformPolicies returned %d violations, expecting 1", len(report.Violations))
+	}
+}
