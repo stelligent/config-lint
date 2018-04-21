@@ -63,3 +63,58 @@ func TestJSONListsIntersectTrue(t *testing.T) {
 		t.Errorf("JSONIntersect should return true")
 	}
 }
+
+func TestShouldIncludeFile(t *testing.T) {
+	patterns := []string{"*.tf", "*.yml"}
+	include, err := ShouldIncludeFile(patterns, "instance.tf")
+	if err != nil {
+		t.Errorf("ShouldIncludeFile generated an unexpected error: %v", err)
+	}
+	if !include {
+		t.Errorf("ShouldIncludeFile failed to include file with matching pattern")
+	}
+}
+
+func TestShouldNotIncludeFile(t *testing.T) {
+	patterns := []string{"*.tf", "*.yml"}
+	include, err := ShouldIncludeFile(patterns, "instance.config")
+	if err != nil {
+		t.Errorf("ShouldIncludeFile generated an unexpected error: %v", err)
+	}
+	if include {
+		t.Errorf("ShouldIncludeFile failed to exclude file with no matching pattern")
+	}
+}
+
+func TestFilterShouldIncludeResources(t *testing.T) {
+	resources := []Resource{
+		Resource{Type: "instance"},
+		Resource{Type: "volume"},
+	}
+	filtered := FilterResourcesByType(resources, "instance")
+	if len(filtered) != 1 {
+		t.Errorf("FilterResourcesByType expected to match one resource")
+	}
+}
+
+func TestFilterShouldExcludeResources(t *testing.T) {
+	resources := []Resource{
+		Resource{Type: "instance"},
+		Resource{Type: "volume"},
+	}
+	filtered := FilterResourcesByType(resources, "database")
+	if len(filtered) != 0 {
+		t.Errorf("FilterResourcesByType expected to match no resources")
+	}
+}
+
+func TestFilterShouldIncludeAllResources(t *testing.T) {
+	resources := []Resource{
+		Resource{Type: "instance"},
+		Resource{Type: "volume"},
+	}
+	filtered := FilterResourcesByType(resources, "*")
+	if len(filtered) != len(resources) {
+		t.Errorf("FilterResourcesByType expected to include all resources")
+	}
+}

@@ -41,6 +41,7 @@ func TestIsMatch(t *testing.T) {
 	sliceOfTags := []interface{}{"Foo", "Bar"}
 	emptySlice := []interface{}{}
 	anotherSlice := []interface{}{"One", "Two"}
+	stringSlice := []string{"One", "Two"}
 
 	testCases := map[string]MatchTestCase{
 		"eqTrue":                         {"Foo", "eq", "Foo", "", true},
@@ -67,6 +68,8 @@ func TestIsMatch(t *testing.T) {
 		"containsFalseForString":         {"Foo", "contains", "aa", "", false},
 		"containsTrueForSlice":           {sliceOfTags, "contains", "Bar", "", true},
 		"containsFalseForSubstring":      {sliceOfTags, "contains", "oo", "", false},
+		"containsTrueForSliceOfStrings":  {stringSlice, "contains", "One", "", true},
+		"containsFalseForSliceOfStrings": {stringSlice, "contains", "Three", "", false},
 		"notContainsFalseForString":      {"Foo", "not-contains", "oo", "", false},
 		"notContainsTrueForString":       {"Foo", "not-contains", "aa", "", true},
 		"notContainsFalseForSlice":       {sliceOfTags, "not-contains", "Bar", "", false},

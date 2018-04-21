@@ -28,10 +28,6 @@ func isPresent(s string) bool {
 	return !isAbsent(s)
 }
 
-func isNotNull(s string) bool {
-	return s != "null"
-}
-
 func isEmpty(data interface{}) bool {
 	switch v := data.(type) {
 	case nil:
