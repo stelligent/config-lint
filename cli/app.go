@@ -49,11 +49,9 @@ func main() {
 	searchExpression := flag.String("search", "", "JMESPath expression to evaluation against the files")
 	validate := flag.Bool("validate", false, "Validate rules file")
 	versionFlag := flag.Bool("version", false, "Get program version")
-	profileFilename := flag.String("profile", "config-lint.yml", "Provide default options")
+	profileFilename := flag.String("profile", "", "Provide default options")
 
 	flag.Parse()
-
-	profileOptions := loadProfile(*profileFilename)
 
 	if *versionFlag == true {
 		fmt.Println(version)
@@ -66,6 +64,12 @@ func main() {
 
 	if *validate {
 		validateRules(flag.Args())
+		return
+	}
+
+	profileOptions, err := loadProfile(*profileFilename)
+	if err != nil {
+		fmt.Printf("Error loading profile: %v\n", err)
 		return
 	}
 
@@ -267,26 +271,35 @@ func makeQueryExpression(queryExpression string, verboseReport bool, profileOpti
 	return "Violations[]"
 }
 
-func loadProfile(filename string) ProjectOptions {
+func loadProfile(filename string) (ProjectOptions, error) {
+	defaultFilename := "config-lint.yml"
 	var options ProjectOptions
+	if filename == "" {
+		filename = defaultFilename
+	}
 	bb, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return options
+		if filename == defaultFilename {
+			return options, nil
+		}
+		return options, err
 	}
 	err = yaml.Unmarshal(bb, &options)
-	if err == nil {
-		if len(options.Files) > 0 {
-			patterns := options.Files
-			options.Files = []string{}
-			for _, pattern := range patterns {
-				matches, err := filepath.Glob(pattern)
-				if err == nil {
-					options.Files = append(options.Files, matches...)
-				}
+	if err != nil {
+		return options, err
+	}
+	if len(options.Files) > 0 {
+		patterns := options.Files
+		options.Files = []string{}
+		for _, pattern := range patterns {
+			matches, err := filepath.Glob(pattern)
+			if err != nil {
+				return options, err
 			}
+			options.Files = append(options.Files, matches...)
 		}
 	}
-	return options
+	return options, nil
 }
 
 func getFilenames(commandLineOptions []string, profileOptions []string) []string {
