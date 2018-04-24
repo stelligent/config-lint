@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/ghodss/yaml"
@@ -23,6 +24,16 @@ type (
 		QueryExpression  string
 		SearchExpression string
 	}
+
+	// ProjectOptions for default options from a project file
+	ProjectOptions struct {
+		Rules     []string
+		IDs       []string
+		Tags      []string
+		Query     string
+		Files     []string
+		Terraform bool
+	}
 )
 
 //go:generate go-bindata -pkg $GOPACKAGE -o assets.go assets/
@@ -38,7 +49,11 @@ func main() {
 	searchExpression := flag.String("search", "", "JMESPath expression to evaluation against the files")
 	validate := flag.Bool("validate", false, "Validate rules file")
 	versionFlag := flag.Bool("version", false, "Get program version")
+	profileFilename := flag.String("profile", "config-lint.yml", "Provide default options")
+
 	flag.Parse()
+
+	profileOptions := loadProfile(*profileFilename)
 
 	if *versionFlag == true {
 		fmt.Println(version)
@@ -54,10 +69,14 @@ func main() {
 		return
 	}
 
+	rulesFilenames = getFilenames(rulesFilenames, profileOptions.Rules)
+	configFilenames := getFilenames(flag.Args(), profileOptions.Files)
+	useTerraformBuiltInRules := *terraformBuiltInRules || profileOptions.Terraform
+
 	applyOptions := ApplyOptions{
-		Tags:             makeTagList(*tags),
-		RuleIDs:          makeRulesList(*ids),
-		QueryExpression:  makeQueryExpression(*queryExpression, *verboseReport),
+		Tags:             makeTagList(*tags, profileOptions.Tags),
+		RuleIDs:          makeRulesList(*ids, profileOptions.IDs),
+		QueryExpression:  makeQueryExpression(*queryExpression, *verboseReport, profileOptions.Query),
 		SearchExpression: *searchExpression,
 	}
 	ruleSets, err := loadRuleSets(rulesFilenames)
@@ -65,7 +84,7 @@ func main() {
 		fmt.Printf("Failed to load rules: %v\n", err)
 		return
 	}
-	if *terraformBuiltInRules {
+	if useTerraformBuiltInRules {
 		builtInRuleSet, err := loadBuiltInRuleSet("assets/terraform.yml")
 		if err != nil {
 			fmt.Printf("Failed to load built-in rules for Terraform: %v\n", err)
@@ -73,7 +92,7 @@ func main() {
 		}
 		ruleSets = append(ruleSets, builtInRuleSet)
 	}
-	applyRules(ruleSets, flag.Args(), applyOptions)
+	applyRules(ruleSets, configFilenames, applyOptions)
 }
 
 func validateRules(filenames []string) {
@@ -190,18 +209,24 @@ func printReport(report assertion.ValidationReport, queryExpression string) erro
 	return nil
 }
 
-func makeTagList(tags string) []string {
-	if tags == "" {
-		return nil
+func makeTagList(tags string, profileOptions []string) []string {
+	if tags != "" {
+		return strings.Split(tags, ",")
 	}
-	return strings.Split(tags, ",")
+	if len(profileOptions) != 0 {
+		return profileOptions
+	}
+	return nil
 }
 
-func makeRulesList(ruleIDs string) []string {
-	if ruleIDs == "" {
-		return nil
+func makeRulesList(ruleIDs string, profileOptions []string) []string {
+	if ruleIDs != "" {
+		return strings.Split(ruleIDs, ",")
 	}
-	return strings.Split(ruleIDs, ",")
+	if len(profileOptions) != 0 {
+		return profileOptions
+	}
+	return nil
 }
 
 type arrayFlags []string
@@ -227,7 +252,7 @@ func generateExitCode(report assertion.ValidationReport) int {
 	return 0
 }
 
-func makeQueryExpression(queryExpression string, verboseReport bool) string {
+func makeQueryExpression(queryExpression string, verboseReport bool, profileOptions string) string {
 	if queryExpression != "" {
 		return queryExpression
 	}
@@ -235,6 +260,38 @@ func makeQueryExpression(queryExpression string, verboseReport bool) string {
 	if verboseReport {
 		return ""
 	}
+	if profileOptions != "" {
+		return profileOptions
+	}
 	// default is to only report Violations
 	return "Violations[]"
+}
+
+func loadProfile(filename string) ProjectOptions {
+	var options ProjectOptions
+	bb, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return options
+	}
+	err = yaml.Unmarshal(bb, &options)
+	if err == nil {
+		if len(options.Files) > 0 {
+			patterns := options.Files
+			options.Files = []string{}
+			for _, pattern := range patterns {
+				matches, err := filepath.Glob(pattern)
+				if err == nil {
+					options.Files = append(options.Files, matches...)
+				}
+			}
+		}
+	}
+	return options
+}
+
+func getFilenames(commandLineOptions []string, profileOptions []string) []string {
+	if len(commandLineOptions) > 0 {
+		return commandLineOptions
+	}
+	return profileOptions
 }
