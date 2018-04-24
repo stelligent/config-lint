@@ -112,6 +112,29 @@ You can limit the output by specifying a JMESPath expression for the --query com
 
 If at least one rule with a severity of FAILURE was triggered the exit code will be 1, otherwise it will be 0.
 
+
+# Profiles
+
+The -profile command line option takes a filename which contains a set of default values for various command line options.
+If there is a file in the working directory called `config-lint.yml`, it will be loaded automatically.
+All values in the profile are optional, and are overriden by anything specified on the command line.
+An example profile:
+
+```
+rules:
+  - example-files/rules/generic.yml
+
+files:
+  - example-files/config/*.config
+
+ids:
+  - RULE_1
+  - RULE_2
+
+tags:
+  - s3
+```
+
 # Developing new rules using --search
 
 Each rule requires a JMESPath key that it will use to search resources. Documentation for JMESPATH is here: http://jmespath.org/
