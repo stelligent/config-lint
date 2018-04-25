@@ -21,7 +21,7 @@ type (
 
 // Validate applies a Ruleset to all SecurityGroups
 func (l AWSResourceLinter) Validate(ruleSet assertion.RuleSet, options Options) (assertion.ValidationReport, error) {
-	rules := assertion.FilterRulesByTagAndID(ruleSet.Rules, options.Tags, options.RuleIDs)
+	rules := assertion.FilterRulesByTagAndID(ruleSet.Rules, options.Tags, options.RuleIDs, options.IgnoreRuleIDs)
 	resources, err := l.Loader.Load()
 	if err != nil {
 		return assertion.ValidationReport{}, err

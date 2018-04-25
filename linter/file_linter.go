@@ -32,7 +32,7 @@ type FileLinter struct {
 // Validate validates a collection of filenames using a RuleSet
 func (fl FileLinter) Validate(ruleSet assertion.RuleSet, options Options) (assertion.ValidationReport, error) {
 
-	rules := assertion.FilterRulesByTagAndID(ruleSet.Rules, options.Tags, options.RuleIDs)
+	rules := assertion.FilterRulesByTagAndID(ruleSet.Rules, options.Tags, options.RuleIDs, options.IgnoreRuleIDs)
 	rl := ResourceLinter{ValueSource: fl.ValueSource}
 
 	resources := []assertion.Resource{}

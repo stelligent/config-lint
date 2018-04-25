@@ -23,16 +23,28 @@ func FilterRulesByTag(rules []Rule, tags []string) []Rule {
 }
 
 // FilterRulesByID selectes a subset of rules based on ID
-func FilterRulesByID(rules []Rule, ruleIDs []string) []Rule {
-	if len(ruleIDs) == 0 {
+func FilterRulesByID(rules []Rule, ruleIDs []string, ignoreRuleIDs []string) []Rule {
+	if len(ruleIDs) == 0 && len(ignoreRuleIDs) == 0 {
 		return rules
 	}
 	filteredRules := make([]Rule, 0)
 	for _, rule := range rules {
+		include := false
 		for _, id := range ruleIDs {
 			if id == rule.ID {
-				filteredRules = append(filteredRules, rule)
+				include = true
 			}
+		}
+		if len(ignoreRuleIDs) > 0 {
+			include = true
+			for _, id := range ignoreRuleIDs {
+				if id == rule.ID {
+					include = false
+				}
+			}
+		}
+		if include {
+			filteredRules = append(filteredRules, rule)
 		}
 	}
 	return filteredRules
@@ -51,17 +63,17 @@ func uniqueRules(list []Rule) []Rule {
 }
 
 // FilterRulesByTagAndID filters by both tag and id
-func FilterRulesByTagAndID(rules []Rule, tags []string, ruleIds []string) []Rule {
-	if len(tags) == 0 && len(ruleIds) == 0 {
+func FilterRulesByTagAndID(rules []Rule, tags []string, ruleIds []string, ignoreRuleIds []string) []Rule {
+	if len(tags) == 0 && len(ruleIds) == 0 && len(ignoreRuleIds) == 0 {
 		return rules
 	}
 	if len(tags) == 0 {
-		return FilterRulesByID(rules, ruleIds)
+		return FilterRulesByID(rules, ruleIds, ignoreRuleIds)
 	}
 	if len(ruleIds) == 0 {
 		return FilterRulesByTag(rules, tags)
 	}
-	return uniqueRules(append(FilterRulesByID(rules, ruleIds), FilterRulesByTag(rules, tags)...))
+	return uniqueRules(append(FilterRulesByID(rules, ruleIds, ignoreRuleIds), FilterRulesByTag(rules, tags)...))
 }
 
 // ResolveRules loads any dynamic values for a collection or rules

@@ -15,8 +15,9 @@ type (
 
 	// Options configures what resources will be linted
 	Options struct {
-		Tags    []string
-		RuleIDs []string
+		Tags          []string
+		RuleIDs       []string
+		IgnoreRuleIDs []string
 	}
 )
 

@@ -83,6 +83,7 @@ func TestParseRules(t *testing.T) {
 type FilterTestCase struct {
 	Tags          []string
 	Ids           []string
+	IgnoreIds     []string
 	ExpectedRules []string
 }
 
@@ -92,14 +93,15 @@ func TestFilterRules(t *testing.T) {
 	var emptyIds []string
 
 	testCases := map[string]FilterTestCase{
-		"allRules": FilterTestCase{emptyTags, emptyIds, []string{"TEST1", "TEST2", "TEST3"}},
-		"tags":     FilterTestCase{[]string{"s3"}, emptyIds, []string{"TEST2"}},
-		"rules":    FilterTestCase{emptyTags, []string{"TEST1"}, []string{"TEST1"}},
-		"both":     FilterTestCase{[]string{"s3"}, []string{"TEST1"}, []string{"TEST1", "TEST2"}},
-		"overlap":  FilterTestCase{[]string{"s3"}, []string{"TEST2"}, []string{"TEST2"}},
+		"allRules": FilterTestCase{emptyTags, emptyIds, emptyIds, []string{"TEST1", "TEST2", "TEST3"}},
+		"tags":     FilterTestCase{[]string{"s3"}, emptyIds, emptyIds, []string{"TEST2"}},
+		"rules":    FilterTestCase{emptyTags, []string{"TEST1"}, emptyIds, []string{"TEST1"}},
+		"both":     FilterTestCase{[]string{"s3"}, []string{"TEST1"}, emptyIds, []string{"TEST1", "TEST2"}},
+		"overlap":  FilterTestCase{[]string{"s3"}, []string{"TEST2"}, emptyIds, []string{"TEST2"}},
+		"exclude":  FilterTestCase{emptyTags, emptyIds, []string{"TEST1"}, []string{"TEST2", "TEST3"}},
 	}
 	for k, tc := range testCases {
-		r := FilterRulesByTagAndID(MustParseRules(content, t).Rules, tc.Tags, tc.Ids)
+		r := FilterRulesByTagAndID(MustParseRules(content, t).Rules, tc.Tags, tc.Ids, tc.IgnoreIds)
 		if len(r) != len(tc.ExpectedRules) {
 			t.Errorf("Expected %s to include %d rules not %d\n", k, len(tc.ExpectedRules), len(r))
 		}
@@ -109,7 +111,7 @@ func TestFilterRules(t *testing.T) {
 func TestFilterRulesByTagAndID(t *testing.T) {
 	tags := []string{"s3"}
 	ids := []string{"TEST3"}
-	r := FilterRulesByTagAndID(MustParseRules(content, t).Rules, tags, ids)
+	r := FilterRulesByTagAndID(MustParseRules(content, t).Rules, tags, ids, []string{})
 	if len(r) != 2 {
 		t.Error("Expected filterRulesByTag to return 2 rules")
 	}

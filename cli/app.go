@@ -21,6 +21,7 @@ type (
 	ApplyOptions struct {
 		Tags             []string
 		RuleIDs          []string
+		IgnoreRuleIDs    []string
 		QueryExpression  string
 		SearchExpression string
 	}
@@ -29,6 +30,7 @@ type (
 	ProjectOptions struct {
 		Rules     []string
 		IDs       []string
+		IgnoreIDs []string `json:"ignore_ids"`
 		Tags      []string
 		Query     string
 		Files     []string
@@ -44,6 +46,7 @@ func main() {
 	flag.Var(&rulesFilenames, "rules", "Rules file, can be specified multiple times")
 	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
 	ids := flag.String("ids", "", "Run only the rules in this comma separated list")
+	ignoreIds := flag.String("ignore-ids", "", "Ignoer the rules in this comma separated list")
 	queryExpression := flag.String("query", "", "JMESPath expression to query the results")
 	verboseReport := flag.Bool("verbose", false, "Output a verbose report")
 	searchExpression := flag.String("search", "", "JMESPath expression to evaluation against the files")
@@ -80,6 +83,7 @@ func main() {
 	applyOptions := ApplyOptions{
 		Tags:             makeTagList(*tags, profileOptions.Tags),
 		RuleIDs:          makeRulesList(*ids, profileOptions.IDs),
+		IgnoreRuleIDs:    makeRulesList(*ignoreIds, profileOptions.IgnoreIDs),
 		QueryExpression:  makeQueryExpression(*queryExpression, *verboseReport, profileOptions.Query),
 		SearchExpression: *searchExpression,
 	}
@@ -168,8 +172,9 @@ func applyRules(ruleSets []assertion.RuleSet, args arrayFlags, options ApplyOpti
 				l.Search(ruleSet, options.SearchExpression, os.Stdout)
 			} else {
 				options := linter.Options{
-					Tags:    options.Tags,
-					RuleIDs: options.RuleIDs,
+					Tags:          options.Tags,
+					RuleIDs:       options.RuleIDs,
+					IgnoreRuleIDs: options.IgnoreRuleIDs,
 				}
 				r, err := l.Validate(ruleSet, options)
 				if err != nil {
