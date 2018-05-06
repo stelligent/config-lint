@@ -111,3 +111,20 @@ func TestTerraformPolicies(t *testing.T) {
 		t.Errorf("TestTerraformPolicies returned %d violations, expecting 1", len(report.Violations))
 	}
 }
+
+func TestTerraformPoliciesWithVariables(t *testing.T) {
+	options := Options{
+		Tags:    []string{},
+		RuleIDs: []string{},
+	}
+	filenames := []string{"./testdata/resources/policy_with_variables.tf"}
+	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: TerraformResourceLoader{}}
+	ruleSet := loadRulesForTest("./testdata/rules/policy_variable.yml", t)
+	report, err := linter.Validate(ruleSet, options)
+	if err != nil {
+		t.Error("Expecting TestTerraformPoliciesWithVariables to not return an error:" + err.Error())
+	}
+	if len(report.Violations) != 0 {
+		t.Errorf("TestTerraformPoliciesWithVariables returned %d violations, expecting 0", len(report.Violations))
+	}
+}

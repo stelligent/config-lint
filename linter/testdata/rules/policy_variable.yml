@@ -1,0 +1,14 @@
+version: 1
+description: Rules for Terraform here documents with variables
+type: Terraform
+files:
+  - "*.tf"
+rules:
+
+  - id: TEST_VARIABLE
+    message: Testing
+    resource: aws_iam_role
+    assertions:
+      - key: "assume_role_policy.Statement[].Effect | [0]"
+        op: eq
+        value: Allow
