@@ -42,7 +42,7 @@ func isMatch(data interface{}, expression Expression) (MatchResult, error) {
 		if compare(data, value, valueType) == 0 {
 			return matches()
 		}
-		return doesNotMatch("%v(%v) should equal to %v", key, searchResult, value)
+		return doesNotMatch("%v(%v) should be equal to %v", key, searchResult, value)
 	case "ne":
 		if compare(data, value, valueType) != 0 {
 			return matches()
