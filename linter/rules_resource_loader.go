@@ -55,3 +55,7 @@ func (l RulesResourceLoader) Load(filename string) (FileResources, error) {
 func (l RulesResourceLoader) ReplaceVariables(resources []assertion.Resource, variables []Variable) ([]assertion.Resource, error) {
 	return resources, nil
 }
+
+func (l RulesResourceLoader) PostProcess(resources []assertion.Resource) ([]assertion.Resource, error) {
+	return resources, nil
+}

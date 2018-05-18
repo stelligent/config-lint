@@ -126,5 +126,24 @@ func TestTerraformPoliciesWithVariables(t *testing.T) {
 	}
 	if len(report.Violations) != 0 {
 		t.Errorf("TestTerraformPoliciesWithVariables returned %d violations, expecting 0", len(report.Violations))
+		t.Errorf("Violations: %v", report.Violations)
+	}
+}
+
+func TestTerraformHereDocWithExpression(t *testing.T) {
+	options := Options{
+		Tags:    []string{},
+		RuleIDs: []string{},
+	}
+	filenames := []string{"./testdata/resources/policy_with_expression.tf"}
+	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: TerraformResourceLoader{}}
+	ruleSet := loadRulesForTest("./testdata/rules/policy_variable.yml", t)
+	report, err := linter.Validate(ruleSet, options)
+	if err != nil {
+		t.Error("Expecting TestTerraformHereDocWithExpression to not return an error:" + err.Error())
+	}
+	if len(report.Violations) != 0 {
+		t.Errorf("TestTerraformPoliciesWithVariables returned %d violations, expecting 0", len(report.Violations))
+		t.Errorf("Violations: %v", report.Violations)
 	}
 }

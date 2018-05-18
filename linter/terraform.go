@@ -23,24 +23,6 @@ type (
 	}
 )
 
-func parsePolicy(templateResource interface{}) (map[string]interface{}, error) {
-	firstResource := templateResource.([]interface{})[0] // FIXME does this array always have 1 element?
-	properties := firstResource.(map[string]interface{})
-	for _, attribute := range []string{"assume_role_policy", "policy"} {
-		if policyAttribute, hasPolicyString := properties[attribute]; hasPolicyString {
-			if policyString, isString := policyAttribute.(string); isString {
-				var policy interface{}
-				err := json.Unmarshal([]byte(policyString), &policy)
-				if err != nil {
-					return properties, err
-				}
-				properties[attribute] = policy
-			}
-		}
-	}
-	return properties, nil
-}
-
 func loadHCL(filename string) (TerraformLoadResult, error) {
 	result := TerraformLoadResult{
 		Resources: []interface{}{},
@@ -128,10 +110,7 @@ func (l TerraformResourceLoader) Load(filename string) (FileResources, error) {
 			if templateResources != nil {
 				for _, templateResource := range templateResources.([]interface{}) {
 					for resourceID, templateResource := range templateResource.(map[string]interface{}) {
-						properties, err := parsePolicy(templateResource)
-						if err != nil {
-							return loaded, err
-						}
+						properties := getProperties(templateResource)
 						lineNumber := getResourceLineNumber(resourceType, resourceID, filename, result.AST)
 						tr := assertion.Resource{
 							ID:         resourceID,
@@ -152,6 +131,17 @@ func (l TerraformResourceLoader) Load(filename string) (FileResources, error) {
 func (l TerraformResourceLoader) ReplaceVariables(resources []assertion.Resource, variables []Variable) ([]assertion.Resource, error) {
 	for _, resource := range resources {
 		resource.Properties = replaceVariables(resource.Properties, variables)
+	}
+	return resources, nil
+}
+
+func (l TerraformResourceLoader) PostProcess(resources []assertion.Resource) ([]assertion.Resource, error) {
+	for _, r := range resources {
+		properties, err := parsePolicy(r.Properties)
+		if err != nil {
+			return resources, err
+		}
+		r.Properties = properties
 	}
 	return resources, nil
 }
@@ -205,5 +195,28 @@ func resolveValue(s string, variables []Variable) string {
 			}
 		}
 	}
-	return s
+	defaultReplacementValue := ""
+	return re.ReplaceAllString(s, defaultReplacementValue)
+}
+
+func parsePolicy(resource interface{}) (interface{}, error) {
+	properties := resource.(map[string]interface{})
+	for _, attribute := range []string{"assume_role_policy", "policy"} {
+		if policyAttribute, hasPolicyString := properties[attribute]; hasPolicyString {
+			if policyString, isString := policyAttribute.(string); isString {
+				var policy interface{}
+				err := json.Unmarshal([]byte(policyString), &policy)
+				if err != nil {
+					return properties, err
+				}
+				properties[attribute] = policy
+			}
+		}
+	}
+	return properties, nil
+}
+
+func getProperties(templateResource interface{}) map[string]interface{} {
+	first := templateResource.([]interface{})[0] // FIXME does this array always have 1 element?
+	return first.(map[string]interface{})
 }

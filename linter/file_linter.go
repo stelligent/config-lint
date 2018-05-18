@@ -19,6 +19,7 @@ type (
 	FileResourceLoader interface {
 		Load(filename string) (FileResources, error)
 		ReplaceVariables(resources []assertion.Resource, variables []Variable) ([]assertion.Resource, error)
+		PostProcess(resources []assertion.Resource) ([]assertion.Resource, error)
 	}
 )
 
@@ -57,7 +58,11 @@ func (fl FileLinter) Validate(ruleSet assertion.RuleSet, options Options) (asser
 	if err != nil {
 		return assertion.ValidationReport{}, err
 	}
-	report, err := rl.ValidateResources(resolvedResources, rules)
+	resourcesToValidate, err := fl.Loader.PostProcess(resolvedResources)
+	if err != nil {
+		return assertion.ValidationReport{}, err
+	}
+	report, err := rl.ValidateResources(resourcesToValidate, rules)
 	if err != nil {
 		return report, err
 	}
