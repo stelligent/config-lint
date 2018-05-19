@@ -1,0 +1,6 @@
+version:1
+description:File with invalid YAML
+type:Terraform
+rules:
+  - id:TEST_POLICY
+   message:Testing

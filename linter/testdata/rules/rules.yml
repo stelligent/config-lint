@@ -1,0 +1,7 @@
+version: 1
+description: Rules to lint rules
+type: LintRules
+files:
+  - "*.tml"
+rules:
+

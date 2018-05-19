@@ -1,0 +1,16 @@
+version: 1
+description: Rules for AWS Resource
+type: IAMUser
+files:
+  - "*"
+rules:
+
+  - id: TEST_POLICY
+    message: Testing
+    resource: "*"
+    assertions:
+      - key: Name
+        op: present
+    severity: FAILURE
+
+

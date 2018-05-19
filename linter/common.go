@@ -32,6 +32,7 @@ func getResourceIDFromFilename(filename string) string {
 	return resourceID
 }
 
+// FIXME move this to the assertion package (along with test)
 // CombineValidationReports merges results from two separate Validate runs
 func CombineValidationReports(r1, r2 assertion.ValidationReport) assertion.ValidationReport {
 	return assertion.ValidationReport{

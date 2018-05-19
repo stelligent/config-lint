@@ -1,0 +1,6 @@
+version: 1
+description: Rules for Kubernetes
+type: Kubernetes
+files:
+  - "*.tf"
+rules:

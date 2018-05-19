@@ -1,0 +1,7 @@
+version: 1
+description: Unsupported type
+type: CloudFormation
+files:
+  - "*.yml"
+rules:
+

@@ -1,6 +1,6 @@
 version: 1
 description: Rules for AWS Resource
-type: AWSResource
+type: SecurityGroup
 files:
   - "*"
 rules:

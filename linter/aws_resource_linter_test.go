@@ -12,7 +12,7 @@ func TestAWSResourceLinterValidate(t *testing.T) {
 		Tags:    []string{},
 		RuleIDs: []string{},
 	}
-	ruleSet := loadRulesForTest("./testdata/rules/aws_resource.yml", t)
+	ruleSet := loadRulesForTest("./testdata/rules/aws_sg_resource.yml", t)
 	mockLoader := AWSMockLoader{}
 	linter := AWSResourceLinter{Loader: mockLoader, ValueSource: TestingValueSource{}}
 	report, err := linter.Validate(ruleSet, options)
@@ -28,7 +28,7 @@ func TestAWSResourceLinterValidate(t *testing.T) {
 }
 
 func TestAWSResourceLinterSearch(t *testing.T) {
-	ruleSet := loadRulesForTest("./testdata/rules/aws_resource.yml", t)
+	ruleSet := loadRulesForTest("./testdata/rules/aws_sg_resource.yml", t)
 	mockLoader := AWSMockLoader{}
 	linter := AWSResourceLinter{Loader: mockLoader, ValueSource: TestingValueSource{}}
 	var b bytes.Buffer
