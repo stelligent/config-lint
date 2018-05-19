@@ -18,8 +18,7 @@ type (
 	// FileResourceLoader provides the interface that a Linter needs to load a collection of Resource objects
 	FileResourceLoader interface {
 		Load(filename string) (FileResources, error)
-		ReplaceVariables(resources []assertion.Resource, variables []Variable) ([]assertion.Resource, error)
-		PostProcess(resources []assertion.Resource) ([]assertion.Resource, error)
+		PostLoad(resources FileResources) ([]assertion.Resource, error)
 	}
 )
 
@@ -54,11 +53,7 @@ func (fl FileLinter) Validate(ruleSet assertion.RuleSet, options Options) (asser
 			variables = append(variables, loaded.Variables...)
 		}
 	}
-	resolvedResources, err := fl.Loader.ReplaceVariables(resources, variables)
-	if err != nil {
-		return assertion.ValidationReport{}, err
-	}
-	resourcesToValidate, err := fl.Loader.PostProcess(resolvedResources)
+	resourcesToValidate, err := fl.Loader.PostLoad(FileResources{Resources: resources, Variables: variables})
 	if err != nil {
 		return assertion.ValidationReport{}, err
 	}

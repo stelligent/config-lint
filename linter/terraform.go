@@ -128,22 +128,18 @@ func (l TerraformResourceLoader) Load(filename string) (FileResources, error) {
 	return loaded, nil
 }
 
-func (l TerraformResourceLoader) ReplaceVariables(resources []assertion.Resource, variables []Variable) ([]assertion.Resource, error) {
-	for _, resource := range resources {
-		resource.Properties = replaceVariables(resource.Properties, variables)
+func (l TerraformResourceLoader) PostLoad(fr FileResources) ([]assertion.Resource, error) {
+	for _, resource := range fr.Resources {
+		resource.Properties = replaceVariables(resource.Properties, fr.Variables)
 	}
-	return resources, nil
-}
-
-func (l TerraformResourceLoader) PostProcess(resources []assertion.Resource) ([]assertion.Resource, error) {
-	for _, r := range resources {
-		properties, err := parsePolicy(r.Properties)
+	for _, resource := range fr.Resources {
+		properties, err := parsePolicy(resource.Properties)
 		if err != nil {
-			return resources, err
+			return fr.Resources, err
 		}
-		r.Properties = properties
+		resource.Properties = properties
 	}
-	return resources, nil
+	return fr.Resources, nil
 }
 
 func replaceVariables(templateResource interface{}, variables []Variable) interface{} {

@@ -50,10 +50,6 @@ func (l KubernetesResourceLoader) Load(filename string) (FileResources, error) {
 	return loaded, nil
 }
 
-func (l KubernetesResourceLoader) ReplaceVariables(resources []assertion.Resource, variables []Variable) ([]assertion.Resource, error) {
-	return resources, nil
-}
-
-func (l KubernetesResourceLoader) PostProcess(resources []assertion.Resource) ([]assertion.Resource, error) {
-	return resources, nil
+func (l KubernetesResourceLoader) PostLoad(r FileResources) ([]assertion.Resource, error) {
+	return r.Resources, nil
 }
