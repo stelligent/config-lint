@@ -17,22 +17,20 @@ type (
 
 	// TerraformLoadResult collects all the returns value for parsing an HCL string
 	TerraformLoadResult struct {
-		Resources    []interface{}
-		Data         []interface{}
-		Providers    []interface{}
-		Provisioners []interface{}
-		Variables    []Variable
-		AST          *ast.File
+		Resources []interface{}
+		Data      []interface{}
+		Providers []interface{}
+		Variables []Variable
+		AST       *ast.File
 	}
 )
 
 func loadHCL(filename string) (TerraformLoadResult, error) {
 	result := TerraformLoadResult{
-		Resources:    []interface{}{},
-		Data:         []interface{}{},
-		Providers:    []interface{}{},
-		Provisioners: []interface{}{},
-		Variables:    []Variable{},
+		Resources: []interface{}{},
+		Data:      []interface{}{},
+		Providers: []interface{}{},
+		Variables: []Variable{},
 	}
 	template, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -67,9 +65,6 @@ func loadHCL(filename string) (TerraformLoadResult, error) {
 	}
 	if m["provider"] != nil {
 		result.Providers = append(result.Providers, m["provider"].([]interface{})...)
-	}
-	if m["provisioner"] != nil {
-		result.Provisioners = append(result.Provisioners, m["provisioner"].([]interface{})...)
 	}
 	assertion.Debugf("LoadHCL Variables: %v\n", result.Variables)
 	return result, nil
@@ -122,6 +117,7 @@ func (l TerraformResourceLoader) Load(filename string) (FileResources, error) {
 	loaded.Variables = result.Variables
 	loaded.Resources = append(loaded.Resources, getResources(filename, result.AST, result.Resources, "resource")...)
 	loaded.Resources = append(loaded.Resources, getResources(filename, result.AST, result.Data, "data")...)
+	loaded.Resources = append(loaded.Resources, getResources(filename, result.AST, result.Providers, "provider")...)
 	return loaded, nil
 }
 
