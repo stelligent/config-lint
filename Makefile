@@ -14,7 +14,7 @@ default: all
 deps:
 	go get "github.com/golang/dep/cmd/dep"
 	go get "github.com/jteeuwen/go-bindata/..."
-	go get "golang.org/x/lint/golint"
+	#go get "golang.org/x/lint/golint"
 	go get "github.com/fzipp/gocyclo"
 	dep ensure
 
@@ -25,7 +25,7 @@ gen:
 lint: gen
 	@echo "=== linting ==="
 	@go vet ./...
-	@golint $(go list ./... | grep -v /vendor/)
+	#@golint $(go list ./... | grep -v /vendor/)
 
 test: lint
 	@echo "=== testing ==="
