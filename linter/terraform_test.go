@@ -147,3 +147,34 @@ func TestTerraformHereDocWithExpression(t *testing.T) {
 		t.Errorf("Violations: %v", report.Violations)
 	}
 }
+
+func TestTerraformDataLoader(t *testing.T) {
+	loader := TerraformResourceLoader{}
+	loaded, err := loader.Load("./testdata/resources/terraform_data.tf")
+	if err != nil {
+		t.Error("Expecting TestTerraformDataLoader to not return an error")
+	}
+	if len(loaded.Resources) != 1 {
+		t.Errorf("TestTerraformDataLoader scanned %d resources, expecting 1", len(loaded.Resources))
+	}
+}
+
+/*
+func TestTerraformDataObject(t *testing.T) {
+	options := Options{
+		Tags:    []string{},
+		RuleIDs: []string{},
+	}
+	filenames := []string{"./testdata/resources/terraform_data.tf"}
+	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: TerraformResourceLoader{}}
+	ruleSet := loadRulesForTest("./testdata/rules/terraform_data.yml", t)
+	report, err := linter.Validate(ruleSet, options)
+	if err != nil {
+		t.Error("Expecting TestTerraformDataObject to not return an error:" + err.Error())
+	}
+	if len(report.Violations) != 1 {
+		t.Errorf("TestTerraformDataObject returned %d violations, expecting 1", len(report.Violations))
+		t.Errorf("Violations: %v", report.Violations)
+	}
+}
+*/

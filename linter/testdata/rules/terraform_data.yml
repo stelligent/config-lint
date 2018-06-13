@@ -1,0 +1,15 @@
+version: 1
+description: Rules for Terraform configuration files
+type: Terraform
+files:
+  - "*.tf"
+rules:
+
+  - id: TEST_1
+    message: Testing
+    resource: template_file
+    category: data
+    assertions:
+      - key: template
+        op: not-contains
+        value: "/example/" 

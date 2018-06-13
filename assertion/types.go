@@ -6,6 +6,7 @@ type (
 	Resource struct {
 		ID         string
 		Type       string
+		Category   string // default is "resource", can be "data", "provisioner", "provider" for Terraform
 		Properties interface{}
 		Filename   string
 		LineNumber int
@@ -27,6 +28,7 @@ type (
 		Message    string
 		Severity   string
 		Resource   string
+		Category   string // default is "resource", can be "data", "provisioner", "provider" for Terraform
 		Conditions []Expression
 		Assertions []Expression
 		Except     []string

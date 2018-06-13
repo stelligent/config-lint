@@ -22,7 +22,7 @@ func (r ResourceLinter) ValidateResources(resources []assertion.Resource, rules 
 
 	for _, rule := range resolvedRules {
 		assertion.Debugf("Rule: ID: %v Message: %s\n", rule.ID, rule.Message)
-		for _, resource := range assertion.FilterResourcesByType(resources, rule.Resource) {
+		for _, resource := range assertion.FilterResourcesByType(resources, rule.Resource, rule.Category) {
 			if assertion.ExcludeResource(rule, resource) {
 				assertion.Debugf("Ignoring resource %s\n", resource.ID)
 			} else {

@@ -17,16 +17,22 @@ type (
 
 	// TerraformLoadResult collects all the returns value for parsing an HCL string
 	TerraformLoadResult struct {
-		Resources []interface{}
-		Variables []Variable
-		AST       *ast.File
+		Resources    []interface{}
+		Data         []interface{}
+		Providers    []interface{}
+		Provisioners []interface{}
+		Variables    []Variable
+		AST          *ast.File
 	}
 )
 
 func loadHCL(filename string) (TerraformLoadResult, error) {
 	result := TerraformLoadResult{
-		Resources: []interface{}{},
-		Variables: []Variable{},
+		Resources:    []interface{}{},
+		Data:         []interface{}{},
+		Providers:    []interface{}{},
+		Provisioners: []interface{}{},
+		Variables:    []Variable{},
 	}
 	template, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -55,6 +61,15 @@ func loadHCL(filename string) (TerraformLoadResult, error) {
 	result.Variables = loadVariables(m["variable"])
 	if m["resource"] != nil {
 		result.Resources = append(result.Resources, m["resource"].([]interface{})...)
+	}
+	if m["data"] != nil {
+		result.Data = append(result.Data, m["data"].([]interface{})...)
+	}
+	if m["provider"] != nil {
+		result.Providers = append(result.Providers, m["provider"].([]interface{})...)
+	}
+	if m["provisioner"] != nil {
+		result.Provisioners = append(result.Provisioners, m["provisioner"].([]interface{})...)
 	}
 	assertion.Debugf("LoadHCL Variables: %v\n", result.Variables)
 	return result, nil
@@ -105,27 +120,35 @@ func (l TerraformResourceLoader) Load(filename string) (FileResources, error) {
 		return loaded, err
 	}
 	loaded.Variables = result.Variables
-	for _, resource := range result.Resources {
+	loaded.Resources = append(loaded.Resources, getResources(filename, result.AST, result.Resources, "resource")...)
+	loaded.Resources = append(loaded.Resources, getResources(filename, result.AST, result.Data, "data")...)
+	return loaded, nil
+}
+
+func getResources(filename string, ast *ast.File, objects []interface{}, category string) []assertion.Resource {
+	resources := []assertion.Resource{}
+	for _, resource := range objects {
 		for resourceType, templateResources := range resource.(map[string]interface{}) {
 			if templateResources != nil {
 				for _, templateResource := range templateResources.([]interface{}) {
 					for resourceID, templateResource := range templateResource.(map[string]interface{}) {
 						properties := getProperties(templateResource)
-						lineNumber := getResourceLineNumber(resourceType, resourceID, filename, result.AST)
+						lineNumber := getResourceLineNumber(resourceType, resourceID, filename, ast)
 						tr := assertion.Resource{
 							ID:         resourceID,
 							Type:       resourceType,
+							Category:   category,
 							Properties: properties,
 							Filename:   filename,
 							LineNumber: lineNumber,
 						}
-						loaded.Resources = append(loaded.Resources, tr)
+						resources = append(resources, tr)
 					}
 				}
 			}
 		}
 	}
-	return loaded, nil
+	return resources
 }
 
 func (l TerraformResourceLoader) PostLoad(fr FileResources) ([]assertion.Resource, error) {

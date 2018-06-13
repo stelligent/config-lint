@@ -85,17 +85,24 @@ func ShouldIncludeFile(patterns []string, filename string) (bool, error) {
 }
 
 // FilterResourcesByType filters a list of resources that match a single resource type
-func FilterResourcesByType(resources []Resource, resourceType string) []Resource {
+func FilterResourcesByType(resources []Resource, resourceType string, resourceCategory string) []Resource {
 	if resourceType == "*" {
 		return resources
 	}
 	filtered := make([]Resource, 0)
 	for _, resource := range resources {
-		if resource.Type == resourceType {
+		if resource.Type == resourceType && categoryMatches(resourceCategory, resource.Category) {
 			filtered = append(filtered, resource)
 		}
 	}
 	return filtered
+}
+
+func categoryMatches(c1, c2 string) bool {
+	if c1 == "" || c1 == "*" {
+		return true
+	}
+	return c1 == c2
 }
 
 // JSONStringify converts a JSON object into an indented string suitable for printing

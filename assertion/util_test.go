@@ -91,7 +91,7 @@ func TestFilterShouldIncludeResources(t *testing.T) {
 		Resource{Type: "instance"},
 		Resource{Type: "volume"},
 	}
-	filtered := FilterResourcesByType(resources, "instance")
+	filtered := FilterResourcesByType(resources, "instance", "*")
 	if len(filtered) != 1 {
 		t.Errorf("FilterResourcesByType expected to match one resource")
 	}
@@ -102,7 +102,7 @@ func TestFilterShouldExcludeResources(t *testing.T) {
 		Resource{Type: "instance"},
 		Resource{Type: "volume"},
 	}
-	filtered := FilterResourcesByType(resources, "database")
+	filtered := FilterResourcesByType(resources, "database", "*")
 	if len(filtered) != 0 {
 		t.Errorf("FilterResourcesByType expected to match no resources")
 	}
@@ -113,8 +113,19 @@ func TestFilterShouldIncludeAllResources(t *testing.T) {
 		Resource{Type: "instance"},
 		Resource{Type: "volume"},
 	}
-	filtered := FilterResourcesByType(resources, "*")
+	filtered := FilterResourcesByType(resources, "*", "*")
 	if len(filtered) != len(resources) {
 		t.Errorf("FilterResourcesByType expected to include all resources")
+	}
+}
+
+func TestFilterShouldMatchCategoryForResources(t *testing.T) {
+	resources := []Resource{
+		Resource{Type: "instance", Category: "resource"},
+		Resource{Type: "template_file", Category: "data"},
+	}
+	filtered := FilterResourcesByType(resources, "template_file", "data")
+	if len(filtered) != 1 {
+		t.Errorf("FilterResourcesByType expected to match one resource")
 	}
 }
