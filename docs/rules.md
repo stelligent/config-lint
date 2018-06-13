@@ -19,6 +19,7 @@ Each rule contains the following attributes:
 |id         | A unique identifier for the rule                                                   |
 |message    | A string to be printed when a validation error is detected                         |
 |resource   | The resource type to which the rule will be applied                                |
+|category   | Optional value used for Terraform: resource(default), data, provider               |
 |conditions | Expressions (in addition to resource) that determine if a rule should apply        |
 |except     | An optional list of resource ids that should not be validated                      |
 |severity   | FAILURE, WARNING, NON_COMPLIANT                                                    |
