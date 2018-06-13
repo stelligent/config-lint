@@ -118,7 +118,7 @@ func CheckRule(rule Rule, resource Resource, e ExternalRuleInvoker) (string, []V
 		return returnStatus, violations, nil
 	}
 	for _, ruleAssertion := range rule.Assertions {
-		Debugf("Checking resource %s\n", resource.ID)
+		Debugf("Checking %s %s %s\n", resource.Category, resource.Type, resource.ID)
 		expressionResult, err := CheckExpression(rule, ruleAssertion, resource)
 		if err != nil {
 			return "FAILURE", violations, err

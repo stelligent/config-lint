@@ -117,8 +117,15 @@ func (l TerraformResourceLoader) Load(filename string) (FileResources, error) {
 	loaded.Variables = result.Variables
 	loaded.Resources = append(loaded.Resources, getResources(filename, result.AST, result.Resources, "resource")...)
 	loaded.Resources = append(loaded.Resources, getResources(filename, result.AST, result.Data, "data")...)
-	loaded.Resources = append(loaded.Resources, getResources(filename, result.AST, result.Providers, "provider")...)
+	loaded.Resources = append(loaded.Resources, getResources(filename, result.AST, normalizeProviders(result.Providers), "provider")...)
 	return loaded, nil
+}
+
+func normalizeProviders(provider []interface{}) []interface{} {
+	wrappedProvider := map[string]interface{}{
+		"provider": provider,
+	}
+	return []interface{}{wrappedProvider}
 }
 
 func getResources(filename string, ast *ast.File, objects []interface{}, category string) []assertion.Resource {
@@ -232,6 +239,10 @@ func parsePolicy(resource interface{}) (interface{}, error) {
 }
 
 func getProperties(templateResource interface{}) map[string]interface{} {
-	first := templateResource.([]interface{})[0] // FIXME does this array always have 1 element?
-	return first.(map[string]interface{})
+	switch v := templateResource.(type) {
+	case []interface{}:
+		return v[0].(map[string]interface{})
+	default:
+		return map[string]interface{}{}
+	}
 }

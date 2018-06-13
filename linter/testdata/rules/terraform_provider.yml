@@ -1,0 +1,17 @@
+version: 1
+description: Rules for Terraform configuration files
+type: Terraform
+files:
+  - "*.tf"
+rules:
+
+  - id: TEST_1
+    message: Testing
+    resource: provider
+    category: provider
+    assertions:
+      - key: access_key
+        op: present
+      - key: secret_key
+        op: present
+
