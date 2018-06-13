@@ -14,7 +14,7 @@ default: all
 deps:
 	go get "github.com/golang/dep/cmd/dep"
 	go get "github.com/jteeuwen/go-bindata/..."
-	go get "github.com/golang/lint/golint"
+	go get "golang.org/x/lint/golint"
 	go get "github.com/fzipp/gocyclo"
 	dep ensure
 
