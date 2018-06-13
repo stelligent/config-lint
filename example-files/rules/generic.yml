@@ -32,7 +32,7 @@ rules:
     assertions:
       - every:
           key: "keys(@)"
-          assertions:
+          expressions:
             - key: "@"
               op: in
               value: widgets,gadgets,other_stuff
@@ -80,7 +80,7 @@ rules:
     assertions:
       - every:
           key: locations
-          assertions:
+          expressions:
             - key: city
               op: present
 
