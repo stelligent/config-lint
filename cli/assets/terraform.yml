@@ -3,7 +3,7 @@ version: 1
 description: Terraform rules for demo
 type: Terraform
 files:
-  - "*"
+  - "*.tf"
 rules:
 
   - id: SG_WORLD_INGRESS
