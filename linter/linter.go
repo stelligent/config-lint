@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"github.com/stelligent/config-lint/assertion"
 	"io"
-	"os"
-	"path/filepath"
 )
 
 type (
@@ -24,9 +22,9 @@ type (
 )
 
 // NewLinter create the right kind of Linter based on the type argument
-func NewLinter(ruleSet assertion.RuleSet, args []string) (Linter, error) {
+func NewLinter(ruleSet assertion.RuleSet, filenames []string) (Linter, error) {
+	assertion.Debugf("Filenames to scan: %v\n", filenames)
 	vs := assertion.StandardValueSource{}
-	filenames := getFilenames(args)
 	switch ruleSet.Type {
 	case "Kubernetes":
 		return FileLinter{Filenames: filenames, ValueSource: vs, Loader: KubernetesResourceLoader{}}, nil
@@ -43,40 +41,4 @@ func NewLinter(ruleSet assertion.RuleSet, args []string) (Linter, error) {
 	default:
 		return nil, fmt.Errorf("Type not supported: %s", ruleSet.Type)
 	}
-}
-
-func getFilenames(args []string) []string {
-	filenames := []string{}
-	for _, arg := range args {
-		fi, err := os.Stat(arg)
-		if err != nil {
-			fmt.Printf("Cannot open %s\n", arg)
-			continue
-		}
-		mode := fi.Mode()
-		if mode.IsDir() {
-			filenames = append(filenames, getFilesInDirectory(arg)...)
-		} else {
-			filenames = append(filenames, arg)
-		}
-	}
-	return filenames
-}
-
-func getFilesInDirectory(root string) []string {
-	directoryFiles := []string{}
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			fmt.Printf("Error processing %s: %s\n", path, err)
-			return err
-		}
-		if !info.IsDir() {
-			directoryFiles = append(directoryFiles, path)
-		}
-		return nil
-	})
-	if err != nil {
-		fmt.Printf("Error walking directory %s: %s\n", root, err)
-	}
-	return directoryFiles
 }

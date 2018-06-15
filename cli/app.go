@@ -17,13 +17,14 @@ import (
 var version string
 
 type (
-	// ApplyOptions for applying rules
-	ApplyOptions struct {
+	// LinterOptions for applying rules
+	LinterOptions struct {
 		Tags             []string
 		RuleIDs          []string
 		IgnoreRuleIDs    []string
 		QueryExpression  string
 		SearchExpression string
+		ExcludePatterns  []string
 	}
 
 	// ProjectOptions for default options from a project file
@@ -41,18 +42,20 @@ type (
 //go:generate go-bindata -pkg $GOPACKAGE -o assets.go assets/
 func main() {
 	var rulesFilenames arrayFlags
+	var excludePatterns arrayFlags
 	terraformBuiltInRules := flag.Bool("terraform", false, "Use built-in rules for Terraform")
-	debug := flag.Bool("debug", false, "Debug logging")
 	flag.Var(&rulesFilenames, "rules", "Rules file, can be specified multiple times")
 	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
 	ids := flag.String("ids", "", "Run only the rules in this comma separated list")
-	ignoreIds := flag.String("ignore-ids", "", "Ignoer the rules in this comma separated list")
+	ignoreIds := flag.String("ignore-ids", "", "Ignore the rules in this comma separated list")
 	queryExpression := flag.String("query", "", "JMESPath expression to query the results")
 	verboseReport := flag.Bool("verbose", false, "Output a verbose report")
 	searchExpression := flag.String("search", "", "JMESPath expression to evaluation against the files")
 	validate := flag.Bool("validate", false, "Validate rules file")
 	versionFlag := flag.Bool("version", false, "Get program version")
 	profileFilename := flag.String("profile", "", "Provide default options")
+	flag.Var(&excludePatterns, "exclude", "Filename patterns to exclude")
+	debug := flag.Bool("debug", false, "Debug logging")
 
 	flag.Parse()
 
@@ -76,16 +79,17 @@ func main() {
 		return
 	}
 
-	rulesFilenames = getFilenames(rulesFilenames, profileOptions.Rules)
-	configFilenames := getFilenames(flag.Args(), profileOptions.Files)
+	rulesFilenames = loadFilenames(rulesFilenames, profileOptions.Rules)
+	configFilenames := loadFilenames(flag.Args(), profileOptions.Files)
 	useTerraformBuiltInRules := *terraformBuiltInRules || profileOptions.Terraform
 
-	applyOptions := ApplyOptions{
+	linterOptions := LinterOptions{
 		Tags:             makeTagList(*tags, profileOptions.Tags),
 		RuleIDs:          makeRulesList(*ids, profileOptions.IDs),
 		IgnoreRuleIDs:    makeRulesList(*ignoreIds, profileOptions.IgnoreIDs),
 		QueryExpression:  makeQueryExpression(*queryExpression, *verboseReport, profileOptions.Query),
 		SearchExpression: *searchExpression,
+		ExcludePatterns:  excludePatterns,
 	}
 	ruleSets, err := loadRuleSets(rulesFilenames)
 	if err != nil {
@@ -100,7 +104,7 @@ func main() {
 		}
 		ruleSets = append(ruleSets, builtInRuleSet)
 	}
-	applyRules(ruleSets, configFilenames, applyOptions)
+	applyRules(ruleSets, configFilenames, linterOptions)
 }
 
 func validateRules(filenames []string) {
@@ -110,10 +114,10 @@ func validateRules(filenames []string) {
 		return
 	}
 	ruleSets := []assertion.RuleSet{builtInRuleSet}
-	applyOptions := ApplyOptions{
+	linterOptions := LinterOptions{
 		QueryExpression: "Violations[]",
 	}
-	applyRules(ruleSets, filenames, applyOptions)
+	applyRules(ruleSets, filenames, linterOptions)
 }
 
 func loadRuleSets(rulesFilenames arrayFlags) ([]assertion.RuleSet, error) {
@@ -153,7 +157,7 @@ func loadBuiltInRuleSet(name string) (assertion.RuleSet, error) {
 	return ruleSet, nil
 }
 
-func applyRules(ruleSets []assertion.RuleSet, args arrayFlags, options ApplyOptions) {
+func applyRules(ruleSets []assertion.RuleSet, args arrayFlags, options LinterOptions) {
 
 	report := assertion.ValidationReport{
 		Violations:       []assertion.Violation{},
@@ -161,8 +165,10 @@ func applyRules(ruleSets []assertion.RuleSet, args arrayFlags, options ApplyOpti
 		ResourcesScanned: []assertion.ScannedResource{},
 	}
 
+	filenames := excludeFilenames(getFilenames(args), options.ExcludePatterns)
+
 	for _, ruleSet := range ruleSets {
-		l, err := linter.NewLinter(ruleSet, args)
+		l, err := linter.NewLinter(ruleSet, filenames)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -307,9 +313,67 @@ func loadProfile(filename string) (ProjectOptions, error) {
 	return options, nil
 }
 
-func getFilenames(commandLineOptions []string, profileOptions []string) []string {
+func loadFilenames(commandLineOptions []string, profileOptions []string) []string {
 	if len(commandLineOptions) > 0 {
 		return commandLineOptions
 	}
 	return profileOptions
+}
+
+func excludeFilenames(filenames []string, excludePatterns []string) []string {
+	assertion.Debugf("Exclude patterns: %v\n", excludePatterns)
+	filteredFilenames := []string{}
+	for _, filename := range filenames {
+		if !excludeFilename(filename, excludePatterns) {
+			filteredFilenames = append(filteredFilenames, filename)
+		}
+	}
+	return filteredFilenames
+}
+
+func excludeFilename(filename string, excludePatterns []string) bool {
+	for _, pattern := range excludePatterns {
+		match, _ := filepath.Match(pattern, filename)
+		if match {
+			assertion.Debugf("Excluding file: %s using pattern: %s\n", filename, pattern)
+			return true
+		}
+	}
+	return false
+}
+
+func getFilenames(args []string) []string {
+	filenames := []string{}
+	for _, arg := range args {
+		fi, err := os.Stat(arg)
+		if err != nil {
+			fmt.Printf("Cannot open %s\n", arg)
+			continue
+		}
+		mode := fi.Mode()
+		if mode.IsDir() {
+			filenames = append(filenames, getFilesInDirectory(arg)...)
+		} else {
+			filenames = append(filenames, arg)
+		}
+	}
+	return filenames
+}
+
+func getFilesInDirectory(root string) []string {
+	directoryFiles := []string{}
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			fmt.Printf("Error processing %s: %s\n", path, err)
+			return err
+		}
+		if !info.IsDir() {
+			directoryFiles = append(directoryFiles, path)
+		}
+		return nil
+	})
+	if err != nil {
+		fmt.Printf("Error walking directory %s: %s\n", root, err)
+	}
+	return directoryFiles
 }
