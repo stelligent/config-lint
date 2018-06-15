@@ -2,6 +2,7 @@ package linter
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/ghodss/yaml"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
@@ -87,7 +88,7 @@ func loadVariables(data interface{}) []Variable {
 
 func extractDefault(value interface{}) interface{} {
 	list := value.([]interface{})
-	var defaultValue interface{} = ""
+	var defaultValue interface{}
 	for _, entry := range list {
 		m := entry.(map[string]interface{})
 		defaultValue = m["default"]
@@ -117,15 +118,37 @@ func (l TerraformResourceLoader) Load(filename string) (FileResources, error) {
 	loaded.Variables = result.Variables
 	loaded.Resources = append(loaded.Resources, getResources(filename, result.AST, result.Resources, "resource")...)
 	loaded.Resources = append(loaded.Resources, getResources(filename, result.AST, result.Data, "data")...)
-	loaded.Resources = append(loaded.Resources, getResources(filename, result.AST, normalizeProviders(result.Providers), "provider")...)
+	loaded.Resources = append(loaded.Resources, getResources(filename, result.AST, addIDToProviders(result.Providers), "provider")...)
 	return loaded, nil
 }
 
-func normalizeProviders(provider []interface{}) []interface{} {
-	wrappedProvider := map[string]interface{}{
-		"provider": provider,
+// Providers do not have an name, so generate one to make the data format the same as resources
+
+func addIDToProviders(providers []interface{}) []interface{} {
+	resources := []interface{}{}
+	for _, provider := range providers {
+		resources = append(resources, addIDToProvider(provider))
 	}
-	return []interface{}{wrappedProvider}
+	return resources
+}
+
+func addIDToProvider(provider interface{}) interface{} {
+	m := provider.(map[string]interface{})
+	for providerType, value := range m {
+		m[providerType] = addIDToProviderValue(value)
+	}
+	return m
+}
+
+// Counter used to generate an ID for providers
+var Counter = 0
+
+func addIDToProviderValue(value interface{}) interface{} {
+	Counter++
+	m := map[string]interface{}{}
+	key := fmt.Sprintf("%d", Counter)
+	m[key] = value
+	return []interface{}{m}
 }
 
 func getResources(filename string, ast *ast.File, objects []interface{}, category string) []assertion.Resource {
@@ -154,6 +177,7 @@ func getResources(filename string, ast *ast.File, objects []interface{}, categor
 	return resources
 }
 
+// PostLoad resolves variable expressions
 func (l TerraformResourceLoader) PostLoad(fr FileResources) ([]assertion.Resource, error) {
 	for _, resource := range fr.Resources {
 		resource.Properties = replaceVariables(resource.Properties, fr.Variables)

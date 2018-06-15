@@ -7,10 +7,12 @@ import (
 )
 
 type (
+	// Variable contains a key value pair for expressions in a Terraform configuration file
 	Variable struct {
 		Name  string
 		Value interface{}
 	}
+	// FileResources contains the variables and resources loaded from a collection of files
 	FileResources struct {
 		Resources []assertion.Resource
 		Variables []Variable
@@ -48,7 +50,6 @@ func (fl FileLinter) Validate(ruleSet assertion.RuleSet, options Options) (asser
 			filesScanned = append(filesScanned, filename)
 			loaded, err := fl.Loader.Load(filename)
 			if err != nil {
-				fmt.Printf("Error loading %s: %s\n", filename, err)
 				loadViolations = append(loadViolations, makeLoadViolation(filename, err))
 				continue
 			}

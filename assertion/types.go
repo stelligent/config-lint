@@ -88,6 +88,7 @@ type (
 		RuleID           string
 		ResourceID       string
 		ResourceType     string
+		Category         string
 		Status           string
 		RuleMessage      string
 		AssertionMessage string

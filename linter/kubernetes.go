@@ -50,6 +50,7 @@ func (l KubernetesResourceLoader) Load(filename string) (FileResources, error) {
 	return loaded, nil
 }
 
+// PostLoad does no additional processing for a KubernetesLoader
 func (l KubernetesResourceLoader) PostLoad(r FileResources) ([]assertion.Resource, error) {
 	return r.Resources, nil
 }

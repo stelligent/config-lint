@@ -189,8 +189,8 @@ func TestTerraformProvider(t *testing.T) {
 	if err != nil {
 		t.Error("Expecting TestTerraformProvider to not return an error:" + err.Error())
 	}
-	if len(report.Violations) != 0 {
-		t.Errorf("TestTerraformProvider returned %d violations, expecting 0", len(report.Violations))
+	if len(report.Violations) != 1 {
+		t.Errorf("TestTerraformProvider returned %d violations, expecting 1", len(report.Violations))
 		t.Errorf("Violations: %v", report.Violations)
 	}
 }
@@ -201,7 +201,6 @@ func TestTerraformParseError(t *testing.T) {
 		RuleIDs: []string{},
 	}
 	filenames := []string{
-		"./testdata/resources/terraform_provider.tf",
 		"./testdata/resources/terraform_syntax_error.tf",
 	}
 	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: TerraformResourceLoader{}}

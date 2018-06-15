@@ -52,6 +52,7 @@ func (l RulesResourceLoader) Load(filename string) (FileResources, error) {
 	return loaded, nil
 }
 
+// PostLoad does no additional processinfr for a RulesResourceLoader
 func (l RulesResourceLoader) PostLoad(r FileResources) ([]assertion.Resource, error) {
 	return r.Resources, nil
 }

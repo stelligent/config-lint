@@ -129,6 +129,7 @@ func CheckRule(rule Rule, resource Resource, e ExternalRuleInvoker) (string, []V
 				RuleID:           rule.ID,
 				ResourceID:       resource.ID,
 				ResourceType:     resource.Type,
+				Category:         resource.Category,
 				Status:           expressionResult.Status,
 				RuleMessage:      rule.Message,
 				AssertionMessage: expressionResult.Message,

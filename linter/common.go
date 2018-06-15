@@ -1,11 +1,9 @@
 package linter
 
 import (
-	"fmt"
 	"github.com/ghodss/yaml"
 	"github.com/stelligent/config-lint/assertion"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 )
 
@@ -13,14 +11,12 @@ func loadYAML(filename string) ([]interface{}, error) {
 	empty := []interface{}{}
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, filename, err.Error())
 		return empty, err
 	}
 
 	var yamlData interface{}
 	err = yaml.Unmarshal(content, &yamlData)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, filename, err.Error())
 		return empty, err
 	}
 	m := yamlData.(map[string]interface{})
@@ -32,7 +28,6 @@ func getResourceIDFromFilename(filename string) string {
 	return resourceID
 }
 
-// FIXME move this to the assertion package (along with test)
 // CombineValidationReports merges results from two separate Validate runs
 func CombineValidationReports(r1, r2 assertion.ValidationReport) assertion.ValidationReport {
 	return assertion.ValidationReport{
