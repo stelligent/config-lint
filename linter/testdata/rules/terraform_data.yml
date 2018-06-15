@@ -5,7 +5,7 @@ files:
   - "*.tf"
 rules:
 
-  - id: TEST_1
+  - id: DATA_NOT_CONTAINS
     message: Testing
     resource: template_file
     category: data

@@ -23,9 +23,7 @@ func TestTerraformLinter(t *testing.T) {
 	if len(report.FilesScanned) != 1 {
 		t.Errorf("TestTerraformLinter scanned %d files, expecting 1", len(report.FilesScanned))
 	}
-	if len(report.Violations) != 0 {
-		t.Errorf("TestTerraformLinter returned %d violations, expecting 0", len(report.Violations))
-	}
+	assertViolationsCount("TestTerraformLinter ", 0, report.Violations, t)
 }
 
 func TestTerraformVariables(t *testing.T) {
@@ -75,9 +73,7 @@ func TestTerraformVariablesInDifferentFile(t *testing.T) {
 	if len(report.FilesScanned) != 2 {
 		t.Errorf("TestTerraformVariablesInDifferentFile scanned %d files, expecting 2", len(report.FilesScanned))
 	}
-	if len(report.Violations) != 0 {
-		t.Errorf("TestTerraformVariablesInDifferentFile expecting no violations, found %v", report.Violations)
-	}
+	assertViolationsCount("TestTerraformVariablesInDifferentFile ", 0, report.Violations, t)
 }
 
 type TestingValueSource struct{}
@@ -107,9 +103,7 @@ func TestTerraformPolicies(t *testing.T) {
 	if len(report.FilesScanned) != 1 {
 		t.Errorf("TestTerraformPolicies scanned %d files, expecting 1", len(report.FilesScanned))
 	}
-	if len(report.Violations) != 1 {
-		t.Errorf("TestTerraformPolicies returned %d violations, expecting 1", len(report.Violations))
-	}
+	assertViolationsCount("TestTerraformPolicies ", 1, report.Violations, t)
 }
 
 func TestTerraformPoliciesWithVariables(t *testing.T) {
@@ -124,10 +118,7 @@ func TestTerraformPoliciesWithVariables(t *testing.T) {
 	if err != nil {
 		t.Error("Expecting TestTerraformPoliciesWithVariables to not return an error:" + err.Error())
 	}
-	if len(report.Violations) != 0 {
-		t.Errorf("TestTerraformPoliciesWithVariables returned %d violations, expecting 0", len(report.Violations))
-		t.Errorf("Violations: %v", report.Violations)
-	}
+	assertViolationsCount("TestTerraformPoliciesWithVariables ", 0, report.Violations, t)
 }
 
 func TestTerraformHereDocWithExpression(t *testing.T) {
@@ -142,10 +133,7 @@ func TestTerraformHereDocWithExpression(t *testing.T) {
 	if err != nil {
 		t.Error("Expecting TestTerraformHereDocWithExpression to not return an error:" + err.Error())
 	}
-	if len(report.Violations) != 0 {
-		t.Errorf("TestTerraformPoliciesWithVariables returned %d violations, expecting 0", len(report.Violations))
-		t.Errorf("Violations: %v", report.Violations)
-	}
+	assertViolationsCount("TestTerraformHereDocWithExpression ", 0, report.Violations, t)
 }
 
 func TestTerraformDataLoader(t *testing.T) {
@@ -171,10 +159,8 @@ func TestTerraformDataObject(t *testing.T) {
 	if err != nil {
 		t.Error("Expecting TestTerraformDataObject to not return an error:" + err.Error())
 	}
-	if len(report.Violations) != 1 {
-		t.Errorf("TestTerraformDataObject returned %d violations, expecting 1", len(report.Violations))
-		t.Errorf("Violations: %v", report.Violations)
-	}
+	assertViolationsCount("TestTerraformDataObject", 1, report.Violations, t)
+	assertViolationByRuleID("TestTerraformDataObject", "DATA_NOT_CONTAINS", report.Violations, t)
 }
 
 func TestTerraformProvider(t *testing.T) {
@@ -189,10 +175,8 @@ func TestTerraformProvider(t *testing.T) {
 	if err != nil {
 		t.Error("Expecting TestTerraformProvider to not return an error:" + err.Error())
 	}
-	if len(report.Violations) != 1 {
-		t.Errorf("TestTerraformProvider returned %d violations, expecting 1", len(report.Violations))
-		t.Errorf("Violations: %v", report.Violations)
-	}
+	assertViolationsCount("TestTerraformProvider", 1, report.Violations, t)
+	assertViolationByRuleID("TestTerraformProvider", "AWS_PROVIDER", report.Violations, t)
 }
 
 func TestTerraformParseError(t *testing.T) {
@@ -213,8 +197,5 @@ func TestTerraformParseError(t *testing.T) {
 		t.Errorf("TestTerraformParseError returned %d violations, expecting 1", len(report.Violations))
 		t.Errorf("Violations: %v", report.Violations)
 	}
-	ruleID := report.Violations[0].RuleID
-	if ruleID != "FILE_LOAD" {
-		t.Errorf("TestTerraformParseError returned RuleID = %s, expecting FILE_LOAD", ruleID)
-	}
+	assertViolationByRuleID("TestTerraformParseError", "FILE_LOAD", report.Violations, t)
 }
