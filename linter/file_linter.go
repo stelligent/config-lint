@@ -39,16 +39,20 @@ func (fl FileLinter) Validate(ruleSet assertion.RuleSet, options Options) (asser
 	variables := []Variable{}
 	filesScanned := []string{}
 
+	loadViolations := []assertion.Violation{}
+
 	for _, filename := range fl.Filenames {
 		include, err := assertion.ShouldIncludeFile(ruleSet.Files, filename)
 		if err == nil && include {
 			assertion.Debugf("Processing %s\n", filename)
+			filesScanned = append(filesScanned, filename)
 			loaded, err := fl.Loader.Load(filename)
 			if err != nil {
-				return assertion.ValidationReport{}, err
+				fmt.Printf("Error loading %s: %s\n", filename, err)
+				loadViolations = append(loadViolations, makeLoadViolation(filename, err))
+				continue
 			}
 			assertion.Debugf("Found variables %v\n", loaded.Variables)
-			filesScanned = append(filesScanned, filename)
 			resources = append(resources, loaded.Resources...)
 			variables = append(variables, loaded.Variables...)
 		}
@@ -62,7 +66,20 @@ func (fl FileLinter) Validate(ruleSet assertion.RuleSet, options Options) (asser
 		return report, err
 	}
 	report.FilesScanned = filesScanned
+	report.Violations = append(report.Violations, loadViolations...)
 	return report, nil
+}
+
+func makeLoadViolation(filename string, err error) assertion.Violation {
+	return assertion.Violation{
+		RuleID:           "FILE_LOAD",
+		ResourceID:       filename,
+		ResourceType:     "file",
+		Status:           "FAILURE",
+		RuleMessage:      "Unable to load file",
+		AssertionMessage: err.Error(),
+		Filename:         filename,
+	}
 }
 
 // Search evaluates a JMESPath expression against resources in a collection of filenames

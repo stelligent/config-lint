@@ -194,3 +194,27 @@ func TestTerraformProvider(t *testing.T) {
 		t.Errorf("Violations: %v", report.Violations)
 	}
 }
+
+func TestTerraformParseError(t *testing.T) {
+	options := Options{
+		Tags:    []string{},
+		RuleIDs: []string{},
+	}
+	filenames := []string{
+		"./testdata/resources/terraform_provider.tf",
+		"./testdata/resources/terraform_syntax_error.tf",
+	}
+	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: TerraformResourceLoader{}}
+	ruleSet := loadRulesForTest("./testdata/rules/terraform_provider.yml", t)
+	report, err := linter.Validate(ruleSet, options)
+	if err != nil {
+		t.Error("Expecting TestTerraformParseError to not return an error:" + err.Error())
+	}
+	if len(report.Violations) != 1 {
+		t.Errorf("TestTerraformParseError returned %d violations, expecting 1", len(report.Violations))
+		t.Errorf("Violations: %v", report.Violations)
+	}
+	if report.Violations[0].RuleID != "FILE_LOAD" {
+		t.Errorf("TestTerraformParseError returned RuleID = %s, expecting FILE_LOAD", report.Violations)
+	}
+}
