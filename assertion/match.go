@@ -120,7 +120,9 @@ func isMatch(data interface{}, expression Expression) (MatchResult, error) {
 	case "contains":
 		return contains(data, key, value)
 	case "not-contains":
-		return notContains(data, key, value)
+		return doesNotContain(data, key, value)
+	case "does-not-contain":
+		return doesNotContain(data, key, value)
 	case "regex":
 		re, err := regexp.Compile(value)
 		if err != nil {

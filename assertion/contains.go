@@ -39,7 +39,7 @@ func contains(data interface{}, key, value string) (MatchResult, error) {
 	}
 }
 
-func notContains(data interface{}, key, value string) (MatchResult, error) {
+func doesNotContain(data interface{}, key, value string) (MatchResult, error) {
 	m, err := contains(data, key, value)
 	if err != nil {
 		return matchError(err)

@@ -15,7 +15,7 @@
 | [ne](#ne)                         | Not equal      |
 | [none](#none)                     | None           |
 | [not](#not)                       | Not            |
-| [not-contains](#not-contains)     | Not Contains   |
+| [does-not-contain](#does-not-contain)     | Does Not Contain   |
 | [not-empty](#not-empty)           | Not Empty      |
 | [not-in](#not-in)                 | Not In         |
 | [or](#or)                         | Or             |
@@ -118,7 +118,7 @@ Attribute is not empty
 
 Attribute contains a substring, or array contains an element
 
-## not-contains
+## does-not-contain
 
 Attribute contains a substring, or array contains an element
 
