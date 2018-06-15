@@ -214,7 +214,8 @@ func TestTerraformParseError(t *testing.T) {
 		t.Errorf("TestTerraformParseError returned %d violations, expecting 1", len(report.Violations))
 		t.Errorf("Violations: %v", report.Violations)
 	}
-	if report.Violations[0].RuleID != "FILE_LOAD" {
-		t.Errorf("TestTerraformParseError returned RuleID = %s, expecting FILE_LOAD", report.Violations)
+	ruleID := report.Violations[0].RuleID
+	if ruleID != "FILE_LOAD" {
+		t.Errorf("TestTerraformParseError returned RuleID = %s, expecting FILE_LOAD", ruleID)
 	}
 }
