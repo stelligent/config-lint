@@ -85,57 +85,6 @@ func (s TestingValueSource) GetValue(a assertion.Expression) (string, error) {
 	return a.Value, nil
 }
 
-func TestTerraformPolicies(t *testing.T) {
-	options := Options{
-		Tags:    []string{},
-		RuleIDs: []string{},
-	}
-	filenames := []string{"./testdata/resources/terraform_policy.tf"}
-	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: TerraformResourceLoader{}}
-	ruleSet := loadRulesForTest("./testdata/rules/terraform_policy.yml", t)
-	report, err := linter.Validate(ruleSet, options)
-	if err != nil {
-		t.Error("Expecting TestTerraformPolicies to not return an error")
-	}
-	if len(report.ResourcesScanned) != 1 {
-		t.Errorf("TestTerraformPolicies scanned %d resources, expecting 1", len(report.ResourcesScanned))
-	}
-	if len(report.FilesScanned) != 1 {
-		t.Errorf("TestTerraformPolicies scanned %d files, expecting 1", len(report.FilesScanned))
-	}
-	assertViolationsCount("TestTerraformPolicies ", 1, report.Violations, t)
-}
-
-func TestTerraformPoliciesWithVariables(t *testing.T) {
-	options := Options{
-		Tags:    []string{},
-		RuleIDs: []string{},
-	}
-	filenames := []string{"./testdata/resources/policy_with_variables.tf"}
-	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: TerraformResourceLoader{}}
-	ruleSet := loadRulesForTest("./testdata/rules/policy_variable.yml", t)
-	report, err := linter.Validate(ruleSet, options)
-	if err != nil {
-		t.Error("Expecting TestTerraformPoliciesWithVariables to not return an error:" + err.Error())
-	}
-	assertViolationsCount("TestTerraformPoliciesWithVariables ", 0, report.Violations, t)
-}
-
-func TestTerraformHereDocWithExpression(t *testing.T) {
-	options := Options{
-		Tags:    []string{},
-		RuleIDs: []string{},
-	}
-	filenames := []string{"./testdata/resources/policy_with_expression.tf"}
-	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: TerraformResourceLoader{}}
-	ruleSet := loadRulesForTest("./testdata/rules/policy_variable.yml", t)
-	report, err := linter.Validate(ruleSet, options)
-	if err != nil {
-		t.Error("Expecting TestTerraformHereDocWithExpression to not return an error:" + err.Error())
-	}
-	assertViolationsCount("TestTerraformHereDocWithExpression ", 0, report.Violations, t)
-}
-
 func TestTerraformDataLoader(t *testing.T) {
 	loader := TerraformResourceLoader{}
 	loaded, err := loader.Load("./testdata/resources/terraform_data.tf")
@@ -147,55 +96,73 @@ func TestTerraformDataLoader(t *testing.T) {
 	}
 }
 
-func TestTerraformDataObject(t *testing.T) {
-	options := Options{
-		Tags:    []string{},
-		RuleIDs: []string{},
-	}
-	filenames := []string{"./testdata/resources/terraform_data.tf"}
-	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: TerraformResourceLoader{}}
-	ruleSet := loadRulesForTest("./testdata/rules/terraform_data.yml", t)
-	report, err := linter.Validate(ruleSet, options)
-	if err != nil {
-		t.Error("Expecting TestTerraformDataObject to not return an error:" + err.Error())
-	}
-	assertViolationsCount("TestTerraformDataObject", 1, report.Violations, t)
-	assertViolationByRuleID("TestTerraformDataObject", "DATA_NOT_CONTAINS", report.Violations, t)
+type terraformLinterTestCase struct {
+	ConfigurationFilename   string
+	RulesFilename           string
+	ExpectedViolationCount  int
+	ExpectedViolationRuleID string
 }
 
-func TestTerraformProvider(t *testing.T) {
-	options := Options{
-		Tags:    []string{},
-		RuleIDs: []string{},
+func TestTerraformLinterCases(t *testing.T) {
+	testCases := map[string]terraformLinterTestCase{
+		"ParseError": {
+			"./testdata/resources/terraform_syntax_error.tf",
+			"./testdata/rules/terraform_provider.yml",
+			1,
+			"FILE_LOAD",
+		},
+		"Provider": {
+			"./testdata/resources/terraform_provider.tf",
+			"./testdata/rules/terraform_provider.yml",
+			1,
+			"AWS_PROVIDER",
+		},
+		"DataObject": {
+			"./testdata/resources/terraform_data.tf",
+			"./testdata/rules/terraform_data.yml",
+			1,
+			"DATA_NOT_CONTAINS",
+		},
+		"PoliciesWithVariables": {
+			"./testdata/resources/policy_with_variables.tf",
+			"./testdata/rules/policy_variable.yml",
+			0,
+			"",
+		},
+		"HereDocWithExpression": {
+			"./testdata/resources/policy_with_expression.tf",
+			"./testdata/rules/policy_variable.yml",
+			0,
+			"",
+		},
+		"Policies": {
+			"./testdata/resources/terraform_policy.tf",
+			"./testdata/rules/terraform_policy.yml",
+			1,
+			"TEST_POLICY",
+		},
 	}
-	filenames := []string{"./testdata/resources/terraform_provider.tf"}
-	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: TerraformResourceLoader{}}
-	ruleSet := loadRulesForTest("./testdata/rules/terraform_provider.yml", t)
-	report, err := linter.Validate(ruleSet, options)
-	if err != nil {
-		t.Error("Expecting TestTerraformProvider to not return an error:" + err.Error())
+	for name, tc := range testCases {
+		options := Options{
+			Tags:    []string{},
+			RuleIDs: []string{},
+		}
+		filenames := []string{tc.ConfigurationFilename}
+		linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: TerraformResourceLoader{}}
+		ruleSet := loadRulesForTest(tc.RulesFilename, t)
+		report, err := linter.Validate(ruleSet, options)
+		if err != nil {
+			t.Errorf("Expecting %s to return without an error: %s", name, err.Error())
+		}
+		if len(report.FilesScanned) != 1 {
+			t.Errorf("TestTerraformPolicies scanned %d files, expecting 1", len(report.FilesScanned))
+		}
+		if len(report.Violations) != tc.ExpectedViolationCount {
+			t.Errorf("%s returned %d violations, expecting %d", name, len(report.Violations), tc.ExpectedViolationCount)
+			t.Errorf("Violations: %v", report.Violations)
+		}
+		if tc.ExpectedViolationRuleID != "" {
+			assertViolationByRuleID(name, tc.ExpectedViolationRuleID, report.Violations, t)
+		}
 	}
-	assertViolationsCount("TestTerraformProvider", 1, report.Violations, t)
-	assertViolationByRuleID("TestTerraformProvider", "AWS_PROVIDER", report.Violations, t)
-}
-
-func TestTerraformParseError(t *testing.T) {
-	options := Options{
-		Tags:    []string{},
-		RuleIDs: []string{},
-	}
-	filenames := []string{
-		"./testdata/resources/terraform_syntax_error.tf",
-	}
-	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: TerraformResourceLoader{}}
-	ruleSet := loadRulesForTest("./testdata/rules/terraform_provider.yml", t)
-	report, err := linter.Validate(ruleSet, options)
-	if err != nil {
-		t.Error("Expecting TestTerraformParseError to not return an error:" + err.Error())
-	}
-	if len(report.Violations) != 1 {
-		t.Errorf("TestTerraformParseError returned %d violations, expecting 1", len(report.Violations))
-		t.Errorf("Violations: %v", report.Violations)
-	}
-	assertViolationByRuleID("TestTerraformParseError", "FILE_LOAD", report.Violations, t)
 }
