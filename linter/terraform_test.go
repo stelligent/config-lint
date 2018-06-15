@@ -141,6 +141,18 @@ func TestTerraformLinterCases(t *testing.T) {
 			1,
 			"TEST_POLICY",
 		},
+		"PolicyInvalidJSON": {
+			"./testdata/resources/terraform_policy_invalid_json.tf",
+			"./testdata/rules/terraform_policy.yml",
+			0,
+			"",
+		},
+		"PolicyEmpty": {
+			"./testdata/resources/terraform_policy_empty.tf",
+			"./testdata/rules/terraform_policy.yml",
+			0,
+			"",
+		},
 	}
 	for name, tc := range testCases {
 		options := Options{

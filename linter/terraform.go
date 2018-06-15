@@ -196,8 +196,10 @@ func replaceVariables(templateResource interface{}, variables []Variable) interf
 	switch v := templateResource.(type) {
 	case map[string]interface{}:
 		return replaceVariablesInMap(v, variables)
+	case string:
+		return resolveValue(v, variables)
 	default:
-		assertion.Debugf("replaceVariables cannot process type %T\n", v)
+		assertion.Debugf("replaceVariables cannot process type %T: %v\n", v, v)
 		return templateResource
 	}
 }
@@ -251,9 +253,11 @@ func parsePolicy(resource interface{}) (interface{}, error) {
 		if policyAttribute, hasPolicyString := properties[attribute]; hasPolicyString {
 			if policyString, isString := policyAttribute.(string); isString {
 				var policy interface{}
-				err := json.Unmarshal([]byte(policyString), &policy)
-				if err != nil {
-					return properties, err
+				if policyString != "" {
+					err := json.Unmarshal([]byte(policyString), &policy)
+					if err != nil {
+						assertion.Debugf("Unable to parse '%s' as JSON\n", policyString)
+					}
 				}
 				properties[attribute] = policy
 			}
