@@ -167,7 +167,7 @@ func TestTerraformLinterCases(t *testing.T) {
 			t.Errorf("Expecting %s to return without an error: %s", name, err.Error())
 		}
 		if len(report.FilesScanned) != 1 {
-			t.Errorf("TestTerraformPolicies scanned %d files, expecting 1", len(report.FilesScanned))
+			t.Errorf("TestTerraformLinterCases scanned %d files, expecting 1", len(report.FilesScanned))
 		}
 		if len(report.Violations) != tc.ExpectedViolationCount {
 			t.Errorf("%s returned %d violations, expecting %d", name, len(report.Violations), tc.ExpectedViolationCount)
