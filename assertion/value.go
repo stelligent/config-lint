@@ -39,19 +39,41 @@ func (v StandardValueSource) GetValue(expression Expression) (string, error) {
 
 // GetValueFromS3 looks up external values for an Expression when the S3 protocol is specified
 func (v StandardValueSource) GetValueFromS3(bucket string, key string) (string, error) {
-	region := &aws.Config{Region: aws.String("us-east-1")}
+	region, err := getBucketRegion(bucket)
+	if err != nil {
+		Debugf("Error getting region for bucket: %s\n", err.Error())
+		return "", err
+	}
+
+	config := &aws.Config{Region: aws.String(region)}
 	awsSession := session.New()
-	s3Client := s3.New(awsSession, region)
+	s3Client := s3.New(awsSession, config)
 	response, err := s3Client.GetObject(&s3.GetObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
 	})
 	if err != nil {
+		Debugf("Error reading from S3: %s\n", err.Error())
 		return "", err
 	}
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(response.Body)
-	return strings.TrimSpace(buf.String()), nil
+	value := strings.TrimSpace(buf.String())
+	Debugf("Value from bucket %s key %s in region %s: %s\n", bucket, key, region, value)
+	return value, nil
+}
+
+func getBucketRegion(bucket string) (string, error) {
+	awsSession := session.New()
+	s3Client := s3.New(awsSession)
+	location, err := s3Client.GetBucketLocation(&s3.GetBucketLocationInput{
+		Bucket: aws.String(bucket),
+	})
+	if err != nil {
+		Debugf("Error getting bucket location: %s\n", err.Error())
+		return "us-east-1", err
+	}
+	return *location.LocationConstraint, nil
 }
 
 // GetValueFromHTTP looks up external value for an Expression when the HTTP protocol is specified

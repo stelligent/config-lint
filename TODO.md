@@ -1,6 +1,5 @@
 # TODO
 
-* Region is hard-coded to us-east-1 for GetValueFromS3
 * Use type switch as more idiomatic way to handle multiple types in match.go
 * Use log package for error reporting
 * Deal with a few FIXME comments in code, mostly error handling
