@@ -43,6 +43,7 @@ type (
 func main() {
 	var rulesFilenames arrayFlags
 	var excludePatterns arrayFlags
+	var excludeFromFilenames arrayFlags
 	terraformBuiltInRules := flag.Bool("terraform", false, "Use built-in rules for Terraform")
 	flag.Var(&rulesFilenames, "rules", "Rules file, can be specified multiple times")
 	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
@@ -55,6 +56,7 @@ func main() {
 	versionFlag := flag.Bool("version", false, "Get program version")
 	profileFilename := flag.String("profile", "", "Provide default options")
 	flag.Var(&excludePatterns, "exclude", "Filename patterns to exclude")
+	flag.Var(&excludeFromFilenames, "exclude-from", "Filename containing patterns to exclude")
 	debug := flag.Bool("debug", false, "Debug logging")
 
 	flag.Parse()
@@ -83,13 +85,19 @@ func main() {
 	configFilenames := loadFilenames(flag.Args(), profileOptions.Files)
 	useTerraformBuiltInRules := *terraformBuiltInRules || profileOptions.Terraform
 
+	allExcludePatterns, err := loadExcludePatterns(excludePatterns, excludeFromFilenames)
+	if err != nil {
+		fmt.Printf("Unable to load exclude patterns: %s\n", err)
+		return
+	}
+
 	linterOptions := LinterOptions{
 		Tags:             makeTagList(*tags, profileOptions.Tags),
 		RuleIDs:          makeRulesList(*ids, profileOptions.IDs),
 		IgnoreRuleIDs:    makeRulesList(*ignoreIds, profileOptions.IgnoreIDs),
 		QueryExpression:  makeQueryExpression(*queryExpression, *verboseReport, profileOptions.Query),
 		SearchExpression: *searchExpression,
-		ExcludePatterns:  excludePatterns,
+		ExcludePatterns:  allExcludePatterns,
 	}
 	ruleSets, err := loadRuleSets(rulesFilenames)
 	if err != nil {
@@ -318,6 +326,25 @@ func loadFilenames(commandLineOptions []string, profileOptions []string) []strin
 		return commandLineOptions
 	}
 	return profileOptions
+}
+
+func loadExcludePatterns(patterns []string, excludeFromFilenames []string) ([]string, error) {
+	if len(excludeFromFilenames) == 0 {
+		return patterns, nil
+	}
+	for _, filename := range excludeFromFilenames {
+		lines, err := ioutil.ReadFile(filename)
+		if err != nil {
+			return patterns, err
+		}
+		for _, patternFromFile := range strings.Split(string(lines), "\n") {
+			if patternFromFile != "" {
+				assertion.Debugf("Pattern from file %s: %s\n", filename, patternFromFile)
+				patterns = append(patterns, patternFromFile)
+			}
+		}
+	}
+	return patterns, nil
 }
 
 func excludeFilenames(filenames []string, excludePatterns []string) []string {

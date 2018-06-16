@@ -44,3 +44,20 @@ func TestExcludeMultiplePattern(t *testing.T) {
 		t.Errorf("Expecting two files to be excluded, but files are %v", filtered)
 	}
 }
+
+func TestExcludeFrom(t *testing.T) {
+	excludeFromFilenames := []string{"./testdata/exclude-list"}
+	patterns, err := loadExcludePatterns([]string{}, excludeFromFilenames)
+	if err != nil {
+		t.Errorf("Expecting loadExcludePatterns returned error: %s", err.Error())
+	}
+	if len(patterns) != 2 {
+		t.Errorf("Expecting to load 2 patterns from excludeFromFilenames, not %v", patterns)
+	}
+	if patterns[0] != "*1.tf" {
+		t.Errorf("Expecting first pattern from file to be '*1.tf', not '%s'", patterns[0])
+	}
+	if patterns[1] != "*2.tf" {
+		t.Errorf("Expecting second pattern from file to be '*2.tf', not '%s'", patterns[1])
+	}
+}
