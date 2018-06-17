@@ -2,6 +2,7 @@ package assertion
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -41,8 +42,8 @@ func (v StandardValueSource) GetValue(expression Expression) (string, error) {
 func (v StandardValueSource) GetValueFromS3(bucket string, key string) (string, error) {
 	region, err := getBucketRegion(bucket)
 	if err != nil {
-		Debugf("Error getting region for bucket: %s\n", err.Error())
-		return "", err
+		message := fmt.Sprintf("Cannot get region for bucket %s: %s", bucket, err.Error())
+		return "", errors.New(message)
 	}
 
 	config := &aws.Config{Region: aws.String(region)}
@@ -53,8 +54,8 @@ func (v StandardValueSource) GetValueFromS3(bucket string, key string) (string, 
 		Key:    aws.String(key),
 	})
 	if err != nil {
-		Debugf("Error reading from S3: %s\n", err.Error())
-		return "", err
+		message := fmt.Sprintf("Cannot read bucket %s key %s: %s", bucket, key, err.Error())
+		return "", errors.New(message)
 	}
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(response.Body)
@@ -70,7 +71,6 @@ func getBucketRegion(bucket string) (string, error) {
 		Bucket: aws.String(bucket),
 	})
 	if err != nil {
-		Debugf("Error getting bucket location: %s\n", err.Error())
 		return "us-east-1", err
 	}
 	return *location.LocationConstraint, nil

@@ -17,7 +17,8 @@ func (r ResourceLinter) ValidateResources(resources []assertion.Resource, rules 
 		Violations:       []assertion.Violation{},
 	}
 
-	resolvedRules := assertion.ResolveRules(rules, r.ValueSource)
+	resolvedRules, violations := assertion.ResolveRules(rules, r.ValueSource)
+	report.Violations = append(report.Violations, violations...)
 	externalRules := assertion.StandardExternalRuleInvoker{}
 
 	for _, rule := range resolvedRules {

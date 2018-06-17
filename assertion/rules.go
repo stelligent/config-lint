@@ -77,26 +77,42 @@ func FilterRulesByTagAndID(rules []Rule, tags []string, ruleIds []string, ignore
 }
 
 // ResolveRules loads any dynamic values for a collection or rules
-func ResolveRules(rules []Rule, valueSource ValueSource) []Rule {
-	resolvedRules := make([]Rule, 0)
+func ResolveRules(rules []Rule, valueSource ValueSource) ([]Rule, []Violation) {
+	resolvedRules := []Rule{}
+	violations := []Violation{}
 	for _, rule := range rules {
-		resolvedRules = append(resolvedRules, ResolveRule(rule, valueSource))
+		r, vs := ResolveRule(rule, valueSource)
+		resolvedRules = append(resolvedRules, r)
+		violations = append(violations, vs...)
 	}
-	return resolvedRules
+	return resolvedRules, violations
 }
 
 // ResolveRule loads any dynamic values for a single Rule
-func ResolveRule(rule Rule, valueSource ValueSource) Rule {
+func ResolveRule(rule Rule, valueSource ValueSource) (Rule, []Violation) {
 	resolvedRule := rule
-	resolvedRule.Assertions = make([]Expression, 0)
+	resolvedRule.Assertions = []Expression{}
+	violations := []Violation{}
 	for _, assertion := range rule.Assertions {
-		value, _ := valueSource.GetValue(assertion) // FIXME return error
+		value, err := valueSource.GetValue(assertion)
+		if err != nil {
+			Debugf("ResolveRule error: %s\n", err.Error())
+			violations = append(violations, Violation{
+				Category:         "load",
+				RuleID:           "RULE_RESOLVE",
+				ResourceID:       rule.ID,
+				ResourceType:     "rule",
+				Status:           "FAILURE",
+				RuleMessage:      "Unable to resolve value in rule",
+				AssertionMessage: err.Error(),
+			})
+		}
 		resolvedAssertion := assertion
 		resolvedAssertion.Value = value
 		resolvedAssertion.ValueFrom = ValueFrom{}
 		resolvedRule.Assertions = append(resolvedRule.Assertions, resolvedAssertion)
 	}
-	return resolvedRule
+	return resolvedRule, violations
 }
 
 // CheckRule returns a list of violations for a single Rule applied to a single Resource

@@ -1,11 +1,13 @@
 package assertion
 
 import (
+	"errors"
 	"testing"
 )
 
-type TestValueSource struct {
-}
+// TestValueSource provides test values
+
+type TestValueSource struct{}
 
 func (t TestValueSource) GetValue(expression Expression) (string, error) {
 	if expression.Value != "" {
@@ -17,6 +19,20 @@ func (t TestValueSource) GetValue(expression Expression) (string, error) {
 func testValueSource() ValueSource {
 	return TestValueSource{}
 }
+
+// TestValueSourceWithError simulates errors for value provider
+
+type TestValueSourceWithError struct{}
+
+func (t TestValueSourceWithError) GetValue(expression Expression) (string, error) {
+	return "", errors.New("GET_VALUE_ERROR")
+}
+
+func testValueSourceWithError() ValueSource {
+	return TestValueSourceWithError{}
+}
+
+// MockExternalRuleInvoker simulates invocation of external endpoints to get values
 
 type MockExternalRuleInvoker int
 
@@ -217,7 +233,10 @@ func TestValueFrom(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "m3.medium"},
 		Filename:   "test.tf",
 	}
-	resolved := ResolveRules(rules.Rules, testValueSource())
+	resolved, violations := ResolveRules(rules.Rules, testValueSource())
+	if len(violations) != 0 {
+		t.Errorf("Expecting ResolveRules to return 0 violations: %v", violations)
+	}
 	status, violations, err := CheckRule(resolved[0], resource, mockExternalRuleInvoker())
 	if err != nil {
 		t.Error("Error in CheckRule:" + err.Error())
@@ -227,6 +246,19 @@ func TestValueFrom(t *testing.T) {
 	}
 	if len(violations) != 0 {
 		t.Error("Expecting value_from test to have 0 violations")
+	}
+}
+
+func TestResolveRuleError(t *testing.T) {
+	rules := MustParseRules(ruleWithValueFrom, t)
+	_, violations := ResolveRules(rules.Rules, testValueSourceWithError())
+	if len(violations) != 1 {
+		t.Errorf("Expecting ResolveRules to return 1 violations: %v", violations)
+	} else {
+		ruleID := violations[0].RuleID
+		if ruleID != "RULE_RESOLVE" {
+			t.Errorf("Expected RULE_RESOLVE violation, not %s", ruleID)
+		}
 	}
 }
 
@@ -247,7 +279,7 @@ func TestInvoke(t *testing.T) {
 		Properties: map[string]interface{}{"instance_type": "m3.medium"},
 		Filename:   "test.tf",
 	}
-	resolved := ResolveRules(rules.Rules, testValueSource())
+	resolved, _ := ResolveRules(rules.Rules, testValueSource())
 	counter := mockExternalRuleInvoker()
 	CheckRule(resolved[0], resource, counter)
 	if *counter != 1 {
