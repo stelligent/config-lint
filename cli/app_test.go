@@ -61,3 +61,30 @@ func TestExcludeFrom(t *testing.T) {
 		t.Errorf("Expecting second pattern from file to be '*2.tf', not '%s'", patterns[1])
 	}
 }
+
+func TestProfileExceptions(t *testing.T) {
+	filenames := []string{"./testdata/terraform.yml"}
+	ruleSets, err := loadRuleSets(filenames)
+	if err != nil {
+		t.Errorf("Expecting loadRuleSets to not return error: %s", err.Error())
+	}
+	profileExceptions := []RuleException{
+		{
+			RuleID:           "RULE_1",
+			ResourceCategory: "resource",
+			ResourceType:     "aws_instance",
+			Comments:         "Testing",
+			ResourceID:       "my-special-resource",
+		},
+	}
+	ruleSets = addExceptions(ruleSets, profileExceptions)
+	ruleExceptions := ruleSets[0].Rules[0].Except
+	if len(ruleExceptions) != 1 {
+		t.Errorf("Expecting Rule.Except to have one ID: %v", ruleExceptions)
+		return
+	}
+	id := ruleExceptions[0]
+	if id != "my-special-resource" {
+		t.Errorf("Unexpected ResourceID found in Except: %s", id)
+	}
+}

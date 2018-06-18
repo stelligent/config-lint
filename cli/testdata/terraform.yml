@@ -1,0 +1,16 @@
+version: 1
+description: Rules for Terraform configuration files
+type: Terraform
+files:
+  - "*.tf"
+rules:
+
+  - id: RULE_1
+    message: Instance type should be t2.micro or m3.medium
+    resource: aws_instance
+    #category: resource
+    assertions:
+      - key: instance_type
+        op: in
+        value: t2.micro,m3.medium
+    severity: FAILURE

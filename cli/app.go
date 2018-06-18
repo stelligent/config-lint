@@ -29,13 +29,23 @@ type (
 
 	// ProjectOptions for default options from a project file
 	ProjectOptions struct {
-		Rules     []string
-		IDs       []string
-		IgnoreIDs []string `json:"ignore_ids"`
-		Tags      []string
-		Query     string
-		Files     []string
-		Terraform bool
+		Rules      []string
+		IDs        []string
+		IgnoreIDs  []string `json:"ignore_ids"`
+		Tags       []string
+		Query      string
+		Files      []string
+		Terraform  bool
+		Exceptions []RuleException
+	}
+
+	// RuleException optional list allowing a project to ignore specific rules for specific resources
+	RuleException struct {
+		RuleID           string
+		ResourceCategory string
+		ResourceType     string
+		ResourceID       string
+		Comments         string
 	}
 )
 
@@ -104,6 +114,7 @@ func main() {
 		fmt.Printf("Failed to load rules: %v\n", err)
 		return
 	}
+	ruleSets = addExceptions(ruleSets, profileOptions.Exceptions)
 	if useTerraformBuiltInRules {
 		builtInRuleSet, err := loadBuiltInRuleSet("assets/terraform.yml")
 		if err != nil {
@@ -113,6 +124,30 @@ func main() {
 		ruleSets = append(ruleSets, builtInRuleSet)
 	}
 	applyRules(ruleSets, configFilenames, linterOptions)
+}
+
+func addExceptions(ruleSets []assertion.RuleSet, exceptions []RuleException) []assertion.RuleSet {
+	sets := []assertion.RuleSet{}
+	for _, ruleSet := range ruleSets {
+		sets = append(sets, addExceptionsToRuleSet(ruleSet, exceptions))
+	}
+	return sets
+}
+
+func addExceptionsToRuleSet(ruleSet assertion.RuleSet, exceptions []RuleException) assertion.RuleSet {
+	rules := []assertion.Rule{}
+	for _, rule := range ruleSet.Rules {
+		for _, e := range exceptions {
+			if rule.ID == e.RuleID &&
+				rule.Resource == e.ResourceType &&
+				(rule.Category == e.ResourceCategory || rule.Category == "") {
+				rule.Except = append(rule.Except, e.ResourceID)
+			}
+		}
+		rules = append(rules, rule)
+	}
+	ruleSet.Rules = rules
+	return ruleSet
 }
 
 func validateRules(filenames []string) {
