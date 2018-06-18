@@ -16,12 +16,6 @@ brew install config-lint
 
 Alternatively, you can install manually from the [releases](https://github.com/stelligent/config-lint/releases).
 
-# Build Command Line tool
-
-```
-make all
-```
-
 # Run
 
 The program has a set of built-in rules for scanning the following types of files:
@@ -46,19 +40,19 @@ And also the scanning of information from AWS Descibe API calls for:
 ### Validate Terraform files with built-in rules
 
 ```
-config-lint -terraform example-files/config/*
+config-lint -terraform example-files/config
 ```
 
 ### Validate Terraform files with custom rules
 
 ```
-config-lint -rules examples-files/rules/terraform.yml example-files/config/*
+config-lint -rules examples-files/rules/terraform.yml example-files/config
 ```
 
 ### Validate Kubernetes files
 
 ```
-config-lint -rules example-files/rules/kubernetes.yml example-files/config/*
+config-lint -rules example-files/rules/kubernetes.yml example-files/config
 ```
 
 ### Validate LintRules files
@@ -66,7 +60,7 @@ config-lint -rules example-files/rules/kubernetes.yml example-files/config/*
 This type of linting allows the tool to lint its own rules.
 
 ```
-config-lint -rules example-files/rules/lint-rules.yml example-files/rules/*
+config-lint -rules example-files/rules/lint-rules.yml example-files/rules
 ```
 
 ### Validate Existing Security Groups
@@ -121,19 +115,35 @@ All values in the profile are optional, and are overriden by anything specified 
 An example profile:
 
 ```
+# A list of files containing rules for linting
 rules:
   - example-files/rules/generic.yml
 
+# A list of files to scan
 files:
   - example-files/config/*.config
 
+# An optional list of rules to check, the default is all rules
 ids:
   - RULE_1
   - RULE_2
 
+# An optional list of tags used to select what rules to apply, the default is all rules
 tags:
   - s3
+
+# A list of resources and rules that should not be applied
+# This is useful if you want to turn off some rules for some resources, especially
+# when using built-in rules
+# (For custom rules files, you can use the Except attribute on a rule)
+exceptions:
+  - RuleID: S3_BUCKET_ACL
+    ResourceCategory: resource
+    ResourceType: aws_s3_bucket
+    ResouceID: simple_website
+    Comments: This bucket hosts a public website
 ```
+
 
 # Developing new rules using --search
 
@@ -150,6 +160,14 @@ This example will scan the example terraform file and print the "ami" attribute 
 If you specify --search, the rules files is only used to determine the type of configuration files.
 The files will *not* be scanned for violations.
 
-# Releasing
+# Development
+
+## Build Command Line tool
+
+```
+make all
+```
+
+## Releasing
 To release a new version, run `make bumpversion` to increment the patch version and push a tag to GitHub to start the release process.
 
