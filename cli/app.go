@@ -163,7 +163,8 @@ func validateRules(filenames []string) {
 	applyRules(ruleSets, filenames, linterOptions)
 }
 
-func loadRuleSets(rulesFilenames arrayFlags) ([]assertion.RuleSet, error) {
+func loadRuleSets(args arrayFlags) ([]assertion.RuleSet, error) {
+	rulesFilenames := yamlFilesOnly(getFilenames(args))
 	ruleSets := []assertion.RuleSet{}
 	for _, rulesFilename := range rulesFilenames {
 		rulesContent, err := ioutil.ReadFile(rulesFilename)
@@ -181,6 +182,18 @@ func loadRuleSets(rulesFilenames arrayFlags) ([]assertion.RuleSet, error) {
 		ruleSets = append(ruleSets, ruleSet)
 	}
 	return ruleSets, nil
+}
+
+func yamlFilesOnly(filenames []string) []string {
+	configFiles := []string{}
+	configPatterns := []string{"*yml", "*.yaml"}
+	for _, filename := range filenames {
+		match, _ := assertion.ShouldIncludeFile(configPatterns, filename)
+		if match {
+			configFiles = append(configFiles, filename)
+		}
+	}
+	return configFiles
 }
 
 func loadBuiltInRuleSet(name string) (assertion.RuleSet, error) {
