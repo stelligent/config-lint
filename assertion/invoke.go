@@ -28,9 +28,11 @@ func makeViolation(rule Rule, resource Resource, message string) Violation {
 		Status:           rule.Severity,
 		ResourceID:       resource.ID,
 		ResourceType:     resource.Type,
+		Category:         resource.Category,
 		Filename:         resource.Filename,
 		RuleMessage:      rule.Message,
 		AssertionMessage: message,
+		CreatedAt:        currentTime(),
 	}
 }
 

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"time"
 )
 
 func unquoted(s string) string {
@@ -112,4 +113,8 @@ func JSONStringify(data interface{}) (string, error) {
 		return "", err
 	}
 	return string(b), nil
+}
+
+func currentTime() string {
+	return time.Now().UTC().Format(time.RFC3339)
 }

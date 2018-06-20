@@ -94,6 +94,7 @@ type (
 		AssertionMessage string
 		Filename         string
 		LineNumber       int
+		CreatedAt        string
 	}
 
 	// ScannedResource has details for each resource scanned

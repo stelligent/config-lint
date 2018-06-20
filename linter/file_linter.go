@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/stelligent/config-lint/assertion"
 	"io"
+	"time"
 )
 
 type (
@@ -76,10 +77,12 @@ func makeLoadViolation(filename string, err error) assertion.Violation {
 		RuleID:           "FILE_LOAD",
 		ResourceID:       filename,
 		ResourceType:     "file",
+		Category:         "load",
 		Status:           "FAILURE",
 		RuleMessage:      "Unable to load file",
 		AssertionMessage: err.Error(),
 		Filename:         filename,
+		CreatedAt:        time.Now().UTC().Format(time.RFC3339),
 	}
 }
 

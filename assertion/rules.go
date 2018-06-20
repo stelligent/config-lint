@@ -105,6 +105,7 @@ func ResolveRule(rule Rule, valueSource ValueSource) (Rule, []Violation) {
 				Status:           "FAILURE",
 				RuleMessage:      "Unable to resolve value in rule",
 				AssertionMessage: err.Error(),
+				CreatedAt:        currentTime(),
 			})
 		}
 		resolvedAssertion := assertion
@@ -151,6 +152,7 @@ func CheckRule(rule Rule, resource Resource, e ExternalRuleInvoker) (string, []V
 				AssertionMessage: expressionResult.Message,
 				Filename:         resource.Filename,
 				LineNumber:       resource.LineNumber,
+				CreatedAt:        currentTime(),
 			}
 			violations = append(violations, v)
 		}
