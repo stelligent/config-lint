@@ -38,6 +38,7 @@ type (
 		Files      []string
 		Terraform  bool
 		Exceptions []RuleException
+		Variables  map[string]string
 	}
 
 	// RuleException optional list allowing a project to ignore specific rules for specific resources
@@ -111,7 +112,7 @@ func main() {
 		QueryExpression:  makeQueryExpression(*queryExpression, *verboseReport, profileOptions.Query),
 		SearchExpression: *searchExpression,
 		ExcludePatterns:  allExcludePatterns,
-		Variables:        parseVariables(variables),
+		Variables:        mergeVariables(profileOptions.Variables, parseVariables(variables)),
 	}
 	ruleSets, err := loadRuleSets(rulesFilenames)
 	if err != nil {
@@ -469,4 +470,17 @@ func parseVariables(vars []string) map[string]string {
 		}
 	}
 	return m
+}
+
+func mergeVariables(a, b map[string]string) map[string]string {
+	if a == nil {
+		return b
+	}
+	if b == nil {
+		return map[string]string{}
+	}
+	for k, v := range b {
+		a[k] = v
+	}
+	return a
 }
