@@ -22,9 +22,8 @@ type (
 )
 
 // NewLinter create the right kind of Linter based on the type argument
-func NewLinter(ruleSet assertion.RuleSet, filenames []string) (Linter, error) {
+func NewLinter(ruleSet assertion.RuleSet, vs assertion.ValueSource, filenames []string) (Linter, error) {
 	assertion.Debugf("Filenames to scan: %v\n", filenames)
-	vs := assertion.StandardValueSource{}
 	switch ruleSet.Type {
 	case "Kubernetes":
 		return FileLinter{Filenames: filenames, ValueSource: vs, Loader: KubernetesResourceLoader{}}, nil

@@ -1,6 +1,7 @@
 package linter
 
 import (
+	"github.com/stelligent/config-lint/assertion"
 	"reflect"
 	"testing"
 )
@@ -21,9 +22,10 @@ func TestNewLinter(t *testing.T) {
 		{"./testdata/rules/rules.yml", "FileLinter"},
 	}
 
+	vs := MockValueSource{}
 	for _, tc := range testCases {
 		ruleSet := loadRulesForTest(tc.Filename, t)
-		l, err := NewLinter(ruleSet, []string{})
+		l, err := NewLinter(ruleSet, vs, []string{})
 		if err != nil {
 			t.Errorf("Expecting TestNewLinter to not return an error: %s", err.Error())
 		}
@@ -36,8 +38,15 @@ func TestNewLinter(t *testing.T) {
 
 func TestUnknownLinterType(t *testing.T) {
 	ruleSet := loadRulesForTest("./testdata/rules/unknown.yml", t)
-	_, err := NewLinter(ruleSet, []string{})
+	vs := MockValueSource{}
+	_, err := NewLinter(ruleSet, vs, []string{})
 	if err == nil {
 		t.Errorf("Expecting NewLinter to return an error for unsupported type")
 	}
+}
+
+type MockValueSource struct{}
+
+func (m MockValueSource) GetValue(e assertion.Expression) (string, error) {
+	return "", nil
 }

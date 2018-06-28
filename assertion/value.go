@@ -14,7 +14,9 @@ import (
 )
 
 // StandardValueSource can fetch values from external sources
-type StandardValueSource struct{}
+type StandardValueSource struct {
+	Variables map[string]string
+}
 
 // GetValue looks up external values when an Expression includes a ValueFrom attribute
 func (v StandardValueSource) GetValue(expression Expression) (string, error) {
@@ -34,6 +36,14 @@ func (v StandardValueSource) GetValue(expression Expression) (string, error) {
 		default:
 			return "", fmt.Errorf("Unsupported protocol for value_from: %s", parsedURL.Scheme)
 		}
+	}
+	if expression.ValueFrom.Variable != "" {
+		if value, ok := v.Variables[expression.ValueFrom.Variable]; ok {
+			Debugf("Getting value_from variable %s: %s\n", expression.ValueFrom.Variable, value)
+			return value, nil
+		}
+		Debugf("Getting value_from variable %s not found\n", expression.ValueFrom.Variable)
+		return expression.ValueFrom.Variable, nil // or should this throw an error?
 	}
 	return expression.Value, nil
 }

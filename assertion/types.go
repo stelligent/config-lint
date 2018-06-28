@@ -60,7 +60,8 @@ type (
 
 	// ValueFrom describes a external source for values
 	ValueFrom struct {
-		URL string
+		URL      string
+		Variable string
 	}
 
 	// InvokeRuleAPI describes an external API for linting a resource

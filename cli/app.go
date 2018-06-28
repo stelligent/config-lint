@@ -25,6 +25,7 @@ type (
 		QueryExpression  string
 		SearchExpression string
 		ExcludePatterns  []string
+		Variables        map[string]string
 	}
 
 	// ProjectOptions for default options from a project file
@@ -54,6 +55,7 @@ func main() {
 	var rulesFilenames arrayFlags
 	var excludePatterns arrayFlags
 	var excludeFromFilenames arrayFlags
+	var variables arrayFlags
 	terraformBuiltInRules := flag.Bool("terraform", false, "Use built-in rules for Terraform")
 	flag.Var(&rulesFilenames, "rules", "Rules file, can be specified multiple times")
 	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
@@ -67,6 +69,7 @@ func main() {
 	profileFilename := flag.String("profile", "", "Provide default options")
 	flag.Var(&excludePatterns, "exclude", "Filename patterns to exclude")
 	flag.Var(&excludeFromFilenames, "exclude-from", "Filename containing patterns to exclude")
+	flag.Var(&variables, "var", "Variable values for rules with ValueFrom.Variable")
 	debug := flag.Bool("debug", false, "Debug logging")
 
 	flag.Parse()
@@ -108,6 +111,7 @@ func main() {
 		QueryExpression:  makeQueryExpression(*queryExpression, *verboseReport, profileOptions.Query),
 		SearchExpression: *searchExpression,
 		ExcludePatterns:  allExcludePatterns,
+		Variables:        parseVariables(variables),
 	}
 	ruleSets, err := loadRuleSets(rulesFilenames)
 	if err != nil {
@@ -222,9 +226,10 @@ func applyRules(ruleSets []assertion.RuleSet, args arrayFlags, options LinterOpt
 	}
 
 	filenames := excludeFilenames(getFilenames(args), options.ExcludePatterns)
+	vs := assertion.StandardValueSource{Variables: options.Variables}
 
 	for _, ruleSet := range ruleSets {
-		l, err := linter.NewLinter(ruleSet, filenames)
+		l, err := linter.NewLinter(ruleSet, vs, filenames)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -451,4 +456,17 @@ func getFilesInDirectory(root string) []string {
 		fmt.Printf("Error walking directory %s: %s\n", root, err)
 	}
 	return directoryFiles
+}
+
+func parseVariables(vars []string) map[string]string {
+	m := map[string]string{}
+	for _, kv := range vars {
+		parts := strings.Split(kv, "=")
+		if len(parts) == 2 {
+			m[parts[0]] = parts[1]
+		} else {
+			fmt.Printf("Cannot parse command line variable: %s\n", kv)
+		}
+	}
+	return m
 }

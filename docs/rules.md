@@ -37,7 +37,7 @@ Each expression contains the following attributes:
 |key        | JMES path used to find data in a resource                                          |
 |op         | Operation to perform on the data return. [See here for valid operations](operations.md) |
 |value      | Literal value needed for most operations                                           |
-|value_from | Endpoint for loading values dynamically                                            |
+|value_from | Endpoint for loading values dynamically [See here for dynamic values](value_from.md) |
 
 ## Invoke external API for validation
 
