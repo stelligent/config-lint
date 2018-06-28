@@ -28,8 +28,8 @@ type (
 		Variables        map[string]string
 	}
 
-	// ProjectOptions for default options from a project file
-	ProjectOptions struct {
+	// ProfileOptions for default options from a project file
+	ProfileOptions struct {
 		Rules      []string
 		IDs        []string
 		IgnoreIDs  []string `json:"ignore_ids"`
@@ -49,71 +49,83 @@ type (
 		ResourceID       string
 		Comments         string
 	}
+
+	// CommandLineOptions for collecting options from the command line
+	CommandLineOptions struct {
+		RulesFilenames        arrayFlags
+		ExcludePatterns       arrayFlags
+		ExcludeFromFilenames  arrayFlags
+		Variables             arrayFlags
+		ProfileFilename       *string
+		TerraformBuiltInRules *bool
+		Tags                  *string
+		Ids                   *string
+		IgnoreIds             *string
+		QueryExpression       *string
+		VerboseReport         *bool
+		SearchExpression      *string
+		Validate              *bool
+		Version               *bool
+		Debug                 *bool
+	}
 )
 
 //go:generate go-bindata -pkg $GOPACKAGE -o assets.go assets/
 func main() {
-	var rulesFilenames arrayFlags
-	var excludePatterns arrayFlags
-	var excludeFromFilenames arrayFlags
-	var variables arrayFlags
-	terraformBuiltInRules := flag.Bool("terraform", false, "Use built-in rules for Terraform")
-	flag.Var(&rulesFilenames, "rules", "Rules file, can be specified multiple times")
-	tags := flag.String("tags", "", "Run only tests with tags in this comma separated list")
-	ids := flag.String("ids", "", "Run only the rules in this comma separated list")
-	ignoreIds := flag.String("ignore-ids", "", "Ignore the rules in this comma separated list")
-	queryExpression := flag.String("query", "", "JMESPath expression to query the results")
-	verboseReport := flag.Bool("verbose", false, "Output a verbose report")
-	searchExpression := flag.String("search", "", "JMESPath expression to evaluation against the files")
-	validate := flag.Bool("validate", false, "Validate rules file")
-	versionFlag := flag.Bool("version", false, "Get program version")
-	profileFilename := flag.String("profile", "", "Provide default options")
-	flag.Var(&excludePatterns, "exclude", "Filename patterns to exclude")
-	flag.Var(&excludeFromFilenames, "exclude-from", "Filename containing patterns to exclude")
-	flag.Var(&variables, "var", "Variable values for rules with ValueFrom.Variable")
-	debug := flag.Bool("debug", false, "Debug logging")
+	commandLineOptions := CommandLineOptions{}
+	commandLineOptions.TerraformBuiltInRules = flag.Bool("terraform", false, "Use built-in rules for Terraform")
+	flag.Var(&commandLineOptions.RulesFilenames, "rules", "Rules file, can be specified multiple times")
+	commandLineOptions.Tags = flag.String("tags", "", "Run only tests with tags in this comma separated list")
+	commandLineOptions.Ids = flag.String("ids", "", "Run only the rules in this comma separated list")
+	commandLineOptions.IgnoreIds = flag.String("ignore-ids", "", "Ignore the rules in this comma separated list")
+	commandLineOptions.QueryExpression = flag.String("query", "", "JMESPath expression to query the results")
+	commandLineOptions.VerboseReport = flag.Bool("verbose", false, "Output a verbose report")
+	commandLineOptions.SearchExpression = flag.String("search", "", "JMESPath expression to evaluation against the files")
+	commandLineOptions.Validate = flag.Bool("validate", false, "Validate rules file")
+	commandLineOptions.Version = flag.Bool("version", false, "Get program version")
+	commandLineOptions.ProfileFilename = flag.String("profile", "", "Provide default options")
+	flag.Var(&commandLineOptions.ExcludePatterns, "exclude", "Filename patterns to exclude")
+	flag.Var(&commandLineOptions.ExcludeFromFilenames, "exclude-from", "Filename containing patterns to exclude")
+	flag.Var(&commandLineOptions.Variables, "var", "Variable values for rules with ValueFrom.Variable")
+	commandLineOptions.Debug = flag.Bool("debug", false, "Debug logging")
 
 	flag.Parse()
 
-	if *versionFlag == true {
+	if *commandLineOptions.Version == true {
 		fmt.Println(version)
 		return
 	}
 
-	if *debug == true {
+	if *commandLineOptions.Debug == true {
 		assertion.SetDebug(true)
 	}
 
-	if *validate {
+	if *commandLineOptions.Validate {
 		validateRules(flag.Args())
 		return
 	}
 
-	profileOptions, err := loadProfile(*profileFilename)
+	profileOptions, err := loadProfile(*commandLineOptions.ProfileFilename)
 	if err != nil {
 		fmt.Printf("Error loading profile: %v\n", err)
 		return
 	}
 
-	rulesFilenames = loadFilenames(rulesFilenames, profileOptions.Rules)
+	rulesFilenames := loadFilenames(commandLineOptions.RulesFilenames, profileOptions.Rules)
 	configFilenames := loadFilenames(flag.Args(), profileOptions.Files)
-	useTerraformBuiltInRules := *terraformBuiltInRules || profileOptions.Terraform
+	useTerraformBuiltInRules := *commandLineOptions.TerraformBuiltInRules || profileOptions.Terraform
 
-	allExcludePatterns, err := loadExcludePatterns(excludePatterns, excludeFromFilenames)
 	if err != nil {
 		fmt.Printf("Unable to load exclude patterns: %s\n", err)
 		return
 	}
 
-	linterOptions := LinterOptions{
-		Tags:             makeTagList(*tags, profileOptions.Tags),
-		RuleIDs:          makeRulesList(*ids, profileOptions.IDs),
-		IgnoreRuleIDs:    makeRulesList(*ignoreIds, profileOptions.IgnoreIDs),
-		QueryExpression:  makeQueryExpression(*queryExpression, *verboseReport, profileOptions.Query),
-		SearchExpression: *searchExpression,
-		ExcludePatterns:  allExcludePatterns,
-		Variables:        mergeVariables(profileOptions.Variables, parseVariables(variables)),
+	linterOptions, err := getLinterOptions(commandLineOptions, profileOptions)
+	if err != nil {
+		fmt.Printf("Failed to parse options: %v\n", err)
+		return
 	}
+
 	ruleSets, err := loadRuleSets(rulesFilenames)
 	if err != nil {
 		fmt.Printf("Failed to load rules: %v\n", err)
@@ -286,26 +298,6 @@ func printReport(report assertion.ValidationReport, queryExpression string) erro
 	return nil
 }
 
-func makeTagList(tags string, profileOptions []string) []string {
-	if tags != "" {
-		return strings.Split(tags, ",")
-	}
-	if len(profileOptions) != 0 {
-		return profileOptions
-	}
-	return nil
-}
-
-func makeRulesList(ruleIDs string, profileOptions []string) []string {
-	if ruleIDs != "" {
-		return strings.Split(ruleIDs, ",")
-	}
-	if len(profileOptions) != 0 {
-		return profileOptions
-	}
-	return nil
-}
-
 type arrayFlags []string
 
 func (i *arrayFlags) String() string {
@@ -329,76 +321,11 @@ func generateExitCode(report assertion.ValidationReport) int {
 	return 0
 }
 
-func makeQueryExpression(queryExpression string, verboseReport bool, profileOptions string) string {
-	if queryExpression != "" {
-		return queryExpression
-	}
-	// return complete report when -verbose option is used
-	if verboseReport {
-		return ""
-	}
-	if profileOptions != "" {
-		return profileOptions
-	}
-	// default is to only report Violations
-	return "Violations[]"
-}
-
-func loadProfile(filename string) (ProjectOptions, error) {
-	defaultFilename := "config-lint.yml"
-	var options ProjectOptions
-	if filename == "" {
-		filename = defaultFilename
-	}
-	bb, err := ioutil.ReadFile(filename)
-	if err != nil {
-		if filename == defaultFilename {
-			return options, nil
-		}
-		return options, err
-	}
-	err = yaml.Unmarshal(bb, &options)
-	if err != nil {
-		return options, err
-	}
-	if len(options.Files) > 0 {
-		patterns := options.Files
-		options.Files = []string{}
-		for _, pattern := range patterns {
-			matches, err := filepath.Glob(pattern)
-			if err != nil {
-				return options, err
-			}
-			options.Files = append(options.Files, matches...)
-		}
-	}
-	return options, nil
-}
-
 func loadFilenames(commandLineOptions []string, profileOptions []string) []string {
 	if len(commandLineOptions) > 0 {
 		return commandLineOptions
 	}
 	return profileOptions
-}
-
-func loadExcludePatterns(patterns []string, excludeFromFilenames []string) ([]string, error) {
-	if len(excludeFromFilenames) == 0 {
-		return patterns, nil
-	}
-	for _, filename := range excludeFromFilenames {
-		lines, err := ioutil.ReadFile(filename)
-		if err != nil {
-			return patterns, err
-		}
-		for _, patternFromFile := range strings.Split(string(lines), "\n") {
-			if patternFromFile != "" {
-				assertion.Debugf("Pattern from file %s: %s\n", filename, patternFromFile)
-				patterns = append(patterns, patternFromFile)
-			}
-		}
-	}
-	return patterns, nil
 }
 
 func excludeFilenames(filenames []string, excludePatterns []string) []string {
@@ -457,30 +384,4 @@ func getFilesInDirectory(root string) []string {
 		fmt.Printf("Error walking directory %s: %s\n", root, err)
 	}
 	return directoryFiles
-}
-
-func parseVariables(vars []string) map[string]string {
-	m := map[string]string{}
-	for _, kv := range vars {
-		parts := strings.Split(kv, "=")
-		if len(parts) == 2 {
-			m[parts[0]] = parts[1]
-		} else {
-			fmt.Printf("Cannot parse command line variable: %s\n", kv)
-		}
-	}
-	return m
-}
-
-func mergeVariables(a, b map[string]string) map[string]string {
-	if a == nil {
-		return b
-	}
-	if b == nil {
-		return map[string]string{}
-	}
-	for k, v := range b {
-		a[k] = v
-	}
-	return a
 }
