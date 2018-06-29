@@ -75,3 +75,71 @@ func TestCommandLineOverridesProfile(t *testing.T) {
 		t.Errorf("getLinterOptions should find 4 tags: %v\n", l.Tags)
 	}
 }
+
+func TestCommandLineVariables(t *testing.T) {
+	emptyString := ""
+	verbose := false
+	variables := []string{"namespace=web"}
+	o := CommandLineOptions{
+		Tags:             &emptyString,
+		Ids:              &emptyString,
+		IgnoreIds:        &emptyString,
+		QueryExpression:  &emptyString,
+		SearchExpression: &emptyString,
+		VerboseReport:    &verbose,
+		Variables:        variables,
+	}
+	p := ProfileOptions{}
+	l, err := getLinterOptions(o, p)
+
+	if err != nil {
+		t.Errorf("getLinterOptions should not return error: %s\n", err.Error())
+	}
+	v, ok := l.Variables["namespace"]
+	if !ok {
+		t.Errorf("Expecting namespace variable to have a value\n")
+	} else {
+		if v != "web" {
+			t.Errorf("Expecting namespace variable to be 'web', not '%s'\n", v)
+		}
+	}
+}
+
+func TestMergeVariables(t *testing.T) {
+	emptyString := ""
+	verbose := false
+	variables := []string{"namespace=web"}
+	o := CommandLineOptions{
+		Tags:             &emptyString,
+		Ids:              &emptyString,
+		IgnoreIds:        &emptyString,
+		QueryExpression:  &emptyString,
+		SearchExpression: &emptyString,
+		VerboseReport:    &verbose,
+		Variables:        variables,
+	}
+	p := ProfileOptions{
+		Variables: map[string]string{"kind": "Pod"},
+	}
+	l, err := getLinterOptions(o, p)
+
+	if err != nil {
+		t.Errorf("getLinterOptions should not return error: %s\n", err.Error())
+	}
+	namespace, ok := l.Variables["namespace"]
+	if !ok {
+		t.Errorf("Expecting namespace variable to have a value\n")
+	} else {
+		if namespace != "web" {
+			t.Errorf("Expecting namespace variable to be 'web', not '%s'\n", namespace)
+		}
+	}
+	kind, ok := l.Variables["kind"]
+	if !ok {
+		t.Errorf("Expecting kind variable to have a value\n")
+	} else {
+		if kind != "Pod" {
+			t.Errorf("Expecting kind variable to be 'Pod', not '%s'\n", kind)
+		}
+	}
+}
