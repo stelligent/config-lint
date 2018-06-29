@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -67,29 +66,14 @@ type (
 		Validate              *bool
 		Version               *bool
 		Debug                 *bool
+		Args                  []string
 	}
 )
 
 //go:generate go-bindata -pkg $GOPACKAGE -o assets.go assets/
 func main() {
-	commandLineOptions := CommandLineOptions{}
-	commandLineOptions.TerraformBuiltInRules = flag.Bool("terraform", false, "Use built-in rules for Terraform")
-	flag.Var(&commandLineOptions.RulesFilenames, "rules", "Rules file, can be specified multiple times")
-	commandLineOptions.Tags = flag.String("tags", "", "Run only tests with tags in this comma separated list")
-	commandLineOptions.Ids = flag.String("ids", "", "Run only the rules in this comma separated list")
-	commandLineOptions.IgnoreIds = flag.String("ignore-ids", "", "Ignore the rules in this comma separated list")
-	commandLineOptions.QueryExpression = flag.String("query", "", "JMESPath expression to query the results")
-	commandLineOptions.VerboseReport = flag.Bool("verbose", false, "Output a verbose report")
-	commandLineOptions.SearchExpression = flag.String("search", "", "JMESPath expression to evaluation against the files")
-	commandLineOptions.Validate = flag.Bool("validate", false, "Validate rules file")
-	commandLineOptions.Version = flag.Bool("version", false, "Get program version")
-	commandLineOptions.ProfileFilename = flag.String("profile", "", "Provide default options")
-	flag.Var(&commandLineOptions.ExcludePatterns, "exclude", "Filename patterns to exclude")
-	flag.Var(&commandLineOptions.ExcludeFromFilenames, "exclude-from", "Filename containing patterns to exclude")
-	flag.Var(&commandLineOptions.Variables, "var", "Variable values for rules with ValueFrom.Variable")
-	commandLineOptions.Debug = flag.Bool("debug", false, "Debug logging")
 
-	flag.Parse()
+	commandLineOptions := getCommandLineOptions()
 
 	if *commandLineOptions.Version == true {
 		fmt.Println(version)
@@ -101,7 +85,7 @@ func main() {
 	}
 
 	if *commandLineOptions.Validate {
-		validateRules(flag.Args())
+		validateRules(commandLineOptions.Args)
 		return
 	}
 
@@ -112,7 +96,7 @@ func main() {
 	}
 
 	rulesFilenames := loadFilenames(commandLineOptions.RulesFilenames, profileOptions.Rules)
-	configFilenames := loadFilenames(flag.Args(), profileOptions.Files)
+	configFilenames := loadFilenames(commandLineOptions.Args, profileOptions.Files)
 	useTerraformBuiltInRules := *commandLineOptions.TerraformBuiltInRules || profileOptions.Terraform
 
 	if err != nil {

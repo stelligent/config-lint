@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/ghodss/yaml"
 	"github.com/stelligent/config-lint/assertion"
@@ -8,6 +9,31 @@ import (
 	"path/filepath"
 	"strings"
 )
+
+func getCommandLineOptions() CommandLineOptions {
+
+	commandLineOptions := CommandLineOptions{}
+	commandLineOptions.TerraformBuiltInRules = flag.Bool("terraform", false, "Use built-in rules for Terraform")
+	flag.Var(&commandLineOptions.RulesFilenames, "rules", "Rules file, can be specified multiple times")
+	commandLineOptions.Tags = flag.String("tags", "", "Run only tests with tags in this comma separated list")
+	commandLineOptions.Ids = flag.String("ids", "", "Run only the rules in this comma separated list")
+	commandLineOptions.IgnoreIds = flag.String("ignore-ids", "", "Ignore the rules in this comma separated list")
+	commandLineOptions.QueryExpression = flag.String("query", "", "JMESPath expression to query the results")
+	commandLineOptions.VerboseReport = flag.Bool("verbose", false, "Output a verbose report")
+	commandLineOptions.SearchExpression = flag.String("search", "", "JMESPath expression to evaluation against the files")
+	commandLineOptions.Validate = flag.Bool("validate", false, "Validate rules file")
+	commandLineOptions.Version = flag.Bool("version", false, "Get program version")
+	commandLineOptions.ProfileFilename = flag.String("profile", "", "Provide default options")
+	flag.Var(&commandLineOptions.ExcludePatterns, "exclude", "Filename patterns to exclude")
+	flag.Var(&commandLineOptions.ExcludeFromFilenames, "exclude-from", "Filename containing patterns to exclude")
+	flag.Var(&commandLineOptions.Variables, "var", "Variable values for rules with ValueFrom.Variable")
+	commandLineOptions.Debug = flag.Bool("debug", false, "Debug logging")
+
+	flag.Parse()
+
+	commandLineOptions.Args = flag.Args()
+	return commandLineOptions
+}
 
 func getLinterOptions(o CommandLineOptions, p ProfileOptions) (LinterOptions, error) {
 	allExcludePatterns, err := loadExcludePatterns(o.ExcludePatterns, o.ExcludeFromFilenames)
