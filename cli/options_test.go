@@ -4,18 +4,23 @@ import (
 	"testing"
 )
 
-func TestCommandLineOnlyOptions(t *testing.T) {
-	tags := "1,2,3"
+func emptyCommandLineOptions() CommandLineOptions {
 	emptyString := ""
 	verbose := false
-	o := CommandLineOptions{
-		Tags:             &tags,
+	return CommandLineOptions{
+		Tags:             &emptyString,
 		Ids:              &emptyString,
 		IgnoreIds:        &emptyString,
 		QueryExpression:  &emptyString,
 		SearchExpression: &emptyString,
 		VerboseReport:    &verbose,
 	}
+}
+
+func TestCommandLineOnlyOptions(t *testing.T) {
+	tags := "1,2,3"
+	o := emptyCommandLineOptions()
+	o.Tags = &tags
 	p := ProfileOptions{}
 	l, err := getLinterOptions(o, p)
 
@@ -28,16 +33,7 @@ func TestCommandLineOnlyOptions(t *testing.T) {
 }
 
 func TestProfileOnlyOptions(t *testing.T) {
-	emptyString := ""
-	verbose := false
-	o := CommandLineOptions{
-		Tags:             &emptyString,
-		Ids:              &emptyString,
-		IgnoreIds:        &emptyString,
-		QueryExpression:  &emptyString,
-		SearchExpression: &emptyString,
-		VerboseReport:    &verbose,
-	}
+	o := emptyCommandLineOptions()
 	p := ProfileOptions{
 		Tags: []string{"1", "2", "3"},
 	}
@@ -53,16 +49,8 @@ func TestProfileOnlyOptions(t *testing.T) {
 
 func TestCommandLineOverridesProfile(t *testing.T) {
 	tags := "1,2,3,4"
-	emptyString := ""
-	verbose := false
-	o := CommandLineOptions{
-		Tags:             &tags,
-		Ids:              &emptyString,
-		IgnoreIds:        &emptyString,
-		QueryExpression:  &emptyString,
-		SearchExpression: &emptyString,
-		VerboseReport:    &verbose,
-	}
+	o := emptyCommandLineOptions()
+	o.Tags = &tags
 	p := ProfileOptions{
 		Tags: []string{"1", "2", "3"},
 	}
@@ -77,18 +65,8 @@ func TestCommandLineOverridesProfile(t *testing.T) {
 }
 
 func TestCommandLineVariables(t *testing.T) {
-	emptyString := ""
-	verbose := false
-	variables := []string{"namespace=web"}
-	o := CommandLineOptions{
-		Tags:             &emptyString,
-		Ids:              &emptyString,
-		IgnoreIds:        &emptyString,
-		QueryExpression:  &emptyString,
-		SearchExpression: &emptyString,
-		VerboseReport:    &verbose,
-		Variables:        variables,
-	}
+	o := emptyCommandLineOptions()
+	o.Variables = []string{"namespace=web"}
 	p := ProfileOptions{}
 	l, err := getLinterOptions(o, p)
 
@@ -106,18 +84,8 @@ func TestCommandLineVariables(t *testing.T) {
 }
 
 func TestMergeVariables(t *testing.T) {
-	emptyString := ""
-	verbose := false
-	variables := []string{"namespace=web"}
-	o := CommandLineOptions{
-		Tags:             &emptyString,
-		Ids:              &emptyString,
-		IgnoreIds:        &emptyString,
-		QueryExpression:  &emptyString,
-		SearchExpression: &emptyString,
-		VerboseReport:    &verbose,
-		Variables:        variables,
-	}
+	o := emptyCommandLineOptions()
+	o.Variables = []string{"namespace=web"}
 	p := ProfileOptions{
 		Variables: map[string]string{"kind": "Pod"},
 	}
@@ -141,5 +109,15 @@ func TestMergeVariables(t *testing.T) {
 		if kind != "Pod" {
 			t.Errorf("Expecting kind variable to be 'Pod', not '%s'\n", kind)
 		}
+	}
+}
+
+func TestLoadProfile(t *testing.T) {
+	p, err := loadProfile("./testdata/profile.yml")
+	if err != nil {
+		t.Errorf("Expecting loadProfile to run without error: %v\n", err.Error())
+	}
+	if len(p.Tags) != 1 || p.Tags[0] != "iam" {
+		t.Errorf("Expecting single tag in profile: %v\n", p.Tags)
 	}
 }
