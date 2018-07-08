@@ -3,6 +3,7 @@ package assertion
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -24,15 +25,9 @@ func TestInvokeOK(t *testing.T) {
 	}
 	resource := Resource{}
 	status, violations, err := i.Invoke(rule, resource)
-	if status != "OK" {
-		t.Errorf("Expecting Invoke to return 'OK': %s\n", status)
-	}
-	if len(violations) != 0 {
-		t.Errorf("Expecting Invoke to return no violations: %v\n", violations)
-	}
-	if err != nil {
-		t.Errorf("Expecting Invoke to not return an error: %v\n", err.Error())
-	}
+	assert.Equal(t, "OK", status, "Expecting Invoke to return 'OK'")
+	assert.Equal(t, 0, len(violations), "Expecting Invoke to return no violations")
+	assert.Nil(t, err, "Expecting Invoke to not return an error")
 }
 
 func TestInvokeWithViolations(t *testing.T) {
@@ -42,9 +37,7 @@ func TestInvokeWithViolations(t *testing.T) {
 		},
 	}
 	jsonData, err := json.Marshal(response)
-	if err != nil {
-		t.Errorf("Failed to marshal test response: %v\n", err.Error())
-	}
+	assert.Nil(t, err, "Failed to marshal test response")
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, string(jsonData))
 	}))
@@ -59,15 +52,9 @@ func TestInvokeWithViolations(t *testing.T) {
 	}
 	resource := Resource{}
 	status, violations, err := i.Invoke(rule, resource)
-	if status != "FAILURE" {
-		t.Errorf("Expecting Invoke to return 'OK': %s\n", status)
-	}
-	if len(violations) != 1 {
-		t.Errorf("Expecting Invoke to return 1 violations: %v\n", violations)
-	}
-	if err != nil {
-		t.Errorf("Expecting Invoke to not return an error: %v\n", err.Error())
-	}
+	assert.Equal(t, "FAILURE", status, "Expecting Invoke to return 'FAILURE'")
+	assert.Equal(t, 1, len(violations), "Expecting Invoke to return 1 violation")
+	assert.Nil(t, err, "Expecting Invoke to not return an error")
 }
 
 func TestInvokeSendsMetadata(t *testing.T) {
@@ -89,17 +76,6 @@ func TestInvokeSendsMetadata(t *testing.T) {
 	resource := Resource{
 		Filename: "example.tf",
 	}
-	status, violations, err := i.Invoke(rule, resource)
-	if status != "OK" {
-		t.Errorf("Expecting Invoke to return 'OK': %s\n", status)
-	}
-	if len(violations) != 0 {
-		t.Errorf("Expecting Invoke to return no violations: %v\n", violations)
-	}
-	if err != nil {
-		t.Errorf("Expecting Invoke to not return an error: %v\n", err.Error())
-	}
-	if invokedResource.Filename != resource.Filename {
-		t.Errorf("Expecting filename metadata to be passed to external endpoint: %s != %s\n", resource.Filename, invokedResource.Filename)
-	}
+	i.Invoke(rule, resource)
+	assert.Equal(t, resource.Filename, invokedResource.Filename, "Expecting filename metadata in request body")
 }
