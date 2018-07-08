@@ -1,23 +1,25 @@
 package assertion
 
 import (
-	"gopkg.in/h2non/gock.v1"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
 func TestInvokeOK(t *testing.T) {
-	defer gock.Off()
 
-	response := InvokeResponse{}
-	gock.New("http://config-lint.org").
-		Post("/lint").
-		Reply(200).
-		JSON(response)
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "{}")
+	}))
+	defer ts.Close()
 
 	i := StandardExternalRuleInvoker{}
 	rule := Rule{
 		Invoke: InvokeRuleAPI{
-			URL: "http://config-lint.org/lint",
+			URL: ts.URL,
 		},
 	}
 	resource := Resource{}
@@ -34,23 +36,25 @@ func TestInvokeOK(t *testing.T) {
 }
 
 func TestInvokeWithViolations(t *testing.T) {
-	defer gock.Off()
-
 	response := InvokeResponse{
 		Violations: []InvokeViolation{
 			InvokeViolation{Message: "Something is not right"},
 		},
 	}
-	gock.New("http://config-lint.org").
-		Post("/lint").
-		Reply(200).
-		JSON(response)
+	jsonData, err := json.Marshal(response)
+	if err != nil {
+		t.Errorf("Failed to marshal test response: %v\n", err.Error())
+	}
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, string(jsonData))
+	}))
+	defer ts.Close()
 
 	i := StandardExternalRuleInvoker{}
 	rule := Rule{
 		Severity: "FAILURE",
 		Invoke: InvokeRuleAPI{
-			URL: "http://config-lint.org/lint",
+			URL: ts.URL,
 		},
 	}
 	resource := Resource{}
@@ -63,5 +67,39 @@ func TestInvokeWithViolations(t *testing.T) {
 	}
 	if err != nil {
 		t.Errorf("Expecting Invoke to not return an error: %v\n", err.Error())
+	}
+}
+
+func TestInvokeSendsMetadata(t *testing.T) {
+
+	var invokedResource Resource
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, _ := ioutil.ReadAll(r.Body)
+		_ = json.Unmarshal(body, &invokedResource)
+		fmt.Fprintln(w, "{}")
+	}))
+	defer ts.Close()
+
+	i := StandardExternalRuleInvoker{}
+	rule := Rule{
+		Invoke: InvokeRuleAPI{
+			URL: ts.URL,
+		},
+	}
+	resource := Resource{
+		Filename: "example.tf",
+	}
+	status, violations, err := i.Invoke(rule, resource)
+	if status != "OK" {
+		t.Errorf("Expecting Invoke to return 'OK': %s\n", status)
+	}
+	if len(violations) != 0 {
+		t.Errorf("Expecting Invoke to return no violations: %v\n", violations)
+	}
+	if err != nil {
+		t.Errorf("Expecting Invoke to not return an error: %v\n", err.Error())
+	}
+	if invokedResource.Filename != resource.Filename {
+		t.Errorf("Expecting filename metadata to be passed to external endpoint: %s != %s\n", resource.Filename, invokedResource.Filename)
 	}
 }
