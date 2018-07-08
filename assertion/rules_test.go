@@ -271,7 +271,7 @@ var ruleWithInvoke = `Rules:
       url: http://localhost
 `
 
-func TestInvoke(t *testing.T) {
+func TestInvokeRule(t *testing.T) {
 	rules := MustParseRules(ruleWithInvoke, t)
 	resource := Resource{
 		ID:         "a_test_resource",
