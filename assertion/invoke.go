@@ -45,7 +45,8 @@ func makeViolations(rule Rule, resource Resource, message string) []Violation {
 func (e StandardExternalRuleInvoker) Invoke(rule Rule, resource Resource) (string, []Violation, error) {
 	status := "OK"
 	violations := make([]Violation, 0)
-	payload := resource.Properties
+	var payload interface{}
+	payload = resource
 	if rule.Invoke.Payload != "" {
 		p, err := SearchData(rule.Invoke.Payload, resource.Properties)
 		if err != nil {
