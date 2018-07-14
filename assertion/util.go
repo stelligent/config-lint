@@ -99,6 +99,17 @@ func FilterResourcesByType(resources []Resource, resourceType string, resourceCa
 	return filtered
 }
 
+// FilterResourcesByTypes filters a list of resources that match a single resource type
+func FilterResourcesByTypes(resources []Resource, resourceTypes []string, resourceCategory string) []Resource {
+	filtered := make([]Resource, 0)
+	for _, resource := range resources {
+		if SliceContains(resourceTypes, resource.Type) && categoryMatches(resourceCategory, resource.Category) {
+			filtered = append(filtered, resource)
+		}
+	}
+	return filtered
+}
+
 func categoryMatches(c1, c2 string) bool {
 	if c1 == "" || c1 == "*" {
 		return true
@@ -117,4 +128,13 @@ func JSONStringify(data interface{}) (string, error) {
 
 func currentTime() string {
 	return time.Now().UTC().Format(time.RFC3339)
+}
+
+func SliceContains(list []string, value string) bool {
+	for _, item := range list {
+		if item == value {
+			return true
+		}
+	}
+	return false
 }
