@@ -99,7 +99,7 @@ func FilterResourcesByType(resources []Resource, resourceType string, resourceCa
 	return filtered
 }
 
-// FilterResourcesByTypes filters a list of resources that match a single resource type
+// FilterResourcesByTypes filters a list of resources that match a slice of resource types
 func FilterResourcesByTypes(resources []Resource, resourceTypes []string, resourceCategory string) []Resource {
 	filtered := make([]Resource, 0)
 	for _, resource := range resources {
