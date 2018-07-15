@@ -138,3 +138,16 @@ func SliceContains(list []string, value string) bool {
 	}
 	return false
 }
+
+// FilterResourcesForRule returns resources applicable to the given rule
+func FilterResourcesForRule(resources []Resource, rule Rule) []Resource {
+	var filteredResources []Resource
+	if rule.Resource != "" {
+		Debugf("filtering rule resources on Resource string")
+		filteredResources = FilterResourcesByType(resources, rule.Resource, rule.Category)
+	} else {
+		Debugf("filtering rule resources on Resources slice")
+		filteredResources = FilterResourcesByTypes(resources, rule.Resources, rule.Category)
+	}
+	return filteredResources
+}

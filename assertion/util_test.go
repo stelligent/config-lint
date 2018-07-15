@@ -169,3 +169,34 @@ func TestFilterPluralShouldNotHaveUnlistedResources(t *testing.T) {
 		t.Errorf("FilterResourcesByTypes expected to match only %s", strings.Join(resourceTypes, ", "))
 	}
 }
+
+func TestFilterResourcesForRuleSlice(t *testing.T) {
+	resources := []Resource{
+		Resource{Type: "instance", Category: "resource"},
+		Resource{Type: "bucket", Category: "resource"},
+	}
+	rule := Rule{
+		Resources: []string{
+			"instance",
+			"bucket",
+		},
+	}
+	filtered := FilterResourcesForRule(resources, rule)
+	if len(filtered) != 2 {
+		t.Errorf("FilterResourcesForRule expected to return both resource types")
+	}
+}
+
+func TestFilterResourcesForRuleString(t *testing.T) {
+	resources := []Resource{
+		Resource{Type: "instance", Category: "resource"},
+		Resource{Type: "bucket", Category: "resource"},
+	}
+	rule := Rule{
+		Resource: "instance",
+	}
+	filtered := FilterResourcesForRule(resources, rule)
+	if len(filtered) != 1 {
+		t.Errorf("FilterResourcesForRule only expected to return one type")
+	}
+}
