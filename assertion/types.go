@@ -28,6 +28,7 @@ type (
 		Message    string
 		Severity   string
 		Resource   string
+		Resources  []string
 		Category   string // default is "resource", can be "data", "provider" for Terraform
 		Conditions []Expression
 		Assertions []Expression

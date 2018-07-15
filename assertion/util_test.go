@@ -1,6 +1,7 @@
 package assertion
 
 import (
+	"strings"
 	"testing"
 )
 
@@ -127,5 +128,75 @@ func TestFilterShouldMatchCategoryForResources(t *testing.T) {
 	filtered := FilterResourcesByType(resources, "template_file", "data")
 	if len(filtered) != 1 {
 		t.Errorf("FilterResourcesByType expected to match one resource")
+	}
+}
+
+func TestSliceContainsTrue(t *testing.T) {
+	test := []string{"x", "y", "z"}
+	isPresent := SliceContains(test, "x")
+	if isPresent != true {
+		t.Errorf("SliceContains expected to return true when a value is present")
+	}
+}
+
+func TestSliceContainsFalse(t *testing.T) {
+	test := []string{"x", "y", "z"}
+	isPresent := SliceContains(test, "a")
+	if isPresent != false {
+		t.Errorf("SliceContains expected to return false when a value is not present")
+	}
+}
+
+func TestFilterPluralShouldMatchMultipleResources(t *testing.T) {
+	resources := []Resource{
+		Resource{Type: "instance", Category: "resource"},
+		Resource{Type: "bucket", Category: "resource"},
+	}
+	filtered := FilterResourcesByTypes(resources, []string{"instance", "bucket"}, "resource")
+	if len(filtered) != 2 {
+		t.Errorf("FilterResourcesByTypes expected to match multiple types")
+	}
+}
+
+func TestFilterPluralShouldNotHaveUnlistedResources(t *testing.T) {
+	resources := []Resource{
+		Resource{Type: "instance", Category: "resource"},
+		Resource{Type: "bucket", Category: "resource"},
+	}
+	resourceTypes := []string{"instance"}
+	filtered := FilterResourcesByTypes(resources, resourceTypes, "resource")
+	if len(filtered) != 1 {
+		t.Errorf("FilterResourcesByTypes expected to match only %s", strings.Join(resourceTypes, ", "))
+	}
+}
+
+func TestFilterResourcesForRuleSlice(t *testing.T) {
+	resources := []Resource{
+		Resource{Type: "instance", Category: "resource"},
+		Resource{Type: "bucket", Category: "resource"},
+	}
+	rule := Rule{
+		Resources: []string{
+			"instance",
+			"bucket",
+		},
+	}
+	filtered := FilterResourcesForRule(resources, rule)
+	if len(filtered) != 2 {
+		t.Errorf("FilterResourcesForRule expected to return both resource types")
+	}
+}
+
+func TestFilterResourcesForRuleString(t *testing.T) {
+	resources := []Resource{
+		Resource{Type: "instance", Category: "resource"},
+		Resource{Type: "bucket", Category: "resource"},
+	}
+	rule := Rule{
+		Resource: "instance",
+	}
+	filtered := FilterResourcesForRule(resources, rule)
+	if len(filtered) != 1 {
+		t.Errorf("FilterResourcesForRule only expected to return one type")
 	}
 }
