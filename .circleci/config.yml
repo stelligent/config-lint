@@ -8,7 +8,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-pkg-cache
+            - v1-config-lint-cache
       - run: 
           name: Dependencies
           command: make deps
@@ -16,7 +16,7 @@ jobs:
           name: Test
           command: make test
       - save_cache:
-          key: go-pkg-cache
+          key: v1-config-lint-cache
           paths:
             - "/go/pkg"
       - persist_to_workspace:
