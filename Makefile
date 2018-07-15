@@ -17,7 +17,7 @@ deps:
 	#go get "golang.org/x/lint/golint"
 	go get "github.com/fzipp/gocyclo"
 	go get "github.com/stretchr/testify/assert"
-	dep ensure
+	#dep ensure
 
 gen:
 	@echo "=== generating ==="
