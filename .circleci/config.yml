@@ -12,6 +12,12 @@ jobs:
       - run: 
           name: Dependencies
           command: make deps
+      - run:
+          name: Debug git status
+          command: git status
+      - run:
+          name: Debug git diff
+          command: git diff
       - run: 
           name: Test
           command: make test
@@ -29,6 +35,12 @@ jobs:
     steps:
       - attach_workspace:
           at: /go/src/github.com/stelligent/config-lint
+      - run:
+          name: Debug git status
+          command: git status
+      - run:
+          name: Debug git diff
+          command: git diff
       - run:
           name: Release
           command: curl -sL https://git.io/goreleaser | bash
