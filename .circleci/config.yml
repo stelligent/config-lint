@@ -9,6 +9,12 @@ jobs:
       - restore_cache:
           keys:
             - v1-config-lint-cache
+      - run:
+          name: Debug git status before dependencies
+          command: git status
+      - run:
+          name: Debug dep version
+          command: dep version
       - run: 
           name: Dependencies
           command: make deps
@@ -17,7 +23,7 @@ jobs:
           command: git status
       - run:
           name: Debug git diff
-          command: git diff
+          command: git --no-pager diff
       - run: 
           name: Test
           command: make test
@@ -40,7 +46,7 @@ jobs:
           command: git status
       - run:
           name: Debug git diff
-          command: git diff
+          command: git --no-pager diff
       - run:
           name: Release
           command: curl -sL https://git.io/goreleaser | bash
