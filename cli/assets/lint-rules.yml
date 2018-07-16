@@ -68,8 +68,11 @@ rules:
     severity: FAILURE
     resource: LintRule
     assertions:
-      - key: resource
-        op: present
+      - or:
+        - key: resource
+          op: present
+        - key: resources
+          op: present
     tags:
       - resource
 
