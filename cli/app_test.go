@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/stelligent/config-lint/assertion"
+	"github.com/stelligent/config-lint/linter"
 	"testing"
 )
 
@@ -86,5 +88,47 @@ func TestProfileExceptions(t *testing.T) {
 	id := ruleExceptions[0]
 	if id != "my-special-resource" {
 		t.Errorf("Unexpected ResourceID found in Except: %s", id)
+	}
+}
+
+func TestBuiltInTerraformRules(t *testing.T) {
+	ruleSet, err := loadBuiltInRuleSet("assets/lint-rules.yml")
+	if err != nil {
+		t.Errorf("Expecting loadBuiltInRulesSet to not return error: %s", err.Error())
+	}
+	vs := assertion.StandardValueSource{}
+	filenames := []string{"assets/terraform.yml"}
+	l, err := linter.NewLinter(ruleSet, vs, filenames)
+	if err != nil {
+		t.Errorf("Expecting NewLinter to not return error: %s", err.Error())
+	}
+	options := linter.Options{}
+	report, err := l.Validate(ruleSet, options)
+	if err != nil {
+		t.Errorf("Expecting Validate to not return error: %s", err.Error())
+	}
+	if len(report.Violations) != 0 {
+		t.Errorf("Expecting Validate for built in rules to not report any violations: %v", report.Violations)
+	}
+}
+
+func TestBuiltInLinterRules(t *testing.T) {
+	ruleSet, err := loadBuiltInRuleSet("assets/lint-rules.yml")
+	if err != nil {
+		t.Errorf("Expecting loadBuiltInRulesSet to not return error: %s", err.Error())
+	}
+	vs := assertion.StandardValueSource{}
+	filenames := []string{"assets/lint-rules.yml"}
+	l, err := linter.NewLinter(ruleSet, vs, filenames)
+	if err != nil {
+		t.Errorf("Expecting NewLinter to not return error: %s", err.Error())
+	}
+	options := linter.Options{}
+	report, err := l.Validate(ruleSet, options)
+	if err != nil {
+		t.Errorf("Expecting Validate to not return error: %s", err.Error())
+	}
+	if len(report.Violations) != 0 {
+		t.Errorf("Expecting Validate for built in lint-rules to not report any violations: %v", report.Violations)
 	}
 }
