@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/hcl/hcl/parser"
 	"github.com/stelligent/config-lint/assertion"
 	"io/ioutil"
+	"path/filepath"
 	"regexp"
 )
 
@@ -160,6 +161,8 @@ func getResources(filename string, ast *ast.File, objects []interface{}, categor
 					for resourceID, templateResource := range templateResource.(map[string]interface{}) {
 						properties := getProperties(templateResource)
 						lineNumber := getResourceLineNumber(resourceType, resourceID, filename, ast)
+						properties["__file__"] = filename
+						properties["__dir__"] = filepath.Dir(filename)
 						tr := assertion.Resource{
 							ID:         resourceID,
 							Type:       resourceType,

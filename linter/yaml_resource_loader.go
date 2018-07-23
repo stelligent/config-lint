@@ -2,6 +2,7 @@ package linter
 
 import (
 	"github.com/stelligent/config-lint/assertion"
+	"path/filepath"
 )
 
 // YAMLResourceLoader loads a list of Resource objects based on the list of ResourceConfig objects
@@ -37,6 +38,8 @@ func (l YAMLResourceLoader) Load(filename string) (FileResources, error) {
 			if ok {
 				for _, element := range sliceOfProperties {
 					properties := element.(map[string]interface{})
+					properties["__file__"] = filename
+					properties["__dir__"] = filepath.Dir(filename)
 					resource := assertion.Resource{
 						ID:         extractResourceID(resourceConfig.ID, properties),
 						Type:       resourceConfig.Type,

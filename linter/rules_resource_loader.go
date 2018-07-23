@@ -2,6 +2,7 @@ package linter
 
 import (
 	"github.com/stelligent/config-lint/assertion"
+	"path/filepath"
 )
 
 // RulesResourceLoader converts a YAML configuration file into a collection with Resource objects
@@ -40,6 +41,8 @@ func (l RulesResourceLoader) Load(filename string) (FileResources, error) {
 		rules := getAttr(m, "rules", "Rules")
 		for _, rule := range rules {
 			properties := rule.(map[string]interface{})
+			properties["__file__"] = filename
+			properties["__dir__"] = filepath.Dir(filename)
 			ruleResource := assertion.Resource{
 				ID:         properties["id"].(string),
 				Type:       "LintRule",

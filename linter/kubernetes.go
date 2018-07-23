@@ -2,6 +2,7 @@ package linter
 
 import (
 	"github.com/stelligent/config-lint/assertion"
+	"path/filepath"
 )
 
 // KubernetesLinter lints resources in Kubernets YAML files
@@ -32,17 +33,19 @@ func (l KubernetesResourceLoader) Load(filename string) (FileResources, error) {
 		return loaded, err
 	}
 	for _, resource := range yamlResources {
-		m := resource.(map[string]interface{})
+		properties := resource.(map[string]interface{})
 		var resourceID string
-		if name, ok := getResourceIDFromMetadata(m); ok {
+		if name, ok := getResourceIDFromMetadata(properties); ok {
 			resourceID = name
 		} else {
 			resourceID = getResourceIDFromFilename(filename)
 		}
+		properties["__file__"] = filename
+		properties["__dir__"] = filepath.Dir(filename)
 		kr := assertion.Resource{
 			ID:         resourceID,
-			Type:       m["kind"].(string),
-			Properties: m,
+			Type:       properties["kind"].(string),
+			Properties: properties,
 			Filename:   filename,
 		}
 		loaded.Resources = append(loaded.Resources, kr)
