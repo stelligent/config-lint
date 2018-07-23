@@ -107,6 +107,10 @@ func TestIsMatch(t *testing.T) {
 		"isNotTrue":                      {"false", "is-true", "", "", false},
 		"isFalse":                        {"false", "is-false", "", "", true},
 		"isNotFalse":                     {"100", "is-false", "", "", false},
+		"startsWithTrue":                 {"FooBar", "starts-with", "Foo", "", true},
+		"startsWithFalse":                {"FooBar", "starts-with", "Bar", "", false},
+		"endsWithTrue":                   {"FooBar", "ends-with", "Bar", "", true},
+		"endsWithFalse":                  {"FooBar", "ends-with", "Foo", "", false},
 	}
 	for k, tc := range testCases {
 		var m MatchResult

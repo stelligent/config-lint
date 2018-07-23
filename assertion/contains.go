@@ -49,3 +49,27 @@ func doesNotContain(data interface{}, key, value string) (MatchResult, error) {
 	}
 	return matches()
 }
+
+func startsWith(data interface{}, key, prefix string) (MatchResult, error) {
+	switch v := data.(type) {
+	case string:
+		if strings.HasPrefix(v, prefix) {
+			return matches()
+		}
+		return doesNotMatch("%v does not start with %v", key, prefix)
+	default:
+		return doesNotMatch("%v is not a string %v", key, prefix)
+	}
+}
+
+func endsWith(data interface{}, key, suffix string) (MatchResult, error) {
+	switch v := data.(type) {
+	case string:
+		if strings.HasSuffix(v, suffix) {
+			return matches()
+		}
+		return doesNotMatch("%v does not end with %v", key, suffix)
+	default:
+		return doesNotMatch("%v is not a string %v", key, suffix)
+	}
+}

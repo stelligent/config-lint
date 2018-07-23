@@ -123,6 +123,10 @@ func isMatch(data interface{}, expression Expression) (MatchResult, error) {
 		return doesNotContain(data, key, value)
 	case "does-not-contain":
 		return doesNotContain(data, key, value)
+	case "starts-with":
+		return startsWith(data, key, value)
+	case "ends-with":
+		return endsWith(data, key, value)
 	case "regex":
 		re, err := regexp.Compile(value)
 		if err != nil {

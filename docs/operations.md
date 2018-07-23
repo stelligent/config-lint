@@ -2,25 +2,27 @@
 
 | Operation                         | Description    |
 |-----------------------------------|----------------|
-| [and](#and)                       | And            |
 | [absent](#absent)                 | Absent         |
+| [and](#and)                       | And            |
 | [contains](#contains)             | Contains       |
+| [does-not-contain](#does-not-contain)     | Does Not Contain   |
+| [end-with](#end-with)             | Ends With      |
+| [eq](#eq)                         | Equal          |
 | [empty](#empty)                   | Empty          |
 | [every](#every)                   | Every          |
-| [eq](#eq)                         | Equal          |
+| [has-properties](#has-properties) | Has Properties |
 | [in](#in)                         | In             |
 | [is-false](#is-false)             | Is False       |
 | [is-true](#is-true)               | Is True        |
-| [has-properties](#has-properties) | Has Properties |
 | [ne](#ne)                         | Not equal      |
 | [none](#none)                     | None           |
 | [not](#not)                       | Not            |
-| [does-not-contain](#does-not-contain)     | Does Not Contain   |
 | [not-empty](#not-empty)           | Not Empty      |
 | [not-in](#not-in)                 | Not In         |
 | [or](#or)                         | Or             |
 | [present](#present)               | Present        |
 | [regex](#regex)                   | Regex          |
+| [starts-with](#starts-with)       | Starts With    |
 | [some](#some)                     | Some           |
 | [xor](#xor)                       | Xor            |
 
@@ -347,5 +349,43 @@ Example:
     assertions:
        - key: public_access
          op: is-false
+...
+```
+
+## starts-with
+
+Check that a string value starts with a value
+
+Example:
+
+```
+...
+  - id: NAME_PREFIX
+    message: Name should have a certain prefix
+    severity: FAILURE
+    resource: some_resource
+    assertions:
+       - key: name
+         op: starts-with
+         value: Foo
+...
+```
+
+## ends-with
+
+Check that a string value ends with a value
+
+Example:
+
+```
+...
+  - id: NAME_SUFFIX
+    message: Name should have a certain suffix
+    severity: FAILURE
+    resource: some_resource
+    assertions:
+       - key: name
+         op: ends-with
+         value: Resource
 ...
 ```
