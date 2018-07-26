@@ -24,10 +24,14 @@ func (r ResourceLinter) ValidateResources(resources []assertion.Resource, rules 
 	for _, rule := range resolvedRules {
 		assertion.Debugf("Rule: ID: %v Message: %s\n", rule.ID, rule.Message)
 		filteredResources := assertion.FilterResourcesForRule(resources, rule)
+		if len(filteredResources) == 0 {
+			assertion.Debugf("No resources to check\n")
+		}
 		for _, resource := range filteredResources {
 			if assertion.ExcludeResource(rule, resource) {
 				assertion.Debugf("Ignoring resource %s\n", resource.ID)
 			} else {
+				assertion.Debugf("Checking resource %s\n", resource.ID)
 				status, violations, err := assertion.CheckRule(rule, resource, externalRules)
 				if err != nil {
 					return report, nil

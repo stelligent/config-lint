@@ -22,6 +22,7 @@ type (
 		Resources []interface{}
 		Data      []interface{}
 		Providers []interface{}
+		Modules   []interface{}
 		Variables []Variable
 		AST       *ast.File
 	}
@@ -32,6 +33,7 @@ func loadHCL(filename string) (TerraformLoadResult, error) {
 		Resources: []interface{}{},
 		Data:      []interface{}{},
 		Providers: []interface{}{},
+		Modules:   []interface{}{},
 		Variables: []Variable{},
 	}
 	template, err := ioutil.ReadFile(filename)
@@ -67,6 +69,9 @@ func loadHCL(filename string) (TerraformLoadResult, error) {
 	}
 	if m["provider"] != nil {
 		result.Providers = append(result.Providers, m["provider"].([]interface{})...)
+	}
+	if m["module"] != nil {
+		result.Modules = append(result.Modules, m["module"].([]interface{})...)
 	}
 	assertion.Debugf("LoadHCL Variables: %v\n", result.Variables)
 	return result, nil
@@ -120,6 +125,10 @@ func (l TerraformResourceLoader) Load(filename string) (FileResources, error) {
 	loaded.Resources = append(loaded.Resources, getResources(filename, result.AST, result.Resources, "resource")...)
 	loaded.Resources = append(loaded.Resources, getResources(filename, result.AST, result.Data, "data")...)
 	loaded.Resources = append(loaded.Resources, getResources(filename, result.AST, addIDToProviders(result.Providers), "provider")...)
+	loaded.Resources = append(loaded.Resources, getResources(filename, result.AST, addKeyToModules(result.Modules), "module")...)
+
+	assertion.DebugJSON("loaded.Resources", loaded.Resources)
+
 	return loaded, nil
 }
 
@@ -150,6 +159,40 @@ func addIDToProviderValue(value interface{}) interface{} {
 	key := fmt.Sprintf("%d", Counter)
 	m[key] = value
 	return []interface{}{m}
+}
+
+// use the source attribute of modules as the key
+func addKeyToModules(modules []interface{}) []interface{} {
+	resources := map[string]interface{}{}
+	for _, module := range modules {
+		resources = addKeyToModule(resources, module)
+	}
+	return []interface{}{resources}
+}
+
+func addKeyToModule(resources map[string]interface{}, module interface{}) map[string]interface{} {
+	m := module.(map[string]interface{})
+	for moduleName, valueList := range m {
+		a := valueList.([]interface{})
+		for _, value := range a {
+			properties := value.(map[string]interface{})
+			source := properties["source"].(string)
+
+			inner := []interface{}{properties}
+
+			outer := map[string]interface{}{}
+			outer[moduleName] = inner
+
+			existing, ok := resources[source]
+			if ok {
+				list := existing.([]interface{})
+				resources[source] = append(list, outer)
+			} else {
+				resources[source] = []interface{}{outer}
+			}
+		}
+	}
+	return resources
 }
 
 func getResources(filename string, ast *ast.File, objects []interface{}, category string) []assertion.Resource {

@@ -153,6 +153,12 @@ func TestTerraformLinterCases(t *testing.T) {
 			0,
 			"",
 		},
+		"Module": {
+			"./testdata/resources/terraform_module.tf",
+			"./testdata/rules/terraform_module.yml",
+			1,
+			"MODULE_DESCRIPTION",
+		},
 	}
 	for name, tc := range testCases {
 		options := Options{
