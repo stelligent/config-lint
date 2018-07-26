@@ -18,3 +18,12 @@ func Debugf(format string, args ...interface{}) {
 	}
 	fmt.Printf(format, args...)
 }
+
+func DebugJSON(title string, object interface{}) {
+	if isDebug == false {
+		return
+	}
+	s, _ := JSONStringify(object)
+	fmt.Println(title)
+	fmt.Println(s)
+}
