@@ -112,6 +112,16 @@ func isMatch(data interface{}, expression Expression) (MatchResult, error) {
 			return matches()
 		}
 		return doesNotMatch("%v should not be empty", key)
+	case "is-array":
+		if isArray(data) {
+			return matches()
+		}
+		return doesNotMatch("%v should be an array", key)
+	case "is-not-array":
+		if !isArray(data) {
+			return matches()
+		}
+		return doesNotMatch("%v should not be an array", key)
 	case "intersect":
 		if jsonListsIntersect(searchResult, value) {
 			return matches()

@@ -12,7 +12,9 @@
 | [every](#every)                   | Every          |
 | [has-properties](#has-properties) | Has Properties |
 | [in](#in)                         | In             |
+| [is-array](#is-array)             | Is Array       |
 | [is-false](#is-false)             | Is False       |
+| [is-not-array](#is-not-array)     | Is Not Array   |
 | [is-true](#is-true)               | Is True        |
 | [ne](#ne)                         | Not equal      |
 | [none](#none)                     | None           |
@@ -387,5 +389,41 @@ Example:
        - key: name
          op: ends-with
          value: Resource
+...
+```
+
+## is-array
+
+Check that an attribute is an array
+
+Example:
+
+```
+...
+  - id: TAGS_ARRAY
+    message: Tags should be an array
+    severity: FAILURE
+    resource: some_resource
+    assertions:
+       - key: Tags[]
+         op: is-array
+...
+```
+
+## is-not-array
+
+Check that an attribute is not an array
+
+Example:
+
+```
+...
+  - id: DESCRIPTION_NOT_AN_ARRAY
+    message: Description should not be an array
+    severity: FAILURE
+    resource: some_resource
+    assertions:
+       - key: Name
+         op: is-not-array
 ...
 ```

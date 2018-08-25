@@ -111,6 +111,10 @@ func TestIsMatch(t *testing.T) {
 		"startsWithFalse":                {"FooBar", "starts-with", "Bar", "", false},
 		"endsWithTrue":                   {"FooBar", "ends-with", "Bar", "", true},
 		"endsWithFalse":                  {"FooBar", "ends-with", "Foo", "", false},
+		"isArrayTrue":                    {sliceOfTags, "is-array", "", "", true},
+		"isArrayFalse":                   {"Foo", "is-array", "", "", false},
+		"isNotArrayTrue":                 {sliceOfTags, "is-not-array", "", "", false},
+		"isNotArrayFalse":                {"Foo", "is-not-array", "", "", true},
 	}
 	for k, tc := range testCases {
 		var m MatchResult

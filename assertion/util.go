@@ -45,6 +45,21 @@ func isEmpty(data interface{}) bool {
 	}
 }
 
+func isArray(data interface{}) bool {
+	switch data.(type) {
+	case nil:
+		return false
+	case string:
+		return false
+	case []interface{}:
+		return true
+	case []map[string]interface{}:
+		return true
+	default:
+		return false
+	}
+}
+
 func listsIntersect(list1 []string, list2 []string) bool {
 	for _, a := range list1 {
 		for _, b := range list2 {
