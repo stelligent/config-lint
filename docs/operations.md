@@ -19,6 +19,7 @@
 | [ne](#ne)                         | Not equal      |
 | [none](#none)                     | None           |
 | [not](#not)                       | Not            |
+| [not-contains](#does-not-contain) | Does Not Contain |
 | [not-empty](#not-empty)           | Not Empty      |
 | [not-in](#not-in)                 | Not In         |
 | [or](#or)                         | Or             |
@@ -126,9 +127,13 @@ Attribute contains a substring, or array contains an element
 
 Attribute contains a substring, or array contains an element
 
+You can also use the 'not-contains' operator to do the same thing.
+
 ## regex
 
 Attribute matches a regular expression
+
+See [here](https://github.com/google/re2/wiki/Syntax) for regular expression syntax.
 
 ## and
 

@@ -29,7 +29,7 @@ type (
 		Severity   string
 		Resource   string
 		Resources  []string
-		Category   string // default is "resource", can be "data", "provider" for Terraform
+		Category   string // default is "resource", can be "data", "provider", "module" for Terraform
 		Conditions []Expression
 		Assertions []Expression
 		Except     []string
