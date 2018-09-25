@@ -30,7 +30,7 @@ func contains(data interface{}, key, value string) (MatchResult, error) {
 	default:
 		searchResult, err := JSONStringify(data)
 		if err != nil {
-			return matches()
+			return matchError(err)
 		}
 		if strings.Contains(searchResult, value) {
 			return matches()
