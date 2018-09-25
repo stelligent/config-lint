@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/hcl/hcl/parser"
 	"github.com/stelligent/config-lint/assertion"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"regexp"
 )
@@ -85,15 +86,27 @@ func loadVariables(data interface{}) []Variable {
 	list := data.([]interface{})
 	for _, entry := range list {
 		m := entry.(map[string]interface{})
-		for key, value := range m {
-			variables = append(variables, Variable{Name: key, Value: extractDefault(value)})
+		for key, resource := range m {
+			variables = append(variables, Variable{Name: key, Value: getVariableValue(key, resource)})
 		}
 	}
 	return variables
 }
 
-func extractDefault(value interface{}) interface{} {
-	list := value.([]interface{})
+func getVariableValue(key string, resource interface{}) interface{} {
+	value := getVariableFromEnvironment(key)
+	if value != "" {
+		return value
+	}
+	return getVariableDefault(resource)
+}
+
+func getVariableFromEnvironment(key string) interface{} {
+	return os.Getenv("TF_VAR_" + key)
+}
+
+func getVariableDefault(resource interface{}) interface{} {
+	list := resource.([]interface{})
 	var defaultValue interface{}
 	for _, entry := range list {
 		m := entry.(map[string]interface{})

@@ -2,6 +2,7 @@ package linter
 
 import (
 	"github.com/stelligent/config-lint/assertion"
+	"os"
 	"testing"
 )
 
@@ -34,7 +35,7 @@ func TestTerraformVariables(t *testing.T) {
 	}
 	resources, err := loader.PostLoad(loaded)
 	if err != nil {
-		t.Error("Expecting TestTerraformLinter.ReplaceVariables to not return an error")
+		t.Error("Expecting TestTerraformLinter.PostLoad to not return an error")
 	}
 	if len(resources) != 1 {
 		t.Errorf("Expecting to load 1 resources, not %d", len(loaded.Resources))
@@ -50,6 +51,27 @@ func TestTerraformVariables(t *testing.T) {
 	if project != "demo" {
 		t.Errorf("Expected project tag to be 'demo', got: %s", project)
 	}
+}
+
+func TestTerraformVariablesFromEnvironment(t *testing.T) {
+	os.Setenv("TF_VAR_instance_type", "c4.large")
+	loader := TerraformResourceLoader{}
+	loaded, err := loader.Load("./testdata/resources/uses_variables.tf")
+	if err != nil {
+		t.Error("Expecting TestTerraformLinter.Load to not return an error")
+	}
+	resources, err := loader.PostLoad(loaded)
+	if err != nil {
+		t.Error("Expecting TestTerraformLinter.PostLoad to not return an error")
+	}
+	if len(resources) != 1 {
+		t.Errorf("Expecting to load 1 resources, not %d", len(loaded.Resources))
+	}
+	properties := resources[0].Properties.(map[string]interface{})
+	if properties["instance_type"] != "c4.large" {
+		t.Errorf("Unexpected value for variable: %s", properties["instance_type"])
+	}
+	os.Setenv("TF_VAR_instance_type", "")
 }
 
 func TestTerraformVariablesInDifferentFile(t *testing.T) {
