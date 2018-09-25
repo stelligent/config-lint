@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 type (
@@ -256,7 +257,7 @@ func replaceVariables(templateResource interface{}, variables []Variable) interf
 	case map[string]interface{}:
 		return replaceVariablesInMap(v, variables)
 	case string:
-		return resolveValue(v, variables)
+		return interpolate(v, variables)
 	default:
 		assertion.Debugf("replaceVariables cannot process type %T: %v\n", v, v)
 		return templateResource
@@ -267,7 +268,7 @@ func replaceVariablesInMap(templateResource map[string]interface{}, variables []
 	for key, value := range templateResource {
 		switch v := value.(type) {
 		case string:
-			templateResource[key] = resolveValue(v, variables)
+			templateResource[key] = interpolate(v, variables)
 		case map[string]interface{}:
 			templateResource[key] = replaceVariablesInMap(v, variables)
 		case []interface{}:
@@ -287,23 +288,52 @@ func replaceVariablesInList(list []interface{}, variables []Variable) []interfac
 	return result
 }
 
-func resolveValue(s string, variables []Variable) string {
-	pattern := "[$][{]var[.](?P<name>.*)[}]"
-	re, _ := regexp.Compile(pattern)
-	match := re.FindStringSubmatch(s)
-	if len(match) == 0 {
-		return s
+type TerraformAction func(match string, variables []Variable) string
+
+type PatternAction struct {
+	Pattern *regexp.Regexp
+	Func    TerraformAction
+}
+
+func interpolate(s string, variables []Variable) string {
+	var pas = []PatternAction{
+		PatternAction{
+			Pattern: regexp.MustCompile("[$][{]var[.](?P<name>.*)[}]"),
+			Func:    resolveVariable,
+		},
+		PatternAction{
+			Pattern: regexp.MustCompile("[$][{]file[(]\"(?P<filename>.*)\"[)][}]"),
+			Func:    loadFile,
+		},
 	}
+	for _, pa := range pas {
+		match := pa.Pattern.FindStringSubmatch(s)
+		if len(match) > 0 {
+			replacementValue := pa.Func(match[1], variables)
+			assertion.Debugf("Replacing %s with %v\n", s, replacementValue)
+			return pa.Pattern.ReplaceAllString(s, replacementValue)
+		}
+	}
+	return s
+}
+
+func resolveVariable(name string, variables []Variable) string {
 	for _, v := range variables {
-		if v.Name == match[1] {
+		if v.Name == name {
 			if replacementValue, ok := v.Value.(string); ok {
-				assertion.Debugf("Replacing %s with %v\n", s, replacementValue)
-				return re.ReplaceAllString(s, replacementValue)
+				return replacementValue
 			}
 		}
 	}
-	defaultReplacementValue := ""
-	return re.ReplaceAllString(s, defaultReplacementValue)
+	return ""
+}
+
+func loadFile(filename string, variables []Variable) string {
+	b, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(b))
 }
 
 func parsePolicy(resource interface{}) (interface{}, error) {

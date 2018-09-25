@@ -74,6 +74,25 @@ func TestTerraformVariablesFromEnvironment(t *testing.T) {
 	os.Setenv("TF_VAR_instance_type", "")
 }
 
+func TestTerraformFileFunction(t *testing.T) {
+	loader := TerraformResourceLoader{}
+	loaded, err := loader.Load("./testdata/resources/reference_file.tf")
+	if err != nil {
+		t.Error("Expecting TestTerraformFileFunction.Load to not return an error")
+	}
+	resources, err := loader.PostLoad(loaded)
+	if err != nil {
+		t.Error("Expecting TestTerraformFileFunction.PostLoad to not return an error")
+	}
+	if len(resources) != 1 {
+		t.Errorf("Expecting to load 1 resources, not %d", len(loaded.Resources))
+	}
+	properties := resources[0].Properties.(map[string]interface{})
+	if properties["bucket"] != "example" {
+		t.Errorf("Unexpected value for file: %s", properties["bucket"])
+	}
+}
+
 func TestTerraformVariablesInDifferentFile(t *testing.T) {
 	options := Options{
 		Tags:    []string{},
