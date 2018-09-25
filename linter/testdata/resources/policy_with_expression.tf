@@ -1,3 +1,7 @@
+variable "resources" {
+    default = "None"
+}
+
 resource "aws_iam_role" "role_with_variable" {
     name = "non_compliant"
     assume_role_policy = <<EOF

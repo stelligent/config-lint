@@ -11,8 +11,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
-	"strings"
 )
 
 type (
@@ -288,54 +286,6 @@ func replaceVariablesInList(list []interface{}, variables []Variable) []interfac
 	return result
 }
 
-type TerraformAction func(match string, variables []Variable) string
-
-type PatternAction struct {
-	Pattern *regexp.Regexp
-	Func    TerraformAction
-}
-
-func interpolate(s string, variables []Variable) string {
-	var pas = []PatternAction{
-		PatternAction{
-			Pattern: regexp.MustCompile("[$][{]var[.](?P<name>.*)[}]"),
-			Func:    resolveVariable,
-		},
-		PatternAction{
-			Pattern: regexp.MustCompile("[$][{]file[(]\"(?P<filename>.*)\"[)][}]"),
-			Func:    loadFile,
-		},
-	}
-	for _, pa := range pas {
-		match := pa.Pattern.FindStringSubmatch(s)
-		if len(match) > 0 {
-			replacementValue := pa.Func(match[1], variables)
-			assertion.Debugf("Replacing %s with %v\n", s, replacementValue)
-			return pa.Pattern.ReplaceAllString(s, replacementValue)
-		}
-	}
-	return s
-}
-
-func resolveVariable(name string, variables []Variable) string {
-	for _, v := range variables {
-		if v.Name == name {
-			if replacementValue, ok := v.Value.(string); ok {
-				return replacementValue
-			}
-		}
-	}
-	return ""
-}
-
-func loadFile(filename string, variables []Variable) string {
-	b, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return ""
-	}
-	return strings.TrimSpace(string(b))
-}
-
 func parsePolicy(resource interface{}) (interface{}, error) {
 	properties := resource.(map[string]interface{})
 	for _, attribute := range []string{"assume_role_policy", "policy"} {
@@ -346,6 +296,7 @@ func parsePolicy(resource interface{}) (interface{}, error) {
 					err := json.Unmarshal([]byte(policyString), &policy)
 					if err != nil {
 						assertion.Debugf("Unable to parse '%s' as JSON\n", policyString)
+						assertion.Debugf("Error: %v\n", err)
 					}
 				}
 				properties[attribute] = policy

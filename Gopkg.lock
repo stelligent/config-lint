@@ -77,9 +77,32 @@
   revision = "ef8a98b0bbce4a65b5aa4c368430a80ddc533168"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/hil"
+  packages = [
+    ".",
+    "ast",
+    "parser",
+    "scanner"
+  ]
+  revision = "fa9f258a92500514cc8e9c67020487709df92432"
+
+[[projects]]
   name = "github.com/jmespath/go-jmespath"
   packages = ["."]
   revision = "0b12d6b5"
+
+[[projects]]
+  name = "github.com/mitchellh/mapstructure"
+  packages = ["."]
+  revision = "fa473d140ef3c6adf42d6b391fe76707f1f243c8"
+  version = "v1.0.0"
+
+[[projects]]
+  name = "github.com/mitchellh/reflectwalk"
+  packages = ["."]
+  revision = "eecee6c969c02c8cc2ae48e1e269843ae8590796"
+  version = "v1.0.0"
 
 [[projects]]
   name = "github.com/pmezard/go-difflib"
@@ -102,6 +125,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4e699d347965a34499d2b8c955fdbc94656fb0e98c4b47ca39f145121902fc47"
+  inputs-digest = "2a9ba2018ccc5cb0a862d1f5cb488ab957b993369ebdc1d134a2ec661933128d"
   solver-name = "gps-cdcl"
   solver-version = 1
