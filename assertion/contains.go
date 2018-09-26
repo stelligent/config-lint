@@ -4,38 +4,54 @@ import (
 	"strings"
 )
 
-func contains(data interface{}, key, value string) (MatchResult, error) {
-	switch v := data.(type) {
-	case []interface{}:
-		for _, element := range v {
-			if stringElement, isString := element.(string); isString {
-				if stringElement == value {
-					return matches()
-				}
-			}
-		}
-		return doesNotMatch("%v does not contain %v", key, value)
-	case []string:
-		for _, stringElement := range v {
+func interfaceListContains(v []interface{}, key, value string) (MatchResult, error) {
+	for _, element := range v {
+		if stringElement, isString := element.(string); isString {
 			if stringElement == value {
 				return matches()
 			}
 		}
-		return doesNotMatch("%v does not contain %v", key, value)
+	}
+	return doesNotMatch("%v does not contain %v", key, value)
+}
+
+func stringListContains(v []string, key, value string) (MatchResult, error) {
+	for _, stringElement := range v {
+		if stringElement == value {
+			return matches()
+		}
+	}
+	return doesNotMatch("%v does not contain %v", key, value)
+}
+
+func stringContains(v string, key, value string) (MatchResult, error) {
+	if strings.Contains(v, value) {
+		return matches()
+	}
+	return doesNotMatch("%v does not contain %v", key, value)
+}
+
+func defaultContains(data interface{}, key, value string) (MatchResult, error) {
+	searchResult, err := JSONStringify(data)
+	if err != nil {
+		return matchError(err)
+	}
+	if strings.Contains(searchResult, value) {
+		return matches()
+	}
+	return doesNotMatch("%v does not contain %v", key, value)
+}
+
+func contains(data interface{}, key, value string) (MatchResult, error) {
+	switch v := data.(type) {
+	case []interface{}:
+		return interfaceListContains(v, key, value)
+	case []string:
+		return stringListContains(v, key, value)
 	case string:
-		if strings.Contains(v, value) {
-			return matches()
-		}
-		return doesNotMatch("%v does not contain %v", key, value)
+		return stringContains(v, key, value)
 	default:
-		searchResult, err := JSONStringify(data)
-		if err != nil {
-			return matchError(err)
-		}
-		if strings.Contains(searchResult, value) {
-			return matches()
-		}
-		return doesNotMatch("%v does not contain %v", key, value)
+		return defaultContains(v, key, value)
 	}
 }
 
