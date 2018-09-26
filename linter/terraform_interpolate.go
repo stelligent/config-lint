@@ -11,9 +11,11 @@ import (
 func makeVarMap(variables []Variable) map[string]ast.Variable {
 	m := map[string]ast.Variable{}
 	for _, v := range variables {
-		m["var."+v.Name] = ast.Variable{
-			Type:  ast.TypeString,
-			Value: v.Value.(string), // FIXME add error checking
+		if stringValue, ok := v.Value.(string); ok {
+			m["var."+v.Name] = ast.Variable{
+				Type:  ast.TypeString,
+				Value: stringValue,
+			}
 		}
 	}
 	return m
