@@ -577,10 +577,11 @@ rules:
     resource: aws_db_instance
     severity: FAILURE
     assertions:
-      - key: storage_encrypted
-        op: is-true
-      - key: kms_key_id
-        op: present
+      - or:
+        - key: storage_encrypted
+          op: is-true
+        - key: kms_key_id
+          op: present
 
   - id: ELB
     message: ELB checks
