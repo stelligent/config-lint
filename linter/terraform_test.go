@@ -39,6 +39,17 @@ func TestTerraformVariables(t *testing.T) {
 	assert.Equal(t, tag["environment"], "test", "Unexpected value for environment tag")
 }
 
+func TestTerraformLocalVariables(t *testing.T) {
+	loader := TerraformResourceLoader{}
+	loaded, err := loader.Load("./testdata/resources/uses_local_variables.tf")
+	assert.Nil(t, err, "Expecting Load to run without error")
+	resources, err := loader.PostLoad(loaded)
+	assert.Nil(t, err, "Expecting PostLoad to run without error")
+	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
+	properties := resources[0].Properties.(map[string]interface{})
+	assert.Equal(t, "myprojectbucket", properties["name"], "Unexpected value for name attribute")
+}
+
 func TestTerraformVariablesFromEnvironment(t *testing.T) {
 	os.Setenv("TF_VAR_instance_type", "c4.large")
 	loader := TerraformResourceLoader{}

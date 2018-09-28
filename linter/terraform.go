@@ -60,7 +60,7 @@ func loadHCL(filename string) (TerraformLoadResult, error) {
 		return result, err
 	}
 	m := hclData.(map[string]interface{})
-	result.Variables = loadVariables(m["variable"])
+	result.Variables = append(loadVariables(m["variable"]), loadLocalVariables(m["locals"])...)
 	if m["resource"] != nil {
 		result.Resources = append(result.Resources, m["resource"].([]interface{})...)
 	}
@@ -86,10 +86,26 @@ func loadVariables(data interface{}) []Variable {
 	for _, entry := range list {
 		m := entry.(map[string]interface{})
 		for key, resource := range m {
-			variables = append(variables, Variable{Name: key, Value: getVariableValue(key, resource)})
+			variables = append(variables, Variable{Name: "var." + key, Value: getVariableValue(key, resource)})
 		}
 	}
 	return variables
+}
+
+func loadLocalVariables(data interface{}) []Variable {
+	variables := []Variable{}
+	if data == nil {
+		return variables
+	}
+	list := data.([]interface{})
+	for _, entry := range list {
+		m := entry.(map[string]interface{})
+		for key, value := range m {
+			variables = append(variables, Variable{Name: "local." + key, Value: value})
+		}
+	}
+	return variables
+
 }
 
 func getVariableValue(key string, resource interface{}) interface{} {
@@ -105,13 +121,15 @@ func getVariableFromEnvironment(key string) interface{} {
 }
 
 func getVariableDefault(resource interface{}) interface{} {
-	list := resource.([]interface{})
-	var defaultValue interface{}
-	for _, entry := range list {
-		m := entry.(map[string]interface{})
-		defaultValue = m["default"]
+	if list, ok := resource.([]interface{}); ok {
+		var defaultValue interface{}
+		for _, entry := range list {
+			m := entry.(map[string]interface{})
+			defaultValue = m["default"]
+		}
+		return flattenMaps(defaultValue)
 	}
-	return flattenMaps(defaultValue)
+	return ""
 }
 
 func flattenMaps(v interface{}) interface{} {

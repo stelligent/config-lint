@@ -56,7 +56,7 @@ func makeVar(v interface{}) ast.Variable {
 func makeVarMap(variables []Variable) map[string]ast.Variable {
 	m := map[string]ast.Variable{}
 	for _, v := range variables {
-		m["var."+v.Name] = makeVar(v.Value)
+		m[v.Name] = makeVar(v.Value)
 	}
 	return m
 }
