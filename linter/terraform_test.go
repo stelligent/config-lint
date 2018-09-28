@@ -2,6 +2,7 @@ package linter
 
 import (
 	"github.com/stelligent/config-lint/assertion"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
 )
@@ -15,90 +16,51 @@ func TestTerraformLinter(t *testing.T) {
 	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: TerraformResourceLoader{}}
 	ruleSet := loadRulesForTest("./testdata/rules/terraform_instance.yml", t)
 	report, err := linter.Validate(ruleSet, options)
-	if err != nil {
-		t.Error("Expecting TestTerraformLinter to not return an error")
-	}
-	if len(report.ResourcesScanned) != 1 {
-		t.Errorf("TestTerraformLinter scanned %d resources, expecting 1", len(report.ResourcesScanned))
-	}
-	if len(report.FilesScanned) != 1 {
-		t.Errorf("TestTerraformLinter scanned %d files, expecting 1", len(report.FilesScanned))
-	}
+	assert.Nil(t, err, "Expecting Validate to run without error")
+	assert.Equal(t, len(report.ResourcesScanned), 1, "Unexpected number of resources scanned")
+	assert.Equal(t, len(report.FilesScanned), 1, "Unexpected number of files scanned")
 	assertViolationsCount("TestTerraformLinter ", 0, report.Violations, t)
 }
 
 func TestTerraformVariables(t *testing.T) {
 	loader := TerraformResourceLoader{}
 	loaded, err := loader.Load("./testdata/resources/uses_variables.tf")
-	if err != nil {
-		t.Error("Expecting TestTerraformLinter.Load to not return an error")
-	}
+	assert.Nil(t, err, "Expecting Load to run without error")
 	resources, err := loader.PostLoad(loaded)
-	if err != nil {
-		t.Error("Expecting TestTerraformLinter.PostLoad to not return an error")
-	}
-	if len(resources) != 1 {
-		t.Errorf("Expecting to load 1 resources, not %d", len(loaded.Resources))
-	}
+	assert.Nil(t, err, "Expecting PostLoad to run without error")
+	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
 	properties := resources[0].Properties.(map[string]interface{})
-	if properties["ami"] != "ami-f2d3638a" {
-		t.Errorf("Unexpected value for variable: %s", properties["ami"])
-	}
+	assert.Equal(t, properties["ami"], "ami-f2d3638a", "Unxpected value for ami property")
 	// this test covers string, map, and slice cases
 	tags := properties["tags"].([]interface{})
 	tag := tags[0].(map[string]interface{})
-	project := tag["project"].(string)
-	if project != "demo" {
-		t.Errorf("Expected project tag to be 'demo', got: %s", project)
-	}
-	comment := tag["comment"].(string)
-	if comment != "bar" {
-		t.Errorf("Expected project tag to be 'bar', got: %s", comment)
-	}
-	environment := tag["environment"].(string)
-	if environment != "test" {
-		t.Errorf("Expected environment tag to be 'test', got: '%s'", environment)
-	}
+	assert.Equal(t, tag["project"], "demo", "Unexpected value for project tag")
+	assert.Equal(t, tag["comment"], "bar", "Unexpected value for comment tag")
+	assert.Equal(t, tag["environment"], "test", "Unexpected value for environment tag")
 }
 
 func TestTerraformVariablesFromEnvironment(t *testing.T) {
 	os.Setenv("TF_VAR_instance_type", "c4.large")
 	loader := TerraformResourceLoader{}
 	loaded, err := loader.Load("./testdata/resources/uses_variables.tf")
-	if err != nil {
-		t.Error("Expecting TestTerraformLinter.Load to not return an error")
-	}
+	assert.Nil(t, err, "Expecting Load to run without error")
 	resources, err := loader.PostLoad(loaded)
-	if err != nil {
-		t.Error("Expecting TestTerraformLinter.PostLoad to not return an error")
-	}
-	if len(resources) != 1 {
-		t.Errorf("Expecting to load 1 resources, not %d", len(loaded.Resources))
-	}
+	assert.Nil(t, err, "Expecting PostLoad to run without error")
+	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
 	properties := resources[0].Properties.(map[string]interface{})
-	if properties["instance_type"] != "c4.large" {
-		t.Errorf("Unexpected value for variable: %s", properties["instance_type"])
-	}
+	assert.Equal(t, properties["instance_type"], "c4.large", "Unexpected value for instance_type")
 	os.Setenv("TF_VAR_instance_type", "")
 }
 
 func TestTerraformFileFunction(t *testing.T) {
 	loader := TerraformResourceLoader{}
 	loaded, err := loader.Load("./testdata/resources/reference_file.tf")
-	if err != nil {
-		t.Error("Expecting TestTerraformFileFunction.Load to not return an error")
-	}
+	assert.Nil(t, err, "Expecting Load to run without error")
 	resources, err := loader.PostLoad(loaded)
-	if err != nil {
-		t.Error("Expecting TestTerraformFileFunction.PostLoad to not return an error")
-	}
-	if len(resources) != 1 {
-		t.Errorf("Expecting to load 1 resources, not %d", len(loaded.Resources))
-	}
+	assert.Nil(t, err, "Expecting PostLoad to run without error")
+	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
 	properties := resources[0].Properties.(map[string]interface{})
-	if properties["bucket"] != "example" {
-		t.Errorf("Unexpected value for file: %s", properties["bucket"])
-	}
+	assert.Equal(t, properties["bucket"], "example", "Unexpected value for bucket property")
 }
 
 func TestTerraformVariablesInDifferentFile(t *testing.T) {
@@ -113,15 +75,9 @@ func TestTerraformVariablesInDifferentFile(t *testing.T) {
 	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: TerraformResourceLoader{}}
 	ruleSet := loadRulesForTest("./testdata/rules/terraform_instance.yml", t)
 	report, err := linter.Validate(ruleSet, options)
-	if err != nil {
-		t.Error("Expecting TestTerraformVariablesInDifferentFile to not return an error")
-	}
-	if len(report.ResourcesScanned) != 1 {
-		t.Errorf("TestTerraformVariablesInDifferentFile scanned %d resources, expecting 1", len(report.ResourcesScanned))
-	}
-	if len(report.FilesScanned) != 2 {
-		t.Errorf("TestTerraformVariablesInDifferentFile scanned %d files, expecting 2", len(report.FilesScanned))
-	}
+	assert.Nil(t, err, "Expecting Validate to run without error")
+	assert.Equal(t, len(report.ResourcesScanned), 1, "Unexpected number of resources")
+	assert.Equal(t, len(report.FilesScanned), 2, "Unexpected number of files scanned")
 	assertViolationsCount("TestTerraformVariablesInDifferentFile ", 0, report.Violations, t)
 }
 
@@ -137,12 +93,8 @@ func (s TestingValueSource) GetValue(a assertion.Expression) (string, error) {
 func TestTerraformDataLoader(t *testing.T) {
 	loader := TerraformResourceLoader{}
 	loaded, err := loader.Load("./testdata/resources/terraform_data.tf")
-	if err != nil {
-		t.Error("Expecting TestTerraformDataLoader to not return an error")
-	}
-	if len(loaded.Resources) != 1 {
-		t.Errorf("TestTerraformDataLoader scanned %d resources, expecting 1", len(loaded.Resources))
-	}
+	assert.Nil(t, err, "Expecting Load to run without error")
+	assert.Equal(t, len(loaded.Resources), 1, "Unexpected number of resources")
 }
 
 type terraformLinterTestCase struct {
