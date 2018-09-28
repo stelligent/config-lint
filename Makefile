@@ -14,8 +14,7 @@ default: all
 deps:
 	go get "github.com/golang/dep/cmd/dep"
 	go get "github.com/jteeuwen/go-bindata/..."
-	#go get "golang.org/x/lint/golint"
-	go get "github.com/fzipp/gocyclo"
+	go get "golang.org/x/lint/golint"
 	go get "github.com/stretchr/testify/assert"
 	dep ensure -vendor-only
 
@@ -26,9 +25,14 @@ gen:
 lint: gen
 	@echo "=== linting ==="
 	@go vet ./...
-	#@golint $(go list ./... | grep -v /vendor/)
+	@golint $(go list ./... | grep -v /vendor/)
 
-test: lint
+cyclo:
+	@echo "=== cyclomatic complexity ==="
+	@go get "github.com/fzipp/gocyclo"
+	@gocyclo -over 15 assertion linter cli || echo "WARNING: cyclomatic complexity is high"
+
+test: lint cyclo
 	@echo "=== testing ==="
 	@go test ./...
 
