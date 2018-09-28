@@ -51,6 +51,14 @@ func TestTerraformVariables(t *testing.T) {
 	if project != "demo" {
 		t.Errorf("Expected project tag to be 'demo', got: %s", project)
 	}
+	comment := tag["comment"].(string)
+	if comment != "bar" {
+		t.Errorf("Expected project tag to be 'bar', got: %s", comment)
+	}
+	environment := tag["environment"].(string)
+	if environment != "test" {
+		t.Errorf("Expected environment tag to be 'test', got: '%s'", environment)
+	}
 }
 
 func TestTerraformVariablesFromEnvironment(t *testing.T) {

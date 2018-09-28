@@ -111,7 +111,19 @@ func getVariableDefault(resource interface{}) interface{} {
 		m := entry.(map[string]interface{})
 		defaultValue = m["default"]
 	}
-	return defaultValue
+	return flattenMaps(defaultValue)
+}
+
+func flattenMaps(v interface{}) interface{} {
+	// map values are wrapped in an array, WAT?
+	if listValue, ok := v.([]interface{}); ok {
+		if len(listValue) == 1 {
+			if mapValue, ok := listValue[0].(map[string]interface{}); ok {
+				return mapValue
+			}
+		}
+	}
+	return v
 }
 
 func getResourceLineNumber(resourceType, resourceID, filename string, root *ast.File) int {

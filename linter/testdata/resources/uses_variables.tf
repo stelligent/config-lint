@@ -10,10 +10,27 @@ variable "project" {
   default = "demo"
 }
 
+variable "list_variable" {
+  default = [ "foo", "bar" ]
+}
+
+variable "default_tags" {
+  default = {
+    project = "demo"
+    environment = "test"
+  }
+}
+
+variable "environment" {
+  default = "test"
+}
+
 resource "aws_instance" "first" {
   ami = "${var.ami}"
   instance_type = "${var.instance_type}"
   tags = {
     project = "${var.project}"
+    environment = "${lookup(var.default_tags,"environment","dev")}"
+    comment = "${var.list_variable[1]}"
   }
 }
