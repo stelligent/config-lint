@@ -25,6 +25,8 @@ variable "environment" {
   default = "test"
 }
 
+variable "department" {}
+
 resource "aws_instance" "first" {
   ami = "${var.ami}"
   instance_type = "${var.instance_type}"
@@ -32,5 +34,6 @@ resource "aws_instance" "first" {
     project = "${var.project}"
     environment = "${lookup(var.default_tags,"environment","dev")}"
     comment = "${var.list_variable[1]}"
+    department = "${var.department}"
   }
 }
