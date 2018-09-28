@@ -487,20 +487,26 @@ rules:
     resource: aws_ami
     severity: FAILURE
     assertions:
-      - key: ebs_block_device.encrypted
-        op: is-true
-      - key: ebs_block_device.kms_key_id
-        op: present
+      - every:
+         key: ebs_block_device
+         expressions:
+           - key: encrypted
+             op: is-true
+           - key: kms_key_id
+             op: present
 
   - id: AMI_COPY
     message: AMI security checks
     resource: aws_ami_copy
     severity: FAILURE
     assertions:
-      - key: ebs_block_device.encrypted
-        op: is-true
-      - key: ebs_block_device.kms_key_id
-        op: present
+      - every:
+          key: ebs_block_device
+          expressions:
+            - key: encrypted
+              op: is-true
+            - key: kms_key_id
+              op: present
 
   - id: API_GATEWAY_DOMAIN_NAME
     message: API Gateway checks
@@ -516,11 +522,11 @@ rules:
     resource: aws_instance
     severity: FAILURE
     assertions:
-      - or:
-          - key: ebs_block_device
-            op: absent
-          - key: ebs_block_device.encrypted
-            op: is-true
+      - every:
+          key: ebs_block_device
+          expressions:
+            - key: encrypted
+              op: is-true
 
   - id: CLOUDFRONT_DISTRIBUTION
     message: CloudFront Distribution checks
