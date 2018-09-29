@@ -1,0 +1,15 @@
+{
+    "Users": [
+        {
+            "UserName": "admin",
+            "Department": "Cloud"
+        }, 
+        {
+            "UserName": "readonly",
+            "Department": "Audit"
+        }, 
+        {
+            "UserName": "user"
+        } 
+    ]
+}

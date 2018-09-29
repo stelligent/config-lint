@@ -28,6 +28,7 @@ The program can also read files from a separate YAML file, and can scan these ty
 * Kubernetes
 * LintRules
 * YAML
+* JSON
 
 And also the scanning of information from AWS Descibe API calls for:
 

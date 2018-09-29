@@ -1,0 +1,16 @@
+version: 1
+description: Rules for users in a JSON file
+type: JSON
+
+resources:
+  - type: User
+    key: Users
+    id: UserName
+
+rules:
+  - id: DEPARTMENT_REQUIRED
+    message: User must have a department
+    resource: User
+    assertions:
+      - key: Department
+        op: present

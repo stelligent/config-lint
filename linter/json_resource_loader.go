@@ -5,12 +5,12 @@ import (
 	"path/filepath"
 )
 
-// YAMLResourceLoader loads a list of Resource objects based on the list of ResourceConfig objects
-type YAMLResourceLoader struct {
+// JSONResourceLoader loads a list of Resource objects based on the list of ResourceConfig objects
+type JSONResourceLoader struct {
 	Resources []assertion.ResourceConfig
 }
 
-func extractYAMLResourceID(expression string, properties interface{}) string {
+func extractJSONResourceID(expression string, properties interface{}) string {
 	resourceID := "None"
 	result, err := assertion.SearchData(expression, properties)
 	if err == nil {
@@ -20,15 +20,15 @@ func extractYAMLResourceID(expression string, properties interface{}) string {
 }
 
 // Load converts a text file into a collection of Resource objects
-func (l YAMLResourceLoader) Load(filename string) (FileResources, error) {
+func (l JSONResourceLoader) Load(filename string) (FileResources, error) {
 	loaded := FileResources{
 		Resources: make([]assertion.Resource, 0),
 	}
-	yamlResources, err := loadYAML(filename)
+	jsonResources, err := loadJSON(filename)
 	if err != nil {
 		return loaded, err
 	}
-	for _, document := range yamlResources {
+	for _, document := range jsonResources {
 		for _, resourceConfig := range l.Resources {
 			matches, err := assertion.SearchData(resourceConfig.Key, document)
 			if err != nil {
@@ -41,7 +41,7 @@ func (l YAMLResourceLoader) Load(filename string) (FileResources, error) {
 					properties["__file__"] = filename
 					properties["__dir__"] = filepath.Dir(filename)
 					resource := assertion.Resource{
-						ID:         extractYAMLResourceID(resourceConfig.ID, properties),
+						ID:         extractJSONResourceID(resourceConfig.ID, properties),
 						Type:       resourceConfig.Type,
 						Properties: properties,
 						Filename:   filename,
@@ -55,6 +55,6 @@ func (l YAMLResourceLoader) Load(filename string) (FileResources, error) {
 }
 
 // PostLoad does no additional processing fro a YAMLResourceLoader
-func (l YAMLResourceLoader) PostLoad(r FileResources) ([]assertion.Resource, error) {
+func (l JSONResourceLoader) PostLoad(r FileResources) ([]assertion.Resource, error) {
 	return r.Resources, nil
 }

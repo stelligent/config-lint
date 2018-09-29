@@ -11,7 +11,7 @@ func TestYAMLLinterValidate(t *testing.T) {
 		Tags:    []string{},
 		RuleIDs: []string{},
 	}
-	ruleSet := loadRulesForTest("./testdata/rules/generic.yml", t)
+	ruleSet := loadRulesForTest("./testdata/rules/generic-yaml.yml", t)
 	filenames := []string{"./testdata/resources/generic.config"}
 	loader := YAMLResourceLoader{Resources: ruleSet.Resources}
 	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: loader}
@@ -31,7 +31,7 @@ func TestYAMLLinterValidate(t *testing.T) {
 }
 
 func TestYAMLLinterSearch(t *testing.T) {
-	ruleSet := loadRulesForTest("./testdata/rules/generic.yml", t)
+	ruleSet := loadRulesForTest("./testdata/rules/generic-yaml.yml", t)
 	filenames := []string{"./testdata/resources/generic.config"}
 	loader := YAMLResourceLoader{Resources: ruleSet.Resources}
 	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: loader}

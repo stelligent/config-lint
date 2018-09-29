@@ -37,6 +37,8 @@ func NewLinter(ruleSet assertion.RuleSet, vs assertion.ValueSource, filenames []
 		return FileLinter{Filenames: filenames, ValueSource: vs, Loader: RulesResourceLoader{}}, nil
 	case "YAML":
 		return FileLinter{Filenames: filenames, ValueSource: vs, Loader: YAMLResourceLoader{Resources: ruleSet.Resources}}, nil
+	case "JSON":
+		return FileLinter{Filenames: filenames, ValueSource: vs, Loader: JSONResourceLoader{Resources: ruleSet.Resources}}, nil
 	default:
 		return nil, fmt.Errorf("Type not supported: %s", ruleSet.Type)
 	}

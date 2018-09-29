@@ -1,6 +1,7 @@
 package linter
 
 import (
+	"encoding/json"
 	"github.com/ghodss/yaml"
 	"github.com/stelligent/config-lint/assertion"
 	"io/ioutil"
@@ -20,6 +21,22 @@ func loadYAML(filename string) ([]interface{}, error) {
 		return empty, err
 	}
 	m := yamlData.(map[string]interface{})
+	return []interface{}{m}, nil
+}
+
+func loadJSON(filename string) ([]interface{}, error) {
+	empty := []interface{}{}
+	content, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return empty, err
+	}
+
+	var jsonData interface{}
+	err = json.Unmarshal(content, &jsonData)
+	if err != nil {
+		return empty, err
+	}
+	m := jsonData.(map[string]interface{})
 	return []interface{}{m}, nil
 }
 
