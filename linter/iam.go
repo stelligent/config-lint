@@ -84,3 +84,13 @@ func (u IAMUserLoader) Load() ([]assertion.Resource, error) {
 
 	return resources, nil
 }
+
+// Load gets group information from AWS and generates Resources suitable for linting
+func (u IAMGroupLoader) Load() ([]assertion.Resource, error) {
+	return []assertion.Resource{}, nil
+}
+
+// Load gets role information from AWS and generates Resources suitable for linting
+func (u IAMRoleLoader) Load() ([]assertion.Resource, error) {
+	return []assertion.Resource{}, nil
+}

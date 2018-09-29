@@ -12,12 +12,11 @@ func TestAWSResourceLinterValidate(t *testing.T) {
 		Tags:    []string{},
 		RuleIDs: []string{},
 	}
-	ruleSet := loadRulesForTest("./testdata/rules/aws_sg_resource.yml", t)
-	mockLoader := AWSMockLoader{}
-	linter := AWSResourceLinter{Loader: mockLoader, ValueSource: TestingValueSource{}}
+	ruleSet := loadRulesForTest("./testdata/rules/aws_resource.yml", t)
+	linter := AWSResourceLinter{Loader: AWSMockLoader{}, ValueSource: TestingValueSource{}}
 	report, err := linter.Validate(ruleSet, options)
 	if err != nil {
-		t.Error("Expecting TestYAMLLinter to not return an error")
+		t.Error("Expecting Validate to not return an error")
 	}
 	if len(report.ResourcesScanned) != 1 {
 		t.Errorf("AWSResourceLinter scanned %d resources, expecting 1", len(report.ResourcesScanned))
@@ -28,7 +27,7 @@ func TestAWSResourceLinterValidate(t *testing.T) {
 }
 
 func TestAWSResourceLinterSearch(t *testing.T) {
-	ruleSet := loadRulesForTest("./testdata/rules/aws_sg_resource.yml", t)
+	ruleSet := loadRulesForTest("./testdata/rules/aws_resource.yml", t)
 	mockLoader := AWSMockLoader{}
 	linter := AWSResourceLinter{Loader: mockLoader, ValueSource: TestingValueSource{}}
 	var b bytes.Buffer
@@ -40,7 +39,7 @@ func TestAWSResourceLinterSearch(t *testing.T) {
 
 type AWSMockLoader struct{}
 
-func (l AWSMockLoader) Load() ([]assertion.Resource, error) {
+func (l AWSMockLoader) Load(ruleSet assertion.RuleSet) ([]assertion.Resource, error) {
 	r := assertion.Resource{
 		ID:   "1",
 		Type: "AWS::S3::Bucket",
