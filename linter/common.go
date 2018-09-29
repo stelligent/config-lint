@@ -5,12 +5,20 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/stelligent/config-lint/assertion"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 )
 
+func readContent(filename string) ([]byte, error) {
+	if filename == "-" {
+		return ioutil.ReadAll(os.Stdin)
+	}
+	return ioutil.ReadFile(filename)
+}
+
 func loadYAML(filename string) ([]interface{}, error) {
 	empty := []interface{}{}
-	content, err := ioutil.ReadFile(filename)
+	content, err := readContent(filename)
 	if err != nil {
 		return empty, err
 	}
@@ -26,7 +34,7 @@ func loadYAML(filename string) ([]interface{}, error) {
 
 func loadJSON(filename string) ([]interface{}, error) {
 	empty := []interface{}{}
-	content, err := ioutil.ReadFile(filename)
+	content, err := readContent(filename)
 	if err != nil {
 		return empty, err
 	}

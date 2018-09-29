@@ -87,6 +87,9 @@ func jsonListsIntersect(s1 string, s2 string) bool {
 
 // ShouldIncludeFile return true if a filename matches one of a list of patterns
 func ShouldIncludeFile(patterns []string, filename string) (bool, error) {
+	if filename == "-" { // always permit stdin
+		return true, nil
+	}
 	for _, pattern := range patterns {
 		_, file := filepath.Split(filename)
 		matched, err := filepath.Match(pattern, file)

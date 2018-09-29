@@ -337,6 +337,10 @@ func excludeFilename(filename string, excludePatterns []string) bool {
 func getFilenames(args []string) []string {
 	filenames := []string{}
 	for _, arg := range args {
+		if arg == "-" {
+			filenames = append(filenames, arg)
+			continue
+		}
 		fi, err := os.Stat(arg)
 		if err != nil {
 			fmt.Printf("Cannot open %s\n", arg)

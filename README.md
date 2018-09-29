@@ -76,6 +76,15 @@ config-lint -rules example-files/rules/security-groups.yml
 config-lint -rules example-files/rules/iam-users.yml
 ```
 
+
+## Using STDIN
+
+You can use "-" for the filename if you want the configuration data read from STDIN.
+
+```
+cat example-files/resources/s3.tf | config-lint -terraform -
+```
+
 # Rules
 
 A YAML file that specifies what kinds of files to process, and what validations to perform, [documented here](docs/rules.md).
