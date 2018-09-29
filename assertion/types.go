@@ -20,6 +20,7 @@ type (
 		Rules       []Rule
 		Version     string
 		Resources   []ResourceConfig
+		Columns     []ColumnConfig
 	}
 
 	// Rule is part of a RuleSet
@@ -76,6 +77,11 @@ type (
 		ID   string
 		Type string
 		Key  string
+	}
+
+	// ColumnConfig describes how to discover resources in a CSV file
+	ColumnConfig struct {
+		Name string
 	}
 
 	// ValidationReport summarizes validation for resources using rules

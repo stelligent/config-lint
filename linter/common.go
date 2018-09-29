@@ -1,12 +1,14 @@
 package linter
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"github.com/ghodss/yaml"
 	"github.com/stelligent/config-lint/assertion"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func readContent(filename string) ([]byte, error) {
@@ -46,6 +48,14 @@ func loadJSON(filename string) ([]interface{}, error) {
 	}
 	m := jsonData.(map[string]interface{})
 	return []interface{}{m}, nil
+}
+
+func loadCSV(filename string) ([][]string, error) {
+	content, err := readContent(filename)
+	if err != nil {
+		return [][]string{}, err
+	}
+	return csv.NewReader(strings.NewReader(string(content))).ReadAll()
 }
 
 func getResourceIDFromFilename(filename string) string {

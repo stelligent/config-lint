@@ -1,0 +1,17 @@
+version: 1
+description: Rules for users in CSV file
+type: CSV
+files:
+  - "*.csv"
+
+columns:
+  - name: User
+  - name: Department
+
+rules:
+  - id: DEPARTMENT_REQUIRED
+    message: User must have a department
+    resource: row
+    assertions:
+      - key: Department
+        op: not-empty

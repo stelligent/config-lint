@@ -17,6 +17,7 @@ func TestNewLinter(t *testing.T) {
 		{"./testdata/rules/terraform_instance.yml", "FileLinter"},
 		{"./testdata/rules/generic-yaml.yml", "FileLinter"},
 		{"./testdata/rules/generic-json.yml", "FileLinter"},
+		{"./testdata/rules/generic-csv.yml", "FileLinter"},
 		{"./testdata/rules/aws_sg_resource.yml", "AWSResourceLinter"},
 		{"./testdata/rules/aws_iam_resource.yml", "AWSResourceLinter"},
 		{"./testdata/rules/kubernetes.yml", "FileLinter"},
