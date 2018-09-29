@@ -30,12 +30,6 @@ The program can also read files from a separate YAML file, and can scan these ty
 * YAML
 * JSON
 
-And also the scanning of information from AWS Descibe API calls for:
-
-* Security Groups
-* IAM Users
-
-
 ## Example invocations
 
 ### Validate Terraform files with built-in rules

@@ -29,8 +29,6 @@ func NewLinter(ruleSet assertion.RuleSet, vs assertion.ValueSource, filenames []
 		return FileLinter{Filenames: filenames, ValueSource: vs, Loader: KubernetesResourceLoader{}}, nil
 	case "Terraform":
 		return FileLinter{Filenames: filenames, ValueSource: vs, Loader: TerraformResourceLoader{}}, nil
-	case "AWS":
-		return AWSResourceLinter{RuleSet: ruleSet, ValueSource: vs, Loader: AWSLazyLoader{}}, nil
 	case "LintRules":
 		return FileLinter{Filenames: filenames, ValueSource: vs, Loader: RulesResourceLoader{}}, nil
 	case "YAML":
