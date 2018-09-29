@@ -23,14 +23,13 @@ type (
 		Load(filename string) (FileResources, error)
 		PostLoad(resources FileResources) ([]assertion.Resource, error)
 	}
+	// FileLinter provides implementation for some common functions that are used by multiple Linter implementations
+	FileLinter struct {
+		Filenames   []string
+		ValueSource assertion.ValueSource
+		Loader      FileResourceLoader
+	}
 )
-
-// FileLinter provides implementation for some common functions that are used by multiple Linter implementations
-type FileLinter struct {
-	Filenames   []string
-	ValueSource assertion.ValueSource
-	Loader      FileResourceLoader
-}
 
 // Validate validates a collection of filenames using a RuleSet
 func (fl FileLinter) Validate(ruleSet assertion.RuleSet, options Options) (assertion.ValidationReport, error) {

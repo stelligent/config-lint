@@ -16,8 +16,7 @@ func TestNewLinter(t *testing.T) {
 	testCases := []NewLinterTestCase{
 		{"./testdata/rules/terraform_instance.yml", "FileLinter"},
 		{"./testdata/rules/generic.yml", "FileLinter"},
-		{"./testdata/rules/aws_sg_resource.yml", "AWSResourceLinter"},
-		{"./testdata/rules/aws_iam_resource.yml", "AWSResourceLinter"},
+		{"./testdata/rules/aws_resource.yml", "AWSResourceLinter"},
 		{"./testdata/rules/kubernetes.yml", "FileLinter"},
 		{"./testdata/rules/rules.yml", "FileLinter"},
 	}
