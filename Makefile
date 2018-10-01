@@ -54,3 +54,13 @@ clean:
 	@echo "=== cleaning ==="
 	rm -rf $(BUILD_DIR)
 	rm -rf vendor
+
+cover-assertion:
+	@cd assertion && go test -coverprofile=coverage.out && go tool cover -html=coverage.out
+
+cover-linter:
+	@cd linter && go test -coverprofile=coverage.out && go tool cover -html=coverage.out
+
+cover-cli:
+	@cd cli && go test -coverprofile=coverage.out && go tool cover -html=coverage.out
+
