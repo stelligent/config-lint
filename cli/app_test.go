@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"github.com/stelligent/config-lint/assertion"
 	"github.com/stelligent/config-lint/linter"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -131,4 +133,58 @@ func TestBuiltInLinterRules(t *testing.T) {
 	if len(report.Violations) != 0 {
 		t.Errorf("Expecting Validate for built in lint-rules to not report any violations: %v", report.Violations)
 	}
+}
+
+func TestPrintReport(t *testing.T) {
+	r := assertion.ValidationReport{}
+	var b bytes.Buffer
+	err := printReport(&b, r, "")
+	assert.Nil(t, err, "Expecting printReport to run without error")
+	assert.Contains(t, b.String(), "FilesScanned\": null")
+	assert.Contains(t, b.String(), "ResourcesScanned\": null")
+	assert.Contains(t, b.String(), "Violations\": null")
+}
+
+func TestPrintReportWithQueryString(t *testing.T) {
+	r := assertion.ValidationReport{
+		Violations: []assertion.Violation{
+			assertion.Violation{RuleMessage: "Houston, we have a problem"},
+		},
+	}
+	var b bytes.Buffer
+	err := printReport(&b, r, "Violations[]")
+	assert.Nil(t, err, "Expecting printReport to run without error")
+	assert.Contains(t, b.String(), "RuleMessage")
+	assert.NotContains(t, b.String(), "Violations")
+	assert.NotContains(t, b.String(), "FilesScanned")
+	assert.NotContains(t, b.String(), "ResourcesScanned")
+}
+
+type TestReportWriter struct {
+	Report assertion.ValidationReport
+}
+
+func (w TestReportWriter) WriteReport(r assertion.ValidationReport, o LinterOptions) {
+	w.Report = r
+}
+
+func TestApplyRules(t *testing.T) {
+	ruleSets := []assertion.RuleSet{
+		assertion.RuleSet{
+			Type: "JSON",
+		},
+	}
+	args := arrayFlags{}
+	options := LinterOptions{}
+	w := TestReportWriter{}
+	exitCode := applyRules(ruleSets, args, options, w)
+	assert.Equal(t, exitCode, 0, "Expecting applyRules to return 0")
+	assert.Empty(t, w.Report.Violations, "Expecting empty report")
+}
+
+func TestValidateRules(t *testing.T) {
+	filenames := []string{"./testdata/has-properties.yml"}
+	w := TestReportWriter{}
+	validateRules(filenames, w)
+	assert.Empty(t, w.Report.Violations, "Expecting empty report for validateRules")
 }

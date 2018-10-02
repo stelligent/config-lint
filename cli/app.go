@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -68,6 +69,14 @@ type (
 		Debug                 *bool
 		Args                  []string
 	}
+
+	// ReportWriter formats and displays a ValidationReport
+	ReportWriter interface {
+		WriteReport(assertion.ValidationReport, LinterOptions)
+	}
+
+	// DefaultReportWriter writes the report to Stdout
+	DefaultReportWriter struct{}
 )
 
 //go:generate go-bindata -pkg $GOPACKAGE -o assets.go assets/
@@ -85,8 +94,7 @@ func main() {
 	}
 
 	if *commandLineOptions.Validate {
-		validateRules(commandLineOptions.Args)
-		return
+		os.Exit(validateRules(commandLineOptions.Args, DefaultReportWriter{}))
 	}
 
 	profileOptions, err := loadProfile(*commandLineOptions.ProfileFilename)
@@ -124,7 +132,7 @@ func main() {
 		}
 		ruleSets = append(ruleSets, builtInRuleSet)
 	}
-	applyRules(ruleSets, configFilenames, linterOptions)
+	os.Exit(applyRules(ruleSets, configFilenames, linterOptions, DefaultReportWriter{}))
 }
 
 func addExceptions(ruleSets []assertion.RuleSet, exceptions []RuleException) []assertion.RuleSet {
@@ -151,17 +159,17 @@ func addExceptionsToRuleSet(ruleSet assertion.RuleSet, exceptions []RuleExceptio
 	return ruleSet
 }
 
-func validateRules(filenames []string) {
+func validateRules(filenames []string, w ReportWriter) int {
 	builtInRuleSet, err := loadBuiltInRuleSet("assets/lint-rules.yml")
 	if err != nil {
 		fmt.Printf("Unable to load build-in rules for validation: %v\n", err)
-		return
+		return -1
 	}
 	ruleSets := []assertion.RuleSet{builtInRuleSet}
 	linterOptions := LinterOptions{
 		QueryExpression: "Violations[]",
 	}
-	applyRules(ruleSets, filenames, linterOptions)
+	return applyRules(ruleSets, filenames, linterOptions, w)
 }
 
 func loadRuleSets(args arrayFlags) ([]assertion.RuleSet, error) {
@@ -214,7 +222,7 @@ func loadBuiltInRuleSet(name string) (assertion.RuleSet, error) {
 	return ruleSet, nil
 }
 
-func applyRules(ruleSets []assertion.RuleSet, args arrayFlags, options LinterOptions) {
+func applyRules(ruleSets []assertion.RuleSet, args arrayFlags, options LinterOptions, w ReportWriter) int {
 
 	report := assertion.ValidationReport{
 		Violations:       []assertion.Violation{},
@@ -229,7 +237,7 @@ func applyRules(ruleSets []assertion.RuleSet, args arrayFlags, options LinterOpt
 		l, err := linter.NewLinter(ruleSet, vs, filenames)
 		if err != nil {
 			fmt.Println(err)
-			return
+			return -1
 		}
 		if l != nil {
 			if options.SearchExpression != "" {
@@ -248,16 +256,11 @@ func applyRules(ruleSets []assertion.RuleSet, args arrayFlags, options LinterOpt
 			}
 		}
 	}
-	if options.SearchExpression == "" {
-		err := printReport(report, options.QueryExpression)
-		if err != nil {
-			fmt.Println(err.Error())
-		}
-	}
-	os.Exit(generateExitCode(report))
+	w.WriteReport(report, options)
+	return generateExitCode(report)
 }
 
-func printReport(report assertion.ValidationReport, queryExpression string) error {
+func printReport(w io.Writer, report assertion.ValidationReport, queryExpression string) error {
 	jsonData, err := json.MarshalIndent(report, "", "  ")
 	if err != nil {
 		return err
@@ -274,10 +277,10 @@ func printReport(report assertion.ValidationReport, queryExpression string) erro
 		}
 		s, err := assertion.JSONStringify(v)
 		if err == nil && s != "null" {
-			fmt.Println(s)
+			fmt.Fprintln(w, s)
 		}
 	} else {
-		fmt.Println(string(jsonData))
+		fmt.Fprintln(w, string(jsonData))
 	}
 	return nil
 }
@@ -299,7 +302,7 @@ func (i *arrayFlags) Set(value string) error {
 func generateExitCode(report assertion.ValidationReport) int {
 	for _, v := range report.Violations {
 		if v.Status == "FAILURE" {
-			return 1
+			return -1
 		}
 	}
 	return 0
