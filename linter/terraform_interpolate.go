@@ -376,12 +376,12 @@ func interpolate(s string, variables []Variable) interface{} {
 	tree, err := hil.Parse(s)
 	if err != nil {
 		assertion.Debugf("Parse error: %v\n", err)
-		return ""
+		return s
 	}
 	result, err := hil.Eval(tree, config)
 	if err != nil {
 		assertion.Debugf("Eval error: %v\n", err)
-		return ""
+		return s
 	}
 	return result.Value
 }

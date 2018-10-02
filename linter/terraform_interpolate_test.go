@@ -15,7 +15,6 @@ func TestInterpolation(t *testing.T) {
 		{"${2+6}", "8"},
 		{"bucket_${var.environment}", "bucket_development"},
 		{"${var.environment == \"development\" ? \"YES\" : \"NO\"}", "YES"},
-		{"${missing_func(1)}", ""},
 		{"${local.count + local.count}", "202"},
 		{"${replace(var.template,var.user_pattern,var.user)}", "https://users/adam"},
 		{"${list(var.a, var.b, var.c)}", []interface{}{"one", "two", "three"}},
@@ -24,6 +23,8 @@ func TestInterpolation(t *testing.T) {
 		{"${concat(list(var.a,var.b), list(var.c))}", []interface{}{"one", "two", "three"}},
 		{"${format(\"id-%s\",var.a)}", "id-one"},
 		{"${map(var.k1,var.v1,var.k2,var.v2)}", map[string]interface{}{"key1": "value1", "key2": "value2"}},
+		{"${missing_func(1)}", "${missing_func(1)}"},
+		{"${module.required_tags.tags}", "${module.required_tags.tags}"},
 	}
 	vars := []Variable{
 		{Name: "var.environment", Value: "development"},
