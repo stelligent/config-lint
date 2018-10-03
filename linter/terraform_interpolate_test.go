@@ -25,6 +25,7 @@ func TestInterpolation(t *testing.T) {
 		{"${map(var.k1,var.v1,var.k2,var.v2)}", map[string]interface{}{"key1": "value1", "key2": "value2"}},
 		{"${missing_func(1)}", "${missing_func(1)}"},
 		{"${module.required_tags.tags}", "${module.required_tags.tags}"},
+		{"${merge(map(\"NodeType\", \"Runner\"), var.tags)}", map[string]interface{}{"NodeType": "Runner", "Name": "Web"}},
 	}
 	vars := []Variable{
 		{Name: "var.environment", Value: "development"},
@@ -40,6 +41,7 @@ func TestInterpolation(t *testing.T) {
 		{Name: "var.k2", Value: "key2"},
 		{Name: "var.v1", Value: "value1"},
 		{Name: "var.v2", Value: "value2"},
+		{Name: "var.tags", Value: map[string]interface{}{"Name": "Web"}},
 	}
 	for _, tc := range testCases {
 		result := interpolate(tc.Input, vars)

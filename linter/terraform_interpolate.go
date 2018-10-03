@@ -352,6 +352,26 @@ func interpolationFuncMap() ast.Function {
 	}
 }
 
+func interpolationFuncMerge() ast.Function {
+	return ast.Function{
+		ArgTypes:     []ast.Type{ast.TypeMap},
+		ReturnType:   ast.TypeMap,
+		Variadic:     true,
+		VariadicType: ast.TypeMap,
+		Callback: func(args []interface{}) (interface{}, error) {
+			outputMap := make(map[string]ast.Variable)
+
+			for _, arg := range args {
+				for k, v := range arg.(map[string]ast.Variable) {
+					outputMap[k] = v
+				}
+			}
+
+			return outputMap, nil
+		},
+	}
+}
+
 func Funcs() map[string]ast.Function {
 	return map[string]ast.Function{
 		"concat":  interpolationFuncConcat(),
@@ -362,11 +382,17 @@ func Funcs() map[string]ast.Function {
 		"list":    interpolationFuncList(),
 		"lookup":  interpolationFuncLookup(),
 		"map":     interpolationFuncMap(),
+		"merge":   interpolationFuncMerge(),
 		"replace": interpolationFuncReplace(),
 	}
 }
 
 func interpolate(s string, variables []Variable) interface{} {
+	if strings.Index(s, "$") == -1 {
+		// no interpolation to be done
+		return s
+	}
+	assertion.Debugf("interpolate: %s\n", s)
 	config := &hil.EvalConfig{
 		GlobalScope: &ast.BasicScope{
 			VarMap:  makeVarMap(variables),
@@ -382,6 +408,10 @@ func interpolate(s string, variables []Variable) interface{} {
 	if err != nil {
 		assertion.Debugf("Eval error: %v\n", err)
 		return s
+	}
+	assertion.Debugf("interpolation result: %v\n", result.Value)
+	if stringValue, ok := result.Value.(string); ok {
+		return interpolate(stringValue, variables)
 	}
 	return result.Value
 }
