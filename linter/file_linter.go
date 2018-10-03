@@ -87,6 +87,8 @@ func makeLoadViolation(filename string, err error) assertion.Violation {
 
 // Search evaluates a JMESPath expression against resources in a collection of filenames
 func (fl FileLinter) Search(ruleSet assertion.RuleSet, searchExpression string, w io.Writer) {
+	resources := []assertion.Resource{}
+	variables := []Variable{}
 	for _, filename := range fl.Filenames {
 		include, _ := assertion.ShouldIncludeFile(ruleSet.Files, filename) // FIXME what about error?
 		if include {
@@ -96,18 +98,25 @@ func (fl FileLinter) Search(ruleSet assertion.RuleSet, searchExpression string, 
 				fmt.Fprintln(w, "Error for file:", filename)
 				fmt.Fprintln(w, err.Error())
 			}
-			for _, resource := range loaded.Resources {
-				v, err := assertion.SearchData(searchExpression, resource.Properties)
-				if err != nil {
-					fmt.Fprintln(w, err)
-				} else {
-					s, err := assertion.JSONStringify(v)
-					if err != nil {
-						fmt.Fprintln(w, err)
-					} else {
-						fmt.Fprintf(w, "%s (%s): %s\n", resource.ID, resource.Type, s)
-					}
-				}
+			resources = append(resources, loaded.Resources...)
+			variables = append(variables, loaded.Variables...)
+		}
+	}
+	resourcesToSearch, err := fl.Loader.PostLoad(FileResources{Resources: resources, Variables: variables})
+	if err != nil {
+		fmt.Fprintln(w, err.Error())
+		return
+	}
+	for _, resource := range resourcesToSearch {
+		v, err := assertion.SearchData(searchExpression, resource.Properties)
+		if err != nil {
+			fmt.Fprintln(w, err)
+		} else {
+			s, err := assertion.JSONStringify(v)
+			if err != nil {
+				fmt.Fprintln(w, err)
+			} else {
+				fmt.Fprintf(w, "%s (%s): %s\n", resource.ID, resource.Type, s)
 			}
 		}
 	}
