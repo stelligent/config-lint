@@ -147,22 +147,23 @@ func addExceptionsToRuleSet(ruleSet assertion.RuleSet, exceptions []RuleExceptio
 	rules := []assertion.Rule{}
 	for _, rule := range ruleSet.Rules {
 		for _, e := range exceptions {
-			if len(rule.Resources) > 0 {
-				if assertion.SliceContains(rule.Resources, e.ResourceType) &&
-					rule.ID == e.RuleID &&
-					(rule.Category == e.ResourceCategory || e.ResourceCategory == "resources") {
-					rule.Except = append(rule.Except, e.ResourceID)
-				}
-			} else if rule.ID == e.RuleID &&
-				rule.Resource == e.ResourceType &&
-				(rule.Category == e.ResourceCategory || rule.Category == "") {
-				rule.Except = append(rule.Except, e.ResourceID)
-			}
+			if resourceMatch(rule, e) &&
+			    rule.ID == e.RuleID &&
+					   (rule.Category == e.ResourceCategory || e.ResourceCategory == "resources" || rule.Category == "") {
+										rule.Except = append(rule.Except, e.ResourceID)
+					}
 		}
 		rules = append(rules, rule)
 	}
 	ruleSet.Rules = rules
 	return ruleSet
+}
+
+func resourceMatch(rule assertion.Rule, exception RuleException) bool {
+	if (assertion.SliceContains(rule.Resources, exception.ResourceType) || rule.Resource == exception.ResourceType) {
+		return true
+	}
+	return false
 }
 
 func validateRules(filenames []string, w ReportWriter) int {
