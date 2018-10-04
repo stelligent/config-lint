@@ -188,3 +188,42 @@ func TestValidateRules(t *testing.T) {
 	validateRules(filenames, w)
 	assert.Empty(t, w.Report.Violations, "Expecting empty report for validateRules")
 }
+
+func TestResourceMatch(t *testing.T) {
+	testRule := []assertion.Rule{
+		{
+			ID:        "RULE_1",
+			Category:  "resource",
+			Resources: []string{"aws_instance", "aws_s3_bucket"},
+		},
+		{
+			ID:       "RULE_2",
+			Category: "resource",
+			Resource: "aws_s3_bucket",
+		},
+	}
+	profileExceptions := []RuleException{
+		{
+			RuleID:           "RULE_1",
+			ResourceCategory: "resource",
+			ResourceType:     "aws_instance",
+			Comments:         "Testing",
+			ResourceID:       "my-special-resource",
+		},
+		{
+			RuleID:           "RULE_2",
+			ResourceCategory: "resources",
+			ResourceType:     "aws_s3_bucket",
+			Comments:         "Testing",
+			ResourceID:       "my-special-bucket",
+		},
+	}
+
+	if !resourceMatch(testRule[0], profileExceptions[0]) {
+		t.Errorf("Expecting exception resource to be found in rule resources")
+	}
+	if !resourceMatch(testRule[1], profileExceptions[1]) {
+		t.Errorf("Expecting one to one match with exception resource and rule resource")
+	}
+
+}
