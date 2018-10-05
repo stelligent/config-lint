@@ -58,18 +58,11 @@ This type of linting allows the tool to lint its own rules.
 config-lint -rules example-files/rules/lint-rules.yml example-files/rules
 ```
 
-### Validate Existing Security Groups
+### Validate a custom YAML file
 
 ```
-config-lint -rules example-files/rules/security-groups.yml
+config-lint -rules example-files/rules/generic-yaml.yml example-files/config/generic.config
 ```
-
-### Validate Existing IAM Users
-
-```
-config-lint -rules example-files/rules/iam-users.yml
-```
-
 
 ## Using STDIN
 
