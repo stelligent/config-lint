@@ -134,9 +134,17 @@ func main() {
 		builtInRuleSet, err := loadBuiltInRuleSet("assets/terraform.yml")
 		if err != nil {
 			fmt.Printf("Failed to load built-in rules for Terraform: %v\n", err)
-			return
+			os.Exit(-1)
 		}
 		ruleSets = append(ruleSets, builtInRuleSet)
+	}
+	if len(ruleSets) == 0 {
+		fmt.Println("No rules")
+		os.Exit(-1)
+	}
+	if len(configFilenames) == 0 {
+		fmt.Println("No files to lint")
+		os.Exit(-1)
 	}
 	os.Exit(applyRules(ruleSets, configFilenames, linterOptions, DefaultReportWriter{Writer: os.Stdout}))
 }
