@@ -160,11 +160,11 @@ func TestPrintReportWithQueryString(t *testing.T) {
 	assert.NotContains(t, b.String(), "ResourcesScanned")
 }
 
-type TestReportWriter struct {
+type MockReportWriter struct {
 	Report assertion.ValidationReport
 }
 
-func (w TestReportWriter) WriteReport(r assertion.ValidationReport, o LinterOptions) {
+func (w MockReportWriter) WriteReport(r assertion.ValidationReport, o LinterOptions) {
 	w.Report = r
 }
 
@@ -176,7 +176,7 @@ func TestApplyRules(t *testing.T) {
 	}
 	args := arrayFlags{}
 	options := LinterOptions{}
-	w := TestReportWriter{}
+	w := MockReportWriter{}
 	exitCode := applyRules(ruleSets, args, options, w)
 	assert.Equal(t, exitCode, 0, "Expecting applyRules to return 0")
 	assert.Empty(t, w.Report.Violations, "Expecting empty report")
@@ -184,7 +184,7 @@ func TestApplyRules(t *testing.T) {
 
 func TestValidateRules(t *testing.T) {
 	filenames := []string{"./testdata/has-properties.yml"}
-	w := TestReportWriter{}
+	w := MockReportWriter{}
 	validateRules(filenames, w)
 	assert.Empty(t, w.Report.Violations, "Expecting empty report for validateRules")
 }
@@ -217,13 +217,16 @@ func TestResourceMatch(t *testing.T) {
 			Comments:         "Testing",
 			ResourceID:       "my-special-bucket",
 		},
+		{
+			RuleID:           "RULE_2",
+			ResourceCategory: "resources",
+			ResourceType:     "aws_vpc",
+			Comments:         "Should not match",
+			ResourceID:       "my-vpc",
+		},
 	}
 
-	if !resourceMatch(testRule[0], profileExceptions[0]) {
-		t.Errorf("Expecting exception resource to be found in rule resources")
-	}
-	if !resourceMatch(testRule[1], profileExceptions[1]) {
-		t.Errorf("Expecting one to one match with exception resource and rule resource")
-	}
-
+	assert.True(t, resourceMatch(testRule[0], profileExceptions[0]), "Expecting exception resource to be found in rule resources")
+	assert.True(t, resourceMatch(testRule[1], profileExceptions[1]), "Expecting one to one match with exception resource and rule resource")
+	assert.False(t, resourceMatch(testRule[1], profileExceptions[2]), "Expecting rule and exception to not match")
 }

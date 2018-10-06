@@ -76,7 +76,9 @@ type (
 	}
 
 	// DefaultReportWriter writes the report to Stdout
-	DefaultReportWriter struct{}
+	DefaultReportWriter struct {
+		Writer io.Writer
+	}
 )
 
 //go:generate go-bindata -pkg $GOPACKAGE -o assets.go assets/
@@ -94,7 +96,7 @@ func main() {
 	}
 
 	if *commandLineOptions.Validate {
-		os.Exit(validateRules(commandLineOptions.Args, DefaultReportWriter{}))
+		os.Exit(validateRules(commandLineOptions.Args, DefaultReportWriter{Writer: os.Stdout}))
 	}
 
 	profileOptions, err := loadProfile(*commandLineOptions.ProfileFilename)
@@ -132,7 +134,7 @@ func main() {
 		}
 		ruleSets = append(ruleSets, builtInRuleSet)
 	}
-	os.Exit(applyRules(ruleSets, configFilenames, linterOptions, DefaultReportWriter{}))
+	os.Exit(applyRules(ruleSets, configFilenames, linterOptions, DefaultReportWriter{Writer: os.Stdout}))
 }
 
 func addExceptions(ruleSets []assertion.RuleSet, exceptions []RuleException) []assertion.RuleSet {
