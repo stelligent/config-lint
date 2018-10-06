@@ -230,3 +230,58 @@ func TestResourceMatch(t *testing.T) {
 	assert.True(t, resourceMatch(testRule[1], profileExceptions[1]), "Expecting one to one match with exception resource and rule resource")
 	assert.False(t, resourceMatch(testRule[1], profileExceptions[2]), "Expecting rule and exception to not match")
 }
+
+func TestLoadRuleSetsBadFilename(t *testing.T) {
+	args := []string{"no-such-file.yml"}
+	_, err := loadRuleSets(args)
+	assert.NotNil(t, err, "LoadRuleSet with bad filename should return an error")
+}
+
+func TestLoadRuleSetsParseErrors(t *testing.T) {
+	args := []string{"./testdata/syntax-errors.yml"}
+	_, err := loadRuleSets(args)
+	assert.NotNil(t, err, "Expecting rules file with syntax errors to fail")
+	if err != nil {
+		assert.Contains(t, err.Error(), "error unmarshaling JSON")
+	}
+}
+
+func TestStdinFilename(t *testing.T) {
+	filenames := getFilenames([]string{"-"})
+	assert.Len(t, filenames, 1, "getFilenames should file 1 file")
+	assert.Equal(t, filenames[0], "-", "getFilenames should allow - for stdin")
+}
+
+func TestGetFilenamesUsingDirectory(t *testing.T) {
+	filenames := getFilenames([]string{"./testdata/dirtest"})
+	assert.Len(t, filenames, 2)
+	assert.Equal(t, "testdata/dirtest/a.yml", filenames[0])
+	assert.Equal(t, "testdata/dirtest/b.yml", filenames[1])
+}
+
+func TestLoadFilenamesFromCommandLine(t *testing.T) {
+	commandLineFilenames := []string{"command.yml"}
+	profileFilenames := []string{"default.yml"}
+	result := loadFilenames(commandLineFilenames, profileFilenames)
+	assert.Equal(t, result, commandLineFilenames)
+}
+
+func TestLoadFilenamesFromProfile(t *testing.T) {
+	commandLineFilenames := []string{}
+	profileFilenames := []string{"default.yml"}
+	result := loadFilenames(commandLineFilenames, profileFilenames)
+	assert.Equal(t, result, profileFilenames)
+}
+
+func TestArrayFlags(t *testing.T) {
+	var f arrayFlags
+	assert.Equal(t, "", f.String(), "Default arrayFlags should return empty string")
+	f.Set("first")
+	f.Set("second")
+	assert.Equal(t, arrayFlags{"first", "second"}, f, "Expecting arrayFlags to have two elements")
+}
+
+func TestLoadBuiltInRuleSetMissing(t *testing.T) {
+	_, err := loadBuiltInRuleSet("missing.yml")
+	assert.Contains(t, err.Error(), "not found", "loadBuiltInRuleSet should fail for missing file")
+}

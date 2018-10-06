@@ -96,7 +96,11 @@ func main() {
 	}
 
 	if *commandLineOptions.Validate {
-		os.Exit(validateRules(commandLineOptions.Args, DefaultReportWriter{Writer: os.Stdout}))
+		exitCode, err := validateRules(commandLineOptions.Args, DefaultReportWriter{Writer: os.Stdout})
+		if err != nil {
+			fmt.Println(err.Error())
+		}
+		os.Exit(exitCode)
 	}
 
 	profileOptions, err := loadProfile(*commandLineOptions.ProfileFilename)
@@ -170,17 +174,16 @@ func categoryMatch(rule assertion.Rule, exception RuleException) bool {
 	return rule.Category == exception.ResourceCategory || exception.ResourceCategory == "resources" || rule.Category == ""
 }
 
-func validateRules(filenames []string, w ReportWriter) int {
+func validateRules(filenames []string, w ReportWriter) (int, error) {
 	builtInRuleSet, err := loadBuiltInRuleSet("assets/lint-rules.yml")
 	if err != nil {
-		fmt.Printf("Unable to load build-in rules for validation: %v\n", err)
-		return -1
+		return -1, err
 	}
 	ruleSets := []assertion.RuleSet{builtInRuleSet}
 	linterOptions := LinterOptions{
 		QueryExpression: "Violations[]",
 	}
-	return applyRules(ruleSets, filenames, linterOptions, w)
+	return applyRules(ruleSets, filenames, linterOptions, w), nil
 }
 
 func loadRuleSets(args arrayFlags) ([]assertion.RuleSet, error) {
@@ -189,14 +192,10 @@ func loadRuleSets(args arrayFlags) ([]assertion.RuleSet, error) {
 	for _, rulesFilename := range rulesFilenames {
 		rulesContent, err := ioutil.ReadFile(rulesFilename)
 		if err != nil {
-			fmt.Println("Unable to load rules from:" + rulesFilename)
-			fmt.Println(err.Error())
 			return ruleSets, err
 		}
 		ruleSet, err := assertion.ParseRules(string(rulesContent))
 		if err != nil {
-			fmt.Println("Unable to parse rules in:" + rulesFilename)
-			fmt.Println(err.Error())
 			return ruleSets, err
 		}
 		ruleSets = append(ruleSets, ruleSet)
@@ -220,14 +219,10 @@ func loadBuiltInRuleSet(name string) (assertion.RuleSet, error) {
 	emptyRuleSet := assertion.RuleSet{}
 	rulesContent, err := Asset(name)
 	if err != nil {
-		fmt.Println("Unable to find built-in rules:", name)
-		fmt.Println(err.Error())
 		return emptyRuleSet, err
 	}
 	ruleSet, err := assertion.ParseRules(string(rulesContent))
 	if err != nil {
-		fmt.Println("Unable to parse built-in rules:" + name)
-		fmt.Println(err.Error())
 		return emptyRuleSet, err
 	}
 	return ruleSet, nil
@@ -319,11 +314,11 @@ func generateExitCode(report assertion.ValidationReport) int {
 	return 0
 }
 
-func loadFilenames(commandLineOptions []string, profileOptions []string) []string {
-	if len(commandLineOptions) > 0 {
-		return commandLineOptions
+func loadFilenames(commandLineFilenames []string, profileFilenames []string) []string {
+	if len(commandLineFilenames) > 0 {
+		return commandLineFilenames
 	}
-	return profileOptions
+	return profileFilenames
 }
 
 func excludeFilenames(filenames []string, excludePatterns []string) []string {
@@ -357,7 +352,8 @@ func getFilenames(args []string) []string {
 		}
 		fi, err := os.Stat(arg)
 		if err != nil {
-			fmt.Printf("Cannot open %s\n", arg)
+			// append as is, error reported later when file cannot be opened
+			filenames = append(filenames, arg)
 			continue
 		}
 		mode := fi.Mode()
