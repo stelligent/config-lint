@@ -2,6 +2,7 @@ package linter
 
 import (
 	"github.com/stelligent/config-lint/assertion"
+	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
 )
@@ -21,6 +22,12 @@ func TestLoadYamlParseError(t *testing.T) {
 	if !strings.Contains(err.Error(), "error converting YAML to JSON") {
 		t.Errorf("Expecting parse error for invalid YAML")
 	}
+}
+
+func TestLoadYamlUnexpectedFormat(t *testing.T) {
+	_, err := loadYAML("./testdata/rules/bad-format.yml")
+	assert.NotNil(t, err, "YAML with unexpected format should return error")
+	assert.Contains(t, err.Error(), "YAML in unexpected format")
 }
 
 func TestGetResourceIDFromFilename(t *testing.T) {

@@ -1,0 +1,4 @@
+---
+- The rule object 
+- should be an object
+- instead of an array

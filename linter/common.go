@@ -3,6 +3,7 @@ package linter
 import (
 	"encoding/csv"
 	"encoding/json"
+	"errors"
 	"github.com/ghodss/yaml"
 	"github.com/stelligent/config-lint/assertion"
 	"io/ioutil"
@@ -30,8 +31,10 @@ func loadYAML(filename string) ([]interface{}, error) {
 	if err != nil {
 		return empty, err
 	}
-	m := yamlData.(map[string]interface{})
-	return []interface{}{m}, nil
+	if m, ok := yamlData.(map[string]interface{}); ok {
+		return []interface{}{m}, nil
+	}
+	return []interface{}{}, errors.New("YAML in unexpected format")
 }
 
 func loadJSON(filename string) ([]interface{}, error) {
