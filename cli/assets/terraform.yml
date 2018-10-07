@@ -21,6 +21,7 @@ rules:
             value: "::/0"
     tags:
       - sg
+      - ec2
 
   - id: SG_WORLD_EGRESS
     resource: aws_security_group
@@ -37,6 +38,7 @@ rules:
             value: "::/0"
     tags:
       - sg
+      - ec2
 
   - id: SG_SSH_WORLD_INGRESS
     resource: aws_security_group
@@ -53,6 +55,7 @@ rules:
             value: "::/0"
     tags:
       - sg
+      - ec2
 
   - id: SG_RD_WORLD_INGRESS
     resource: aws_security_group
@@ -69,6 +72,7 @@ rules:
             value: "::/0"
     tags:
       - sg
+      - ec2
 
   - id: SG_NON_32_INGRESS
     resource: aws_security_group
@@ -80,6 +84,7 @@ rules:
         value: ".*/32$"
     tags:
       - sg
+      - ec2
 
   - id: SG_INGRESS_PORT_RANGE
     resource: aws_security_group
@@ -90,6 +95,7 @@ rules:
         op: empty
     tags:
       - sg
+      - ec2
 
   - id: SG_EGRESS_PORT_RANGE
     resource: aws_security_group
@@ -100,6 +106,7 @@ rules:
         op: empty
     tags:
       - sg
+      - ec2
 
   - id: SG_MISSING_EGRESS
     resource: aws_security_group
@@ -110,10 +117,11 @@ rules:
         op: present
     tags:
       - sg
+      - ec2
 
   - id: CLOUDFRONT_LOGGING
     message: CloudFront Distribution must configure logging
-    resource: s3_distribution
+    resource: aws_cloudfront_distribution
     severity: FAILURE
     assertions:
       - key: logging_config
@@ -121,7 +129,7 @@ rules:
     tags:
       - cf
 
-  - id: ROLE_POLICY_NOT_ACTION
+  - id: IAM_ROLE_POLICY_NOT_ACTION
     message: Should not use NotAction in IAM policy
     resource: aws_iam_role_policy
     severity: WARNING
@@ -130,9 +138,10 @@ rules:
         op: absent
     tags:
       - iam
+      - role
       - policy
 
-  - id: ROLE_POLICY_NOT_RESOURCE
+  - id: IAM_ROLE_POLICY_NOT_RESOURCE
     message: Should not use NotResource in IAM policy
     resource: aws_iam_role_policy
     severity: WARNING
@@ -141,9 +150,10 @@ rules:
         op: absent
     tags:
       - iam
+      - role
       - policy
 
-  - id: ROLE_POLICY_WILDCARD_ACTION
+  - id: IAM_ROLE_POLICY_WILDCARD_ACTION
     message: Should not use wildcard action in IAM policy
     resource: aws_iam_role_policy
     severity: FAILURE
@@ -154,9 +164,10 @@ rules:
           value: "*"
     tags:
       - iam
+      - role
       - policy
 
-  - id: ROLE_POLICY_WILDCARD_RESOURCE
+  - id: IAM_ROLE_POLICY_WILDCARD_RESOURCE
     message: Should not use wildcard resource in IAM policy
     resource: aws_iam_role_policy
     severity: WARNING
@@ -167,9 +178,10 @@ rules:
           value: "*"
     tags:
       - iam
+      - role
       - policy
 
-  - id: POLICY_NOT_ACTION
+  - id: IAM_POLICY_NOT_ACTION
     message: Should not use NotAction in IAM policy
     resource: aws_iam_policy
     severity: WARNING
@@ -180,7 +192,7 @@ rules:
       - iam
       - policy
 
-  - id: POLICY_NOT_RESOURCE
+  - id: IAM_POLICY_NOT_RESOURCE
     message: Should not use NotResource in IAM policy
     resource: aws_iam_policy
     severity: WARNING
@@ -191,7 +203,7 @@ rules:
       - iam
       - policy
 
-  - id: POLICY_WILDCARD_ACTION
+  - id: IAM_POLICY_WILDCARD_ACTION
     message: Should not use wildcard action in IAM policy
     resource: aws_iam_policy
     severity: FAILURE
@@ -204,7 +216,7 @@ rules:
       - iam
       - policy
 
-  - id: ROLE_NOT_ACTION
+  - id: IAM_ROLE_NOT_ACTION
     message: Should not use NotAction in IAM role
     resource: aws_iam_role
     severity: WARNING
@@ -215,7 +227,7 @@ rules:
       - iam
       - role
 
-  - id: ROLE_NOT_RESOURCE
+  - id: IAM_ROLE_NOT_RESOURCE
     message: Should not use NotResource in IAM role
     resource: aws_iam_role
     severity: WARNING
@@ -226,7 +238,7 @@ rules:
       - iam
       - role
 
-  - id: ROLE_WILDCARD_ACTION
+  - id: IAM_ROLE_WILDCARD_ACTION
     message: Should not use wildcard action in IAM role
     resource: aws_iam_role
     severity: FAILURE
@@ -239,7 +251,7 @@ rules:
       - iam
       - role
 
-  - id: ROLE_WILDCARD_RESOURCE
+  - id: IAM_ROLE_WILDCARD_RESOURCE
     message: Should not use wildcard action in IAM role
     resource: aws_iam_role
     severity: FAILURE
@@ -270,6 +282,8 @@ rules:
       - key: acl
         op: not-in
         value: public-read,public-read-write
+    tags:
+      - s3
 
   - id: S3_NOT_ACTION
     message: Should not use NotAction in S3 bucket policy
@@ -391,6 +405,17 @@ rules:
     tags:
       - sqs
 
+  - id: SQS_QUEUE_ENCRYPTION
+    message: SQSQueue encryption checks
+    resource: aws_sqs_queue
+    severity: FAILURE
+    assertions:
+      - key: "@"
+        op: has-properties
+        value: kms_master_key_id,kms_data_key_reuse_period_seconds
+    tags:
+      - sqs
+
   - id: IAM_USER
     message: IAM User should not have an inline policy (make member of group instead)
     resource: aws_iam_user
@@ -421,6 +446,8 @@ rules:
         op: present
       - key: users
         op: not-empty
+    tags:
+      - iam
 
   - id: LAMBDA_PERMISSION_INVOKE_ACTION
     message: Lambda permission should not allow lambda:InvokeAction 
@@ -602,8 +629,8 @@ rules:
       - key: kms_key_arn
         op: present
 
-  - id: EBS_VOLUME
-    message: EBS Volume checks
+  - id: EBS_VOLUME_ENCRYPTION
+    message: EBS Volume should be encrypted
     resource: aws_ebs_volume
     severity: FAILURE
     assertions:
@@ -611,6 +638,9 @@ rules:
         op: is-true
       - key: kms_key_id
         op: present
+    tags:
+      - ec2
+      - ebs
 
   - id: EFS
     message: EFS Checks
@@ -684,12 +714,6 @@ rules:
     assertions:
       - key: kms_key_id
         op: present
+    tags:
+      - s3
 
-  - id: SQS_QUEUE
-    message: SQSQueue checks
-    resource: aws_sqs_queue
-    severity: FAILURE
-    assertions:
-      - key: "@"
-        op: has-properties
-        value: kms_master_key_id,kms_data_key_reuse_period_seconds
