@@ -450,12 +450,12 @@ rules:
       - iam
 
   - id: LAMBDA_PERMISSION_INVOKE_ACTION
-    message: Lambda permission should not allow lambda:InvokeAction 
+    message: Lambda permission should allow only lambda:InvokeAction
     resource: aws_lambda_permission
     severity: WARNING
     assertions:
       - key: action
-        op: ne
+        op: eq
         value: lambda:InvokeFunction
     tags:
      - lambda
@@ -470,6 +470,16 @@ rules:
         value: "*"
     tags:
      - lambda
+
+  - id: LAMBDA_FUNCTION_ENCRYPTION
+    message: Lambda function should use encryption
+    resource: aws_lambda_function
+    severity: WARNING
+    assertions:
+      - key: kms_key_arn
+        op: present
+    tags:
+      - lambda
 
   - id: WAF_WEB_ACL
     message: Default action for WAF should not be ALLOW
@@ -575,13 +585,15 @@ rules:
       - key: logging_config
         op: present
 
-  - id: CLOUDTRAIL
+  - id: CLOUDTRAIL_ENCRYPTION
     message: CloudTrail checks
     resource: aws_cloudtrail
     severity: FAILURE
     assertions:
       - key: kms_key_id
         op: present
+    tags:
+      - cloudtrail
 
   - id: CODEBUILD_PROJECT
     message: CodeBuild Project checks
@@ -599,8 +611,8 @@ rules:
       - key: encryption_key
         op: present
 
-  - id: DB_INSTANCE
-    message: DB Instance checks
+  - id: DB_INSTANCE_ENCRYPTION
+    message: DB Instance encryption
     resource: aws_db_instance
     severity: FAILURE
     assertions:
@@ -609,6 +621,20 @@ rules:
           op: is-true
         - key: kms_key_id
           op: present
+    tags:
+      - rds
+
+  - id: RDS_CLUSTER_ENCYPTION
+    message: RDSCluster encryption
+    resource: aws_rds_cluster
+    severity: FAILURE
+    assertions:
+      - key: storage_encrypted
+        op: is-true
+      - key: kms_key_id
+        op: present
+    tags:
+      - rds
 
   - id: ELB
     message: ELB checks
@@ -671,14 +697,6 @@ rules:
         - key: extended_s3_configuration.kms_key_arn
           op: present
 
-  - id: LAMBDA_FUNCTION
-    message: Lambda checks
-    resource: aws_lambda_function
-    severity: FAILURE
-    assertions:
-      - key: kms_key_arn
-        op: present
-
   - id: OPSWORKS_APPLICATION
     message: OpsWorks Application checks
     resource: aws_opsworks_application
@@ -686,16 +704,6 @@ rules:
     assertions:
       - key: enable_ssl
         op: is-true
-
-  - id: RDS_CLUSTER
-    message: RDSCluster checks
-    resource: aws_rds_cluster
-    severity: FAILURE
-    assertions:
-      - key: storage_encrypted
-        op: is-true
-      - key: kms_key_id
-        op: present
 
   - id: REDSHIFT_CLUSTER
     message: RedshiftCluster checks
@@ -717,3 +725,28 @@ rules:
     tags:
       - s3
 
+  - id: ECS_ENVIRONMENT_SECRETS
+    message: Environment for ECS task definition should not include AWS secrets
+    resource: aws_ecs_task_definition
+    severity: FAILURE
+    assertions:
+      - none:
+          key: container_definitions[].environment[]
+          expressions:
+            - or:
+              - and:
+                - key: name
+                  op: contains
+                  value: KEY
+                - key: value
+                  op: regex
+                  value: "AKIA[A-Z0-9]{16}"
+              - and:
+                - key: name
+                  op: contains
+                  value: SECRET
+                - key: value
+                  op: regex
+                  value: "[A-Za-z0-9/\\+=]{40}"
+    tags:
+      - ecs

@@ -271,7 +271,7 @@ func (l TerraformResourceLoader) PostLoad(fr FileResources) ([]assertion.Resourc
 		resource.Properties = replaceVariables(resource.Properties, fr.Variables)
 	}
 	for _, resource := range fr.Resources {
-		properties, err := parsePolicy(resource.Properties)
+		properties, err := parseJSONDocuments(resource.Properties)
 		if err != nil {
 			return fr.Resources, err
 		}
@@ -316,9 +316,9 @@ func replaceVariablesInList(list []interface{}, variables []Variable) []interfac
 	return result
 }
 
-func parsePolicy(resource interface{}) (interface{}, error) {
+func parseJSONDocuments(resource interface{}) (interface{}, error) {
 	properties := resource.(map[string]interface{})
-	for _, attribute := range []string{"assume_role_policy", "policy"} {
+	for _, attribute := range []string{"assume_role_policy", "policy", "container_definitions"} {
 		if policyAttribute, hasPolicyString := properties[attribute]; hasPolicyString {
 			if policyString, isString := policyAttribute.(string); isString {
 				var policy interface{}
