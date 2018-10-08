@@ -739,16 +739,22 @@ rules:
     message: Environment for ECS task definition should not include AWS secrets
     resource: aws_lambda_function
     severity: FAILURE
+    # this rule fails is it finds a regex match for both the key and the secret key
     assertions:
-      - none:
-          key: "environment[].variables[]|[0]|values(@)"
-          expressions:
-            - or:
-              - key: "@"
-                op: regex
-                value: "^AKIA[A-Z0-9]{16}$"
-              - key: "@"
-                op: regex
-                value: "^[A-Za-z0-9/\\+=]{40}$"
+      - not:
+        - and:
+          - some:
+              key: "environment[].variables[]|[0]|values(@)"
+              expressions:
+                - key: "@"
+                  op: regex
+                  value: "^AKIA[A-Z0-9]{16}$"
+          - some:
+              key: "environment[].variables[]|[0]|values(@)"
+              expressions:
+                - key: "@"
+                  op: regex
+                  value: "^[A-Za-z0-9/\\+=]{40}$"
     tags:
       - lambda
+
