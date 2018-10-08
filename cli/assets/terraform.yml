@@ -740,13 +740,31 @@ rules:
                   value: KEY
                 - key: value
                   op: regex
-                  value: "AKIA[A-Z0-9]{16}"
+                  value: "^AKIA[A-Z0-9]{16}$"
               - and:
                 - key: name
                   op: contains
                   value: SECRET
                 - key: value
                   op: regex
-                  value: "[A-Za-z0-9/\\+=]{40}"
+                  value: "^[A-Za-z0-9/\\+=]{40}$"
     tags:
       - ecs
+
+  - id: LAMBDA_ENVIRONMENT_SECRETS
+    message: Environment for ECS task definition should not include AWS secrets
+    resource: aws_lambda_function
+    severity: FAILURE
+    assertions:
+      - none:
+          key: "environment[].variables[]|[0]|values(@)"
+          expressions:
+            - or:
+              - key: "@"
+                op: regex
+                value: "^AKIA[A-Z0-9]{16}$"
+              - key: "@"
+                op: regex
+                value: "^[A-Za-z0-9/\\+=]{40}$"
+    tags:
+      - lambda
