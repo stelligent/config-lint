@@ -388,7 +388,7 @@ func Funcs() map[string]ast.Function {
 }
 
 func interpolate(s string, variables []Variable) interface{} {
-	if strings.Index(s, "$") == -1 {
+	if strings.Index(s, "${") == -1 {
 		// no interpolation to be done
 		return s
 	}
