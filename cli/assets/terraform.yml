@@ -603,13 +603,15 @@ rules:
     tags:
       - cloudtrail
 
-  - id: CODEBUILD_PROJECT
-    message: CodeBuild Project checks
+  - id: CODEBUILD_PROJECT_ENCRYPTION
+    message: CodeBuild Project artifacts should be encrypted
     resource: aws_codebuild_project
     severity: FAILURE
     assertions:
       - key: encryption_key
         op: present
+    tags:
+      - codebuild
 
   - id: CODEPIPELINE
     message: CodePipeline checks
@@ -699,8 +701,8 @@ rules:
       - key: kms_key_id
         op: present
 
-  - id: S3_BUCKET_OBJECT
-    message: S3 Bucket Object checks
+  - id: S3_BUCKET_OBJECT_ENCRYPTION
+    message: S3 Bucket Object should be encrypted
     resource: aws_s3_bucket_object
     severity: FAILURE
     assertions:
