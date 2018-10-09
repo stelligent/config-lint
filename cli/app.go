@@ -142,10 +142,6 @@ func main() {
 		fmt.Println("No rules")
 		os.Exit(-1)
 	}
-	if len(configFilenames) == 0 {
-		fmt.Println("No files to lint")
-		os.Exit(-1)
-	}
 	os.Exit(applyRules(ruleSets, configFilenames, linterOptions, DefaultReportWriter{Writer: os.Stdout}))
 }
 
@@ -326,7 +322,11 @@ func loadFilenames(commandLineFilenames []string, profileFilenames []string) []s
 	if len(commandLineFilenames) > 0 {
 		return commandLineFilenames
 	}
-	return profileFilenames
+	if len(profileFilenames) > 0 {
+		return profileFilenames
+	}
+	// default to current directory if no filesnames given
+	return []string{"."}
 }
 
 func excludeFilenames(filenames []string, excludePatterns []string) []string {
