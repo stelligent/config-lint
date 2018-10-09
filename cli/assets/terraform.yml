@@ -562,8 +562,8 @@ rules:
       - alb
       - lb
 
-  - id: AMI
-    message: AMI security checks
+  - id: AMI_VOLUMES_ENCRYPTED
+    message: Volumes should be encrypted for aws_ami
     resource: aws_ami
     severity: FAILURE
     assertions:
@@ -574,28 +574,21 @@ rules:
              op: is-true
            - key: kms_key_id
              op: present
+    tags:
+      - ami
 
-  - id: AMI_COPY
-    message: AMI security checks
+  - id: AMI_COPY_SNAPSHOTS_ENCRYPTED
+    message: Destination snapshots should be encrypted for aws_ami_copy
     resource: aws_ami_copy
     severity: FAILURE
     assertions:
-      - every:
-          key: ebs_block_device
-          expressions:
-            - key: encrypted
-              op: is-true
-            - key: kms_key_id
-              op: present
-
-  - id: API_GATEWAY_DOMAIN_NAME
-    message: API Gateway checks
-    resource: aws_api_gateway_domain_name
-    severity: FAILURE
-    assertions:
-      - key: "@"
-        op: has-properties
-        value: certificate_name,certificate_body,certificate_change,certificate_private_key
+      - and:
+        - key: encrypted
+          op: is-true
+        - key: kms_key_id
+          op: present
+    tags:
+      - ami
 
   - id: INSTANCE
     message: Instance checks
@@ -633,8 +626,11 @@ rules:
     resource: aws_codepipeline
     severity: FAILURE
     assertions:
-      - key: encryption_key
-        op: present
+      - every:
+          key: artifact_store
+          expressions:
+            - key: encryption_key
+              op: present
 
   - id: DB_INSTANCE_ENCRYPTION
     message: DB Instance encryption
@@ -690,10 +686,13 @@ rules:
     resource: aws_efs_file_system
     severity: FAILURE
     assertions:
-      - key: encrypted
-        op: is-true
-      - key: kms_key_id
-        op: present
+      - and:
+        - key: encrypted
+          op: is-true
+        - key: kms_key_id
+          op: present
+    tags:
+      - efs
 
   - id: KINESIS_FIREHOSE_DELIVERY_STREAM_ENCRYPTION
     message: KinesisFirehoseDeliveryStream should use encrytion
@@ -705,16 +704,21 @@ rules:
           op: present
         - key: extended_s3_configuration.kms_key_arn
           op: present
+    tags:
+      - firehose
 
   - id: REDSHIFT_CLUSTER
     message: RedshiftCluster checks
     resource: aws_redshift_cluster
     severity: FAILURE
     assertions:
-      - key: encrypted
-        op: is-true
-      - key: kms_key_id
-        op: present
+      - and:
+        - key: encrypted
+          op: is-true
+        - key: kms_key_id
+          op: present
+    tags:
+      - redshift
 
   - id: S3_BUCKET_OBJECT_ENCRYPTION
     message: S3 Bucket Object should be encrypted
