@@ -520,9 +520,11 @@ rules:
     tags:
       - waf
 
-  - id: ALB_LISTENER
-    message: ALB listener security checks
-    resource: aws_alb_listener
+  - id: ALB_LISTENER_HTTPS
+    message: ALB listener should use HTTPS
+    resources:
+      - aws_alb_listener
+      - aws_lb_listener
     severity: FAILURE
     assertions:
       - key: port
@@ -542,10 +544,22 @@ rules:
         value: ELBSecurityPolicy-TLS-1-0-2015-04
       - key: certificate_arn
         op: present
+    tags:
+      - alb
+      - lb
+
+  - id: ALB_ACCESS_LOGS
+    message: ALB should enable access logs
+    resources:
+      - aws_alb
+      - aws_lb
+    severity: FAILURE
+    assertions:
       - key: access_logs
         op: present
-      - key: internal  # TODO if the default is true, then add an or that checks absent or is-true
-        op: is-true
+    tags:
+      - alb
+      - lb
 
   - id: AMI
     message: AMI security checks
@@ -613,8 +627,8 @@ rules:
     tags:
       - codebuild
 
-  - id: CODEPIPELINE
-    message: CodePipeline checks
+  - id: CODEPIPELINE_ENCRYPTION
+    message: CodePipeline should encrypt artifacts
     resource: aws_codepipeline
     severity: FAILURE
     assertions:
