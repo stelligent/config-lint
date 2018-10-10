@@ -83,6 +83,10 @@ func getBucketRegion(bucket string) (string, error) {
 	if err != nil {
 		return "us-east-1", err
 	}
+	if location.LocationConstraint == nil {
+		// default region is us-east-1
+		return "us-east-1", nil
+	}
 	return *location.LocationConstraint, nil
 }
 
