@@ -4,6 +4,7 @@ description: Terraform rules for demo
 type: Terraform
 files:
   - "*.tf"
+  - "*.tfvars"
 rules:
 
   - id: SG_WORLD_INGRESS
