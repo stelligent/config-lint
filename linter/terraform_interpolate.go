@@ -411,6 +411,9 @@ func interpolate(s string, variables []Variable) interface{} {
 	}
 	assertion.Debugf("interpolation result: %v\n", result.Value)
 	if stringValue, ok := result.Value.(string); ok {
+		if stringValue == s {
+			return stringValue // no changes, no need for recursive call
+		}
 		return interpolate(stringValue, variables)
 	}
 	return result.Value

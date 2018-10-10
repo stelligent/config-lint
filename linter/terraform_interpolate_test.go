@@ -26,6 +26,8 @@ func TestInterpolation(t *testing.T) {
 		{"${missing_func(1)}", "${missing_func(1)}"},
 		{"${module.required_tags.tags}", "${module.required_tags.tags}"},
 		{"${merge(map(\"NodeType\", \"Runner\"), var.tags)}", map[string]interface{}{"NodeType": "Runner", "Name": "Web"}},
+		{"{\"version\":\"$LATEST\"}", "{\"version\":\"$LATEST\"}"},
+		{"echo $PWD", "echo $PWD"},
 	}
 	vars := []Variable{
 		{Name: "var.environment", Value: "development"},
