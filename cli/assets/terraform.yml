@@ -515,9 +515,12 @@ rules:
     resource: aws_waf_web_acl
     severity: FAILURE
     assertions:
-      - key: default_action.type
-        op: ne
-        value: ALLOW
+      - none:
+          key: default_action
+          expressions:
+            - key: type
+              op: eq
+              value: ALLOW
     tags:
       - waf
 
@@ -681,8 +684,8 @@ rules:
       - ec2
       - ebs
 
-  - id: EFS
-    message: EFS Checks
+  - id: EFS_ENCRYPTED
+    message: EFS should be encrypted
     resource: aws_efs_file_system
     severity: FAILURE
     assertions:
@@ -699,11 +702,16 @@ rules:
     resource: aws_kinesis_firehose_delivery_stream
     severity: FAILURE
     assertions:
-      - or:
-        - key: s3_configuration.kms_key_arn
-          op: present
-        - key: extended_s3_configuration.kms_key_arn
-          op: present
+      - every:
+          key: s3_configuration
+          expressions:
+            - key: kms_key_arn
+              op: present
+      - every:
+          key: extended_s3_configuration
+          expressions:
+            - key: kms_key_arn
+              op: present
     tags:
       - firehose
 
