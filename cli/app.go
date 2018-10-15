@@ -110,7 +110,7 @@ func main() {
 	}
 
 	rulesFilenames := loadFilenames(commandLineOptions.RulesFilenames, profileOptions.Rules)
-	configFilenames := loadFilenames(commandLineOptions.Args, profileOptions.Files)
+	configFilenames := defaultToCurrentDirectory(loadFilenames(commandLineOptions.Args, profileOptions.Files))
 	useTerraformBuiltInRules := *commandLineOptions.TerraformBuiltInRules || profileOptions.Terraform
 
 	if err != nil {
@@ -325,8 +325,14 @@ func loadFilenames(commandLineFilenames []string, profileFilenames []string) []s
 	if len(profileFilenames) > 0 {
 		return profileFilenames
 	}
-	// default to current directory if no filesnames given
-	return []string{"."}
+	return []string{}
+}
+
+func defaultToCurrentDirectory(filenames []string) []string {
+	if len(filenames) == 0 {
+		return []string{"."}
+	}
+	return filenames
 }
 
 func excludeFilenames(filenames []string, excludePatterns []string) []string {
