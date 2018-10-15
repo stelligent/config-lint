@@ -2,6 +2,7 @@ package assertion
 
 import (
 	"strconv"
+	"time"
 )
 
 func intCompare(n1 int, n2 int) int {
@@ -10,6 +11,20 @@ func intCompare(n1 int, n2 int) int {
 	}
 	if n1 > n2 {
 		return 1
+	}
+	return 0
+}
+
+func daysOld(data interface{}) int {
+	if stringValue, ok := data.(string); ok {
+		layout := "2006-01-02T15:04:05Z"
+		t, err := time.Parse(layout, stringValue)
+		if err != nil {
+			return 0
+		}
+		days := int(time.Since(t).Hours() / 24.0)
+		Debugf("Date: %v Days ago: %d\n", data, days)
+		return days
 	}
 	return 0
 }
@@ -41,6 +56,9 @@ func compare(data interface{}, value string, valueType string) int {
 			return intCompare(n1, n2)
 		}
 		return 0
+	case "age":
+		n, _ := strconv.Atoi(value)
+		return intCompare(daysOld(data), n)
 	default:
 		tmp, _ := JSONStringify(data)
 		s := unquoted(tmp)
