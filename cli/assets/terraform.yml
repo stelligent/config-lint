@@ -215,7 +215,7 @@ rules:
     resource: aws_iam_policy
     severity: WARNING
     assertions:
-      - key: assume_role_policy.Statement[].NotAction
+      - key: policy.Statement[].NotAction
         op: absent
     tags:
       - iam
@@ -226,7 +226,7 @@ rules:
     resource: aws_iam_policy
     severity: WARNING
     assertions:
-      - key: assume_role_policy.Statement[].NotResource
+      - key: policy.Statement[].NotResource
         op: absent
     tags:
       - iam
@@ -238,60 +238,12 @@ rules:
     severity: FAILURE
     assertions:
       - not:
-        - key: assume_role_policy.Statement[].Action
+        - key: policy.Statement[].Action
           op: contains
           value: "*"
     tags:
       - iam
       - policy
-
-  - id: IAM_ROLE_NOT_ACTION
-    message: Should not use NotAction in IAM role
-    resource: aws_iam_role
-    severity: WARNING
-    assertions:
-      - key: assume_role_policy.Statement[].NotAction
-        op: absent
-    tags:
-      - iam
-      - role
-
-  - id: IAM_ROLE_NOT_RESOURCE
-    message: Should not use NotResource in IAM role
-    resource: aws_iam_role
-    severity: WARNING
-    assertions:
-      - key: assume_role_policy.Statement[].NotResource
-        op: absent
-    tags:
-      - iam
-      - role
-
-  - id: IAM_ROLE_WILDCARD_ACTION
-    message: Should not use wildcard action in IAM role
-    resource: aws_iam_role
-    severity: FAILURE
-    assertions:
-      - not:
-        - key: assume_role_policy.Statement[].Action
-          op: contains
-          value: "*"
-    tags:
-      - iam
-      - role
-
-  - id: IAM_ROLE_WILDCARD_RESOURCE
-    message: Should not use wildcard resource in IAM role
-    resource: aws_iam_role
-    severity: FAILURE
-    assertions:
-      - not:
-        - key: assume_role_policy.Statement[].Resource
-          op: contains
-          value: "*"
-    tags:
-      - iam
-      - role
 
   - id: ELB_ACCESS_LOGGING
     message: ELB should enable access logging
