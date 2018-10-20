@@ -281,7 +281,7 @@ rules:
       - role
 
   - id: IAM_ROLE_WILDCARD_RESOURCE
-    message: Should not use wildcard action in IAM role
+    message: Should not use wildcard resource in IAM role
     resource: aws_iam_role
     severity: FAILURE
     assertions:
