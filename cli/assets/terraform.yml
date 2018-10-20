@@ -163,8 +163,11 @@ rules:
     resource: aws_iam_role_policy
     severity: WARNING
     assertions:
-      - key: policy.Statement[].NotAction
-        op: absent
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: NotAction
+              op: present
     tags:
       - iam
       - role
@@ -175,8 +178,11 @@ rules:
     resource: aws_iam_role_policy
     severity: WARNING
     assertions:
-      - key: policy.Statement[].NotResource
-        op: absent
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: NotResource
+              op: present
     tags:
       - iam
       - role
@@ -187,10 +193,12 @@ rules:
     resource: aws_iam_role_policy
     severity: FAILURE
     assertions:
-      - not:
-        - key: policy.Statement[].Action
-          op: contains
-          value: "*"
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: Action
+              op: contains
+              value: "*"
     tags:
       - iam
       - role
@@ -201,10 +209,12 @@ rules:
     resource: aws_iam_role_policy
     severity: WARNING
     assertions:
-      - not:
-        - key: policy.Statement[].Resource
-          op: contains
-          value: "*"
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: Resource
+              op: contains
+              value: "*"
     tags:
       - iam
       - role
@@ -215,8 +225,11 @@ rules:
     resource: aws_iam_policy
     severity: WARNING
     assertions:
-      - key: policy.Statement[].NotAction
-        op: absent
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: NotAction
+              op: present
     tags:
       - iam
       - policy
@@ -226,8 +239,11 @@ rules:
     resource: aws_iam_policy
     severity: WARNING
     assertions:
-      - key: policy.Statement[].NotResource
-        op: absent
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: NotResource
+              op: present
     tags:
       - iam
       - policy
@@ -237,10 +253,12 @@ rules:
     resource: aws_iam_policy
     severity: FAILURE
     assertions:
-      - not:
-        - key: policy.Statement[].Action
-          op: contains
-          value: "*"
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: Action
+              op: contains
+              value: "*"
     tags:
       - iam
       - policy
