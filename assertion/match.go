@@ -145,7 +145,7 @@ func isMatch(data interface{}, expression Expression) (MatchResult, error) {
 		if re.MatchString(searchResult) {
 			return matches()
 		}
-		return doesNotMatch("%v should match %v", key, value)
+		return doesNotMatch("%v(%v) should match %v", key, searchResult, value)
 	case "has-properties":
 		return hasProperties(data, value)
 	case "is-true":
