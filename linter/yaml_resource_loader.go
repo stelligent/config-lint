@@ -54,7 +54,7 @@ func (l YAMLResourceLoader) Load(filename string) (FileResources, error) {
 	return loaded, nil
 }
 
-// PostLoad does no additional processing fro a YAMLResourceLoader
+// PostLoad does no additional processing for a YAMLResourceLoader
 func (l YAMLResourceLoader) PostLoad(r FileResources) ([]assertion.Resource, error) {
 	return r.Resources, nil
 }
