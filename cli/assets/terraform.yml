@@ -1,6 +1,6 @@
 ---
 version: 1
-description: Terraform rules for demo
+description: Terraform rules
 type: Terraform
 files:
   - "*.tf"
@@ -43,7 +43,7 @@ rules:
 
   - id: SG_SSH_WORLD_INGRESS
     resource: aws_security_group
-    message: Security group should not allow ingress from 0.0.0.0/0 or ::/0
+    message: Security group should not allow SSH ingress from 0.0.0.0/0 or ::/0
     severity: FAILURE
     assertions:
       - not:
@@ -60,7 +60,7 @@ rules:
 
   - id: SG_RD_WORLD_INGRESS
     resource: aws_security_group
-    message: Security group should not allow ingress from 0.0.0.0/0 or ::/0
+    message: Security group should not allow RD ingress from 0.0.0.0/0 or ::/0
     severity: FAILURE
     assertions:
       - not:
@@ -80,9 +80,12 @@ rules:
     message: Security group should not allow ingress from CIDR block that does not end in /32
     severity: WARNING
     assertions:
-      - key: "ingress[].cidr_blocks[] | [0]"
-        op: regex
-        value: ".*/32$"
+      - every:
+          key: "ingress[].cidr_blocks"
+          expressions:
+            - key: "@"
+              op: regex
+              value: ".*/32$"
     tags:
       - sg
       - ec2
@@ -196,6 +199,9 @@ rules:
       - none:
           key: policy.Statement[]
           expressions:
+            - key: Effect
+              op: eq
+              value: Allow
             - key: Action
               op: contains
               value: "*"
@@ -212,6 +218,9 @@ rules:
       - none:
           key: policy.Statement[]
           expressions:
+            - key: Effect
+              op: eq
+              value: Allow
             - key: Resource
               op: contains
               value: "*"
@@ -256,6 +265,9 @@ rules:
       - none:
           key: policy.Statement[]
           expressions:
+            - key: Effect
+              op: eq
+              value: Allow
             - key: Action
               op: contains
               value: "*"
@@ -289,8 +301,11 @@ rules:
     resource: aws_s3_bucket_policy
     severity: WARNING
     assertions:
-      - key: policy.Statement[].NotAction
-        op: absent
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: NotAction
+              op: present
     tags:
       - s3
 
@@ -299,8 +314,11 @@ rules:
     resource: aws_s3_bucket_policy
     severity: WARNING
     assertions:
-      - key: policy.Statement[].NotPrincipal
-        op: absent
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: NotPrincipal
+              op: present
     tags:
       - s3
 
@@ -309,10 +327,15 @@ rules:
     resource: aws_s3_bucket_policy
     severity: WARNING
     assertions:
-      - not:
-        - key: policy.Statement[].Principal
-          op: contains
-          value: "*"
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: Effect
+              op: eq
+              value: Allow
+            - key: Principal
+              op: contains
+              value: "*"
     tags:
       - s3
 
@@ -321,10 +344,15 @@ rules:
     resource: aws_s3_bucket_policy
     severity: WARNING
     assertions:
-      - not:
-        - key: policy.Statement[].Action
-          op: contains
-          value: "*"
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: Effect
+              op: eq
+              value: Allow
+            - key: Action
+              op: contains
+              value: "*"
     tags:
       - s3
 
@@ -333,10 +361,15 @@ rules:
     resource: aws_sns_topic_policy
     severity: WARNING
     assertions:
-      - not:
-        - key: policy.Statement[].Principal
-          op: contains
-          value: "*"
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: Effect
+              op: eq
+              value: Allow
+            - key: Principal
+              op: contains
+              value: "*"
     tags:
       - sns
 
@@ -345,8 +378,11 @@ rules:
     resource: aws_sns_topic_policy
     severity: WARNING
     assertions:
-      - key: policy.Statement[].NotAction
-        op: absent
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: NotAction
+              op: present
     tags:
       - sns
 
@@ -365,10 +401,15 @@ rules:
     resource: aws_sqs_queue_policy
     severity: WARNING
     assertions:
-      - not:
-        - key: policy.Statement[].Principal
-          op: contains
-          value: "*"
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: Effect
+              op: eq
+              value: Allow
+            - key: Principal
+              op: contains
+              value: "*"
     tags:
       - sqs
 
@@ -377,10 +418,15 @@ rules:
     resource: aws_sqs_queue_policy
     severity: WARNING
     assertions:
-      - not:
-        - key: policy.Statement[].Action
-          op: contains
-          value: "*"
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: Effect
+              op: eq
+              value: Allow
+            - key: Action
+              op: contains
+              value: "*"
     tags:
       - sqs
 
@@ -389,8 +435,11 @@ rules:
     resource: aws_sqs_queue_policy
     severity: WARNING
     assertions:
-      - key: policy.Statement[].NotAction
-        op: absent
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: NotAction
+              op: present
     tags:
       - sqs
 
@@ -399,13 +448,16 @@ rules:
     resource: aws_sqs_queue_policy
     severity: WARNING
     assertions:
-      - key: policy.Statement[].NotPrincipal
-        op: absent
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: NotPrincipal
+              op: present
     tags:
       - sqs
 
   - id: SQS_QUEUE_ENCRYPTION
-    message: SQSQueue encryption checks
+    message: SQSQueue should use encryption
     resource: aws_sqs_queue
     severity: FAILURE
     assertions:
@@ -465,7 +517,7 @@ rules:
     severity: FAILURE
     assertions:
       - key: action
-        op: ne
+        op: does-not-contain
         value: "*"
     tags:
      - lambda
@@ -563,8 +615,8 @@ rules:
     tags:
       - ami
 
-  - id: INSTANCE
-    message: Instance checks
+  - id: EBS_BLOCK_DEVICE_ENCRYPTED
+    message: EBS block devices should use encryption
     resource: aws_instance
     severity: FAILURE
     assertions:
@@ -575,7 +627,7 @@ rules:
               op: is-true
 
   - id: CLOUDTRAIL_ENCRYPTION
-    message: CloudTrail checks
+    message: CloudTrail should use encryption
     resource: aws_cloudtrail
     severity: FAILURE
     assertions:
@@ -630,16 +682,13 @@ rules:
     tags:
       - rds
 
-  - id: ELB
-    message: ELB checks
+  - id: ELB_ACCESS_LOGS
+    message: ELB should have access logs configured
     resource: aws_elb
     severity: FAILURE
     assertions:
       - key: access_logs
         op: present
-      - key: listener.lb_port
-        op: not-in
-        value: 80,21,23,5900
 
   - id: EBS_VOLUME_ENCRYPTION
     message: EBS Volume should be encrypted
@@ -685,8 +734,8 @@ rules:
     tags:
       - firehose
 
-  - id: REDSHIFT_CLUSTER
-    message: RedshiftCluster checks
+  - id: REDSHIFT_CLUSTER_ENCRYPTION
+    message: RedshiftCluster should use encryption
     resource: aws_redshift_cluster
     severity: FAILURE
     assertions:
@@ -757,3 +806,28 @@ rules:
     tags:
       - lambda
 
+  - id: POLICY_VERSION
+    message: Version in IAM Policy should be 2012-10-17
+    resources:
+      - aws_sns_topic_policy
+      - aws_s3_bucket_policy
+      - aws_sqs_queue_policy
+      - aws_iam_policy
+      - aws_iam_role_policy
+    assertions:
+      - key: policy.Version
+        op: eq
+        value: "2012-10-17"
+
+  - id: ASSUME_ROLEPOLICY_VERSION
+    message: Version in IAM Policy should be 2012-10-17
+    resources:
+      - aws_iam_role
+    assertions:
+      - key: assume_role_policy.Version
+        op: eq
+        value: "2012-10-17"
+
+  # add KMS key policy version
+  # ECR repository policy
+  # add ElasticSearch domain access policy version
