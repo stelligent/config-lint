@@ -10,6 +10,9 @@ func interfaceListContains(v []interface{}, key, value string) (MatchResult, err
 			if stringElement == value {
 				return matches()
 			}
+			if strings.Contains(stringElement, value) {
+				return matches()
+			}
 		}
 	}
 	return doesNotMatch("%v does not contain %v", key, value)
@@ -18,6 +21,9 @@ func interfaceListContains(v []interface{}, key, value string) (MatchResult, err
 func stringListContains(v []string, key, value string) (MatchResult, error) {
 	for _, stringElement := range v {
 		if stringElement == value {
+			return matches()
+		}
+		if strings.Contains(stringElement, value) {
 			return matches()
 		}
 	}

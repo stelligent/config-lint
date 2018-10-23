@@ -275,6 +275,24 @@ rules:
       - iam
       - policy
 
+  - id: IAM_POLICY_WILDCARD_RESOURCE
+    message: Should not use wildcard resource in IAM policy
+    resource: aws_iam_policy
+    severity: WARNING
+    assertions:
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: Effect
+              op: eq
+              value: Allow
+            - key: Resource
+              op: contains
+              value: "*"
+    tags:
+      - iam
+      - policy
+
   - id: ELB_ACCESS_LOGGING
     message: ELB should enable access logging
     resource: aws_elb
@@ -478,7 +496,7 @@ rules:
       - iam
 
   - id: IAM_USER_POLICY_ATTACHMENT
-    message: IAM should not have policies attached (make user a member of a group instead)
+    message: IAM user should not have policies attached (make user a member of a group instead)
     resource: aws_iam_user_policy_attachment
     severity: FAILURE
     assertions:

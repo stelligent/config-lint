@@ -1,6 +1,7 @@
 package assertion
 
 import (
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -20,4 +21,18 @@ func TestDoesNotContainWithNonJSONType(t *testing.T) {
 	if err == nil {
 		t.Errorf("Expecting doesNotContain to return an error for non JSON encodable data")
 	}
+}
+
+func TestContainsWithString(t *testing.T) {
+	s := "s3:Get*"
+	match, err := contains(s, "Action", "*")
+	assert.Nil(t, err, "Expecting no error from contains")
+	assert.True(t, match.Match, "Expecting match for string")
+}
+
+func TestContainsWithSliceOfStrings(t *testing.T) {
+	s := []string{"s3:Get*"}
+	match, err := contains(s, "Action", "*")
+	assert.Nil(t, err, "Expecting no error from contains")
+	assert.True(t, match.Match, "Expecting match for string")
 }
