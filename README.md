@@ -91,12 +91,12 @@ The program outputs a JSON string with the results. The JSON object has the foll
 * FilesScanned - a list of the filenames evaluated
 * Violations - an object whose keys are the severity of any violations detected. The value for each key is an array with an entry for every violation of that severity.
 
-## Using --query to limit the output
+## Using -query to limit the output
 
-You can limit the output by specifying a JMESPath expression for the --query command line option. For example, if you just wanted to see the ResourceId attribute for failed checks, you can do the following:
+You can limit the output by specifying a JMESPath expression for the -query command line option. For example, if you just wanted to see the ResourceId attribute for failed checks, you can do the following:
 
 ```
-./config-lint --rules example-files/rules/terraform.yml --query 'Violations.FAILURE[].ResourceId' example-files/config/*
+./config-lint -rules example-files/rules/terraform.yml -query 'Violations.FAILURE[].ResourceId' example-files/config/*
 ```
 
 # Exit Code
@@ -108,19 +108,19 @@ If at least one rule with a severity of FAILURE was triggered the exit code will
 
 You can use a [profile](docs/profiles.md) to control the default options.
 
-# Developing new rules using --search
+# Developing new rules using -search
 
 Each rule requires a JMESPath key that it will use to search resources. Documentation for JMESPATH is here: http://jmespath.org/
 
-The expressions can be tricky to get right, so this tool provides a --search option which takes a JMESPath expression. The expression is evaluated against all the resources in the files provided on the command line. The results are written to stdout.
+The expressions can be tricky to get right, so this tool provides a -search option which takes a JMESPath expression. The expression is evaluated against all the resources in the files provided on the command line. The results are written to stdout.
 
 This example will scan the example terraform file and print the "ami" attribute for each resource:
 
 ```
-./config-lint --rules example-files/rules/terraform.yml --search 'ami' example-files/config/terraform.tf
+./config-lint -rules example-files/rules/terraform.yml -search 'ami' example-files/config/terraform.tf
 ```
 
-If you specify --search, the rules files is only used to determine the type of configuration files.
+If you specify -search, the rules files is only used to determine the type of configuration files.
 The files will *not* be scanned for violations.
 
 # Design
