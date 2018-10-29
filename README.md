@@ -3,8 +3,9 @@
 # config-lint
 
 A command line tool to validate configurations using rules specified in a YAML file.
-The data being validated can come from template files, such as a Terraform file.
-There is also an example of a Linter that runs agains data returned from an AWS API call.
+The configurations files can be one of several formats, such as Terraform, JSON, YAML.
+There is a built-in set of rules provided for Terraform. Custom files are used
+for other formats.
 
 # Installation 
 You can use [Homebrew](https://brew.sh/) to install the latest version:
