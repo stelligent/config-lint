@@ -81,6 +81,8 @@ func TestIsMatch(t *testing.T) {
 		"regExTrueForBeginningOfString":  {"Foo", "regex", "^F", "", true},
 		"regExFalseForBeginningOfString": {"Foo", "regex", "^B", "", false},
 		"reqExFalseForEntireString":      {"Foo", "regex", "^Bar$", "", false},
+		"regExIgnoreCaseTrue":            {"HTTPS", "regex", "(?i)https", "", true},
+		"regexIgnoreCaseFalse":           {"HTTP", "regex", "(?i)https", "", false},
 		"ltTrue":                         {"a", "lt", "b", "", true},
 		"ltFalse":                        {"a", "lt", "a", "", false},
 		"leTrue":                         {"a", "le", "a", "", true},
