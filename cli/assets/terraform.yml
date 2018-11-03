@@ -633,17 +633,6 @@ rules:
     tags:
       - ami
 
-  - id: EBS_BLOCK_DEVICE_ENCRYPTED
-    message: EBS block devices should use encryption
-    resource: aws_instance
-    severity: FAILURE
-    assertions:
-      - every:
-          key: ebs_block_device
-          expressions:
-            - key: encrypted
-              op: is-true
-
   - id: CLOUDTRAIL_ENCRYPTION
     message: CloudTrail should use encryption
     resource: aws_cloudtrail
@@ -700,13 +689,19 @@ rules:
     tags:
       - rds
 
-  - id: ELB_ACCESS_LOGS
-    message: ELB should have access logs configured
-    resource: aws_elb
+  - id: EBS_BLOCK_DEVICE_ENCRYPTED
+    message: EBS block devices should use encryption
+    resource: aws_instance
     severity: FAILURE
     assertions:
-      - key: access_logs
-        op: present
+      - every:
+          key: ebs_block_device
+          expressions:
+            - key: encrypted
+              op: is-true
+    tags:
+      - ec2
+      - ebs
 
   - id: EBS_VOLUME_ENCRYPTION
     message: EBS Volume should be encrypted
