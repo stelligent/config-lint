@@ -785,7 +785,7 @@ rules:
                   value: KEY
                 - key: value
                   op: regex
-                  value: "^AKIA[A-Z0-9]{16}$"
+                  value: "^(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}$"
               - and:
                 - key: name
                   op: contains
@@ -809,7 +809,7 @@ rules:
               expressions:
                 - key: "@"
                   op: regex
-                  value: "^AKIA[A-Z0-9]{16}$"
+                  value: "^(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}$"
           - some:
               key: "environment[].variables[]|[0]|values(@)"
               expressions:
