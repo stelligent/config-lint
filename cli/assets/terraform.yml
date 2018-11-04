@@ -797,7 +797,7 @@ rules:
       - ecs
 
   - id: LAMBDA_ENVIRONMENT_SECRETS
-    message: Environment for ECS task definition should not include AWS secrets
+    message: Environment for Lambda function should not include AWS secrets
     resource: aws_lambda_function
     severity: FAILURE
     # this rule fails is it finds a regex match for both the key and the secret key
