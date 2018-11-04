@@ -534,8 +534,8 @@ rules:
     resource: aws_lambda_permission
     severity: FAILURE
     assertions:
-      - key: action
-        op: does-not-contain
+      - key: principal
+        op: ne
         value: "*"
     tags:
      - lambda
