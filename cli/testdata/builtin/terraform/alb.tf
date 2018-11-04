@@ -118,14 +118,14 @@ resource "aws_autoscaling_group" "asg" {
 resource "aws_alb_target_group" "tg" {
   name = "webserver-target"
   port = 80
-  protocol = "HTTP"
+  protocol = "HTTPS"
   vpc_id = "${aws_vpc.website.id}"
 }
 
 resource "aws_alb_listener" "l" {
   load_balancer_arn = "${aws_alb.alb.id}"
   port = 80
-  protocol = "HTTP"
+  protocol = "HTTPS"
   default_action {
     type = "forward"
     target_group_arn = "${aws_alb_target_group.tg.arn}"

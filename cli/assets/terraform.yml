@@ -575,9 +575,8 @@ rules:
         op: eq
         value: 443
       - key: protocol
-        op: ne
-        value: http
-        options: ignore-case
+        op: regex
+        value: "(?i)HTTPS"
       - key: ssl_policy
         op: present
       - key: ssl_policy

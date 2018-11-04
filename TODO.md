@@ -7,5 +7,4 @@
 * Update value_from to handle JSON return values
 * Create a Provider interface for AWS calls, create a mock for testing SecurityGroupLinter
 * Starting to have inconsistent naming in ops: is-true, is-false, has-properties vs. present, absent, empty, null
-* Add options to Assertion type, for things like 'ignore-case' for string compares? Or just use a regex?
 * Terraform converter wraps every map in an array - apparently it is valid HCL to have, e.g. "tags" appear multiple times in a resource
