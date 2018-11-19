@@ -4,7 +4,7 @@ test_cases:
 
   - name: every_OK
     rule:
-      id:       COLLECTION_1
+      id:       COLLECTION
       message:  Invalid key
       severity: FAILURE
       resource: sample
@@ -30,7 +30,7 @@ test_cases:
 
   - name: every_FAILURE
     rule:
-      id:       COLLECTION_1
+      id:       COLLECTION
       message:  Invalid key
       severity: FAILURE
       resource: sample
@@ -58,7 +58,7 @@ test_cases:
 
   - name: every_multiple_assertions_FAILURE
     rule:
-      id:       COLLECTION_1
+      id:       COLLECTION
       message:  Invalid key
       severity: FAILURE
       resource: sample
@@ -82,7 +82,7 @@ test_cases:
 
   - name: some_OK
     rule:
-      id:       COLLECTION_3
+      id:       COLLECTION
       message:  Invalid key
       severity: FAILURE
       resource: sample
@@ -108,7 +108,7 @@ test_cases:
 
   - name: some_FAILURE
     rule:
-      id:       COLLECTION_4
+      id:       COLLECTION
       message:  Invalid key
       severity: FAILURE
       resource: sample
@@ -129,7 +129,7 @@ test_cases:
 
   - name: none_OK
     rule:
-      id:       COLLECTION_3
+      id:       COLLECTION
       message:  Invalid key
       severity: FAILURE
       resource: sample
@@ -151,7 +151,7 @@ test_cases:
 
   - name: none_with_multiple_assertions_OK
     rule:
-      id: COLLECTION_3
+      id: COLLECTION
       message: Invalid key
       severity: FAILURE
       resource: sample
@@ -178,7 +178,7 @@ test_cases:
 
   - name: none_FAILURE
     rule:
-      id:       COLLECTION_4
+      id:       COLLECTION
       message:  Invalid key
       severity: FAILURE
       resource: sample
@@ -201,7 +201,7 @@ test_cases:
 
   - name: none_with_multiple_assertions_FAILURE
     rule:
-      id: COLLECTION_3
+      id: COLLECTION
       message: Invalid key
       severity: FAILURE
       resource: sample
@@ -224,5 +224,50 @@ test_cases:
           - fromPort: 22
             ipRanges:
               - 0.0.0.0/0
+    result: FAILURE
+
+  - name: once_OK
+    rule:
+      id:       COLLECTION
+      message:  Duplicate names
+      severity: FAILURE
+      resource: example
+      assertions:
+        - once:
+            key: "tags[]"
+            expressions:
+              - key: name
+                op: eq
+                value: A
+    resource:
+      id: collection_id
+      type: example
+      properties:
+        tags:
+          - name: A
+          - name: B
+    result: OK
+
+  - name: once_FAILURE
+    rule:
+      id:       COLLECTION
+      message:  Duplicate names
+      severity: FAILURE
+      resource: example
+      assertions:
+        - once:
+            key: "tags[]"
+            expressions:
+              - key: name
+                op: eq
+                value: B
+    resource:
+      id: collection_id
+      type: example
+      properties:
+        tags:
+          - name: A
+          - name: B
+          - name: B
     result: FAILURE
 

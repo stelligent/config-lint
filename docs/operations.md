@@ -22,6 +22,7 @@
 | [not-contains](#does-not-contain) | Does Not Contain |
 | [not-empty](#not-empty)           | Not Empty      |
 | [not-in](#not-in)                 | Not In         |
+| [once](#once)                     | Once           |
 | [or](#or)                         | Or             |
 | [present](#present)               | Present        |
 | [regex](#regex)                   | Regex          |
@@ -321,6 +322,28 @@ Example:
               op: contains
               value: 0.0.0.0/0
 ...
+```
+
+## once
+
+Select an array from a resource, and run assertions against each element. Only one of the sub assertions should return true for the test to pass.
+The key is a JMESPath expression that should return an array of objects. The key used in each sub assertion is relative to the selected objects.
+
+This provides a simple looping mechanism that is easier to write and understand than a complex JMESPath expression.
+
+Example:
+
+```
+  - id: ONLY_ONE_DEFAULT
+    message:  Default should be true for only one element
+    severity: FAILURE
+    resource: sample
+    assertions:
+      - once:
+          key: "items[]"
+          expressions:
+            - key: "default"
+              op: is-true
 ```
 
 ## is-true

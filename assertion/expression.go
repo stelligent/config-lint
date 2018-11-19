@@ -148,6 +148,27 @@ func noneExpression(collectionExpression CollectionExpression, resource Resource
 	return matches()
 }
 
+func onceExpression(collectionExpression CollectionExpression, resource Resource) (MatchResult, error) {
+	resources, err := collectResources(collectionExpression.Key, resource)
+	if err != nil {
+		return matchError(err)
+	}
+	matchCount := 0
+	for _, collectionResource := range resources {
+		match, err := andExpression(collectionExpression.Expressions, collectionResource)
+		if err != nil {
+			return matchError(err)
+		}
+		if match.Match {
+			matchCount++
+		}
+	}
+	if matchCount == 1 {
+		return matches()
+	}
+	return doesNotMatch("Once expression fails")
+}
+
 func booleanExpression(expression Expression, resource Resource) (MatchResult, error) {
 	if expression.Or != nil && len(expression.Or) > 0 {
 		return orExpression(expression.Or, resource)
@@ -169,6 +190,9 @@ func booleanExpression(expression Expression, resource Resource) (MatchResult, e
 	}
 	if expression.None.Key != "" {
 		return noneExpression(expression.None, resource)
+	}
+	if expression.Once.Key != "" {
+		return onceExpression(expression.Once, resource)
 	}
 	return searchAndMatch(expression, resource)
 }

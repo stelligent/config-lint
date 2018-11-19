@@ -52,6 +52,7 @@ type (
 		Every     CollectionExpression
 		Some      CollectionExpression
 		None      CollectionExpression
+		Once      CollectionExpression
 	}
 
 	// CollectionExpression assertion for every element of a collection
