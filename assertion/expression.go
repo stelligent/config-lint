@@ -148,7 +148,7 @@ func noneExpression(collectionExpression CollectionExpression, resource Resource
 	return matches()
 }
 
-func onceExpression(collectionExpression CollectionExpression, resource Resource) (MatchResult, error) {
+func exactlyOneExpression(collectionExpression CollectionExpression, resource Resource) (MatchResult, error) {
 	resources, err := collectResources(collectionExpression.Key, resource)
 	if err != nil {
 		return matchError(err)
@@ -166,7 +166,7 @@ func onceExpression(collectionExpression CollectionExpression, resource Resource
 	if matchCount == 1 {
 		return matches()
 	}
-	return doesNotMatch("Once expression fails")
+	return doesNotMatch("ExactlyOne expression fails")
 }
 
 func booleanExpression(expression Expression, resource Resource) (MatchResult, error) {
@@ -191,8 +191,8 @@ func booleanExpression(expression Expression, resource Resource) (MatchResult, e
 	if expression.None.Key != "" {
 		return noneExpression(expression.None, resource)
 	}
-	if expression.Once.Key != "" {
-		return onceExpression(expression.Once, resource)
+	if expression.ExactlyOne.Key != "" {
+		return exactlyOneExpression(expression.ExactlyOne, resource)
 	}
 	return searchAndMatch(expression, resource)
 }

@@ -22,7 +22,7 @@
 | [not-contains](#does-not-contain) | Does Not Contain |
 | [not-empty](#not-empty)           | Not Empty      |
 | [not-in](#not-in)                 | Not In         |
-| [once](#once)                     | Once           |
+| [exactly-one](#exactly-one)       | Exactly One    |
 | [or](#or)                         | Or             |
 | [present](#present)               | Present        |
 | [regex](#regex)                   | Regex          |
@@ -324,7 +324,7 @@ Example:
 ...
 ```
 
-## once
+## exactly-one
 
 Select an array from a resource, and run assertions against each element. Only one of the sub assertions should return true for the test to pass.
 The key is a JMESPath expression that should return an array of objects. The key used in each sub assertion is relative to the selected objects.
@@ -339,7 +339,7 @@ Example:
     severity: FAILURE
     resource: sample
     assertions:
-      - once:
+      - exactly-one:
           key: "items[]"
           expressions:
             - key: "default"

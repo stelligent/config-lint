@@ -40,19 +40,19 @@ type (
 
 	// Expression expression for a Rule
 	Expression struct {
-		Key       string
-		Op        string
-		Value     string
-		ValueType string    `json:"value_type"`
-		ValueFrom ValueFrom `json:"value_from"`
-		Or        []Expression
-		Xor       []Expression
-		And       []Expression
-		Not       []Expression
-		Every     CollectionExpression
-		Some      CollectionExpression
-		None      CollectionExpression
-		Once      CollectionExpression
+		Key        string
+		Op         string
+		Value      string
+		ValueType  string    `json:"value_type"`
+		ValueFrom  ValueFrom `json:"value_from"`
+		Or         []Expression
+		Xor        []Expression
+		And        []Expression
+		Not        []Expression
+		Every      CollectionExpression
+		Some       CollectionExpression
+		None       CollectionExpression
+		ExactlyOne CollectionExpression `json:"exactly-one"`
 	}
 
 	// CollectionExpression assertion for every element of a collection

@@ -226,14 +226,14 @@ test_cases:
               - 0.0.0.0/0
     result: FAILURE
 
-  - name: once_OK
+  - name: one_OK
     rule:
       id:       COLLECTION
       message:  Duplicate names
       severity: FAILURE
       resource: example
       assertions:
-        - once:
+        - exactly-one:
             key: "tags[]"
             expressions:
               - key: name
@@ -248,14 +248,14 @@ test_cases:
           - name: B
     result: OK
 
-  - name: once_FAILURE
+  - name: one_FAILURE
     rule:
       id:       COLLECTION
       message:  Duplicate names
       severity: FAILURE
       resource: example
       assertions:
-        - once:
+        - exactly-one:
             key: "tags[]"
             expressions:
               - key: name
