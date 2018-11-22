@@ -1,0 +1,46 @@
+version: 1
+description: Aggregate example
+type: Terraform
+files:
+  - "*.tf"
+rules:
+
+  - id: TEST_1
+    message: Must have subnets with 10.0.1.0 and 10.0.2.0 CIDR blocks
+    resource: aws_subnet
+    aggregate: true
+    assertions:
+      - some:
+          key: "@"
+          expressions: 
+            - key: cidr_block
+              op: eq
+              value: "10.0.1.0/24"
+      - some:
+          key: "@"
+          expressions: 
+            - key: cidr_block
+              op: eq
+              value: "10.0.2.0/24"
+
+  - id: TEST_2
+    message: Must have exactly two subnets
+    resource: aws_subnet
+    aggregate: true
+    assertions:
+      - key: "@"
+        op: eq
+        value: 2
+        value_type: size
+
+  - id: TEST_3
+    message: Every subnet must has a Name tag # doesn't need aggregate
+    resource: aws_subnet
+    aggregate: true
+    assertions:
+      - every:
+          key: "@"
+          expressions:
+            - key: tags
+              op: not-empty
+    severity: FAILURE
