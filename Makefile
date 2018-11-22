@@ -54,6 +54,7 @@ clean:
 	@echo "=== cleaning ==="
 	rm -rf $(BUILD_DIR)
 	rm -rf vendor
+	rm -f cli/*-packr.go
 
 cover-assertion:
 	@cd assertion && go test -coverprofile=coverage.out && go tool cover -html=coverage.out

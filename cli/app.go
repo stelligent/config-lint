@@ -1,5 +1,7 @@
 package main
 
+//go:generate packr
+
 import (
 	"encoding/json"
 	"fmt"

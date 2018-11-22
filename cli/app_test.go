@@ -262,5 +262,5 @@ func TestArrayFlags(t *testing.T) {
 
 func TestLoadBuiltInRuleSetMissing(t *testing.T) {
 	_, err := loadBuiltInRuleSet("missing.yml")
-	assert.Contains(t, err.Error(), "no such file or directory", "loadBuiltInRuleSet should fail for missing file")
+	assert.Contains(t, err.Error(), "file does not exist", "loadBuiltInRuleSet should fail for missing file")
 }
