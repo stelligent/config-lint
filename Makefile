@@ -12,14 +12,13 @@ CLI_FILES = $(shell find cli linter assertion -name \*.go)
 default: all
 
 deps:
+	@echo "=== dependencies ==="
 	go get "github.com/golang/dep/cmd/dep"
-	go get "github.com/jteeuwen/go-bindata/..."
-	go get "golang.org/x/lint/golint"
-	go get "github.com/stretchr/testify/assert"
-	dep ensure -vendor-only
+	@dep ensure -vendor-only -v
 
 gen:
 	@echo "=== generating ==="
+	@go get "github.com/gobuffalo/packr/..."
 	@go generate ./...
 
 lint: gen

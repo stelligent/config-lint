@@ -41,7 +41,7 @@ func numberOfFailures(violations []assertion.Violation) int {
 }
 
 func TestTerraformBuiltInRules(t *testing.T) {
-	ruleSet := loadRules(t, "assets/terraform.yml")
+	ruleSet := loadRules(t, "terraform.yml")
 	testCases := []BuiltInTestCase{
 		{"security-groups.tf", "SG_WORLD_INGRESS", 1, 0},
 		{"security-groups.tf", "SG_WORLD_EGRESS", 2, 0},

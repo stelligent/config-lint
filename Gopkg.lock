@@ -58,6 +58,30 @@
   version = "v1.38.1"
 
 [[projects]]
+  name = "github.com/gobuffalo/envy"
+  packages = ["."]
+  revision = "b29bf6b8134f3398b9333ba1893c58620152edb0"
+  version = "v1.6.9"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/gobuffalo/packd"
+  packages = ["."]
+  revision = "a1fb7d1c9873c1dae25b15ece2fceaaf445a24eb"
+
+[[projects]]
+  name = "github.com/gobuffalo/packr"
+  packages = ["."]
+  revision = "7c2dcc2885cf30cb864d25bb1a5f50e0f5c99acd"
+  version = "v1.21.3"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/gobuffalo/syncx"
+  packages = ["."]
+  revision = "558ac7de985fc4f4057bff27c7bdf99e92fe0750"
+
+[[projects]]
   branch = "master"
   name = "github.com/hashicorp/hcl"
   packages = [
@@ -90,6 +114,18 @@
   revision = "0b12d6b5"
 
 [[projects]]
+  name = "github.com/joho/godotenv"
+  packages = ["."]
+  revision = "23d116af351c84513e1946b527c88823e476be13"
+  version = "v1.3.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/markbates/oncer"
+  packages = ["."]
+  revision = "05fccaae8fc423476d98fd4c3e4699ba0fbbde48"
+
+[[projects]]
   name = "github.com/mitchellh/mapstructure"
   packages = ["."]
   revision = "fa473d140ef3c6adf42d6b391fe76707f1f243c8"
@@ -100,6 +136,12 @@
   packages = ["."]
   revision = "eecee6c969c02c8cc2ae48e1e269843ae8590796"
   version = "v1.0.0"
+
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
 
 [[projects]]
   name = "github.com/pmezard/go-difflib"
@@ -122,6 +164,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f22cd2b0221104711a5999001efc3a4ce9bcd83b696a63696776ab313e1f49b1"
+  inputs-digest = "1b2fde9e2f6eb298268c922c3a63d94409bfa7690fbdd1b6e8c5efb3b37dfd3c"
   solver-name = "gps-cdcl"
   solver-version = 1

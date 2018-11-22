@@ -9,14 +9,14 @@ import (
 )
 
 func TestLoadTerraformRules(t *testing.T) {
-	_, err := loadBuiltInRuleSet("assets/terraform.yml")
+	_, err := loadBuiltInRuleSet("terraform.yml")
 	if err != nil {
 		t.Errorf("Cannot load built-in Terraform rules")
 	}
 }
 
 func TestLoadValidateRules(t *testing.T) {
-	_, err := loadBuiltInRuleSet("assets/lint-rules.yml")
+	_, err := loadBuiltInRuleSet("lint-rules.yml")
 	if err != nil {
 		t.Errorf("Cannot load built-in rules for -validate option")
 	}
@@ -93,13 +93,13 @@ func TestProfileExceptions(t *testing.T) {
 	}
 }
 
-func TestBuiltInTerraformRules(t *testing.T) {
-	ruleSet, err := loadBuiltInRuleSet("assets/lint-rules.yml")
+func TestBuiltRules(t *testing.T) {
+	ruleSet, err := loadBuiltInRuleSet("lint-rules.yml")
 	if err != nil {
 		t.Errorf("Expecting loadBuiltInRulesSet to not return error: %s", err.Error())
 	}
 	vs := assertion.StandardValueSource{}
-	filenames := []string{"assets/terraform.yml"}
+	filenames := []string{"assets/terraform.yml", "assets/lint-rules.yml"}
 	l, err := linter.NewLinter(ruleSet, vs, filenames)
 	if err != nil {
 		t.Errorf("Expecting NewLinter to not return error: %s", err.Error())
@@ -111,27 +111,6 @@ func TestBuiltInTerraformRules(t *testing.T) {
 	}
 	if len(report.Violations) != 0 {
 		t.Errorf("Expecting Validate for built in rules to not report any violations: %v", report.Violations)
-	}
-}
-
-func TestBuiltInLinterRules(t *testing.T) {
-	ruleSet, err := loadBuiltInRuleSet("assets/lint-rules.yml")
-	if err != nil {
-		t.Errorf("Expecting loadBuiltInRulesSet to not return error: %s", err.Error())
-	}
-	vs := assertion.StandardValueSource{}
-	filenames := []string{"assets/lint-rules.yml"}
-	l, err := linter.NewLinter(ruleSet, vs, filenames)
-	if err != nil {
-		t.Errorf("Expecting NewLinter to not return error: %s", err.Error())
-	}
-	options := linter.Options{}
-	report, err := l.Validate(ruleSet, options)
-	if err != nil {
-		t.Errorf("Expecting Validate to not return error: %s", err.Error())
-	}
-	if len(report.Violations) != 0 {
-		t.Errorf("Expecting Validate for built in lint-rules to not report any violations: %v", report.Violations)
 	}
 }
 
@@ -283,5 +262,5 @@ func TestArrayFlags(t *testing.T) {
 
 func TestLoadBuiltInRuleSetMissing(t *testing.T) {
 	_, err := loadBuiltInRuleSet("missing.yml")
-	assert.Contains(t, err.Error(), "not found", "loadBuiltInRuleSet should fail for missing file")
+	assert.Contains(t, err.Error(), "no such file or directory", "loadBuiltInRuleSet should fail for missing file")
 }

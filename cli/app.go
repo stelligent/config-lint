@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/ghodss/yaml"
+	"github.com/gobuffalo/packr"
 	"github.com/stelligent/config-lint/assertion"
 	"github.com/stelligent/config-lint/linter"
 )
@@ -81,7 +82,6 @@ type (
 	}
 )
 
-//go:generate go-bindata -pkg $GOPACKAGE -o assets.go assets/
 func main() {
 
 	commandLineOptions := getCommandLineOptions()
@@ -131,7 +131,7 @@ func main() {
 	}
 	ruleSets = addExceptions(ruleSets, profileOptions.Exceptions)
 	if useTerraformBuiltInRules {
-		builtInRuleSet, err := loadBuiltInRuleSet("assets/terraform.yml")
+		builtInRuleSet, err := loadBuiltInRuleSet("terraform.yml")
 		if err != nil {
 			fmt.Printf("Failed to load built-in rules for Terraform: %v\n", err)
 			os.Exit(-1)
@@ -179,7 +179,7 @@ func categoryMatch(rule assertion.Rule, exception RuleException) bool {
 }
 
 func validateRules(filenames []string, w ReportWriter) (int, error) {
-	builtInRuleSet, err := loadBuiltInRuleSet("assets/lint-rules.yml")
+	builtInRuleSet, err := loadBuiltInRuleSet("lint-rules.yml")
 	if err != nil {
 		return -1, err
 	}
@@ -221,7 +221,8 @@ func yamlFilesOnly(filenames []string) []string {
 
 func loadBuiltInRuleSet(name string) (assertion.RuleSet, error) {
 	emptyRuleSet := assertion.RuleSet{}
-	rulesContent, err := Asset(name)
+	box := packr.NewBox("./assets")
+	rulesContent, err := box.FindString(name)
 	if err != nil {
 		return emptyRuleSet, err
 	}
