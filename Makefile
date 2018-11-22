@@ -24,6 +24,7 @@ gen:
 lint: gen
 	@echo "=== linting ==="
 	@go vet ./...
+	@go get -u golang.org/x/lint/golint
 	@golint $(go list ./... | grep -v /vendor/)
 
 cyclo:
