@@ -31,7 +31,9 @@ jobs:
           at: /go/src/github.com/stelligent/config-lint
       - run:
           name: Release
-          command: curl -sL https://git.io/goreleaser | bash
+          command: |
+            go get github.com/goreleaser/goreleaser
+            goreleaser release --skip-validate
 
 workflows:
   version: 2
