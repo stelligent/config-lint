@@ -108,7 +108,7 @@ func main() {
 	profileOptions, err := loadProfile(*commandLineOptions.ProfileFilename)
 	if err != nil {
 		fmt.Printf("Error loading profile: %v\n", err)
-		return
+		os.Exit(-1)
 	}
 
 	rulesFilenames := loadFilenames(commandLineOptions.RulesFilenames, profileOptions.Rules)
@@ -117,19 +117,19 @@ func main() {
 
 	if err != nil {
 		fmt.Printf("Unable to load exclude patterns: %s\n", err)
-		return
+		os.Exit(-1)
 	}
 
 	linterOptions, err := getLinterOptions(commandLineOptions, profileOptions)
 	if err != nil {
 		fmt.Printf("Failed to parse options: %v\n", err)
-		return
+		os.Exit(-1)
 	}
 
 	ruleSets, err := loadRuleSets(rulesFilenames)
 	if err != nil {
 		fmt.Printf("Failed to load rules: %v\n", err)
-		return
+		os.Exit(-1)
 	}
 	ruleSets = addExceptions(ruleSets, profileOptions.Exceptions)
 	if useTerraformBuiltInRules {
