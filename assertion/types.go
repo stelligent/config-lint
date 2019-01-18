@@ -25,17 +25,18 @@ type (
 
 	// Rule is part of a RuleSet
 	Rule struct {
-		ID         string
-		Message    string
-		Severity   string
-		Resource   string
-		Resources  []string
-		Category   string // default is "resource", can be "data", "provider", "module" for Terraform
-		Conditions []Expression
-		Assertions []Expression
-		Except     []string
-		Tags       []string
-		Invoke     InvokeRuleAPI
+		ID              string
+		Message         string
+		Severity        string
+		Resource        string
+		Resources       []string
+		ExceptResources []string `json:"except_resources"`
+		Category        string   // default is "resource", can be "data", "provider", "module" for Terraform
+		Conditions      []Expression
+		Assertions      []Expression
+		Except          []string
+		Tags            []string
+		Invoke          InvokeRuleAPI
 	}
 
 	// Expression expression for a Rule

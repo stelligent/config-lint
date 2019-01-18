@@ -200,3 +200,49 @@ func TestFilterResourcesForRuleString(t *testing.T) {
 		t.Errorf("FilterResourcesForRule only expected to return one type")
 	}
 }
+
+func TestFilterResourcesForWildcard(t *testing.T) {
+	resources := []Resource{
+		Resource{Type: "instance", Category: "resource"},
+		Resource{Type: "bucket", Category: "resource"},
+	}
+	rule := Rule{
+		Resource: "*",
+	}
+	filtered := FilterResourcesForRule(resources, rule)
+	if len(filtered) != 2 {
+		t.Errorf("FilterResourcesForRule expected all resources to match")
+	}
+}
+
+func TestFilterResourcesForDefault(t *testing.T) {
+	resources := []Resource{
+		Resource{Type: "instance", Category: "resource"},
+		Resource{Type: "bucket", Category: "resource"},
+	}
+	rule := Rule{}
+	filtered := FilterResourcesForRule(resources, rule)
+	if len(filtered) != 2 {
+		t.Errorf("FilterResourcesForRule expected all resources to match")
+	}
+}
+
+func TestFilterExcludeResourcesForRuleString(t *testing.T) {
+	resources := []Resource{
+		Resource{Type: "instance", Category: "resource"},
+		Resource{Type: "bucket", Category: "resource"},
+	}
+	rule := Rule{
+		ExceptResources: []string{
+			"instance",
+			"security_group",
+		},
+	}
+	filtered := FilterResourcesForRule(resources, rule)
+	if len(filtered) != 1 {
+		t.Errorf("FilterResourcesForRule expected to return one type")
+	}
+	if len(filtered) > 0 && filtered[0].Type != "bucket" {
+		t.Errorf("FilterResourcesForRule expected to return bucket")
+	}
+}

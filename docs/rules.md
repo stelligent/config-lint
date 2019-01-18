@@ -14,19 +14,21 @@
 
 Each rule contains the following attributes:
 
-|Name       |Description                                                                         |
-|-----------|------------------------------------------------------------------------------------|
-|id         | A unique identifier for the rule                                                   |
-|message    | A string to be printed when a validation error is detected                         |
-|resource   | The resource type to which the rule will be applied                                |
-|category   | Optional value used for Terraform: resource(default), data, provider               |
-|conditions | Expressions (in addition to resource) that determine if a rule should apply        |
-|except     | An optional list of resource ids that should not be validated                      |
-|severity   | FAILURE, WARNING, NON_COMPLIANT                                                    |
-|assertions | A list of expressions used to detect validation errors, see next section           |
-|invoke     | Alternative to assertions for a custom external API call to validate, see below    |
-|tags       | Optional list of tags, command line has option to limit scans to a subset of tags  |
-|conditions | Optional expressions that must be true for the rule to be applied                  |
+|Name             |Description                                                                         |
+|-----------------|------------------------------------------------------------------------------------|
+|id               | A unique identifier for the rule                                                   |
+|message          | A string to be printed when a validation error is detected                         |
+|resource         | The resource type to which the rule will be applied                                |
+|resources        | A list of resources types to which the rule will be applied                        |
+|except_resources | A list of resource types to exclude                                                |
+|category         | Optional value used for Terraform: resource(default), data, provider               |
+|conditions       | Expressions (in addition to resource) that determine if a rule should apply        |
+|except           | An optional list of resource ids that should not be validated                      |
+|severity         | FAILURE, WARNING, NON_COMPLIANT                                                    |
+|assertions       | A list of expressions used to detect validation errors, see next section           |
+|invoke           | Alternative to assertions for a custom external API call to validate, see below    |
+|tags             | Optional list of tags, command line has option to limit scans to a subset of tags  |
+|conditions       | Optional expressions that must be true for the rule to be applied                  |
 
 ## Attributes for each Expression
 

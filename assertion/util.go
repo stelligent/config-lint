@@ -157,15 +157,31 @@ func SliceContains(list []string, value string) bool {
 	return false
 }
 
+// Exclude resources
+func ExcludeResourceTypes(resources []Resource, resourceTypes []string, resourceCategory string) []Resource {
+	filtered := make([]Resource, 0)
+	for _, resource := range resources {
+		if !SliceContains(resourceTypes, resource.Type) && categoryMatches(resourceCategory, resource.Category) {
+			filtered = append(filtered, resource)
+		}
+	}
+	return filtered
+}
+
 // FilterResourcesForRule returns resources applicable to the given rule
 func FilterResourcesForRule(resources []Resource, rule Rule) []Resource {
-	var filteredResources []Resource
-	if rule.Resource != "" {
-		Debugf("filtering rule resources on Resource string")
-		filteredResources = FilterResourcesByType(resources, rule.Resource, rule.Category)
-	} else {
+	if len(rule.Resources) > 0 {
 		Debugf("filtering rule resources on Resources slice")
-		filteredResources = FilterResourcesByTypes(resources, rule.Resources, rule.Category)
+		return FilterResourcesByTypes(resources, rule.Resources, rule.Category)
 	}
-	return filteredResources
+	if rule.Resource != "" && rule.Resource != "*" {
+		Debugf("filtering rule resources on Resource string")
+		return FilterResourcesByType(resources, rule.Resource, rule.Category)
+	}
+	if len(rule.ExceptResources) > 0 {
+		Debugf("filtering rule resources on ExceptResources slice")
+		return ExcludeResourceTypes(resources, rule.ExceptResources, rule.Category)
+	}
+	// default is to match all resources
+	return resources
 }
