@@ -64,7 +64,7 @@ rules:
         op: present
 
   - id: RESOURCE_PRESENT
-    message: Rule must have a resource filter
+    message: Rule must have a resource, resources or except_resources attribute
     severity: FAILURE
     resource: LintRule
     assertions:
@@ -72,6 +72,8 @@ rules:
         - key: resource
           op: present
         - key: resources
+          op: present
+        - key: except_resources
           op: present
     tags:
       - resource
