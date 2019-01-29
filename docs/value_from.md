@@ -6,7 +6,7 @@ In cases where a rule needs a dynamic value, instead of specifying "value", "val
 ## Using an S3 Bucket
 
 
-###Example:
+### Example:
 
 ```
 ...
