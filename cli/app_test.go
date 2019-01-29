@@ -31,6 +31,15 @@ func TestExcludeAll(t *testing.T) {
 	}
 }
 
+func TestExcludeSubdirectory(t *testing.T) {
+	filenames := []string{"file1.tf", "foo/bar/secrets/database.yml"}
+	patterns := []string{"foo/bar/secrets/*"}
+	filtered := excludeFilenames(filenames, patterns)
+	if len(filtered) != 1 {
+		t.Errorf("Expecting secrets subdirectory to be excluded, but files are %v", filtered)
+	}
+}
+
 func TestExcludeOnePattern(t *testing.T) {
 	filenames := []string{"file1.tf", "file2.tf", "file3.tf"}
 	patterns := []string{"*1.tf"}
