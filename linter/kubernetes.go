@@ -1,6 +1,7 @@
 package linter
 
 import (
+	"errors"
 	"github.com/stelligent/config-lint/assertion"
 	"path/filepath"
 )
@@ -42,13 +43,18 @@ func (l KubernetesResourceLoader) Load(filename string) (FileResources, error) {
 		}
 		properties["__file__"] = filename
 		properties["__dir__"] = filepath.Dir(filename)
-		kr := assertion.Resource{
-			ID:         resourceID,
-			Type:       properties["kind"].(string),
-			Properties: properties,
-			Filename:   filename,
+		kind, ok := properties["kind"].(string)
+		if ok {
+			kr := assertion.Resource{
+				ID:         resourceID,
+				Type:       kind,
+				Properties: properties,
+				Filename:   filename,
+			}
+			loaded.Resources = append(loaded.Resources, kr)
+		} else {
+			return loaded, errors.New("Missing kind attribute")
 		}
-		loaded.Resources = append(loaded.Resources, kr)
 	}
 	return loaded, nil
 }

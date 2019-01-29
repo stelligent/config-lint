@@ -25,3 +25,10 @@ func TestKubernetesLoadMultipleDocuments(t *testing.T) {
 	assert.Nil(t, err, "Expecting Load to not return an error")
 	assert.Equal(t, 2, len(loaded.Resources), "Expecting loader to find 2 resources")
 }
+
+func TestKubernetesMissingKind(t *testing.T) {
+	loader := KubernetesResourceLoader{}
+	filename := "./testdata/resources/missing_kind.yml"
+	_, err := loader.Load(filename)
+	assert.NotNil(t, err, "Expecting Load to not return an error")
+}
