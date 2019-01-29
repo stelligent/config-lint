@@ -25,16 +25,26 @@ func loadYAML(filename string) ([]interface{}, error) {
 	if err != nil {
 		return empty, err
 	}
-
-	var yamlData interface{}
-	err = yaml.Unmarshal(content, &yamlData)
-	if err != nil {
-		return empty, err
+	var result []interface{}
+	docs := strings.Split(string(content), "---")
+	for _, doc := range docs {
+		if len(doc) == 0 {
+			continue // skip empty documents, which can happen when a file starts with ---
+		}
+		var yamlData interface{}
+		err = yaml.Unmarshal([]byte(doc), &yamlData)
+		if err != nil {
+			return empty, err
+		}
+		// Expecting every document to be an object (not simply valid YAML, such as a list)
+		m, ok := yamlData.(map[string]interface{})
+		if ok {
+			result = append(result, m)
+		} else {
+			return []interface{}{}, errors.New("YAML in unexpected format")
+		}
 	}
-	if m, ok := yamlData.(map[string]interface{}); ok {
-		return []interface{}{m}, nil
-	}
-	return []interface{}{}, errors.New("YAML in unexpected format")
+	return result, nil
 }
 
 func loadJSON(filename string) ([]interface{}, error) {
