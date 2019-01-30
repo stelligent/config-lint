@@ -30,6 +30,18 @@ func TestLoadYamlUnexpectedFormat(t *testing.T) {
 	assert.Contains(t, err.Error(), "YAML in unexpected format")
 }
 
+func TestLoadYamlMultipleDocuments(t *testing.T) {
+	docs, err := loadYAML("./testdata/resources/multiple_pods.yml")
+	assert.Nil(t, err, "Expecting Load to not return an error")
+	assert.Equal(t, 2, len(docs), "Expecting loader to find 2 documents")
+}
+
+func TestLoadYamlWithEmbeddedYaml(t *testing.T) {
+	docs, err := loadYAML("./testdata/resources/embedded_yaml.yml")
+	assert.Nil(t, err, "Expecting Load to not return an error")
+	assert.Equal(t, 2, len(docs), "Expecting loader to find 2 documents")
+}
+
 func TestGetResourceIDFromFilename(t *testing.T) {
 	expected := "resource.yml"
 	n := getResourceIDFromFilename("path/to/resource.yml")

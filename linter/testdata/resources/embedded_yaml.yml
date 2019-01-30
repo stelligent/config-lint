@@ -1,0 +1,27 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config
+data:
+  config1.yml: |-
+    ---
+    # this is an embedded YAML file
+    foo:
+      bar:
+        key1: value
+        key2: value
+          unit_count: 1
+  config2.yml: |-
+    ---
+    # another embedded YAML file
+    logging:
+      loglevel: INFO
+      logformat: default
+---
+apiVersion: 1
+kind: ConfigMap
+metadata:
+  name: config2
+data:
+  message: Hello

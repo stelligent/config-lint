@@ -26,11 +26,7 @@ func loadYAML(filename string) ([]interface{}, error) {
 		return empty, err
 	}
 	var result []interface{}
-	docs := strings.Split(string(content), "---")
-	for _, doc := range docs {
-		if docIsEmpty(doc) {
-			continue // skip empty documents, which can happen when a file starts or ends with ---
-		}
+	for _, doc := range splitYAMLDocs(string(content)) {
 		var yamlData interface{}
 		err = yaml.Unmarshal([]byte(doc), &yamlData)
 		if err != nil {
@@ -47,8 +43,28 @@ func loadYAML(filename string) ([]interface{}, error) {
 	return result, nil
 }
 
-func docIsEmpty(s string) bool {
-	return s == "" || s == "\n"
+func splitYAMLDocs(content string) []string {
+	docs := []string{}
+	doc := ""
+	lines := strings.Split(content, "\n")
+	for _, line := range lines {
+		if line == "---" {
+			if docIsNotEmpty(doc) {
+				docs = append(docs, doc)
+			}
+			doc = ""
+		} else {
+			doc = doc + line + "\n"
+		}
+	}
+	if docIsNotEmpty(doc) {
+		docs = append(docs, doc)
+	}
+	return docs
+}
+
+func docIsNotEmpty(s string) bool {
+	return strings.TrimSpace(s) != ""
 }
 
 func loadJSON(filename string) ([]interface{}, error) {
