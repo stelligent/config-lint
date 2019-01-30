@@ -42,6 +42,12 @@ func TestLoadYamlWithEmbeddedYaml(t *testing.T) {
 	assert.Equal(t, 2, len(docs), "Expecting loader to find 2 documents")
 }
 
+func TestLoadYamlWithEmptyDocument(t *testing.T) {
+	docs, err := loadYAML("./testdata/resources/empty_document.yml")
+	assert.Nil(t, err, "Expecting Load to not return an error")
+	assert.Equal(t, 1, len(docs), "Expecting loader to find 1 document")
+}
+
 func TestGetResourceIDFromFilename(t *testing.T) {
 	expected := "resource.yml"
 	n := getResourceIDFromFilename("path/to/resource.yml")

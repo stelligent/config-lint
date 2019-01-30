@@ -32,11 +32,13 @@ func loadYAML(filename string) ([]interface{}, error) {
 		if err != nil {
 			return empty, err
 		}
-		// Expecting every document to be an object (not simply valid YAML, such as a list)
-		m, ok := yamlData.(map[string]interface{})
-		if ok {
-			result = append(result, m)
-		} else {
+		switch v := yamlData.(type) {
+		case nil:
+			// ignore empty document - probably only contains comments
+		case map[string]interface{}:
+			// Non-empty document should contain an object (not a list for example)
+			result = append(result, v)
+		default:
 			return []interface{}{}, errors.New("YAML in unexpected format")
 		}
 	}
