@@ -1,4 +1,4 @@
-[![Build Status](https://circleci.com/gh/stelligent/config-lint.svg?style=shield)](https://circleci.com/gh/stelligent/config-lint)
+[![Build Status](https://circleci.com/gh/stelligent/config-lint.svg?style=shield)](https://circleci.com/gh/stelligent/config-lint) [![Join the chat at https://gitter.im/stelligent/config-lint](https://badges.gitter.im/stelligent/config-lint.svg)](https://gitter.im/stelligent/config-lint?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # config-lint
 
