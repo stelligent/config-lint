@@ -43,7 +43,7 @@ var privateIPTests = []struct {
 }
 
 func TestIsPrivateIp(t *testing.T) {
-	for _, input := range ipTests {
+	for _, input := range privateIPTests {
 		t.Run(input.value, func(t *testing.T) {
 			result := isPrivateIP(input.value)
 			if result != input.expectedResult {
