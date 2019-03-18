@@ -36,10 +36,13 @@ var privateIPTests = []struct {
 	{"10.1.0.0/16", true},
 	{"10.1.1.1/32", true},
 	{"10.1.1.1", true},
+	{"172.16.0.0/12", true},
+	{"172.0.0.0/8", false},
 	{"172.16.1.1", true},
 	{"172.15.1.1", false},
 	{"192.168.1.1", true},
 	{"52.1.1.1", false},
+	{"sg-1234567", false},
 }
 
 func TestIsPrivateIp(t *testing.T) {
