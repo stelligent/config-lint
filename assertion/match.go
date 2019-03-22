@@ -158,6 +158,18 @@ func isMatch(data interface{}, expression Expression) (MatchResult, error) {
 			return matches()
 		}
 		return doesNotMatch("%v should be 'false', not '%v'", key, value)
+	case "is-subnet":
+		isSubnet := isSubnet(searchResult, value)
+		if isSubnet {
+			return matches()
+		}
+		return doesNotMatch("%v should be a subnet of %v", searchResult, value)
+	case "is-private-ip":
+		isPrivate := isPrivateIP(searchResult)
+		if isPrivate {
+			return matches()
+		}
+		return doesNotMatch("%v should be a private ip", searchResult)
 	}
 	return doesNotMatch("unknown op %v", op)
 }

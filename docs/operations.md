@@ -29,6 +29,8 @@
 | [starts-with](#starts-with)       | Starts With    |
 | [some](#some)                     | Some           |
 | [xor](#xor)                       | Xor            |
+| [is-subnet](#is-subnet)           | Is Subnet      |
+| [is-private-ip](#is-private-ip)           | Is Private IP      |
 
 ## eq
 
@@ -453,5 +455,42 @@ Example:
     assertions:
        - key: Name
          op: is-not-array
+...
+```
+
+## is-subnet
+
+Check whether a given IP or CIDR block is a subnet of a larger CIDR  block
+
+Example:
+
+```
+...
+  - id: IP_IN_SUPERNET
+    message: All ip_address values should be in the 10.0.0.0/8 supernet
+    severity: FAILURE
+    resource: some_resource
+    assertions:
+       - key: "ip_address"
+         op: is-subnet
+         value: "10.0.0.0/8"
+...
+```
+
+## is-private-ip
+
+Check whether a given IP is in RFC1918 address space.
+
+Example:
+
+```
+...
+  - id: IP_IN_PRIVATE_RANGE
+    message: All ip_address values should be in private address space
+    severity: FAILURE
+    resource: some_resource
+    assertions:
+       - key: "ip_address"
+         op: is-private-ip
 ...
 ```
