@@ -2,7 +2,6 @@ package assertion
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"strings"
 )
@@ -23,12 +22,12 @@ func getIPObject(addressString string) (net.IP, error) {
 func isSubnet(ipAddressStr string, supernet string) bool {
 	ipAddress, parseError := getIPObject(ipAddressStr)
 	if parseError != nil {
-		log.Printf("%v", parseError)
+		Debugf("%v", parseError)
 		return false
 	}
 	_, superNetwork, err := net.ParseCIDR(supernet)
 	if err != nil {
-		log.Fatal("error parsing supernet:", err)
+		Debugf("error parsing supernet: %v", err)
 	}
 	return superNetwork.Contains(ipAddress)
 }
