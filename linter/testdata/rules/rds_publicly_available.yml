@@ -1,0 +1,14 @@
+version: 1
+description: RDS Public Availability
+type: Terraform
+files:
+  - "*.tf"
+rules:
+  - id: RDS_PUBLIC_AVAILABILITY
+    message: RDS instance should not be publicly accessible
+    resource: aws_db_instance
+    severity: FAILING
+    assertions:
+      - not:
+        - key: publicly_accessible
+          op: is-true

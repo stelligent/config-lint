@@ -197,6 +197,36 @@ func TestTerraformLinterCases(t *testing.T) {
 			0,
 			"",
 		},
+		"PublicEC2": {
+			"./testdata/resources/ec2_public.tf",
+			"./testdata/rules/ec2_public.yml",
+			0,
+			"",
+		},
+		"ElastiCacheRest": {
+			"./testdata/resources/elasticache_encryption_rest.tf",
+			"./testdata/rules/elasticache_encryption_rest.yml",
+			1,
+			"ELASTICACHE_ENCRYPTION_REST",
+		},
+		"ElastiCacheTransit": {
+			"./testdata/resources/elasticache_encryption_transit.tf",
+			"./testdata/rules/elasticache_encryption_transit.yml",
+			1,
+			"ELASTICACHE_ENCRYPTION_TRANSIT",
+		},
+		"NeptuneClusterEncryption": {
+			"./testdata/resources/neptune_db_encryption.tf",
+			"./testdata/rules/neptune_db_encryption.yml",
+			1,
+			"NEPTUNE_DB_ENCRYPTION",
+		},
+		"RdsPublic": {
+			"./testdata/resources/rds_publicly_available.tf",
+			"./testdata/rules/rds_publicly_available.yml",
+			0,
+			"",
+		},
 	}
 	for name, tc := range testCases {
 		options := Options{

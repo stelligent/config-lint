@@ -895,7 +895,47 @@ rules:
           - key: container_properties.privileged
             op: is-true
 
+  - id: EC2_SUBNET_MAP_PUBLIC
+    message: EC2 Subnet should not have MapPublicIpOnLaunch set to true
+    resource: aws_subnet
+    severity: WARNING
+    assertions:
+    - not:
+      - key: map_public_ip_on_launch
+        op: is-true
 
+  - id: ELASTICACHE_ENCRYPTION_REST
+    message: ElastiCache ReplicationGroup should have encryption enabled for at rest
+    resource: aws_elasticache_replication_group
+    severity: FAILING
+    assertions:
+    - key: at_rest_encryption_enabled
+      op: is-true
+
+  - id: ELASTICACHE_ENCRYPTION_TRANSIT
+    message: ElastiCache ReplicationGroup should have encryption enabled for in transit
+    resource: aws_elasticache_replication_group
+    severity: FAILING
+    assertions:
+    - key: transit_encryption_enabled
+      op: is-true
+
+  - id: NEPTUNE_DB_ENCRYPTION
+    message: Neptune database cluster storage should have encryption enabled
+    resource: aws_neptune_cluster
+    severity: FAILING
+    assertions:
+    - key: storage_encrypted
+      op: is-true
+
+  - id: RDS_PUBLIC_AVAILABILITY
+    message: RDS instance should not be publicly accessible
+    resource: aws_db_instance
+    severity: FAILING
+    assertions:
+    - not:
+      - key: publicly_accessible
+        op: is-true
   # add KMS key policy version
   # ECR repository policy
   # add ElasticSearch domain access policy version
