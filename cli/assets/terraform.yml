@@ -886,6 +886,15 @@ rules:
         op: eq
         value: "2012-10-17"
 
+  - id: BATCH_DEFINITION_PRIVILEGED
+    message: Batch Job Definition Container Properties should not have Privileged set to true
+    resource: aws_batch_job_definition
+    severity: WARNING
+    assertions:
+      - not:
+          - key: container_properties.privileged
+            op: is-true
+
   # add KMS key policy version
   # ECR repository policy
   # add ElasticSearch domain access policy version

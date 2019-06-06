@@ -3,14 +3,15 @@ package linter
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+
 	"github.com/ghodss/yaml"
 	"github.com/hashicorp/hcl"
 	"github.com/hashicorp/hcl/hcl/ast"
 	"github.com/hashicorp/hcl/hcl/parser"
 	"github.com/stelligent/config-lint/assertion"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 )
 
 type (
@@ -318,7 +319,7 @@ func replaceVariablesInList(list []interface{}, variables []Variable) []interfac
 
 func parseJSONDocuments(resource interface{}) (interface{}, error) {
 	properties := resource.(map[string]interface{})
-	for _, attribute := range []string{"assume_role_policy", "policy", "container_definitions", "access_policies"} {
+	for _, attribute := range []string{"assume_role_policy", "policy", "container_definitions", "access_policies", "container_properties"} {
 		if policyAttribute, hasPolicyString := properties[attribute]; hasPolicyString {
 			if policyString, isString := policyAttribute.(string); isString {
 				var policy interface{}
