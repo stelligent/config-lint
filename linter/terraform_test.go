@@ -1,11 +1,10 @@
 package linter
 
 import (
-	"os"
-	"testing"
-
 	"github.com/stelligent/config-lint/assertion"
 	"github.com/stretchr/testify/assert"
+	"os"
+	"testing"
 )
 
 func TestTerraformLinter(t *testing.T) {
@@ -186,11 +185,17 @@ func TestTerraformLinterCases(t *testing.T) {
 			1,
 			"MODULE_DESCRIPTION",
 		},
-		"Batch_Privileged": {
+		"BatchPrivileged": {
 			"./testdata/resources/batch_privileged.tf",
 			"./testdata/rules/batch_definition.yml",
 			1,
 			"BATCH_DEFINITION_PRIVILEGED",
+		},
+		"CloudfrontAccessLogs": {
+			"./testdata/resources/cloudfront_access_logs.tf",
+			"./testdata/rules/cloudfront_access_logs.yml",
+			0,
+			"",
 		},
 	}
 	for name, tc := range testCases {

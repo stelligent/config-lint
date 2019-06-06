@@ -895,6 +895,14 @@ rules:
           - key: container_properties.privileged
             op: is-true
 
+  - id: CLOUDFRONT ACCESS LOGGING
+    message: CloudFront Distribution should enable access logging
+    resource: aws_cloudfront_distribution
+    severity: WARNING
+    assertions:
+      - key: "logging_config"
+        op: present
+
   # add KMS key policy version
   # ECR repository policy
   # add ElasticSearch domain access policy version
