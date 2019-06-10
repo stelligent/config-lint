@@ -1,10 +1,11 @@
 package linter
 
 import (
-	"github.com/stelligent/config-lint/assertion"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	"github.com/stelligent/config-lint/assertion"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTerraformLinter(t *testing.T) {
@@ -226,6 +227,12 @@ func TestTerraformLinterCases(t *testing.T) {
 			"./testdata/rules/rds_publicly_available.yml",
 			0,
 			"",
+		},
+		"KinesisKms": {
+			"./testdata/resources/kinesis_kms_stream.tf",
+			"./testdata/rules/kinesis_kms_stream.yml",
+			1,
+			"KINESIS_STREAM_KMS",
 		},
 	}
 	for name, tc := range testCases {

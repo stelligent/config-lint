@@ -1,0 +1,13 @@
+version: 1
+description:  Kinesis streams kms
+type: Terraform
+files:
+  - "*.tf"
+rules:
+  - id: KINESIS_STREAM_KMS
+    message: Kinesis streams should be associated with a kms key
+    resource: aws_kinesis_stream
+    severity: FAILING
+    assertions:
+      - key: kms_key_id
+        op: present
