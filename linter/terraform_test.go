@@ -246,6 +246,12 @@ func TestTerraformLinterCases(t *testing.T) {
 			1,
 			"AWS_EMR_CLUSTER_LOGGING",
 		},
+		"KmsKeyRotation": {
+			"./testdata/resources/kms_key_rotation.tf",
+			"./testdata/rules/kms_key_rotation.yml",
+			1,
+			"AWS_KMS_KEY_ROTATION",
+		},
 	}
 	for name, tc := range testCases {
 		options := Options{
