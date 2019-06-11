@@ -234,6 +234,18 @@ func TestTerraformLinterCases(t *testing.T) {
 			1,
 			"KINESIS_STREAM_KMS",
 		},
+		"DmsEncryption": {
+			"./testdata/resources/dms_endpoint_encryption.tf",
+			"./testdata/rules/dms_endpoint_encryption.yml",
+			0,
+			"",
+		},
+		"EmrClusterLogs": {
+			"./testdata/resources/emr_cluster_logs.tf",
+			"./testdata/rules/emr_cluster_logs.yml",
+			1,
+			"AWS_EMR_CLUSTER_LOGGING",
+		},
 	}
 	for name, tc := range testCases {
 		options := Options{

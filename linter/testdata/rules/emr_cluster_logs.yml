@@ -1,0 +1,16 @@
+version: 1
+description: AWS EMR Cluster Logging
+type: Terraform
+files:
+  - "*.tf"
+rules:
+
+  - id: AWS_EMR_CLUSTER_LOGGING
+    message: AWS EMR Should have logging enabled
+    resource: aws_emr_cluster
+    severity: WARNING
+    assertions:
+      - key: log_uri
+        op: present
+    tags:
+      - emr
