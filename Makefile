@@ -13,8 +13,7 @@ default: all
 
 deps:
 	@echo "=== dependencies ==="
-	go get "github.com/golang/dep/cmd/dep"
-	@dep ensure -vendor-only -v
+	go mod download
 
 gen:
 	@echo "=== generating ==="
