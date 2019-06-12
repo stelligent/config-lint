@@ -252,6 +252,18 @@ func TestTerraformLinterCases(t *testing.T) {
 			1,
 			"AWS_KMS_KEY_ROTATION",
 		},
+		"SagemakerEndpoint": {
+			"./testdata/resources/sagemaker_endpoint_encryption.tf",
+			"./testdata/rules/sagemaker_endpoint_encryption.yml",
+			1,
+			"SAGEMAKER_ENDPOINT_ENCRYPTION",
+		},
+		"SagemakerNotebook": {
+			"./testdata/resources/sagemaker_notebook_encryption.tf",
+			"./testdata/rules/sagemaker_notebook_encryption.yml",
+			1,
+			"SAGEMAKER_NOTEBOOK_ENCRYPTION",
+		},
 	}
 	for name, tc := range testCases {
 		options := Options{

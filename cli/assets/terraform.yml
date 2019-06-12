@@ -992,6 +992,26 @@ rules:
         op: is-true
     tags:
       - kms
+
+  - id: SAGEMAKER_ENDPOINT_ENCRYPTION
+    message: Sagemaker configuration should be encrypted
+    resource: aws_sagemaker_endpoint_configuration
+    severity: WARNING
+    assertions:
+      - key: kms_key_arn
+        op: present
+    tags:
+      - sagemaker
+      -
+  - id: SAGEMAKER_NOTEBOOK_ENCRYPTION
+    message: Sagemaker Notebook should be encrypted
+    resource: aws_sagemaker_notebook_instance
+    severity: WARNING
+    assertions:
+      - key: kms_key_id
+        op: present
+    tags:
+      - sagemaker
   # add KMS key policy version
   # ECR repository policy
   # add ElasticSearch domain access policy version
