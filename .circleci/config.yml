@@ -2,16 +2,18 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:1.10
+      - image: circleci/golang:1.11
+        environment:
+          - GO111MODULE=on
     working_directory: /go/src/github.com/stelligent/config-lint
     steps:
       - checkout
       - restore_cache:
           keys:
             - v1-config-lint-cache
-      - run: 
+      - run:
           name: Dependencies
-          command: make deps
+          command: go mod download
       - run: 
           name: Test
           command: make test
@@ -24,7 +26,7 @@ jobs:
           paths: .
   release:
     docker:
-      - image: circleci/golang:1.10
+      - image: circleci/golang:1.11
     working_directory: /go/src/github.com/stelligent/config-lint
     steps:
       - attach_workspace:
