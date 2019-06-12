@@ -16,7 +16,7 @@ jobs:
           command: go mod download
       - run: 
           name: Test
-          command: make test
+          command: go test
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths:
