@@ -10,10 +10,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-config-lint-cache
-      - run: 
-          name: Dependencies
-          command: make deps
+            - go-mod-v1-{{ checksum "go.sum" }}
       - run: 
           name: Test
           command: make test
@@ -26,7 +23,9 @@ jobs:
           paths: .
   release:
     docker:
-      - image: circleci/golang:1.10
+      - image: circleci/golang:1.11
+        environment:
+          GO111MODULE: "ON"
     working_directory: /go/src/github.com/stelligent/config-lint
     steps:
       - attach_workspace:
