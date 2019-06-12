@@ -13,7 +13,7 @@ jobs:
             - go-mod-v1-{{ checksum "go.sum" }}'
       - run:
           name: Dependencies
-            command: go mod download
+          command: go mod download
       - run: 
           name: Test
           command: make test
