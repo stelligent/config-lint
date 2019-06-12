@@ -10,7 +10,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - go-mod-v1-{{ checksum "go.sum" }}'
+            - v1-config-lint-cache
       - run:
           name: Dependencies
           command: go mod download
@@ -18,7 +18,7 @@ jobs:
           name: Test
           command: go test
       - save_cache:
-          key: go-mod-v1-{{ checksum "go.sum" }}
+          key: v1-config-lint-cache
           paths:
             - "/go/pkg"
       - persist_to_workspace:

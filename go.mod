@@ -1,4 +1,4 @@
-module /Users/michaelschappacher/Downloads/config-lint-go_modules
+module config-lint
 
 go 1.12
 
