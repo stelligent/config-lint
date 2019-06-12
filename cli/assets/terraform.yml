@@ -573,7 +573,7 @@ rules:
         op: eq
         value: lambda:InvokeFunction
     tags:
-     - lambda
+      - lambda
 
   - id: LAMBDA_PERMISSION_WILDCARD_PRINCIPAL
     message: Lambda permission should not have wildcard principal
@@ -584,7 +584,7 @@ rules:
         op: ne
         value: "*"
     tags:
-     - lambda
+      - lambda
 
   - id: LAMBDA_FUNCTION_ENCRYPTION
     message: Lambda function should use encryption
@@ -791,7 +791,7 @@ rules:
               op: present
     tags:
       - firehose
-  
+
   - id: KINESIS_STREAM_KMS
     message: Kinesis streams should be associated with a kms key
     resource: aws_kinesis_stream
@@ -983,6 +983,7 @@ rules:
         op: present
     tags:
       - emr
+
   - id: AWS_KMS_KEY_ROTATION
     message: AWS KMS Key Rotation should be enabled
     resource: aws_kms_key
@@ -1002,8 +1003,7 @@ rules:
         op: present
     tags:
       - sagemaker
-      -
-        -
+
   - id: SAGEMAKER_NOTEBOOK_ENCRYPTION
     message: Sagemaker Notebook should be encrypted
     resource: aws_sagemaker_notebook_instance
@@ -1013,6 +1013,7 @@ rules:
         op: present
     tags:
       - sagemaker
+
   # add KMS key policy version
   # ECR repository policy
   # add ElasticSearch domain access policy version
