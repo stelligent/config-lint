@@ -5,7 +5,7 @@ jobs:
       - image: circleci/golang:1.11
         environment:
           - GO111MODULE=on
-    working_directory: /go/src/github.com/stelligent/config-lint
+    working_directory: /go/src/github.com/MikeSchapp/config-lint
     steps:
       - checkout
       - restore_cache:
@@ -27,10 +27,10 @@ jobs:
   release:
     docker:
       - image: circleci/golang:1.11
-    working_directory: /go/src/github.com/stelligent/config-lint
+    working_directory: /go/src/github.com/MikeSchapp/config-lint
     steps:
       - attach_workspace:
-          at: /go/src/github.com/stelligent/config-lint
+          at: /go/src/github.com/MikeSchapp/config-lint
       - run:
           name: Release
           command: |
