@@ -1,4 +1,4 @@
-module github.com/stelligent/config-lint
+module github.com/MikeSchapp/config-lint
 
 go 1.11
 
