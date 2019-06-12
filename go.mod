@@ -1,4 +1,4 @@
-module github.com/mikeschapp/config-lint
+module github.com/stelligent/config-lint
 
 go 1.12
 
@@ -22,7 +22,6 @@ require (
 	github.com/nightlyone/lockfile v0.0.0-20180618180623-0ad87eef1443 // indirect
 	github.com/sdboyer/constext v0.0.0-20170321163424-836a14457353 // indirect
 	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a // indirect
-	github.com/stelligent/config-lint v0.0.36
 	github.com/stretchr/testify v1.3.0
 	golang.org/x/crypto v0.0.0-20190611184440-5c40567a22f8 // indirect
 	golang.org/x/lint v0.0.0-20190409202823-959b441ac422 // indirect
