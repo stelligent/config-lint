@@ -3,19 +3,20 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.11
-        environment:
-          GO111MODULE: "ON"
     working_directory: /go/src/github.com/stelligent/config-lint
     steps:
       - checkout
       - restore_cache:
           keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
+            - go-mod-v1-{{ checksum "go.sum" }}'
+      - run:
+          name: Dependencies
+            command: GO111MODULE=on go mod download
       - run: 
           name: Test
           command: make test
       - save_cache:
-          key: v1-config-lint-cache
+          key: go-mod-v1-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg"
       - persist_to_workspace:
@@ -24,8 +25,6 @@ jobs:
   release:
     docker:
       - image: circleci/golang:1.11
-        environment:
-          GO111MODULE: "ON"
     working_directory: /go/src/github.com/stelligent/config-lint
     steps:
       - attach_workspace:
