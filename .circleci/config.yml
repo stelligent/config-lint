@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.10
-    working_directory: /go/src/github.com/MikeSchapp/config-lint
+    working_directory: /go/src/github.com/stelligent/config-lint
     steps:
       - checkout
       - restore_cache:
@@ -25,10 +25,10 @@ jobs:
   release:
     docker:
       - image: circleci/golang:1.10
-    working_directory: /go/src/github.com/MikeSchapp/config-lint
+    working_directory: /go/src/github.com/stelligent/config-lint
     steps:
       - attach_workspace:
-          at: /go/src/github.com/MikeSchapp/config-lint
+          at: /go/src/github.com/stelligent/config-lint
       - run:
           name: Release
           command: |
