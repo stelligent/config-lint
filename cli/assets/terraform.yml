@@ -1003,6 +1003,7 @@ rules:
     tags:
       - sagemaker
       -
+        -
   - id: SAGEMAKER_NOTEBOOK_ENCRYPTION
     message: Sagemaker Notebook should be encrypted
     resource: aws_sagemaker_notebook_instance
