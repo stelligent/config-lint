@@ -2,7 +2,9 @@ package assertion
 
 import (
 	"fmt"
+	"math"
 	"net"
+	"strconv"
 	"strings"
 )
 
@@ -39,4 +41,23 @@ func isPrivateIP(ipAddressStr string) bool {
 		}
 	}
 	return false
+}
+
+func maxHostCount(ruleCidr string, hostLimitStr string) bool {
+	hostLimit, convErr := strconv.Atoi(hostLimitStr)
+	if convErr != nil {
+		Debugf("error converting %v to int", hostLimitStr)
+		hostLimit = 0
+	}
+	_, network, err := net.ParseCIDR(ruleCidr)
+	if err != nil {
+		Debugf("error parsing ruleCidr: %v", ruleCidr)
+		return false
+	}
+	netmaskOnes, _ := network.Mask.Size()
+	return hostCountByNetmaskOnes(netmaskOnes) <= hostLimit
+}
+
+func hostCountByNetmaskOnes(netmaskOnes int) int {
+	return int(math.Pow(float64(2), float64(32-netmaskOnes)))
 }
