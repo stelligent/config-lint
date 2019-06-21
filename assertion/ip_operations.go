@@ -44,6 +44,9 @@ func isPrivateIP(ipAddressStr string) bool {
 }
 
 func maxHostCount(ruleCidr string, hostLimitStr string) bool {
+	if !strings.Contains(ruleCidr, "/") {
+		ruleCidr = fmt.Sprintf("%s/32", ruleCidr)
+	}
 	hostLimit, convErr := strconv.Atoi(hostLimitStr)
 	if convErr != nil {
 		Debugf("error converting %v to int", hostLimitStr)
