@@ -73,6 +73,41 @@ You can use "-" for the filename if you want the configuration data read from ST
 cat example-files/resources/s3.tf | config-lint -terraform -
 ```
 
+# Options
+
+Here are all the different command line options that can be used with config-lint. You can also
+view them via the -help option.
+
+ * -debug - Debug logging
+    	
+ * -exclude value - Filename patterns to exclude
+ 
+ * -exclude-from value - Filename containing patterns to exclude
+ 
+ * -ids string - Run only the rules in this comma separated list
+ 
+ * -ignore-ids string - Ignore the rules in this comma separated list
+ 
+ * -profile string- Provide default options
+ 
+ * -query string - JMESPath expression to query the results
+ 
+ * -rules value - Rules file, can be specified multiple times
+ 
+ * -search string - JMESPath expression to evaluation against the files
+ 
+ * -tags string - Run only tests with tags in this comma separated list
+ 
+ * -terraform - Use built-in rules for Terraform
+ 
+ * -validate - Validate rules file
+ 
+ * -var value - Variable values for rules with ValueFrom.Variable
+ 
+ * -verbose - Output a verbose report
+ 
+ * -version - Get program version
+
 # Rules
 
 A YAML file that specifies what kinds of files to process, and what validations to perform, [documented here](docs/rules.md).

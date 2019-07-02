@@ -27,6 +27,8 @@ jobs:
   release:
     docker:
       - image: circleci/golang:1.11
+        environment:
+          - GO111MODULE=on
     working_directory: /go/src/github.com/stelligent/config-lint
     steps:
       - attach_workspace:
