@@ -55,3 +55,28 @@ func TestIsPrivateIp(t *testing.T) {
 		})
 	}
 }
+
+var maxHostCountTests = []struct {
+	value          string
+	max            string
+	expectedResult bool
+}{
+	{"10.0.0.0/8", "1000", false},
+	{"10.0.0.0/23", "500", false},
+	{"10.1.0.0/16", "65600", true},
+	{"10.1.1.1/32", "2", true},
+	{"10.1.1.1/32", "1", true},
+	{"10.1.1.1", "1", true},
+	{"sg-1234567", "0", false},
+}
+
+func TestMaxHostCount(t *testing.T) {
+	for _, input := range maxHostCountTests {
+		t.Run(input.value, func(t *testing.T) {
+			result := maxHostCount(input.value, input.max)
+			if result != input.expectedResult {
+				t.Errorf("got %v, want %v", result, input.expectedResult)
+			}
+		})
+	}
+}

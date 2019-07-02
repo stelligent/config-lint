@@ -31,6 +31,7 @@
 | [xor](#xor)                       | Xor            |
 | [is-subnet](#is-subnet)           | Is Subnet      |
 | [is-private-ip](#is-private-ip)           | Is Private IP      |
+| [exposed-hosts](#exposed-hosts)           | Number of hosts exposed to |
 
 ## eq
 
@@ -492,5 +493,27 @@ Example:
     assertions:
        - key: "ip_address"
          op: is-private-ip
+...
+```
+
+## max-host-count
+
+Checks how many hosts in a given CIDR range. This is useful for evaluating security group rules, for instance.
+
+Example:
+
+```
+...
+  - id: MAX_HOSTS_EXPOSED_PER_RULE
+    message: All security group rules must expose less than 1016 hosts
+    severity: FAILURE
+    resource: aws_security_group_rule
+    assertions:
+      - every:
+        key: "cidr_blocks"
+        expressions:
+          - key: "@"
+            op: max-host-count
+            value: 1016
 ...
 ```

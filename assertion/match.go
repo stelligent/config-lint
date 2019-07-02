@@ -170,6 +170,12 @@ func isMatch(data interface{}, expression Expression) (MatchResult, error) {
 			return matches()
 		}
 		return doesNotMatch("%v should be a private ip", searchResult)
+	case "max-host-count":
+		hostCountWithinLimit := maxHostCount(searchResult, value)
+		if hostCountWithinLimit {
+			return matches()
+		}
+		return doesNotMatch("%v should be less than or equal to %v", searchResult, value)
 	}
 	return doesNotMatch("unknown op %v", op)
 }
