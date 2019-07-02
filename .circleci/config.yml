@@ -8,9 +8,6 @@ jobs:
     working_directory: /go/src/github.com/stelligent/config-lint
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-config-lint-cache
       - run:
           name: Dependencies
           command: go mod download
