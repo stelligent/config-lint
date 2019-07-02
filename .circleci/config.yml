@@ -8,19 +8,12 @@ jobs:
     working_directory: /go/src/github.com/stelligent/config-lint
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v1-config-lint-cache
       - run:
           name: Dependencies
           command: go mod download
       - run: 
           name: Test
           command: make test
-      - save_cache:
-          key: v1-config-lint-cache
-          paths:
-            - "/go/pkg"
       - persist_to_workspace:
           root: .
           paths: .
