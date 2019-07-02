@@ -17,10 +17,6 @@ jobs:
       - run: 
           name: Test
           command: make test
-      - save_cache:
-          key: v1-config-lint-cache
-          paths:
-            - "/go/pkg"
       - persist_to_workspace:
           root: .
           paths: .
