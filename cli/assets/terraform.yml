@@ -573,7 +573,7 @@ rules:
         op: eq
         value: lambda:InvokeFunction
     tags:
-     - lambda
+      - lambda
 
   - id: LAMBDA_PERMISSION_WILDCARD_PRINCIPAL
     message: Lambda permission should not have wildcard principal
@@ -584,7 +584,7 @@ rules:
         op: ne
         value: "*"
     tags:
-     - lambda
+      - lambda
 
   - id: LAMBDA_FUNCTION_ENCRYPTION
     message: Lambda function should use encryption
@@ -792,6 +792,16 @@ rules:
     tags:
       - firehose
 
+  - id: KINESIS_STREAM_KMS
+    message: Kinesis streams should be associated with a kms key
+    resource: aws_kinesis_stream
+    severity: FAILING
+    assertions:
+      - key: kms_key_id
+        op: present
+    tags:
+      - kinesis
+
   - id: REDSHIFT_CLUSTER_ENCRYPTION
     message: RedshiftCluster should use encryption
     resource: aws_redshift_cluster
@@ -876,6 +886,8 @@ rules:
       - key: policy.Version
         op: eq
         value: "2012-10-17"
+    tags:
+      - iam
 
   - id: ASSUME_ROLEPOLICY_VERSION
     message: Version in IAM Policy should be 2012-10-17
@@ -885,6 +897,122 @@ rules:
       - key: assume_role_policy.Version
         op: eq
         value: "2012-10-17"
+    tags:
+      - iam
+
+  - id: BATCH_DEFINITION_PRIVILEGED
+    message: Batch Job Definition Container Properties should not have Privileged set to true
+    resource: aws_batch_job_definition
+    severity: WARNING
+    assertions:
+      - not:
+          - key: container_properties.privileged
+            op: is-true
+    tags:
+      - batch
+
+  - id: EC2_SUBNET_MAP_PUBLIC
+    message: EC2 Subnet should not have MapPublicIpOnLaunch set to true
+    resource: aws_subnet
+    severity: WARNING
+    assertions:
+    - not:
+      - key: map_public_ip_on_launch
+        op: is-true
+    tags:
+      - ec2
+      - subnet
+
+  - id: ELASTICACHE_ENCRYPTION_REST
+    message: ElastiCache ReplicationGroup should have encryption enabled for at rest
+    resource: aws_elasticache_replication_group
+    severity: FAILING
+    assertions:
+    - key: at_rest_encryption_enabled
+      op: is-true
+    tags:
+      - elasticache
+
+  - id: ELASTICACHE_ENCRYPTION_TRANSIT
+    message: ElastiCache ReplicationGroup should have encryption enabled for in transit
+    resource: aws_elasticache_replication_group
+    severity: FAILING
+    assertions:
+    - key: transit_encryption_enabled
+      op: is-true
+    tags:
+      - elasticache
+
+  - id: NEPTUNE_DB_ENCRYPTION
+    message: Neptune database cluster storage should have encryption enabled
+    resource: aws_neptune_cluster
+    severity: FAILING
+    assertions:
+    - key: storage_encrypted
+      op: is-true
+    tags:
+      - neptune
+
+  - id: RDS_PUBLIC_AVAILABILITY
+    message: RDS instance should not be publicly accessible
+    resource: aws_db_instance
+    severity: FAILING
+    assertions:
+    - not:
+      - key: publicly_accessible
+        op: is-true
+    tags:
+      - rds
+
+  - id: AWS_DMS_ENDPOINT_ENCRYPTION
+    message: AWS DMS Endpoint should have a kms key present
+    resource: aws_dms_endpoint
+    severity: WARNING
+    assertions:
+      - key: kms_key_arn
+        op: present
+    tags:
+      - dms
+
+  - id: AWS_EMR_CLUSTER_LOGGING
+    message: AWS EMR Should have logging enabled
+    resource: aws_emr_cluster
+    severity: WARNING
+    assertions:
+      - key: log_uri
+        op: present
+    tags:
+      - emr
+
+  - id: AWS_KMS_KEY_ROTATION
+    message: AWS KMS Key Rotation should be enabled
+    resource: aws_kms_key
+    severity: WARNING
+    assertions:
+      - key: enable_key_rotation
+        op: is-true
+    tags:
+      - kms
+
+  - id: SAGEMAKER_ENDPOINT_ENCRYPTION
+    message: Sagemaker configuration should be encrypted
+    resource: aws_sagemaker_endpoint_configuration
+    severity: WARNING
+    assertions:
+      - key: kms_key_arn
+        op: present
+    tags:
+      - sagemaker
+
+  - id: SAGEMAKER_NOTEBOOK_ENCRYPTION
+    message: Sagemaker Notebook should be encrypted
+    resource: aws_sagemaker_notebook_instance
+    severity: WARNING
+    assertions:
+      - key: kms_key_id
+        op: present
+    tags:
+      - sagemaker
 
   # add KMS key policy version
   # ECR repository policy

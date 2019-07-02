@@ -1,0 +1,15 @@
+
+version: 1
+description: AWS DMS Endpoint Encryption
+type: Terraform
+files:
+  - "*.tf"
+rules:
+
+  - id: AWS_DMS_ENDPOINT_ENCRYPTION
+    message: AWS DMS Endpoint should have a kms key present
+    resource: aws_dms_endpoint
+    severity: WARNING
+    assertions:
+      - key: kms_key_arn
+        op: present

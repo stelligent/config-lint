@@ -3,7 +3,6 @@ MAJOR_VERSION := $(word 1, $(subst ., ,$(VERSION)))
 MINOR_VERSION := $(word 2, $(subst ., ,$(VERSION)))
 PATCH_VERSION := $(word 3, $(subst ., ,$(VERSION)))
 NEXT_VERSION ?= $(MAJOR_VERSION).$(MINOR_VERSION).$(shell echo $(PATCH_VERSION)+1|bc)
-
 BUILD_DIR = .release
 GOLDFLAGS = "-X main.version=$(NEXT_VERSION)"
 
@@ -13,8 +12,7 @@ default: all
 
 deps:
 	@echo "=== dependencies ==="
-	go get "github.com/golang/dep/cmd/dep"
-	@dep ensure -vendor-only -v
+	go mod download
 
 gen:
 	@echo "=== generating ==="

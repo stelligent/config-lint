@@ -1,10 +1,11 @@
 package linter
 
 import (
-	"github.com/stelligent/config-lint/assertion"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	"github.com/stelligent/config-lint/assertion"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTerraformLinter(t *testing.T) {
@@ -184,6 +185,84 @@ func TestTerraformLinterCases(t *testing.T) {
 			"./testdata/rules/terraform_module.yml",
 			1,
 			"MODULE_DESCRIPTION",
+		},
+		"BatchPrivileged": {
+			"./testdata/resources/batch_privileged.tf",
+			"./testdata/rules/batch_definition.yml",
+			1,
+			"BATCH_DEFINITION_PRIVILEGED",
+		},
+		"CloudfrontAccessLogs": {
+			"./testdata/resources/cloudfront_access_logs.tf",
+			"./testdata/rules/cloudfront_access_logs.yml",
+			0,
+			"",
+		},
+		"PublicEC2": {
+			"./testdata/resources/ec2_public.tf",
+			"./testdata/rules/ec2_public.yml",
+			0,
+			"",
+		},
+		"ElastiCacheRest": {
+			"./testdata/resources/elasticache_encryption_rest.tf",
+			"./testdata/rules/elasticache_encryption_rest.yml",
+			1,
+			"ELASTICACHE_ENCRYPTION_REST",
+		},
+		"ElastiCacheTransit": {
+			"./testdata/resources/elasticache_encryption_transit.tf",
+			"./testdata/rules/elasticache_encryption_transit.yml",
+			1,
+			"ELASTICACHE_ENCRYPTION_TRANSIT",
+		},
+		"NeptuneClusterEncryption": {
+			"./testdata/resources/neptune_db_encryption.tf",
+			"./testdata/rules/neptune_db_encryption.yml",
+			1,
+			"NEPTUNE_DB_ENCRYPTION",
+		},
+		"RdsPublic": {
+			"./testdata/resources/rds_publicly_available.tf",
+			"./testdata/rules/rds_publicly_available.yml",
+			0,
+			"",
+		},
+		"KinesisKms": {
+			"./testdata/resources/kinesis_kms_stream.tf",
+			"./testdata/rules/kinesis_kms_stream.yml",
+			1,
+			"KINESIS_STREAM_KMS",
+		},
+		"DmsEncryption": {
+			"./testdata/resources/dms_endpoint_encryption.tf",
+			"./testdata/rules/dms_endpoint_encryption.yml",
+			0,
+			"",
+		},
+		"EmrClusterLogs": {
+			"./testdata/resources/emr_cluster_logs.tf",
+			"./testdata/rules/emr_cluster_logs.yml",
+			1,
+			"AWS_EMR_CLUSTER_LOGGING",
+		},
+		"KmsKeyRotation": {
+			"./testdata/resources/kms_key_rotation.tf",
+			"./testdata/rules/kms_key_rotation.yml",
+			1,
+			"AWS_KMS_KEY_ROTATION",
+		},
+		"SagemakerEndpoint": {
+			"./testdata/resources/sagemaker_endpoint_encryption.tf",
+			"./testdata/rules/sagemaker_endpoint_encryption.yml",
+			1,
+			"SAGEMAKER_ENDPOINT_ENCRYPTION",
+		},
+		"SagemakerNotebook": {
+			"./testdata/resources/sagemaker_notebook_encryption.tf",
+			"./testdata/rules/sagemaker_notebook_encryption.yml",
+			1,
+			"SAGEMAKER_NOTEBOOK_ENCRYPTION",
 		},
 	}
 	for name, tc := range testCases {

@@ -1,0 +1,14 @@
+version: 1
+description: Batch Privileged
+type: Terraform
+files:
+  - "*.tf"
+rules:
+
+  - id: CLOUDFRONT ACCESS LOGGING
+    message: CloudFront Distribution should enable access logging
+    resource: aws_cloudfront_distribution
+    severity: WARNING
+    assertions:
+      - key: "logging_config"
+        op: present

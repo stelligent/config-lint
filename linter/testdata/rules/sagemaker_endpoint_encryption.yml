@@ -1,0 +1,16 @@
+version: 1
+description: AWS Sagemaker Endpoint Encryption
+type: Terraform
+files:
+  - "*.tf"
+rules:
+
+  - id: SAGEMAKER_ENDPOINT_ENCRYPTION
+    message: Sagemaker configuration should be encrypted
+    resource: aws_sagemaker_endpoint_configuration
+    severity: WARNING
+    assertions:
+      - key: kms_key_arn
+        op: present
+    tags:
+      - sagemaker

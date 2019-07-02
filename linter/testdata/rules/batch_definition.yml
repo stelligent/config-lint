@@ -1,0 +1,15 @@
+version: 1
+description: Batch Privileged
+type: Terraform
+files:
+  - "*.tf"
+rules:
+
+  - id: BATCH_DEFINITION_PRIVILEGED
+    message: Batch Job Definition Container Properties should not have Privileged set to true
+    resource: aws_batch_job_definition
+    severity: WARNING
+    assertions:
+      - not:
+        - key: container_properties.privileged
+          op: is-true

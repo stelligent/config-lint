@@ -1,0 +1,13 @@
+version: 1
+description: Elasticache encryption in transit
+type: Terraform
+files:
+    - "*.tf"
+rules:
+  - id: ELASTICACHE_ENCRYPTION_TRANSIT
+    message: ElastiCache ReplicationGroup should have encryption enabled for in transit
+    resource: aws_elasticache_replication_group
+    severity: FAILING
+    assertions:
+      - key: transit_encryption_enabled
+        op: is-true
