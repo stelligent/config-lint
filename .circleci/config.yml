@@ -34,7 +34,7 @@ jobs:
       - run:
           name: Release
           command: |
-            go get github.com/goreleaser/goreleaser
+            go get -u github.com/goreleaser/goreleaser
             goreleaser release --skip-validate
 
 workflows:
