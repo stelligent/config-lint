@@ -34,6 +34,10 @@ test: lint cyclo
 	@echo "=== testing ==="
 	@go test ./...
 
+testtf: lint cyclo
+	@echo "=== testing ==="
+	@go test -v ./cli/... -run TestTerraformBuiltInRules
+
 bumpversion:
 	@echo "=== promoting $(NEXT_VERSION) ==="
 	@git tag -a -m "$(VERSION) -> $(NEXT_VERSION)" $(NEXT_VERSION)
