@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"testing"
+
 	"github.com/stelligent/config-lint/assertion"
 	"github.com/stelligent/config-lint/linter"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func loadRules(t *testing.T, filename string) assertion.RuleSet {
@@ -73,6 +74,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"s3.tf", "S3_NOT_PRINCIPAL", 0, 0},
 		{"s3.tf", "S3_BUCKET_POLICY_WILDCARD_PRINCIPAL", 1, 0},
 		{"s3.tf", "S3_BUCKET_POLICY_WILDCARD_ACTION", 1, 0},
+		{"s3.tf", "S3_BUCKET_ENCRYPTION", 0, 1},
 		{"s3.tf", "S3_BUCKET_OBJECT_ENCRYPTION", 0, 1},
 		{"sns.tf", "SNS_TOPIC_POLICY_WILDCARD_PRINCIPAL", 1, 0},
 		{"sns.tf", "SNS_TOPIC_POLICY_NOT_ACTION", 0, 0},

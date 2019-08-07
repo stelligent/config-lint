@@ -420,6 +420,17 @@ rules:
     tags:
       - s3
 
+  - id: S3_BUCKET_ENCRYPTION
+    message: S3 bucket should be encrypted
+    resource: aws_s3_bucket
+    severity: FAILURE
+    assertions:
+      - key: "@"
+        op: has-properties
+        value: server_side_encryption_configuration
+    tags:
+      - s3
+
   - id: SNS_TOPIC_POLICY_WILDCARD_PRINCIPAL
     message: Should not use wildcard Principal in SNS topic policy
     resource: aws_sns_topic_policy
