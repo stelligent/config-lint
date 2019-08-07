@@ -164,11 +164,37 @@ The files will *not* be scanned for violations.
 The overall design in described [here](docs/design.md).
 
 # Development
-design
+
+## Prerequisites 
+- [Install golang](https://golang.org/doc/install)
+- Add the output of the following command to your PATH
+```
+echo "$(go env GOPATH)/bin"
+```
+
 ## Build Command Line tool
 
 ```
 make all
+```
+
+The binary is located at `.release/config-lint`
+
+## Tests
+Tests are located in the `assertion` directory. To run all tests: 
+```
+make test
+```
+
+To run the Terraform builtin rules tests:
+```
+make testtf
+```
+
+## Linting
+To lint all files (using golint):
+```
+make lint
 ```
 
 ## Releasing
