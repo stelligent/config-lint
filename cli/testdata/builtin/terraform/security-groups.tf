@@ -31,3 +31,17 @@ resource "aws_security_group" "sg_ssh" {
     cidr_blocks     = ["0.0.0.0/0"]
   }
 }
+
+resource "aws_security_group" "sg_all_protocols" {
+  name = "all_all_protocols"
+  description = "Allow all protocols and ports"
+
+  ingress {
+    protocol    = "-1"
+    cidr_blocks = "10.0.1.10/32" # A random IP is used to prevent a quad 0 warning
+  }
+  egress {
+    protocol    = "-1"
+    cidr_blocks = "10.0.1.10/32" # A random IP is used to prevent a quad 0 warning
+  }
+}

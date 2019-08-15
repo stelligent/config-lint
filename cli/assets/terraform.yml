@@ -123,6 +123,28 @@ rules:
       - sg
       - ec2
 
+  - id: SG_INGRESS_ALL_PROTOCALS
+    resource: aws_security_group
+    message: Should make individual rules per protocol since all protocals ignores ports
+    assertions:
+      - key: "ingress[].protocol"
+        op: eq
+        value: "-1"
+    severity: WARNING
+    tags:
+      - sg
+
+  - id: SG_EGRESS_ALL_PROTOCALS
+    resource: aws_security_group
+    message: Should make individual rules per protocol since all protocals ignores ports
+    assertions:
+      - key: "egress[].protocol"
+        op: eq
+        value: "-1"
+    severity: WARNING
+    tags:
+      - sg
+
   - id: CLOUDFRONT_DISTRIBUTION_LOGGING
     message: CloudFront Distribution must configure logging
     resource: aws_cloudfront_distribution

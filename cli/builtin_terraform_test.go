@@ -52,6 +52,8 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"security-groups.tf", "SG_INGRESS_PORT_RANGE", 0, 0},
 		{"security-groups.tf", "SG_EGRESS_PORT_RANGE", 0, 0},
 		{"security-groups.tf", "SG_MISSING_EGRESS", 0, 0},
+		{"security-groups.tf", "SG_INGRESS_ALL_PROTOCALS", 1, 0},
+		{"security-groups.tf", "SG_EGRESS_ALL_PROTOCALS", 3, 0},
 		{"cloudfront.tf", "CLOUDFRONT_DISTRIBUTION_LOGGING", 0, 1},
 		{"cloudfront.tf", "CLOUDFRONT_DISTRIBUTION_ORIGIN_POLICY", 0, 0},
 		{"cloudfront.tf", "CLOUDFRONT_DISTRIBUTION_DISTRIBUTION_PROTOCOl", 0, 0},
