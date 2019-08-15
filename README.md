@@ -163,7 +163,16 @@ The files will *not* be scanned for violations.
 
 The overall design in described [here](docs/design.md).
 
-# Development
+# VS Code Remote Development
+The preferred method of developing is to use the VS Code Remote development functionality.
+
+- Install the VS Code [Remote Development extension pack](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack)
+- Open the repo in VS Code
+- When prompted "`Folder contains a dev container configuration file. Reopen folder to develop in a container`" click the "`Reopen in Container`" button
+- When opening in the future use the "`config-lint [Dev Container]`" option
+
+
+# Local Development
 
 ## Prerequisites 
 - [Install golang](https://golang.org/doc/install)
