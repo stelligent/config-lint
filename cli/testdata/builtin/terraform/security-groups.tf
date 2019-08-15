@@ -38,10 +38,10 @@ resource "aws_security_group" "sg_all_protocols" {
 
   ingress {
     protocol    = "-1"
-    cidr_blocks = ["1.2.3.4/32"]
+    cidr_blocks = "1.2.3.4/32"
   }
   egress {
     protocol    = "-1"
-    cidr_blocks = ["1.2.3.4/32"]
+    cidr_blocks = "1.2.3.4/32"
   }
 }
