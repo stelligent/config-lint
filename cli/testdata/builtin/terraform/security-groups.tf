@@ -31,3 +31,17 @@ resource "aws_security_group" "sg_ssh" {
     cidr_blocks     = ["0.0.0.0/0"]
   }
 }
+
+resource "aws_security_group" "sg_all_protocols" {
+  name = "all_all_protocols"
+  description = "Allow all protocols and ports"
+
+  ingress {
+    protocol    = "-1"
+    cidr_blocks = "1.2.3.4/32"
+  }
+  egress {
+    protocol    = "-1"
+    cidr_blocks = "1.2.3.4/32"
+  }
+}
