@@ -123,9 +123,9 @@ rules:
       - sg
       - ec2
 
-  - id: SG_INGRESS_ALL_PROTOCALS
+  - id: SG_INGRESS_ALL_PROTOCOLS
     resource: aws_security_group
-    message: Should make individual rules per protocol since all protocals ignores ports
+    message: Best practices recommend not opening all protocols and ports to ingress traffic
     assertions:
       - not:
         - key: "ingress[].protocol"
@@ -135,9 +135,9 @@ rules:
     tags:
       - sg
 
-  - id: SG_EGRESS_ALL_PROTOCALS
+  - id: SG_EGRESS_ALL_PROTOCOLS
     resource: aws_security_group
-    message: Should make individual rules per protocol since all protocals ignores ports
+    message: Best practices recommend not opening all protocols and ports to egress traffic
     assertions:
       - not:
         - key: "egress[].protocol"
