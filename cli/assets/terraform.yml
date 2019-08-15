@@ -127,9 +127,10 @@ rules:
     resource: aws_security_group
     message: Should make individual rules per protocol since all protocals ignores ports
     assertions:
-      - key: "ingress[].protocol"
-        op: eq
-        value: "-1"
+      - not:
+        - key: "ingress[].protocol"
+          op: contains
+          value: "-1"
     severity: WARNING
     tags:
       - sg
@@ -138,9 +139,10 @@ rules:
     resource: aws_security_group
     message: Should make individual rules per protocol since all protocals ignores ports
     assertions:
-      - key: "egress[].protocol"
-        op: eq
-        value: "-1"
+      - not:
+        - key: "egress[].protocol"
+          op: contains
+          value: "-1"
     severity: WARNING
     tags:
       - sg

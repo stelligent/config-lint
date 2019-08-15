@@ -38,10 +38,10 @@ resource "aws_security_group" "sg_all_protocols" {
 
   ingress {
     protocol    = "-1"
-    cidr_blocks = "10.0.1.10/32" # A random IP is used to prevent a quad 0 warning
+    cidr_blocks = ["1.2.3.4/32"]
   }
   egress {
     protocol    = "-1"
-    cidr_blocks = "10.0.1.10/32" # A random IP is used to prevent a quad 0 warning
+    cidr_blocks = ["1.2.3.4/32"]
   }
 }
