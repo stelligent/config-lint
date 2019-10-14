@@ -1,6 +1,9 @@
-name: Default Workflow
+name: Build
 
-on: [push]
+on:
+  push:
+    branches:
+      - "*"
 
 jobs:
   build:
