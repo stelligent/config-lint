@@ -1,0 +1,13 @@
+package workflows
+name: Default Workflow
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: golang:1.12
+    steps:
+      - uses: actions/checkout@master
+      - name: dependencies
+        run: go mod download
