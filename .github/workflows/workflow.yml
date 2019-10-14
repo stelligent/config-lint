@@ -1,9 +1,11 @@
 name: Build
 
-on: [push]
-#  push:
-#    branches:
-#      - '*'
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
 
 jobs:
   build:
