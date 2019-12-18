@@ -3,17 +3,19 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/ghodss/yaml"
-	"github.com/stelligent/config-lint/assertion"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
+
+	"github.com/ghodss/yaml"
+	"github.com/stelligent/config-lint/assertion"
 )
 
 func getCommandLineOptions() CommandLineOptions {
 
 	commandLineOptions := CommandLineOptions{}
 	commandLineOptions.TerraformBuiltInRules = flag.Bool("terraform", false, "Use built-in rules for Terraform")
+	commandLineOptions.Terraform12BuiltInRules = flag.Bool("terraform12", false, "Use built-in rules for Terraform v0.12")
 	flag.Var(&commandLineOptions.RulesFilenames, "rules", "Rules file, can be specified multiple times")
 	commandLineOptions.Tags = flag.String("tags", "", "Run only tests with tags in this comma separated list")
 	commandLineOptions.Ids = flag.String("ids", "", "Run only the rules in this comma separated list")

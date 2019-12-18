@@ -2,8 +2,9 @@ package linter
 
 import (
 	"fmt"
-	"github.com/stelligent/config-lint/assertion"
 	"io"
+
+	"github.com/stelligent/config-lint/assertion"
 )
 
 type (
@@ -29,6 +30,8 @@ func NewLinter(ruleSet assertion.RuleSet, vs assertion.ValueSource, filenames []
 		return FileLinter{Filenames: filenames, ValueSource: vs, Loader: KubernetesResourceLoader{}}, nil
 	case "Terraform":
 		return FileLinter{Filenames: filenames, ValueSource: vs, Loader: TerraformResourceLoader{}}, nil
+	case "Terraform12":
+		return FileLinter{Filenames: filenames, ValueSource: vs, Loader: Terraform12ResourceLoader{}}, nil
 	case "LintRules":
 		return FileLinter{Filenames: filenames, ValueSource: vs, Loader: RulesResourceLoader{}}, nil
 	case "YAML":

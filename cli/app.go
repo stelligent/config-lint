@@ -33,15 +33,16 @@ type (
 
 	// ProfileOptions for default options from a project file
 	ProfileOptions struct {
-		Rules      []string
-		IDs        []string
-		IgnoreIDs  []string `json:"ignore_ids"`
-		Tags       []string
-		Query      string
-		Files      []string
-		Terraform  bool
-		Exceptions []RuleException
-		Variables  map[string]string
+		Rules       []string
+		IDs         []string
+		IgnoreIDs   []string `json:"ignore_ids"`
+		Tags        []string
+		Query       string
+		Files       []string
+		Terraform   bool
+		Terraform12 bool
+		Exceptions  []RuleException
+		Variables   map[string]string
 	}
 
 	// RuleException optional list allowing a project to ignore specific rules for specific resources
@@ -55,22 +56,23 @@ type (
 
 	// CommandLineOptions for collecting options from the command line
 	CommandLineOptions struct {
-		RulesFilenames        arrayFlags
-		ExcludePatterns       arrayFlags
-		ExcludeFromFilenames  arrayFlags
-		Variables             arrayFlags
-		ProfileFilename       *string
-		TerraformBuiltInRules *bool
-		Tags                  *string
-		Ids                   *string
-		IgnoreIds             *string
-		QueryExpression       *string
-		VerboseReport         *bool
-		SearchExpression      *string
-		Validate              *bool
-		Version               *bool
-		Debug                 *bool
-		Args                  []string
+		RulesFilenames          arrayFlags
+		ExcludePatterns         arrayFlags
+		ExcludeFromFilenames    arrayFlags
+		Variables               arrayFlags
+		ProfileFilename         *string
+		TerraformBuiltInRules   *bool
+		Terraform12BuiltInRules *bool
+		Tags                    *string
+		Ids                     *string
+		IgnoreIds               *string
+		QueryExpression         *string
+		VerboseReport           *bool
+		SearchExpression        *string
+		Validate                *bool
+		Version                 *bool
+		Debug                   *bool
+		Args                    []string
 	}
 
 	// ReportWriter formats and displays a ValidationReport
@@ -114,6 +116,7 @@ func main() {
 	rulesFilenames := loadFilenames(commandLineOptions.RulesFilenames, profileOptions.Rules)
 	configFilenames := defaultToCurrentDirectory(loadFilenames(commandLineOptions.Args, profileOptions.Files))
 	useTerraformBuiltInRules := *commandLineOptions.TerraformBuiltInRules || profileOptions.Terraform
+	useTerraform12BuiltInRules := *commandLineOptions.Terraform12BuiltInRules || profileOptions.Terraform12
 
 	if err != nil {
 		fmt.Printf("Unable to load exclude patterns: %s\n", err)
@@ -136,6 +139,14 @@ func main() {
 		builtInRuleSet, err := loadBuiltInRuleSet("terraform.yml")
 		if err != nil {
 			fmt.Printf("Failed to load built-in rules for Terraform: %v\n", err)
+			os.Exit(-1)
+		}
+		ruleSets = append(ruleSets, builtInRuleSet)
+	}
+	if useTerraform12BuiltInRules {
+		builtInRuleSet, err := loadBuiltInRuleSet("terraform12.yml")
+		if err != nil {
+			fmt.Printf("Failed to load built-in rules for Terraform 12: %v\n", err)
 			os.Exit(-1)
 		}
 		ruleSets = append(ruleSets, builtInRuleSet)

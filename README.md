@@ -22,10 +22,12 @@ Alternatively, you can install manually from the [releases](https://github.com/s
 The program has a set of built-in rules for scanning the following types of files:
 
 * [Terraform](docs/terraform.md)
+* [Terraform v0.12][docs/terraform12.md] # TODO: create new terraform v0.12 docs and examples
 
 The program can also read files from a separate YAML file, and can scan these types of files:
 
 * [Terraform](docs/terraform.md)
+* [Terraform v0.12][docs/terraform12.md] # TODO: create new terraform v0.12 docs and examples
 * Kubernetes
 * LintRules
 * YAML
@@ -99,6 +101,8 @@ view them via the -help option.
  * -tags string - Run only tests with tags in this comma separated list
  
  * -terraform - Use built-in rules for Terraform
+
+* -terraform12 - Use built-in rules for Terraform v0.12
  
  * -validate - Validate rules file
  

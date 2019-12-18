@@ -2,9 +2,10 @@ package linter
 
 import (
 	"fmt"
-	"github.com/stelligent/config-lint/assertion"
 	"io"
 	"time"
+
+	"github.com/stelligent/config-lint/assertion"
 )
 
 type (
@@ -33,7 +34,6 @@ type (
 
 // Validate validates a collection of filenames using a RuleSet
 func (fl FileLinter) Validate(ruleSet assertion.RuleSet, options Options) (assertion.ValidationReport, error) {
-
 	rules := assertion.FilterRulesByTagAndID(ruleSet.Rules, options.Tags, options.RuleIDs, options.IgnoreRuleIDs)
 	rl := ResourceLinter{ValueSource: fl.ValueSource}
 
