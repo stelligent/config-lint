@@ -7,11 +7,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ghodss/yaml"
-	"github.com/hashicorp/hcl"
-	"github.com/hashicorp/hcl/hcl/ast"
-	"github.com/hashicorp/hcl/hcl/parser"
 	"github.com/stelligent/config-lint/assertion"
+
+	hcl2 "github.com/hashicorp/hcl/v2"
+	hcl2parse "github.com/hashicorp/hcl/v2/hclparse"
 )
 
 type (
@@ -25,7 +24,7 @@ type (
 		Providers []interface{}
 		Modules   []interface{}
 		Variables []Variable
-		AST       *ast.File
+		AST       *hcl2.File
 	}
 )
 
@@ -42,25 +41,62 @@ func loadHCLv2(filename string) (Terraform12LoadResult, error) {
 		return result, err
 	}
 
-	result.AST, _ = parser.Parse(template)
+	// NEW PARSER FOR HCL V2 (hclparse)
+	hcl2parser := hcl2parse.NewParser()
+	result.AST, _ = hcl2parser.ParseHCL(template, filename)
 
-	var v interface{}
-	err = hcl.Unmarshal([]byte(template), &v)
-	if err != nil {
-		return result, err
-	}
-	jsonData, err := json.MarshalIndent(v, "", "  ")
-	if err != nil {
-		return result, err
-	}
-	assertion.Debugf("LoadHCL: %s\n", string(jsonData))
+	// PRINT OUT STRING CONVERSION OF 'result.AST'
+	//fmt.Printf("RESULT AST:\n %v\n", string(result.AST.Bytes))
 
-	var hclData interface{}
-	err = yaml.Unmarshal(jsonData, &hclData)
+	// BODY CONTENT IN THE FORMAT OF SCHEMA FROM 'schema.go'
+	hcl2BodyContent, _ := result.AST.Body.Content(terraformSchema)
+	// fmt.Printf("BODY CONTENT:\n %v\n", hcl2BodyContent)
+
+	// BODY BLOCKS WITHIN BODY CONTENT
+	hcl2BodyBlocks := hcl2BodyContent.Blocks.ByType()
+	// fmt.Printf("BODY BLOCKS:\n %v\n", hcl2BodyBlocks)
+
+	// RETURNS THE JSON ENCODING OF THE 'hcl2BodyBlocks' map[string]hcl2.blocks (hcl2BodyContent.Blocks.ByType())
+	hcl2JSONEncoding, err := json.Marshal(hcl2BodyBlocks)
 	if err != nil {
+		fmt.Println(err)
+	}
+	// fmt.Printf("JSON ENCODING STRING VALUE CONVERSION FROM BYTE SLICE:\n %v\n", string(hcl2JSONEncoding))
+
+	// TAKES THE BYTE SLICE FORMAT OF THE JSON ENCODING (hcl2JSONEncoding) AND UNMARSHALS IT TO 'var hcl2Data interface{}'
+	var hcl2Data interface{}
+	err = json.Unmarshal([]byte(hcl2JSONEncoding), &hcl2Data)
+	if err != nil {
+		fmt.Printf("ERROR: %v\n", err)
 		return result, err
 	}
-	m := hclData.(map[string]interface{})
+	// 'hcl2Data interface{}' VALUE AFTER BEING UNMARSHALED TO FROM 'hcl2JSONEncoding'
+	// fmt.Printf("VAR V INTERFACE{}:\n %v\n", hcl2Data)
+
+	// *****************************************************************************************************************************
+	// BELOW NOT NECESSARY. UNCOMMENT FOR OUTPUTTING READABLE FORMAT OF JSON STRING AND FOR DEBUGGING PURPOSES
+	// *****************************************************************************************************************************
+	// jsonData, err := json.MarshalIndent(v, "", "  ")
+	// if err != nil {
+	// 	fmt.Printf("JSON DATA ERR: %v\n", err)
+	// 	return result, err
+	// }
+	// fmt.Printf("jsonData IN []BYTE FORM AFTER MARSHAL INDENT:\n %v\n", jsonData)
+	// fmt.Printf("jsonData IN JSON STRING FORMAT:\n %v\n", string(jsonData))
+	// assertion.Debugf("LoadHCL: %s\n", string(jsonData))
+
+	// var hcl2Data interface{}
+	// err = yaml.Unmarshal(jsonData, &hcl2Data)
+	// if err != nil {
+	// 	return result, err
+	// }
+	// fmt.Printf("hcl2Data INTERFACE:\n %v\n", hcl2Data)
+	// *****************************************************************************************************************************
+	// END
+	// *****************************************************************************************************************************
+
+	m := hcl2Data.(map[string]interface{})
+
 	result.Variables = append(tf12LoadVariables(m["variable"]), tf12LoadLocalVariables(m["locals"])...)
 	if m["resource"] != nil {
 		result.Resources = append(result.Resources, m["resource"].([]interface{})...)
@@ -145,12 +181,14 @@ func tf12FlattenMaps(v interface{}) interface{} {
 	return v
 }
 
-func tf12GetResourceLineNumber(resourceType, resourceID, filename string, root *ast.File) int {
-	resourceItems := root.Node.(*ast.ObjectList).Filter("resource", resourceType, resourceID).Items
-	if len(resourceItems) > 0 {
-		resourcePos := resourceItems[0].Val.Pos()
-		assertion.Debugf("Position %s %s:%d\n", resourceID, filename, resourcePos.Line)
-		return resourcePos.Line
+// ** TODO: Create func/logic to make sure this is grabbing the desired resource line based on 'resourceType' and 'resourceID' **
+func tf12GetResourceLineNumber(resourceType, resourceID, filename string, root *hcl2.File) int {
+	hcl2BodyContent, _ := root.Body.Content(terraformSchema)
+	hcl2ResourceBlocks := hcl2BodyContent.Blocks.OfType("resource")
+	if len(hcl2ResourceBlocks) > 0 {
+		tf12ResourceBlockRange := hcl2ResourceBlocks[0].TypeRange
+		assertion.Debugf("Position %s %s:%d\n", resourceID, filename, tf12ResourceBlockRange.Start.Line)
+		return tf12ResourceBlockRange.Start.Line
 	}
 	return 0
 }
@@ -237,7 +275,7 @@ func tf12AddKeyToModule(resources map[string]interface{}, module interface{}) ma
 	return resources
 }
 
-func tf12GetResources(filename string, ast *ast.File, objects []interface{}, category string) []assertion.Resource {
+func tf12GetResources(filename string, ast *hcl2.File, objects []interface{}, category string) []assertion.Resource {
 	resources := []assertion.Resource{}
 	for _, resource := range objects {
 		for resourceType, templateResources := range resource.(map[string]interface{}) {
