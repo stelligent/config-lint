@@ -3,7 +3,6 @@ package linter
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -29,6 +28,7 @@ type (
 )
 
 func loadHCLv2(filename string) (Terraform12LoadResult, error) {
+	diags := hcl2.Diagnostics{}
 	result := Terraform12LoadResult{
 		Resources: []interface{}{},
 		Data:      []interface{}{},
@@ -36,14 +36,13 @@ func loadHCLv2(filename string) (Terraform12LoadResult, error) {
 		Modules:   []interface{}{},
 		Variables: []Variable{},
 	}
-	template, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return result, err
-	}
 
 	// NEW PARSER FOR HCL V2 (hclparse)
-	hcl2parser := hcl2parse.NewParser()
-	result.AST, _ = hcl2parser.ParseHCL(template, filename)
+	result.AST, diags = hcl2parse.NewParser().ParseHCLFile(filename)
+	if diags.HasErrors() {
+		fmt.Printf("ERROR: %v\n", diags)
+		return result, diags
+	}
 
 	// PRINT OUT STRING CONVERSION OF 'result.AST'
 	//fmt.Printf("RESULT AST:\n %v\n", string(result.AST.Bytes))
@@ -71,7 +70,7 @@ func loadHCLv2(filename string) (Terraform12LoadResult, error) {
 		return result, err
 	}
 	// 'hcl2Data interface{}' VALUE AFTER BEING UNMARSHALED TO FROM 'hcl2JSONEncoding'
-	// fmt.Printf("VAR V INTERFACE{}:\n %v\n", hcl2Data)
+	// fmt.Printf("VAR HCL2DATA INTERFACE{}:\n %v\n", hcl2Data)
 
 	// *****************************************************************************************************************************
 	// BELOW NOT NECESSARY. UNCOMMENT FOR OUTPUTTING READABLE FORMAT OF JSON STRING AND FOR DEBUGGING PURPOSES
