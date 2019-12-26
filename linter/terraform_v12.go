@@ -6,10 +6,12 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/ghodss/yaml"
 	"github.com/stelligent/config-lint/assertion"
 
 	hcl2 "github.com/hashicorp/hcl/v2"
 	hcl2parse "github.com/hashicorp/hcl/v2/hclparse"
+	hclsyntax "github.com/hashicorp/hcl/v2/hclsyntax"
 )
 
 type (
@@ -39,62 +41,58 @@ func loadHCLv2(filename string) (Terraform12LoadResult, error) {
 
 	// NEW PARSER FOR HCL V2 (hclparse)
 	result.AST, diags = hcl2parse.NewParser().ParseHCLFile(filename)
+	var InitialPos = hcl2.Pos{Byte: 0, Line: 1, Column: 1}
 	if diags.HasErrors() {
 		fmt.Printf("ERROR: %v\n", diags)
 		return result, diags
 	}
 
-	// PRINT OUT STRING CONVERSION OF 'result.AST'
-	//fmt.Printf("RESULT AST:\n %v\n", string(result.AST.Bytes))
+	newParsed, diags := hclsyntax.ParseTemplate(result.AST.Bytes, filename, InitialPos)
+	if diags.HasErrors() {
+		fmt.Printf("ERROR: %v\n", diags)
+		return result, diags
+	}
 
-	// BODY CONTENT IN THE FORMAT OF SCHEMA FROM 'schema.go'
-	hcl2BodyContent, _ := result.AST.Body.Content(terraformSchema)
-	// fmt.Printf("BODY CONTENT:\n %v\n", hcl2BodyContent)
+	newParsedVal, diags := newParsed.Value(nil)
+	if diags.HasErrors() {
+		fmt.Printf("ERROR: %v\n", diags)
+		return result, diags
+	}
 
-	// BODY BLOCKS WITHIN BODY CONTENT
-	hcl2BodyBlocks := hcl2BodyContent.Blocks.ByType()
-	// fmt.Printf("BODY BLOCKS:\n %v\n", hcl2BodyBlocks)
-
-	// RETURNS THE JSON ENCODING OF THE 'hcl2BodyBlocks' map[string]hcl2.blocks (hcl2BodyContent.Blocks.ByType())
-	hcl2JSONEncoding, err := json.Marshal(hcl2BodyBlocks)
+	parsedValString := newParsedVal.AsString()
+	hcl2JSONEncoding, err := json.Marshal(parsedValString)
 	if err != nil {
 		fmt.Println(err)
-	}
-	// fmt.Printf("JSON ENCODING STRING VALUE CONVERSION FROM BYTE SLICE:\n %v\n", string(hcl2JSONEncoding))
-
-	// TAKES THE BYTE SLICE FORMAT OF THE JSON ENCODING (hcl2JSONEncoding) AND UNMARSHALS IT TO 'var hcl2Data interface{}'
-	var hcl2Data interface{}
-	err = json.Unmarshal([]byte(hcl2JSONEncoding), &hcl2Data)
-	if err != nil {
-		fmt.Printf("ERROR: %v\n", err)
 		return result, err
 	}
-	// 'hcl2Data interface{}' VALUE AFTER BEING UNMARSHALED TO FROM 'hcl2JSONEncoding'
-	// fmt.Printf("VAR HCL2DATA INTERFACE{}:\n %v\n", hcl2Data)
 
-	// *****************************************************************************************************************************
-	// BELOW NOT NECESSARY. UNCOMMENT FOR OUTPUTTING READABLE FORMAT OF JSON STRING AND FOR DEBUGGING PURPOSES
-	// *****************************************************************************************************************************
+	fmt.Printf("JSON ENCODED STRING:\n %v\n", string(hcl2JSONEncoding))
+
+	// var v interface{}
+	// err = json.Unmarshal(hcl2JSONEncoding, &v)
+	// if err != nil {
+	// 	fmt.Println("ERROR:")
+	// 	fmt.Println(err)
+	// }
+
 	// jsonData, err := json.MarshalIndent(v, "", "  ")
 	// if err != nil {
-	// 	fmt.Printf("JSON DATA ERR: %v\n", err)
-	// 	return result, err
+	// 	fmt.Printf("ERROR:\n %v\n", err)
 	// }
-	// fmt.Printf("jsonData IN []BYTE FORM AFTER MARSHAL INDENT:\n %v\n", jsonData)
-	// fmt.Printf("jsonData IN JSON STRING FORMAT:\n %v\n", string(jsonData))
-	// assertion.Debugf("LoadHCL: %s\n", string(jsonData))
+	// fmt.Println("-----------------------------------------------------------")
+	// fmt.Printf("JSON DATA STRING:\n %v\n", string(jsonData))
+	// fmt.Println("-----------------------------------------------------------")
 
-	// var hcl2Data interface{}
-	// err = yaml.Unmarshal(jsonData, &hcl2Data)
-	// if err != nil {
-	// 	return result, err
-	// }
-	// fmt.Printf("hcl2Data INTERFACE:\n %v\n", hcl2Data)
-	// *****************************************************************************************************************************
-	// END
-	// *****************************************************************************************************************************
+	var hclData interface{}
+	err = yaml.Unmarshal(hcl2JSONEncoding, &hclData)
+	if err != nil {
+		fmt.Printf("ERROR:\n %v\n", err)
+	}
 
-	m := hcl2Data.(map[string]interface{})
+	fmt.Println("HCL DATA")
+	fmt.Println(hclData)
+
+	m := hclData.(map[string]interface{})
 
 	result.Variables = append(tf12LoadVariables(m["variable"]), tf12LoadLocalVariables(m["locals"])...)
 	if m["resource"] != nil {
