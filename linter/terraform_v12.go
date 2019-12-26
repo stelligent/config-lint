@@ -3,15 +3,16 @@ package linter
 import (
 	"encoding/json"
 	"fmt"
+	//"go/parser"
 	"os"
 	"path/filepath"
 
-	"github.com/ghodss/yaml"
+	//"github.com/ghodss/yaml"
 	"github.com/stelligent/config-lint/assertion"
 
-	hcl2 "github.com/hashicorp/hcl/v2"
-	hcl2parse "github.com/hashicorp/hcl/v2/hclparse"
-	hclsyntax "github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/hclparse"
+	//hclsyntax "github.com/hashicorp/hcl/v2/hclsyntax"
 )
 
 type (
@@ -25,12 +26,10 @@ type (
 		Providers []interface{}
 		Modules   []interface{}
 		Variables []Variable
-		AST       *hcl2.File
+		AST       *hcl.File
 	}
 )
-
 func loadHCLv2(filename string) (Terraform12LoadResult, error) {
-	diags := hcl2.Diagnostics{}
 	result := Terraform12LoadResult{
 		Resources: []interface{}{},
 		Data:      []interface{}{},
@@ -39,34 +38,40 @@ func loadHCLv2(filename string) (Terraform12LoadResult, error) {
 		Variables: []Variable{},
 	}
 
-	// NEW PARSER FOR HCL V2 (hclparse)
-	result.AST, diags = hcl2parse.NewParser().ParseHCLFile(filename)
-	var InitialPos = hcl2.Pos{Byte: 0, Line: 1, Column: 1}
-	if diags.HasErrors() {
-		fmt.Printf("ERROR: %v\n", diags)
-		return result, diags
-	}
+	var hclParser *hclparse.Parser
+	var file *hcl.File
+	file, _ = hclParser.ParseHCLFile(filename)
+	fmt.Println(file.Body)
 
-	newParsed, diags := hclsyntax.ParseTemplate(result.AST.Bytes, filename, InitialPos)
-	if diags.HasErrors() {
-		fmt.Printf("ERROR: %v\n", diags)
-		return result, diags
-	}
-
-	newParsedVal, diags := newParsed.Value(nil)
-	if diags.HasErrors() {
-		fmt.Printf("ERROR: %v\n", diags)
-		return result, diags
-	}
-
-	parsedValString := newParsedVal.AsString()
-	hcl2JSONEncoding, err := json.Marshal(parsedValString)
-	if err != nil {
-		fmt.Println(err)
-		return result, err
-	}
-
-	fmt.Printf("JSON ENCODED STRING:\n %v\n", string(hcl2JSONEncoding))
+	//file, _ = hclparse.NewParser().ParseHCLFile(filename)
+	//var blocks hcl.Blocks
+	//blocks, _ = result.AST.Body.Content(terraformSchema).Blocks
+	//var InitialPos = hcl2.Pos{Byte: 0, Line: 1, Column: 1}
+	//if diags.HasErrors() {
+	//	fmt.Printf("ERROR: %v\n", diags)
+	//	return result, diags
+	//}
+	//
+	//newParsed, diags := hclsyntax.ParseTemplate(result.AST.Bytes, filename, InitialPos)
+	//if diags.HasErrors() {
+	//	fmt.Printf("ERROR: %v\n", diags)
+	//	return result, diags
+	//}
+	//
+	//newParsedVal, diags := newParsed.Value(nil)
+	//if diags.HasErrors() {
+	//	fmt.Printf("ERROR: %v\n", diags)
+	//	return result, diags
+	//}
+	//
+	//parsedValString := newParsedVal.AsString()
+	//hcl2JSONEncoding, err := json.Marshal(parsedValString)
+	//if err != nil {
+	//	fmt.Println(err)
+	//	return result, err
+	//}
+	//
+	//fmt.Printf("JSON ENCODED STRING:\n %v\n", string(hcl2JSONEncoding))
 
 	// var v interface{}
 	// err = json.Unmarshal(hcl2JSONEncoding, &v)
@@ -83,30 +88,30 @@ func loadHCLv2(filename string) (Terraform12LoadResult, error) {
 	// fmt.Printf("JSON DATA STRING:\n %v\n", string(jsonData))
 	// fmt.Println("-----------------------------------------------------------")
 
-	var hclData interface{}
-	err = yaml.Unmarshal(hcl2JSONEncoding, &hclData)
-	if err != nil {
-		fmt.Printf("ERROR:\n %v\n", err)
-	}
-
-	fmt.Println("HCL DATA")
-	fmt.Println(hclData)
-
-	m := hclData.(map[string]interface{})
-
-	result.Variables = append(tf12LoadVariables(m["variable"]), tf12LoadLocalVariables(m["locals"])...)
-	if m["resource"] != nil {
-		result.Resources = append(result.Resources, m["resource"].([]interface{})...)
-	}
-	if m["data"] != nil {
-		result.Data = append(result.Data, m["data"].([]interface{})...)
-	}
-	if m["provider"] != nil {
-		result.Providers = append(result.Providers, m["provider"].([]interface{})...)
-	}
-	if m["module"] != nil {
-		result.Modules = append(result.Modules, m["module"].([]interface{})...)
-	}
+	//var hclData interface{}
+	//err = yaml.Unmarshal(hcl2JSONEncoding, &hclData)
+	//if err != nil {
+	//	fmt.Printf("ERROR:\n %v\n", err)
+	//}
+	//
+	//fmt.Println("HCL DATA")
+	//fmt.Println(hclData)
+	//
+	//m := hclData.(map[string]interface{})
+	//
+	//result.Variables = append(tf12LoadVariables(m["variable"]), tf12LoadLocalVariables(m["locals"])...)
+	//if m["resource"] != nil {
+	//	result.Resources = append(result.Resources, m["resource"].([]interface{})...)
+	//}
+	//if m["data"] != nil {
+	//	result.Data = append(result.Data, m["data"].([]interface{})...)
+	//}
+	//if m["provider"] != nil {
+	//	result.Providers = append(result.Providers, m["provider"].([]interface{})...)
+	//}
+	//if m["module"] != nil {
+	//	result.Modules = append(result.Modules, m["module"].([]interface{})...)
+	//}
 	assertion.Debugf("LoadHCL Variables: %v\n", result.Variables)
 	return result, nil
 }
@@ -179,7 +184,7 @@ func tf12FlattenMaps(v interface{}) interface{} {
 }
 
 // ** TODO: Create func/logic to make sure this is grabbing the desired resource line based on 'resourceType' and 'resourceID' **
-func tf12GetResourceLineNumber(resourceType, resourceID, filename string, root *hcl2.File) int {
+func tf12GetResourceLineNumber(resourceType, resourceID, filename string, root *hcl.File) int {
 	hcl2BodyContent, _ := root.Body.Content(terraformSchema)
 	hcl2ResourceBlocks := hcl2BodyContent.Blocks.OfType("resource")
 	if len(hcl2ResourceBlocks) > 0 {
@@ -272,7 +277,7 @@ func tf12AddKeyToModule(resources map[string]interface{}, module interface{}) ma
 	return resources
 }
 
-func tf12GetResources(filename string, ast *hcl2.File, objects []interface{}, category string) []assertion.Resource {
+func tf12GetResources(filename string, ast *hcl.File, objects []interface{}, category string) []assertion.Resource {
 	resources := []assertion.Resource{}
 	for _, resource := range objects {
 		for resourceType, templateResources := range resource.(map[string]interface{}) {
