@@ -18,6 +18,7 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.0 // indirect
 	github.com/smartystreets/goconvey v0.0.0-20190330032615-68dc04aab96a // indirect
 	github.com/stretchr/testify v1.4.0
+	github.com/zclconf/go-cty v1.1.1
 	golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f // indirect
 	golang.org/x/tools v0.0.0-20191224055732-dd894d0a8a40 // indirect
 	gopkg.in/ini.v1 v1.42.0 // indirect

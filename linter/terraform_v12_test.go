@@ -1,48 +1,55 @@
 package linter
 
 import (
-	"testing"
-
+	"github.com/stelligent/config-lint/assertion"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
-func TestTerraformV12Linter(t *testing.T) {
-	options := Options{
-		Tags:    []string{},
-		RuleIDs: []string{},
-	}
-	filenames := []string{"./testdata/resources/terraform_instance.tf"}
-	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: Terraform12ResourceLoader{}}
-	ruleSet := loadRulesForTest("./testdata/rules/terraform_instance.yml", t)
-	report, err := linter.Validate(ruleSet, options)
-	assert.Nil(t, err, "Expecting Validate to run without error")
-	assert.Equal(t, len(report.ResourcesScanned), 1, "Unexpected number of resources scanned")
-	assert.Equal(t, len(report.FilesScanned), 1, "Unexpected number of files scanned")
-	assertViolationsCount("TestTerraformLinter ", 0, report.Violations, t)
-}
-
-//func loadResourcesToTest(t *testing.T, filename string) []assertion.Resource {
-//	loader := TerraformResourceLoader{}
-//	loaded, err := loader.Load(filename)
-//	assert.Nil(t, err, "Expecting Load to run without error")
-//	resources, err := loader.PostLoad(loaded)
-//	assert.Nil(t, err, "Expecting PostLoad to run without error")
-//	return resources
+//func TestTerraformV12Linter(t *testing.T) {
+//	options := Options{
+//		Tags:    []string{},
+//		RuleIDs: []string{},
+//	}
+//	filenames := []string{"./testdata/resources/terraform_instance.tf"}
+//	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: Terraform12ResourceLoader{}}
+//	ruleSet := loadRulesForTest("./testdata/rules/terraform_instance.yml", t)
+//	report, err := linter.Validate(ruleSet, options)
+//	assert.Nil(t, err, "Expecting Validate to run without error")
+//	assert.Equal(t, len(report.ResourcesScanned), 1, "Unexpected number of resources scanned")
+//	assert.Equal(t, len(report.FilesScanned), 1, "Unexpected number of files scanned")
+//	assertViolationsCount("TestTerraformLinter ", 0, report.Violations, t)
 //}
+
+func loadResources12ToTest(t *testing.T, filename string) []assertion.Resource {
+	loader := Terraform12ResourceLoader{}
+	loaded, err := loader.Load(filename)
+	assert.Nil(t, err, "Expecting Load to run without error")
+	resources, err := loader.PostLoad(loaded)
+	assert.Nil(t, err, "Expecting PostLoad to run without error")
+	return resources
+}
 //
 //func getResourceTags(r assertion.Resource) map[string]interface{} {
 //	properties := r.Properties.(map[string]interface{})
 //	tags := properties["tags"].([]interface{})
 //	return tags[0].(map[string]interface{})
 //}
-//
-//func TestTerraformVariable(t *testing.T) {
-//	resources := loadResourcesToTest(t, "./testdata/resources/uses_variables.tf")
-//	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
-//	properties := resources[0].Properties.(map[string]interface{})
-//	assert.Equal(t, properties["ami"], "ami-f2d3638a", "Unexpected value for simple variable")
-//}
-//
+
+func TestSingleResourceType(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
+	assert.Equal(t, resources[0].Type, "resource")
+	assert.Equal(t, resources[0].ID, "aws_instance")
+}
+
+func TestTerraform12Variable(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
+	properties := resources[0].Properties.(map[string]interface{})
+	assert.Equal(t, "ami-f2d3638a", properties["ami"], "Unexpected value for simple variable")
+}
+
 //func TestTerraformVariableWithNoDefault(t *testing.T) {
 //	resources := loadResourcesToTest(t, "./testdata/resources/uses_variables.tf")
 //	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
