@@ -65,10 +65,6 @@ func loadHCLv2(filename string) (Terraform12LoadResult, error) {
 		Filename:   filename,
 		LineNumber: 0,
 	}
-	Variable{
-		Name:  "",
-		Value: nil,
-	}
 	props := make(map[string]interface{})
 	resource.Properties = props
 	props["ami"] = "ami-f2d3638a"
