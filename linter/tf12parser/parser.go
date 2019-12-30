@@ -52,7 +52,7 @@ func (parser *Parser) ParseDirectory(path string) (Blocks, error) {
 	return allBlocks.RemoveDuplicates(), nil
 }
 
-func (parser *Parser) ParseFile(path string) (*hcl.EvalContext, error) {
+func (parser *Parser) ParseFile(path string) (Blocks, error) {
 
 	var blocks hcl.Blocks
 
@@ -67,9 +67,8 @@ func (parser *Parser) ParseFile(path string) (*hcl.EvalContext, error) {
 	inputVars := make(map[string]cty.Value)
 	// TODO add .tfvars values to inputVars
 
-	resultBlocks, context := parser.buildEvaluationContext(blocks, path, inputVars, true)
-	fmt.Println(resultBlocks)
-	return context, nil
+	allBlocks, _ := parser.buildEvaluationContext(blocks, path, inputVars, true)
+	return allBlocks.RemoveDuplicates(), nil
 }
 
 func (parser *Parser) parseFile(file *hcl.File) (hcl.Blocks, error) {

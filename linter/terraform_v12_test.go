@@ -1,7 +1,6 @@
 package linter
 
 import (
-	"fmt"
 	"github.com/stelligent/config-lint/assertion"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -39,34 +38,33 @@ func loadResources12ToTest(t *testing.T, filename string) []assertion.Resource {
 
 func TestSingleResourceType(t *testing.T) {
 	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
-	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
-	assert.Equal(t, resources[0].Type, "resource")
-	assert.Equal(t, resources[0].ID, "aws_instance")
+	assert.Equal(t, 1, len(resources), "Expecting 1 resource")
+	assert.Equal(t, "aws_instance", resources[0].Type)
+	assert.Equal(t, "first", resources[0].ID)
 }
 
 func TestTerraform12Variable(t *testing.T) {
 	loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
-	fmt.Println()
-	//resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
-	//assert.Equal(t, len(resources), 1, "Expecting 1 resource")
-	//properties := resources[0].Properties.(map[string]interface{})
-	//assert.Equal(t, "ami-f2d3638a", properties["ami"], "Unexpected value for simple variable")
+	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	assert.Equal(t, 1, len(resources), "Expecting 1 resource")
+	properties := resources[0].Properties.(map[string]interface{})
+	assert.Equal(t, "ami-f2d3638a", properties["ami"], "Unexpected value for simple variable")
 }
 
-//func TestTerraformVariableWithNoDefault(t *testing.T) {
-//	resources := loadResourcesToTest(t, "./testdata/resources/uses_variables.tf")
-//	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
-//	tags := getResourceTags(resources[0])
-//	assert.Equal(t, tags["department"], "", "Unexpected value for variable with no default")
-//}
-//
-//func TestTerraformFunctionCall(t *testing.T) {
-//	resources := loadResourcesToTest(t, "./testdata/resources/uses_variables.tf")
-//	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
-//	tags := getResourceTags(resources[0])
-//	assert.Equal(t, tags["environment"], "test", "Unexpected value for lookup function")
-//}
-//
+func TestTerraform12VariableWithNoDefault(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
+	tags := getResourceTags(resources[0])
+	assert.Equal(t, "", tags["department"], "Unexpected value for variable with no default")
+}
+
+func TestTerraform12FunctionCall(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
+	tags := getResourceTags(resources[0])
+	assert.Equal(t, "test", tags["environment"], "Unexpected value for lookup function")
+}
+
 //func TestTerraformListVariable(t *testing.T) {
 //	resources := loadResourcesToTest(t, "./testdata/resources/uses_variables.tf")
 //	assert.Equal(t, len(resources), 1, "Expecting 1 resource")

@@ -64,14 +64,25 @@ func loadHCLv2(filename string) (Terraform12LoadResult, error) {
 	}
 
 	parser := *tf12parser.New()
-	context, err := parser.ParseFile(filename)
+	blocks, err := parser.ParseFile(filename)
 	if err != nil {
 		fmt.Println("Boo!")
 	}
 
+	resourceBlocks := blocks.OfType("resource")
+	for _, block := range resourceBlocks {
+		resource := assertion.Resource{
+			ID:         block.Labels()[1],
+			Type:       block.Labels()[0],
+			Category:   "",
+			Properties: attributesToMap(block.GetAttributes()),
+			Filename:   "",
+			LineNumber: 0,
+		}
+		result.Resources = append(result.Resources, resource)
+	}
 
-	resources := context.Variables["resource"]
-	mapResources(resources)
+
 	//resourceStruct := new(Instance)
 	//err = gocty.FromCtyValue(resources, resourceStruct)
 	//Note: values are not processing in a consistent order. If there's any error, the entire result is invalid
@@ -86,21 +97,46 @@ func loadHCLv2(filename string) (Terraform12LoadResult, error) {
 	return result, nil
 }
 
-func mapResources(value cty.Value) {
-	var resources []assertion.Resource
-	it := value.ElementIterator()
-	for it.Next() {
-		key, _ := it.Element()
-		resource := assertion.Resource{
-			ID:         "",
-			Type:       key.AsString(),
-			Category:   "resource",
-			Properties: nil,
-			Filename:   "",
-			LineNumber: 0,
+func attributesToMap(attributes []*tf12parser.Attribute) interface{} {
+	propertyMap := make(map[string]interface{})
+	for _, elem := range attributes {
+		if elem.Value().CanIterateElements() {
+			var innerArray []interface{}
+			innerMap := make(map[string]interface{})
+			innerArray = append(innerArray, innerMap)
+			propertyMap[elem.Name()] = innerArray
+
+			iter := elem.Value().ElementIterator()
+			for iter.Next() {
+				key, value := iter.Element()
+				if value.Type().HasDynamicTypes() {
+					innerMap[key.AsString()] = ""
+				} else {
+					innerMap[key.AsString()] = value.AsString()
+				}
+			}
+		} else {
+			propertyMap[elem.Name()] = elem.Value().AsString()
 		}
-		resources = append(resources, resource)
 	}
+	return propertyMap
+}
+
+//func mapResources(value cty.Value) {
+//	var resources []assertion.Resource
+//	it := value.ElementIterator()
+//	for it.Next() {
+//		key, _ := it.Element()
+//		resource := assertion.Resource{
+//			ID:         "",
+//			Type:       key.AsString(),
+//			Category:   "resource",
+//			Properties: nil,
+//			Filename:   "",
+//			LineNumber: 0,
+//		}
+//		resources = append(resources, resource)
+//	}
 	//for v := range value {
 	//
 	//}
@@ -116,7 +152,7 @@ func mapResources(value cty.Value) {
 	//	return true, nil
 	//})
 	//fmt.Println(resources)
-}
+//}
 
 func getNameAtLevel(path cty.Path, value cty.Value) (b bool, err error) {
 	level := len(path)
