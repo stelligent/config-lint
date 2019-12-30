@@ -37,3 +37,7 @@ resource "aws_instance" "first" {
     department = "${var.department}"
   }
 }
+
+resource "aws_vpc" "example" {
+  cidr_block = "10.0.0.0/16"
+}

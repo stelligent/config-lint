@@ -1,12 +1,15 @@
 package linter
 
 import (
-	"github.com/hashicorp/hcl/v2/hclparse"
+	"fmt"
+	"github.com/zclconf/go-cty/cty"
+
 	//"github.com/ghodss/yaml"
 	"github.com/stelligent/config-lint/assertion"
 
 	"github.com/hashicorp/hcl/v2"
 	//hclsyntax "github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/stelligent/config-lint/linter/tf12parser"
 )
 
 type (
@@ -15,7 +18,7 @@ type (
 
 	// Terraform12LoadResult collects all the returns value for parsing an HCL string
 	Terraform12LoadResult struct {
-		Resources []interface{}
+		Resources []assertion.Resource
 		Data      []interface{}
 		Providers []interface{}
 		Modules   []interface{}
@@ -35,7 +38,7 @@ func (l Terraform12ResourceLoader) Load(filename string) (FileResources, error) 
 	}
 	//TODO: MN -- Need to iterate over range here to append all? Seems like I'm missing a GoLang idiom
 	for _, element := range result.Resources {
-		loaded.Resources = append(loaded.Resources, element.(assertion.Resource))
+		loaded.Resources = append(loaded.Resources, element)
 	}
 
 	assertion.DebugJSON("loaded.Resources", loaded.Resources)
@@ -43,35 +46,84 @@ func (l Terraform12ResourceLoader) Load(filename string) (FileResources, error) 
 	return loaded, nil
 }
 
+type (
+	Instance struct {
+		Ami string `cty:"ami"`
+		InstanceType string `cty:"instance_type"`
+		Tags map[string]string `cty:"tags"`
+	}
+)
+
 func loadHCLv2(filename string) (Terraform12LoadResult, error) {
 	result := Terraform12LoadResult{
-		Resources: []interface{}{},
+		Resources: []assertion.Resource{},
 		Data:      []interface{}{},
 		Providers: []interface{}{},
 		Modules:   []interface{}{},
 		Variables: []Variable{},
 	}
 
-	var file *hcl.File
-	parser := hclparse.NewParser()
-	file, _ = parser.ParseHCLFile(filename)
-	content, _ := file.Body.Content(terraformSchema)
-	resourceBlocks := content.Blocks.OfType("resource")
-	//TODO: Only getting the first resource Block here, almost certainly need to recurse
-	resource := assertion.Resource{
-		ID:         resourceBlocks[0].Labels[0],
-		Type:       resourceBlocks[0].Type,
-		Category:   "",
-		Filename:   filename,
-		LineNumber: 0,
+	parser := *tf12parser.New()
+	context, err := parser.ParseFile(filename)
+	if err != nil {
+		fmt.Println("Boo!")
 	}
-	props := make(map[string]interface{})
-	resource.Properties = props
-	props["ami"] = "ami-f2d3638a"
-	result.Resources = append(result.Resources, resource)
+
+
+	resources := context.Variables["resource"]
+	mapResources(resources)
+	//resourceStruct := new(Instance)
+	//err = gocty.FromCtyValue(resources, resourceStruct)
+	//Note: values are not processing in a consistent order. If there's any error, the entire result is invalid
+	if err != nil {
+		fmt.Println("Boo!")
+	}
+
+	//fmt.Println(resourceStruct.Ami)
+	//fmt.Println(resourceStruct.InstanceType)
 
 	assertion.Debugf("LoadHCL Variables: %v\n", result.Variables)
 	return result, nil
+}
+
+func mapResources(value cty.Value) {
+	var resources []assertion.Resource
+	it := value.ElementIterator()
+	for it.Next() {
+		key, _ := it.Element()
+		resource := assertion.Resource{
+			ID:         "",
+			Type:       key.AsString(),
+			Category:   "resource",
+			Properties: nil,
+			Filename:   "",
+			LineNumber: 0,
+		}
+		resources = append(resources, resource)
+	}
+	//for v := range value {
+	//
+	//}
+	//var resources []assertion.Resource
+	//
+	//cty.Walk(value, func(path cty.Path, value cty.Value) (bool, error) {
+	//	level := len(path)
+	//	if level == 1 {
+	//		resources = append(resources, assertion.Resource{
+	//			Type: path[len(path)-1].(cty.GetAttrStep).Name,
+	//		})
+	//	}
+	//	return true, nil
+	//})
+	//fmt.Println(resources)
+}
+
+func getNameAtLevel(path cty.Path, value cty.Value) (b bool, err error) {
+	level := len(path)
+	if level == 1 {
+		fmt.Println(path[len(path)-1].(cty.GetAttrStep).Name)
+	}
+	return true, nil
 }
 
 // PostLoad resolves variable expressions
