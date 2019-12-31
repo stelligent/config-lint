@@ -116,50 +116,14 @@ func attributesToMap(attributes []*tf12parser.Attribute) interface{} {
 				}
 			}
 		} else {
-			propertyMap[elem.Name()] = elem.Value().AsString()
+			if elem.Type() == cty.NilType {
+				propertyMap[elem.Name()] = ""
+			} else {
+				propertyMap[elem.Name()] = elem.Value().AsString()
+			}
 		}
 	}
 	return propertyMap
-}
-
-//func mapResources(value cty.Value) {
-//	var resources []assertion.Resource
-//	it := value.ElementIterator()
-//	for it.Next() {
-//		key, _ := it.Element()
-//		resource := assertion.Resource{
-//			ID:         "",
-//			Type:       key.AsString(),
-//			Category:   "resource",
-//			Properties: nil,
-//			Filename:   "",
-//			LineNumber: 0,
-//		}
-//		resources = append(resources, resource)
-//	}
-	//for v := range value {
-	//
-	//}
-	//var resources []assertion.Resource
-	//
-	//cty.Walk(value, func(path cty.Path, value cty.Value) (bool, error) {
-	//	level := len(path)
-	//	if level == 1 {
-	//		resources = append(resources, assertion.Resource{
-	//			Type: path[len(path)-1].(cty.GetAttrStep).Name,
-	//		})
-	//	}
-	//	return true, nil
-	//})
-	//fmt.Println(resources)
-//}
-
-func getNameAtLevel(path cty.Path, value cty.Value) (b bool, err error) {
-	level := len(path)
-	if level == 1 {
-		fmt.Println(path[len(path)-1].(cty.GetAttrStep).Name)
-	}
-	return true, nil
 }
 
 // PostLoad resolves variable expressions
