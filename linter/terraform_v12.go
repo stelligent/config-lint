@@ -2,6 +2,7 @@ package linter
 
 import (
 	"github.com/zclconf/go-cty/cty"
+	"strconv"
 
 	//"github.com/ghodss/yaml"
 	"github.com/stelligent/config-lint/assertion"
@@ -78,7 +79,7 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 		resource := assertion.Resource{
 			ID:         block.Labels()[1],
 			Type:       block.Labels()[0],
-			Category:   "",
+			Category:   "resource",
 			Properties: attributesToMap(block.GetAttributes()),
 			Filename:   "",
 			LineNumber: 0,
@@ -87,9 +88,27 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 	}
 
 	providerBlocks := blocks.OfType("provider")
+	i := 0
 	for _, block := range providerBlocks {
-		result.Providers = append(result.Providers, attributesToMap(block.GetAttributes()))
+		resource := assertion.Resource{
+			ID:         strconv.Itoa(i),
+			Type:       block.Labels()[0],
+			Category:   "provider",
+			Properties: attributesToMap(block.GetAttributes()),
+			Filename:   "",
+			LineNumber: 0,
+		}
+		result.Resources = append(result.Resources, resource)
+		i++
 	}
+
+	//dataBlocks := blocks.OfType("data")
+	//for _, block := range dataBlocks {
+	//	outerMap := attributesToMap(block.GetAttributes())
+	//	for _, elem := range outerMap.(map[string]interface{}) {
+	//		result.Data = append(result.Data, elem)
+	//	}
+	//}
 
 	assertion.Debugf("LoadHCL Variables: %v\n", result.Variables)
 	return result, nil
