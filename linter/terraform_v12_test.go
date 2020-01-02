@@ -192,24 +192,24 @@ func TestTerraform12LinterCases(t *testing.T) {
 		//	1,
 		//	"MODULE_DESCRIPTION",
 		//},
-		//"BatchPrivileged": {
-		//	"./testdata/resources/batch_privileged.tf",
-		//	"./testdata/rules/batch_definition.yml",
-		//	1,
-		//	"BATCH_DEFINITION_PRIVILEGED",
-		//},
+		"BatchPrivileged": {
+			"./testdata/resources/batch_privileged.tf",
+			"./testdata/rules/batch_definition.yml",
+			1,
+			"BATCH_DEFINITION_PRIVILEGED",
+		},
 		//"CloudfrontAccessLogs": {
 		//	"./testdata/resources/cloudfront_access_logs.tf",
 		//	"./testdata/rules/cloudfront_access_logs.yml",
 		//	0,
 		//	"",
 		//},
-		//"PublicEC2": {
-		//	"./testdata/resources/ec2_public.tf",
-		//	"./testdata/rules/ec2_public.yml",
-		//	0,
-		//	"",
-		//},
+		"PublicEC2": {
+			"./testdata/resources/ec2_public.tf",
+			"./testdata/rules/ec2_public.yml",
+			0,
+			"",
+		},
 		//"ElastiCacheRest": {
 		//	"./testdata/resources/elasticache_encryption_rest.tf",
 		//	"./testdata/rules/elasticache_encryption_rest.yml",
