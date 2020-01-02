@@ -139,66 +139,66 @@ func TestTerraform12DataLoader(t *testing.T) {
 
 func TestTerraform12LinterCases(t *testing.T) {
 	testCases := map[string]terraformLinterTestCase{
-		//"ParseError": {
-		//	"./testdata/resources/terraform_syntax_error.tf",
-		//	"./testdata/rules/terraform_provider.yml",
-		//	1,
-		//	"FILE_LOAD",
-		//},
-		//"Provider": {
-		//	"./testdata/resources/terraform_provider.tf",
-		//	"./testdata/rules/terraform_provider.yml",
-		//	1,
-		//	"AWS_PROVIDER",
-		//},
-		//"DataObject": {
-		//	"./testdata/resources/terraform_data.tf",
-		//	"./testdata/rules/terraform_data.yml",
-		//	1,
-		//	"DATA_NOT_CONTAINS",
-		//},
-		//"PoliciesWithVariables": {
-		//	"./testdata/resources/policy_with_variables.tf",
-		//	"./testdata/rules/policy_variable.yml",
-		//	0,
-		//	"",
-		//},
-		//"HereDocWithExpression": {
-		//	"./testdata/resources/policy_with_expression.tf",
-		//	"./testdata/rules/policy_variable.yml",
-		//	0,
-		//	"",
-		//},
-		//"Policies": {
-		//	"./testdata/resources/terraform_policy.tf",
-		//	"./testdata/rules/terraform_policy.yml",
-		//	1,
-		//	"TEST_POLICY",
-		//},
-		//"PolicyInvalidJSON": {
-		//	"./testdata/resources/terraform_policy_invalid_json.tf",
-		//	"./testdata/rules/terraform_policy.yml",
-		//	0,
-		//	"",
-		//},
-		//"PolicyEmpty": {
-		//	"./testdata/resources/terraform_policy_empty.tf",
-		//	"./testdata/rules/terraform_policy.yml",
-		//	0,
-		//	"",
-		//},
-		//"BatchPrivileged": {
-		//	"./testdata/resources/batch_privileged.tf",
-		//	"./testdata/rules/batch_definition.yml",
-		//	1,
-		//	"BATCH_DEFINITION_PRIVILEGED",
-		//},
-		//"PublicEC2": {
-		//	"./testdata/resources/ec2_public.tf",
-		//	"./testdata/rules/ec2_public.yml",
-		//	0,
-		//	"",
-		//},
+		"ParseError": {
+			"./testdata/resources/terraform_syntax_error.tf",
+			"./testdata/rules/terraform_provider.yml",
+			1,
+			"FILE_LOAD",
+		},
+		"Provider": {
+			"./testdata/resources/terraform_provider.tf",
+			"./testdata/rules/terraform_provider.yml",
+			1,
+			"AWS_PROVIDER",
+		},
+		"DataObject": {
+			"./testdata/resources/terraform_data.tf",
+			"./testdata/rules/terraform_data.yml",
+			1,
+			"DATA_NOT_CONTAINS",
+		},
+		"PoliciesWithVariables": {
+			"./testdata/resources/policy_with_variables.tf",
+			"./testdata/rules/policy_variable.yml",
+			0,
+			"",
+		},
+		"HereDocWithExpression": {
+			"./testdata/resources/policy_with_expression.tf",
+			"./testdata/rules/policy_variable.yml",
+			0,
+			"",
+		},
+		"Policies": {
+			"./testdata/resources/terraform_policy.tf",
+			"./testdata/rules/terraform_policy.yml",
+			1,
+			"TEST_POLICY",
+		},
+		"PolicyInvalidJSON": {
+			"./testdata/resources/terraform_policy_invalid_json.tf",
+			"./testdata/rules/terraform_policy.yml",
+			0,
+			"",
+		},
+		"PolicyEmpty": {
+			"./testdata/resources/terraform_policy_empty.tf",
+			"./testdata/rules/terraform_policy.yml",
+			0,
+			"",
+		},
+		"BatchPrivileged": {
+			"./testdata/resources/batch_privileged.tf",
+			"./testdata/rules/batch_definition.yml",
+			1,
+			"BATCH_DEFINITION_PRIVILEGED",
+		},
+		"PublicEC2": {
+			"./testdata/resources/ec2_public.tf",
+			"./testdata/rules/ec2_public.yml",
+			0,
+			"",
+		},
 		//"CloudfrontAccessLogs": {
 		//	"./testdata/resources/cloudfront_access_logs.tf",
 		//	"./testdata/rules/cloudfront_access_logs.yml",
