@@ -150,18 +150,18 @@ func TestTerraform12LinterCases(t *testing.T) {
 			1,
 			"AWS_PROVIDER",
 		},
-		//"DataObject": {
-		//	"./testdata/resources/terraform_data.tf",
-		//	"./testdata/rules/terraform_data.yml",
-		//	1,
-		//	"DATA_NOT_CONTAINS",
-		//},
-		//"PoliciesWithVariables": {
-		//	"./testdata/resources/policy_with_variables.tf",
-		//	"./testdata/rules/policy_variable.yml",
-		//	0,
-		//	"",
-		//},
+		"DataObject": {
+			"./testdata/resources/terraform_data.tf",
+			"./testdata/rules/terraform_data.yml",
+			1,
+			"DATA_NOT_CONTAINS",
+		},
+		"PoliciesWithVariables": {
+			"./testdata/resources/policy_with_variables.tf",
+			"./testdata/rules/policy_variable.yml",
+			0,
+			"",
+		},
 		//"HereDocWithExpression": {
 		//	"./testdata/resources/policy_with_expression.tf",
 		//	"./testdata/rules/policy_variable.yml",

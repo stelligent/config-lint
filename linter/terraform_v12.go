@@ -102,6 +102,19 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 		i++
 	}
 
+	dataBlocks := blocks.OfType("data")
+	for _, block := range dataBlocks {
+		resource := assertion.Resource{
+			ID:         block.Labels()[1],
+			Type:       block.Labels()[0],
+			Category:   "data",
+			Properties: attributesToMap(block.GetAttributes()),
+			Filename:   "",
+			LineNumber: 0,
+		}
+		result.Resources = append(result.Resources, resource)
+	}
+
 	//dataBlocks := blocks.OfType("data")
 	//for _, block := range dataBlocks {
 	//	outerMap := attributesToMap(block.GetAttributes())
@@ -109,6 +122,14 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 	//		result.Data = append(result.Data, elem)
 	//	}
 	//}
+
+	for _, resource := range result.Resources {
+		properties, err := parseJSONDocuments(resource.Properties)
+		if err != nil {
+			return result, err
+		}
+		resource.Properties = properties
+	}
 
 	assertion.Debugf("LoadHCL Variables: %v\n", result.Variables)
 	return result, nil
