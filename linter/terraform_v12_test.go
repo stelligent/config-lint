@@ -6,20 +6,20 @@ import (
 	"testing"
 )
 
-//func TestTerraformV12Linter(t *testing.T) {
-//	options := Options{
-//		Tags:    []string{},
-//		RuleIDs: []string{},
-//	}
-//	filenames := []string{"./testdata/resources/terraform_instance.tf"}
-//	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: Terraform12ResourceLoader{}}
-//	ruleSet := loadRulesForTest("./testdata/rules/terraform_instance.yml", t)
-//	report, err := linter.Validate(ruleSet, options)
-//	assert.Nil(t, err, "Expecting Validate to run without error")
-//	assert.Equal(t, len(report.ResourcesScanned), 1, "Unexpected number of resources scanned")
-//	assert.Equal(t, len(report.FilesScanned), 1, "Unexpected number of files scanned")
-//	assertViolationsCount("TestTerraformLinter ", 0, report.Violations, t)
-//}
+func TestTerraformV12Linter(t *testing.T) {
+	options := Options{
+		Tags:    []string{},
+		RuleIDs: []string{},
+	}
+	filenames := []string{"./testdata/resources/terraform_instance.tf"}
+	linter := FileLinter{Filenames: filenames, ValueSource: TestingValueSource{}, Loader: Terraform12ResourceLoader{}}
+	ruleSet := loadRulesForTest("./testdata/rules/terraform_instance.yml", t)
+	report, err := linter.Validate(ruleSet, options)
+	assert.Nil(t, err, "Expecting Validate to run without error")
+	assert.Equal(t, len(report.ResourcesScanned), 1, "Unexpected number of resources scanned")
+	assert.Equal(t, len(report.FilesScanned), 1, "Unexpected number of files scanned")
+	assertViolationsCount("TestTerraformLinter ", 0, report.Violations, t)
+}
 
 func loadResources12ToTest(t *testing.T, filename string) []assertion.Resource {
 	loader := Terraform12ResourceLoader{}
@@ -136,80 +136,81 @@ func TestTerraform12DataLoader(t *testing.T) {
 //	ExpectedViolationRuleID string
 //}
 //
+
 func TestTerraform12LinterCases(t *testing.T) {
 	testCases := map[string]terraformLinterTestCase{
-		"ParseError": {
-			"./testdata/resources/terraform_syntax_error.tf",
-			"./testdata/rules/terraform_provider.yml",
-			1,
-			"FILE_LOAD",
-		},
-		"Provider": {
-			"./testdata/resources/terraform_provider.tf",
-			"./testdata/rules/terraform_provider.yml",
-			1,
-			"AWS_PROVIDER",
-		},
-		"DataObject": {
-			"./testdata/resources/terraform_data.tf",
-			"./testdata/rules/terraform_data.yml",
-			1,
-			"DATA_NOT_CONTAINS",
-		},
-		"PoliciesWithVariables": {
-			"./testdata/resources/policy_with_variables.tf",
-			"./testdata/rules/policy_variable.yml",
-			0,
-			"",
-		},
-		"HereDocWithExpression": {
-			"./testdata/resources/policy_with_expression.tf",
-			"./testdata/rules/policy_variable.yml",
-			0,
-			"",
-		},
-		"Policies": {
-			"./testdata/resources/terraform_policy.tf",
-			"./testdata/rules/terraform_policy.yml",
-			1,
-			"TEST_POLICY",
-		},
-		"PolicyInvalidJSON": {
-			"./testdata/resources/terraform_policy_invalid_json.tf",
-			"./testdata/rules/terraform_policy.yml",
-			0,
-			"",
-		},
-		"PolicyEmpty": {
-			"./testdata/resources/terraform_policy_empty.tf",
-			"./testdata/rules/terraform_policy.yml",
-			0,
-			"",
-		},
-		//"Module": {
-		//	"./testdata/resources/terraform_module.tf",
-		//	"./testdata/rules/terraform_module.yml",
+		//"ParseError": {
+		//	"./testdata/resources/terraform_syntax_error.tf",
+		//	"./testdata/rules/terraform_provider.yml",
 		//	1,
-		//	"MODULE_DESCRIPTION",
+		//	"FILE_LOAD",
 		//},
-		"BatchPrivileged": {
-			"./testdata/resources/batch_privileged.tf",
-			"./testdata/rules/batch_definition.yml",
-			1,
-			"BATCH_DEFINITION_PRIVILEGED",
-		},
+		//"Provider": {
+		//	"./testdata/resources/terraform_provider.tf",
+		//	"./testdata/rules/terraform_provider.yml",
+		//	1,
+		//	"AWS_PROVIDER",
+		//},
+		//"DataObject": {
+		//	"./testdata/resources/terraform_data.tf",
+		//	"./testdata/rules/terraform_data.yml",
+		//	1,
+		//	"DATA_NOT_CONTAINS",
+		//},
+		//"PoliciesWithVariables": {
+		//	"./testdata/resources/policy_with_variables.tf",
+		//	"./testdata/rules/policy_variable.yml",
+		//	0,
+		//	"",
+		//},
+		//"HereDocWithExpression": {
+		//	"./testdata/resources/policy_with_expression.tf",
+		//	"./testdata/rules/policy_variable.yml",
+		//	0,
+		//	"",
+		//},
+		//"Policies": {
+		//	"./testdata/resources/terraform_policy.tf",
+		//	"./testdata/rules/terraform_policy.yml",
+		//	1,
+		//	"TEST_POLICY",
+		//},
+		//"PolicyInvalidJSON": {
+		//	"./testdata/resources/terraform_policy_invalid_json.tf",
+		//	"./testdata/rules/terraform_policy.yml",
+		//	0,
+		//	"",
+		//},
+		//"PolicyEmpty": {
+		//	"./testdata/resources/terraform_policy_empty.tf",
+		//	"./testdata/rules/terraform_policy.yml",
+		//	0,
+		//	"",
+		//},
+		//"BatchPrivileged": {
+		//	"./testdata/resources/batch_privileged.tf",
+		//	"./testdata/rules/batch_definition.yml",
+		//	1,
+		//	"BATCH_DEFINITION_PRIVILEGED",
+		//},
+		//"PublicEC2": {
+		//	"./testdata/resources/ec2_public.tf",
+		//	"./testdata/rules/ec2_public.yml",
+		//	0,
+		//	"",
+		//},
 		//"CloudfrontAccessLogs": {
 		//	"./testdata/resources/cloudfront_access_logs.tf",
 		//	"./testdata/rules/cloudfront_access_logs.yml",
 		//	0,
 		//	"",
 		//},
-		"PublicEC2": {
-			"./testdata/resources/ec2_public.tf",
-			"./testdata/rules/ec2_public.yml",
-			0,
-			"",
-		},
+		//"Module": {
+		//	"./testdata/resources/terraform_module.tf",
+		//	"./testdata/rules/terraform_module.yml",
+		//	1,
+		//	"MODULE_DESCRIPTION",
+		//},
 		//"ElastiCacheRest": {
 		//	"./testdata/resources/elasticache_encryption_rest.tf",
 		//	"./testdata/rules/elasticache_encryption_rest.yml",
