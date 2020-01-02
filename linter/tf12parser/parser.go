@@ -28,6 +28,27 @@ func New() *Parser {
 	}
 }
 
+func (parser *Parser) ParseMany(paths []string) (Blocks, error) {
+	for _, path := range paths {
+		parser.hclParser.ParseHCLFile(path)
+	}
+
+	var blocks hcl.Blocks
+	for _, file := range parser.hclParser.Files() {
+		fileBlocks, err := parser.parseFile(file)
+		if err != nil {
+			return nil, err
+		}
+		blocks = append(blocks, fileBlocks...)
+	}
+
+	inputVars := make(map[string]cty.Value)
+	// TODO add .tfvars values to inputVars
+
+	allBlocks, _ := parser.buildEvaluationContext(blocks, paths[len(paths)-1], inputVars, true)
+	return allBlocks.RemoveDuplicates(), nil
+}
+
 // ParseDirectory recursively parses all terraform files within a given directory
 func (parser *Parser) ParseDirectory(path string) (Blocks, error) {
 

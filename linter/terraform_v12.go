@@ -32,29 +32,33 @@ func (l Terraform12ResourceLoader) Load(filename string) (FileResources, error) 
 	loaded := FileResources{
 		Resources: []assertion.Resource{},
 	}
-	result, err := loadHCLv2(filename)
+	result, err := loadHCLv2([]string{filename})
 	if err != nil {
 		return loaded, err
 	}
-	//TODO: MN -- Need to iterate over range here to append all? Seems like I'm missing a GoLang idiom
-	for _, element := range result.Resources {
-		loaded.Resources = append(loaded.Resources, element)
-	}
+	loaded.Resources = result.Resources
 
 	assertion.DebugJSON("loaded.Resources", loaded.Resources)
 
 	return loaded, nil
 }
 
-type (
-	Instance struct {
-		Ami string `cty:"ami"`
-		InstanceType string `cty:"instance_type"`
-		Tags map[string]string `cty:"tags"`
+func (l Terraform12ResourceLoader) LoadMany(filenames []string) (FileResources, error) {
+	loaded := FileResources{
+		Resources: []assertion.Resource{},
 	}
-)
+	result, err := loadHCLv2(filenames)
+	if err != nil {
+		return loaded, err
+	}
+	loaded.Resources = result.Resources
 
-func loadHCLv2(filename string) (Terraform12LoadResult, error) {
+	assertion.DebugJSON("loaded.Resources", loaded.Resources)
+
+	return loaded, nil
+}
+
+func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 	result := Terraform12LoadResult{
 		Resources: []assertion.Resource{},
 		Data:      []interface{}{},
@@ -64,7 +68,7 @@ func loadHCLv2(filename string) (Terraform12LoadResult, error) {
 	}
 
 	parser := *tf12parser.New()
-	blocks, err := parser.ParseFile(filename)
+	blocks, err := parser.ParseMany(paths)
 	if err != nil {
 		fmt.Println("Boo!")
 	}
@@ -81,17 +85,6 @@ func loadHCLv2(filename string) (Terraform12LoadResult, error) {
 		}
 		result.Resources = append(result.Resources, resource)
 	}
-
-
-	//resourceStruct := new(Instance)
-	//err = gocty.FromCtyValue(resources, resourceStruct)
-	//Note: values are not processing in a consistent order. If there's any error, the entire result is invalid
-	if err != nil {
-		fmt.Println("Boo!")
-	}
-
-	//fmt.Println(resourceStruct.Ami)
-	//fmt.Println(resourceStruct.InstanceType)
 
 	assertion.Debugf("LoadHCL Variables: %v\n", result.Variables)
 	return result, nil
@@ -128,15 +121,5 @@ func attributesToMap(attributes []*tf12parser.Attribute) interface{} {
 
 // PostLoad resolves variable expressions
 func (l Terraform12ResourceLoader) PostLoad(inputResources FileResources) ([]assertion.Resource, error) {
-	//for _, resource := range inputResources.Resources {
-	//	resource.Properties = tf12ReplaceVariables(resource.Properties, inputResources.Variables)
-	//}
-	//for _, resource := range inputResources.Resources {
-	//	properties, err := tf12ParseJSONDocuments(resource.Properties)
-	//	if err != nil {
-	//		return inputResources.Resources, err
-	//	}
-	//	resource.Properties = properties
-	//}
 	return inputResources.Resources, nil
 }

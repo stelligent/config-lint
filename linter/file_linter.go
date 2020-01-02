@@ -42,7 +42,34 @@ func (fl FileLinter) Validate(ruleSet assertion.RuleSet, options Options) (asser
 	filesScanned := []string{}
 
 	loadViolations := []assertion.Violation{}
+	var resourcesToValidate []assertion.Resource
 
+	//TODO: This is ugly in several ways
+	if tf12Loader, ok := fl.Loader.(Terraform12ResourceLoader); ok {
+		result, _ := tf12Loader.LoadMany(fl.Filenames)
+		resourcesToValidate = result.Resources
+		for _, file := range fl.Filenames {
+			filesScanned = append(filesScanned, file)
+		}
+	} else {
+		filesScanned, loadViolations, resources, variables = iterateFiles(fl, ruleSet, filesScanned, loadViolations, resources, variables)
+		var err error
+		resourcesToValidate, err = fl.Loader.PostLoad(FileResources{Resources: resources, Variables: variables})
+		if err != nil {
+			return assertion.ValidationReport{}, err
+		}
+	}
+
+	report, err := rl.ValidateResources(resourcesToValidate, rules)
+	if err != nil {
+		return report, err
+	}
+	report.FilesScanned = filesScanned
+	report.Violations = append(report.Violations, loadViolations...)
+	return report, nil
+}
+
+func iterateFiles(fl FileLinter, ruleSet assertion.RuleSet, filesScanned []string, loadViolations []assertion.Violation, resources []assertion.Resource, variables []Variable) ([]string, []assertion.Violation, []assertion.Resource, []Variable) {
 	for _, filename := range fl.Filenames {
 		include, err := assertion.ShouldIncludeFile(ruleSet.Files, filename)
 		if err == nil && include {
@@ -58,17 +85,7 @@ func (fl FileLinter) Validate(ruleSet assertion.RuleSet, options Options) (asser
 			variables = append(variables, loaded.Variables...)
 		}
 	}
-	resourcesToValidate, err := fl.Loader.PostLoad(FileResources{Resources: resources, Variables: variables})
-	if err != nil {
-		return assertion.ValidationReport{}, err
-	}
-	report, err := rl.ValidateResources(resourcesToValidate, rules)
-	if err != nil {
-		return report, err
-	}
-	report.FilesScanned = filesScanned
-	report.Violations = append(report.Violations, loadViolations...)
-	return report, nil
+	return filesScanned, loadViolations, resources, variables
 }
 
 func makeLoadViolation(filename string, err error) assertion.Violation {

@@ -3,7 +3,6 @@ package linter
 import (
 	"github.com/stelligent/config-lint/assertion"
 	"github.com/stretchr/testify/assert"
-	"os"
 	"testing"
 )
 
@@ -58,13 +57,13 @@ func TestTerraform12VariableWithNoDefault(t *testing.T) {
 	tags := getResourceTags(resources[0])
 	assert.Equal(t, "", tags["department"], "Unexpected value for variable with no default")
 }
-
-func TestTerraform12FunctionCall(t *testing.T) {
-	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
-	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
-	tags := getResourceTags(resources[0])
-	assert.Equal(t, "test", tags["environment"], "Unexpected value for lookup function")
-}
+//
+//func TestTerraform12FunctionCall(t *testing.T) {
+//	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+//	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
+//	tags := getResourceTags(resources[0])
+//	assert.Equal(t, "test", tags["environment"], "Unexpected value for lookup function")
+//}
 
 func TestTerraform12ListVariable(t *testing.T) {
 	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
@@ -79,22 +78,22 @@ func TestTerraform12LocalVariable(t *testing.T) {
 	properties := resources[0].Properties.(map[string]interface{})
 	assert.Equal(t, "myprojectbucket", properties["name"], "Unexpected value for name attribute")
 }
-
-func TestTerraform12VariablesFromEnvironment(t *testing.T) {
-	os.Setenv("TF_VAR_instance_type", "c4.large")
-	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
-	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
-	properties := resources[0].Properties.(map[string]interface{})
-	assert.Equal(t, properties["instance_type"], "c4.large", "Unexpected value for instance_type")
-	os.Setenv("TF_VAR_instance_type", "")
-}
-
-func TestTerraform12FileFunction(t *testing.T) {
-	resources := loadResources12ToTest(t, "./testdata/resources/reference_file.tf")
-	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
-	properties := resources[0].Properties.(map[string]interface{})
-	assert.Equal(t, properties["bucket"], "example", "Unexpected value for bucket property")
-}
+//
+//func TestTerraform12VariablesFromEnvironment(t *testing.T) {
+//	os.Setenv("TF_VAR_instance_type", "c4.large")
+//	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+//	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
+//	properties := resources[0].Properties.(map[string]interface{})
+//	assert.Equal(t, properties["instance_type"], "c4.large", "Unexpected value for instance_type")
+//	os.Setenv("TF_VAR_instance_type", "")
+//}
+//
+//func TestTerraform12FileFunction(t *testing.T) {
+//	resources := loadResources12ToTest(t, "./testdata/resources/reference_file.tf")
+//	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
+//	properties := resources[0].Properties.(map[string]interface{})
+//	assert.Equal(t, properties["bucket"], "example", "Unexpected value for bucket property")
+//}
 
 func TestTerraform12VariablesInDifferentFile(t *testing.T) {
 	options := Options{
@@ -109,8 +108,8 @@ func TestTerraform12VariablesInDifferentFile(t *testing.T) {
 	ruleSet := loadRulesForTest("./testdata/rules/terraform_instance.yml", t)
 	report, err := linter.Validate(ruleSet, options)
 	assert.Nil(t, err, "Expecting Validate to run without error")
-	assert.Equal(t, len(report.ResourcesScanned), 1, "Unexpected number of resources")
-	assert.Equal(t, len(report.FilesScanned), 2, "Unexpected number of files scanned")
+	assert.Equal(t, 1, len(report.ResourcesScanned), "Unexpected number of resources")
+	assert.Equal(t, 2, len(report.FilesScanned), "Unexpected number of files scanned")
 	assertViolationsCount("TestTerraformVariablesInDifferentFile ", 0, report.Violations, t)
 }
 
