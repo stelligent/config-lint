@@ -1,7 +1,6 @@
 package linter
 
 import (
-	"fmt"
 	"github.com/zclconf/go-cty/cty"
 
 	//"github.com/ghodss/yaml"
@@ -28,6 +27,7 @@ type (
 )
 
 // Load parses an HCLv2 file into a collection or Resource objects
+//TODO: This should be unused, but can't remove due to the interface, I think?
 func (l Terraform12ResourceLoader) Load(filename string) (FileResources, error) {
 	loaded := FileResources{
 		Resources: []assertion.Resource{},
@@ -70,7 +70,7 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 	parser := *tf12parser.New()
 	blocks, err := parser.ParseMany(paths)
 	if err != nil {
-		fmt.Println("Boo!")
+		return result, err
 	}
 
 	resourceBlocks := blocks.OfType("resource")
@@ -84,6 +84,11 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 			LineNumber: 0,
 		}
 		result.Resources = append(result.Resources, resource)
+	}
+
+	providerBlocks := blocks.OfType("provider")
+	for _, block := range providerBlocks {
+		result.Providers = append(result.Providers, attributesToMap(block.GetAttributes()))
 	}
 
 	assertion.Debugf("LoadHCL Variables: %v\n", result.Variables)
