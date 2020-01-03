@@ -29,6 +29,7 @@ func loadResources12ToTest(t *testing.T, filename string) []assertion.Resource {
 	assert.Nil(t, err, "Expecting PostLoad to run without error")
 	return resources
 }
+
 //
 //func getResourceTags(r assertion.Resource) map[string]interface{} {
 //	properties := r.Properties.(map[string]interface{})
@@ -57,6 +58,7 @@ func TestTerraform12VariableWithNoDefault(t *testing.T) {
 	tags := getResourceTags(resources[0])
 	assert.Equal(t, "", tags["department"], "Unexpected value for variable with no default")
 }
+
 //
 func TestTerraform12FunctionCall(t *testing.T) {
 	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
@@ -78,6 +80,7 @@ func TestTerraform12LocalVariable(t *testing.T) {
 	properties := resources[0].Properties.(map[string]interface{})
 	assert.Equal(t, "myprojectbucket", properties["name"], "Unexpected value for name attribute")
 }
+
 //
 //func TestTerraform12VariablesFromEnvironment(t *testing.T) {
 //	os.Setenv("TF_VAR_instance_type", "c4.large")
@@ -137,6 +140,47 @@ func TestTerraform12DataLoader(t *testing.T) {
 //	ExpectedViolationRuleID string
 //}
 //
+
+func TestTerraform12ResourceLineNumber(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	assert.Equal(t, 30, resources[0].LineNumber)
+}
+
+func TestTerraform12ResourceFileName(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	assert.Equal(t, "./testdata/resources/uses_variables.tf", resources[0].Filename)
+}
+
+func TestTerraform12DataLineNumber(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/terraform_data.tf")
+	assert.Equal(t, 1, resources[0].LineNumber)
+}
+
+func TestTerraform12DataFileName(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/terraform_data.tf")
+	assert.Equal(t, "./testdata/resources/terraform_data.tf", resources[0].Filename)
+}
+
+func TestTerraform12ProviderLineNumber(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/terraform_provider.tf")
+	assert.Equal(t, 1, resources[0].LineNumber)
+}
+
+func TestTerraform12ProviderFileName(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/terraform_provider.tf")
+	assert.Equal(t, "./testdata/resources/terraform_provider.tf", resources[0].Filename)
+}
+
+// TODO: Enable these when Module processing is in
+// func TestTerraform12ModuleLineNumber(t *testing.T) {
+// 	resources := loadResources12ToTest(t, "./testdata/resources/terraform_module.tf")
+// 	assert.Equal(t, 1, resources[0].LineNumber)
+// }
+
+// func TestTerraform12ModuleFileName(t *testing.T) {
+// 	resources := loadResources12ToTest(t, "./testdata/resources/terraform_module.tf")
+// 	assert.Equal(t, "./testdata/resources/terraform_module.tf", resources[0].Filename)
+// }
 
 func TestTerraform12LinterCases(t *testing.T) {
 	testCases := map[string]terraformLinterTestCase{

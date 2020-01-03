@@ -81,8 +81,8 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 			Type:       block.Labels()[0],
 			Category:   "resource",
 			Properties: attributesToMap(block.GetAttributes()),
-			Filename:   "",
-			LineNumber: 0,
+			Filename:   block.Range().Filename,
+			LineNumber: block.Range().StartLine,
 		}
 		result.Resources = append(result.Resources, resource)
 	}
@@ -95,8 +95,8 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 			Type:       block.Labels()[0],
 			Category:   "provider",
 			Properties: attributesToMap(block.GetAttributes()),
-			Filename:   "",
-			LineNumber: 0,
+			Filename:   block.Range().Filename,
+			LineNumber: block.Range().StartLine,
 		}
 		result.Resources = append(result.Resources, resource)
 		i++
@@ -109,8 +109,8 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 			Type:       block.Labels()[0],
 			Category:   "data",
 			Properties: attributesToMap(block.GetAttributes()),
-			Filename:   "",
-			LineNumber: 0,
+			Filename:   block.Range().Filename,
+			LineNumber: block.Range().StartLine,
 		}
 		result.Resources = append(result.Resources, resource)
 	}
