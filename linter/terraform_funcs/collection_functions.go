@@ -1,4 +1,4 @@
-package tf12parser
+package terraform_funcs
 
 import (
 	"errors"

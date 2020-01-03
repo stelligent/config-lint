@@ -10,6 +10,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
+	"github.com/stelligent/config-lint/linter/terraform_funcs"
 )
 
 const maxContextIterations = 32
@@ -141,7 +142,7 @@ func (parser *Parser) buildEvaluationContext(blocks hcl.Blocks, path string, inp
 	ctx := &hcl.EvalContext{
 		Variables: make(map[string]cty.Value),
 		Functions: map[string]function.Function{
-			"lookup": LookupFunc,
+			"lookup": terraform_funcs.LookupFunc,
 		},
 	}
 
