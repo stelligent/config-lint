@@ -138,7 +138,9 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 func attributesToMap(block tf12parser.Block) map[string]interface{} {
 	propertyMap := make(map[string]interface{})
 	for _, block := range block.AllBlocks() {
-		propertyMap[block.Type()] = attributesToMap(*block)
+		var toAppend []interface{}
+		toAppend = append(toAppend, attributesToMap(*block))
+		propertyMap[block.Type()] = toAppend
 	}
 	attributes := block.GetAttributes()
 	for _, attribute := range attributes {
