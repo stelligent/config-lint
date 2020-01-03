@@ -2,11 +2,11 @@ package tf12parser
 
 import (
 	"fmt"
+	"github.com/zclconf/go-cty/cty"
+	"github.com/zclconf/go-cty/cty/function"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
-
-	"github.com/zclconf/go-cty/cty"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
@@ -140,6 +140,9 @@ func (parser *Parser) recursivelyParseDirectory(path string) error {
 func (parser *Parser) buildEvaluationContext(blocks hcl.Blocks, path string, inputVars map[string]cty.Value, isRoot bool) (Blocks, *hcl.EvalContext) {
 	ctx := &hcl.EvalContext{
 		Variables: make(map[string]cty.Value),
+		Functions: map[string]function.Function{
+			"lookup": LookupFunc,
+		},
 	}
 
 	ctx.Variables["module"] = cty.ObjectVal(make(map[string]cty.Value))
@@ -195,7 +198,6 @@ func (parser *Parser) buildEvaluationContext(blocks hcl.Blocks, path string, inp
 			localBlocks = append(localBlocks, block)
 		}
 	}
-
 	return localBlocks, ctx
 }
 

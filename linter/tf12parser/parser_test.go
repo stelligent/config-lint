@@ -44,7 +44,23 @@ data "cats_cat" "the-cats-mother" {
 	name = local.proxy
 }
 
+variable "project" {
+  default = "demo"
+}
 
+variable "default_tags" {
+  default = {
+    project = "demo"
+    environment = "test"
+  }
+}
+
+resource "aws_instance" "first" {
+  tags = {
+    project = var.project
+    environment = lookup(var.default_tags,"environment","dev")
+  }
+}
 `)
 
 	blocks, err := parser.ParseDirectory(filepath.Dir(path))
@@ -54,7 +70,7 @@ data "cats_cat" "the-cats-mother" {
 
 	// variable
 	variables := blocks.OfType("variable")
-	require.Len(t, variables, 1)
+	require.Len(t, variables, 3)
 	assert.Equal(t, "variable", variables[0].Type())
 	require.Len(t, variables[0].Labels(), 1)
 	assert.Equal(t, "cats_mother", variables[0].Labels()[0])
@@ -72,7 +88,7 @@ data "cats_cat" "the-cats-mother" {
 
 	// resources
 	resourceBlocks := blocks.OfType("resource")
-	require.Len(t, resourceBlocks, 2)
+	require.Len(t, resourceBlocks, 3)
 	require.Len(t, resourceBlocks[0].Labels(), 2)
 
 	assert.Equal(t, "resource", resourceBlocks[0].Type())
@@ -86,6 +102,15 @@ data "cats_cat" "the-cats-mother" {
 	assert.Equal(t, "cats_kitten", resourceBlocks[1].Labels()[0])
 	assert.Equal(t, "the great destroyer", resourceBlocks[1].GetAttribute("name").Value().AsString())
 	assert.Equal(t, "mittens", resourceBlocks[1].GetAttribute("parent").Value().AsString())
+
+	// New Tests
+	assert.Equal(t, "resource", resourceBlocks[2].Type())
+	assert.Equal(t, "aws_instance", resourceBlocks[2].Labels()[0])
+	assert.Equal(t, "first", resourceBlocks[2].Labels()[1])
+	assert.Equal(t, "demo", resourceBlocks[2].GetAttribute("tags").Value().AsValueMap()["project"].AsString())
+	assert.Equal(t, true, resourceBlocks[2].GetAttribute("tags").Value().AsValueMap()["environment"].IsKnown())
+	assert.Equal(t, "test", resourceBlocks[2].GetAttribute("tags").Value().AsValueMap()["environment"].AsString())
+
 
 	// data
 	dataBlocks := blocks.OfType("data")

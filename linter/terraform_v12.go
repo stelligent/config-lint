@@ -1,7 +1,6 @@
 package linter
 
 import (
-	"fmt"
 	"github.com/zclconf/go-cty/cty"
 	"strconv"
 
@@ -158,7 +157,7 @@ func attributesToMap(attributes []*tf12parser.Attribute) interface{} {
 			if elem.Type() == cty.NilType {
 				propertyMap[elem.Name()] = ""
 			} else {
-				fmt.Println(elem)
+				//fmt.Println(elem)
 				propertyMap[elem.Name()] = elem.Value().AsString()
 			}
 		}
