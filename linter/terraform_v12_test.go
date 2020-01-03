@@ -200,12 +200,12 @@ func TestTerraform12LinterCases(t *testing.T) {
 			0,
 			"",
 		},
-		//"CloudfrontAccessLogs": {
-		//	"./testdata/resources/cloudfront_access_logs.tf",
-		//	"./testdata/rules/cloudfront_access_logs.yml",
-		//	0,
-		//	"",
-		//},
+		"CloudfrontAccessLogs": {
+			"./testdata/resources/cloudfront_access_logs.tf",
+			"./testdata/rules/cloudfront_access_logs.yml",
+			0,
+			"",
+		},
 		//"Module": {
 		//	"./testdata/resources/terraform_module.tf",
 		//	"./testdata/rules/terraform_module.yml",

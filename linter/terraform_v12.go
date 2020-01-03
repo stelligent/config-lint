@@ -80,7 +80,7 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 			ID:         block.Labels()[1],
 			Type:       block.Labels()[0],
 			Category:   "resource",
-			Properties: attributesToMap(block.GetAttributes()),
+			Properties: attributesToMap(*block),
 			Filename:   "",
 			LineNumber: 0,
 		}
@@ -94,7 +94,7 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 			ID:         strconv.Itoa(i),
 			Type:       block.Labels()[0],
 			Category:   "provider",
-			Properties: attributesToMap(block.GetAttributes()),
+			Properties: attributesToMap(*block),
 			Filename:   "",
 			LineNumber: 0,
 		}
@@ -108,7 +108,7 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 			ID:         block.Labels()[1],
 			Type:       block.Labels()[0],
 			Category:   "data",
-			Properties: attributesToMap(block.GetAttributes()),
+			Properties: attributesToMap(*block),
 			Filename:   "",
 			LineNumber: 0,
 		}
@@ -135,8 +135,12 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 	return result, nil
 }
 
-func attributesToMap(attributes []*tf12parser.Attribute) interface{} {
+func attributesToMap(block tf12parser.Block) map[string]interface{} {
 	propertyMap := make(map[string]interface{})
+	for _, block := range block.AllBlocks() {
+		propertyMap[block.Type()] = attributesToMap(*block)
+	}
+	attributes := block.GetAttributes()
 	for _, attribute := range attributes {
 		if attribute.Value().CanIterateElements() {
 			var innerArray []interface{}

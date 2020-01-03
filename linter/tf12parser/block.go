@@ -73,6 +73,17 @@ func (block *Block) Range() Range {
 	}
 }
 
+func (block *Block) AllBlocks() []*Block {
+	if block == nil || block.hclBlock == nil {
+		return nil
+	}
+	var blocks []*Block
+	for _, child := range block.body().Blocks {
+			blocks = append(blocks, NewBlock(child.AsHCLBlock(), block.ctx))
+	}
+	return blocks
+}
+
 func (block *Block) GetBlock(name string) *Block {
 	if block == nil || block.hclBlock == nil {
 		return nil
