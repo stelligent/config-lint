@@ -148,9 +148,9 @@ func attributesToMap(attributes []*tf12parser.Attribute) interface{} {
 			for iter.Next() {
 				key, value := iter.Element()
 				if value.Type().HasDynamicTypes() {
-					innerMap[key.AsString()] = ""
+					innerMap[ctyValueToString(key)] = ""
 				} else {
-					innerMap[key.AsString()] = value.AsString()
+					innerMap[ctyValueToString(key)] = ctyValueToString(value)
 				}
 			}
 		} else {
@@ -172,6 +172,11 @@ func ctyValueToString(value cty.Value) string {
 		}
 	case cty.String:
 		return value.AsString()
+	case cty.Number:
+		if value.RawEquals(cty.PositiveInfinity) || value.RawEquals(cty.NegativeInfinity) {
+			panic("cannot convert infinity to string")
+		}
+		return value.AsBigFloat().Text('f', -1)
 	default:
 		panic("unsupported primitive type")
 	}
