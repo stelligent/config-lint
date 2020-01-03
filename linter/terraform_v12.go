@@ -137,14 +137,14 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 
 func attributesToMap(attributes []*tf12parser.Attribute) interface{} {
 	propertyMap := make(map[string]interface{})
-	for _, elem := range attributes {
-		if elem.Value().CanIterateElements() {
+	for _, attribute := range attributes {
+		if attribute.Value().CanIterateElements() {
 			var innerArray []interface{}
 			innerMap := make(map[string]interface{})
 			innerArray = append(innerArray, innerMap)
-			propertyMap[elem.Name()] = innerArray
+			propertyMap[attribute.Name()] = innerArray
 
-			iter := elem.Value().ElementIterator()
+			iter := attribute.Value().ElementIterator()
 			for iter.Next() {
 				key, value := iter.Element()
 				if value.Type().HasDynamicTypes() {
@@ -154,15 +154,27 @@ func attributesToMap(attributes []*tf12parser.Attribute) interface{} {
 				}
 			}
 		} else {
-			if elem.Type() == cty.NilType {
-				propertyMap[elem.Name()] = ""
-			} else {
-				//fmt.Println(elem)
-				propertyMap[elem.Name()] = elem.Value().AsString()
-			}
+			propertyMap[attribute.Name()] = ctyValueToString(attribute.Value())
 		}
 	}
 	return propertyMap
+}
+
+func ctyValueToString(value cty.Value) string {
+	switch value.Type() {
+	case cty.NilType:
+		return ""
+	case cty.Bool:
+		if value.True() {
+			return "true"
+		} else {
+			return "false"
+		}
+	case cty.String:
+		return value.AsString()
+	default:
+		panic("unsupported primitive type")
+	}
 }
 
 // PostLoad resolves variable expressions
