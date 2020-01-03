@@ -88,12 +88,13 @@ func TestTerraform12LocalVariable(t *testing.T) {
 //	os.Setenv("TF_VAR_instance_type", "")
 //}
 //
-//func TestTerraform12FileFunction(t *testing.T) {
-//	resources := loadResources12ToTest(t, "./testdata/resources/reference_file.tf")
-//	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
-//	properties := resources[0].Properties.(map[string]interface{})
-//	assert.Equal(t, properties["bucket"], "example", "Unexpected value for bucket property")
-//}
+
+func TestTerraform12FileFunction(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/reference_file.tf")
+	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
+	properties := resources[0].Properties.(map[string]interface{})
+	assert.Equal(t, properties["bucket"], "example", "Unexpected value for bucket property")
+}
 
 func TestTerraform12VariablesInDifferentFile(t *testing.T) {
 	options := Options{

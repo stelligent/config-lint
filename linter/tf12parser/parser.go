@@ -143,6 +143,7 @@ func (parser *Parser) buildEvaluationContext(blocks hcl.Blocks, path string, inp
 		Variables: make(map[string]cty.Value),
 		Functions: map[string]function.Function{
 			"lookup": terraform_funcs.LookupFunc,
+			"file": terraform_funcs.ReadFileContents,
 		},
 	}
 

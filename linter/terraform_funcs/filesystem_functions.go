@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"unicode/utf8"
 
 	"github.com/bmatcuk/doublestar"
@@ -48,6 +49,27 @@ func MakeFileFunc(baseDir string, encBase64 bool) function.Function {
 		},
 	})
 }
+
+var ReadFileContents = function.New(&function.Spec{
+	Params: []function.Parameter{
+		{
+			Name: "path",
+			Type: cty.String,
+		},
+	},
+	Type: function.StaticReturnType(cty.String),
+	Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
+		path := args[0].AsString()
+		baseDir := filepath.Dir(path)
+
+		fileByteContents, err := readFileBytes(baseDir, filepath.Base(path))
+		if err != nil{
+			return cty.NilVal, err
+		}
+		fileStringContent := strings.Trim(string(fileByteContents), "\n")
+		return cty.StringVal(string(fileStringContent)), nil
+	},
+})
 
 // MakeTemplateFileFunc constructs a function that takes a file path and
 // an arbitrary object of named values and attempts to render the referenced
