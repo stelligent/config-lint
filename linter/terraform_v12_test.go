@@ -316,6 +316,12 @@ func TestTerraform12LinterCases(t *testing.T) {
 			1,
 			"SAGEMAKER_NOTEBOOK_ENCRYPTION",
 		},
+		"TF12Variables": {
+			"./testdata/resources/uses_tf12_variables.tf",
+			"./testdata/rules/terraform_v12_variables.yml",
+			0,
+			"",
+		},
 	}
 	for name, tc := range testCases {
 		options := Options{
