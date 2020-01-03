@@ -67,7 +67,7 @@ var ReadFileContents = function.New(&function.Spec{
 			return cty.NilVal, err
 		}
 		fileStringContent := strings.Trim(string(fileByteContents), "\n")
-		return cty.StringVal(string(fileStringContent)), nil
+		return cty.StringVal(fileStringContent), nil
 	},
 })
 
