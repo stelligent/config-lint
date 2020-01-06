@@ -1,0 +1,13 @@
+version: 1
+description: Rules for Terraform configuration files
+type: Terraform
+files:
+  - "*.tf"
+rules:
+
+  - id: CIDR_SET
+    message: Testing
+    resource: aws_security_group
+    assertions:
+      - key: igress.cidr_blocks
+        op: absent

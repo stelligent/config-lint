@@ -144,6 +144,7 @@ func (parser *Parser) buildEvaluationContext(blocks hcl.Blocks, path string, inp
 		Functions: map[string]function.Function{
 			"lookup": terraform_funcs.LookupFunc,
 			"file": terraform_funcs.ReadFileContents,
+			"cidrsubnet": terraform_funcs.CidrSubnetFunc,
 		},
 	}
 
@@ -157,7 +158,6 @@ func (parser *Parser) buildEvaluationContext(blocks hcl.Blocks, path string, inp
 		ctx.Variables["var"] = parser.getValuesByBlockType(ctx, blocks, "variable", inputVars)
 		ctx.Variables["local"] = parser.getValuesByBlockType(ctx, blocks, "locals", nil)
 		ctx.Variables["provider"] = parser.getValuesByBlockType(ctx, blocks, "provider", nil)
-		//ctx.Variables["resource"] = parser.getValuesByBlockType(ctx, blocks, "resource", nil)
 		resources := parser.getValuesByBlockType(ctx, blocks, "resource", nil)
 		for key, resource := range resources.AsValueMap() {
 			ctx.Variables[key] = resource

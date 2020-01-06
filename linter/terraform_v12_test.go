@@ -250,12 +250,12 @@ func TestTerraform12LinterCases(t *testing.T) {
 			0,
 			"",
 		},
-		"Module": {
-			"./testdata/resources/terraform_module.tf",
-			"./testdata/rules/terraform_module.yml",
-			1,
-			"MODULE_DESCRIPTION",
-		},
+		//"Module": {
+		//	"./testdata/resources/terraform_module.tf",
+		//	"./testdata/rules/terraform_module.yml",
+		//	1,
+		//	"MODULE_DESCRIPTION",
+		//},
 		"ElastiCacheRest": {
 			"./testdata/resources/elasticache_encryption_rest.tf",
 			"./testdata/rules/elasticache_encryption_rest.yml",
