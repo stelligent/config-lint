@@ -154,11 +154,7 @@ func attributesToMap(block tf12parser.Block) map[string]interface{} {
 			iter := attribute.Value().ElementIterator()
 			for iter.Next() {
 				key, value := iter.Element()
-				if value.Type().HasDynamicTypes() {
-					innerMap[ctyValueToString(key)] = ""
-				} else {
-					innerMap[ctyValueToString(key)] = ctyValueToString(value)
-				}
+				innerMap[ctyValueToString(key)] = ctyValueToString(value)
 			}
 		} else {
 			environmentVariable := getVariableFromEnvironment(attribute.Name())
@@ -173,6 +169,9 @@ func attributesToMap(block tf12parser.Block) map[string]interface{} {
 }
 
 func ctyValueToString(value cty.Value) string {
+	if !value.IsKnown() {
+		return ""
+	}
 	switch value.Type() {
 	case cty.NilType:
 		return ""
