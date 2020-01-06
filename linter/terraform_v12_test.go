@@ -59,7 +59,6 @@ func TestTerraform12VariableWithNoDefault(t *testing.T) {
 	assert.Equal(t, "", tags["department"], "Unexpected value for variable with no default")
 }
 
-//
 func TestTerraform12FunctionCall(t *testing.T) {
 	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
 	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
@@ -81,7 +80,6 @@ func TestTerraform12LocalVariable(t *testing.T) {
 	assert.Equal(t, "myprojectbucket", properties["name"], "Unexpected value for name attribute")
 }
 
-//
 //func TestTerraform12VariablesFromEnvironment(t *testing.T) {
 //	os.Setenv("TF_VAR_instance_type", "c4.large")
 //	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
@@ -90,7 +88,7 @@ func TestTerraform12LocalVariable(t *testing.T) {
 //	assert.Equal(t, properties["instance_type"], "c4.large", "Unexpected value for instance_type")
 //	os.Setenv("TF_VAR_instance_type", "")
 //}
-//
+
 
 func TestTerraform12FileFunction(t *testing.T) {
 	resources := loadResources12ToTest(t, "./testdata/resources/reference_file.tf")
@@ -184,144 +182,144 @@ func TestTerraform12ModuleFileName(t *testing.T) {
 
 func TestTerraform12LinterCases(t *testing.T) {
 	testCases := map[string]terraformLinterTestCase{
-		//"ParseError": {
-		//	"./testdata/resources/terraform_syntax_error.tf",
-		//	"./testdata/rules/terraform_provider.yml",
-		//	1,
-		//	"FILE_LOAD",
-		//},
-		//"Provider": {
-		//	"./testdata/resources/terraform_provider.tf",
-		//	"./testdata/rules/terraform_provider.yml",
-		//	1,
-		//	"AWS_PROVIDER",
-		//},
-		//"DataObject": {
-		//	"./testdata/resources/terraform_data.tf",
-		//	"./testdata/rules/terraform_data.yml",
-		//	1,
-		//	"DATA_NOT_CONTAINS",
-		//},
-		//"PoliciesWithVariables": {
-		//	"./testdata/resources/policy_with_variables.tf",
-		//	"./testdata/rules/policy_variable.yml",
-		//	0,
-		//	"",
-		//},
-		//"HereDocWithExpression": {
-		//	"./testdata/resources/policy_with_expression.tf",
-		//	"./testdata/rules/policy_variable.yml",
-		//	0,
-		//	"",
-		//},
-		//"Policies": {
-		//	"./testdata/resources/terraform_policy.tf",
-		//	"./testdata/rules/terraform_policy.yml",
-		//	1,
-		//	"TEST_POLICY",
-		//},
-		//"PolicyInvalidJSON": {
-		//	"./testdata/resources/terraform_policy_invalid_json.tf",
-		//	"./testdata/rules/terraform_policy.yml",
-		//	0,
-		//	"",
-		//},
-		//"PolicyEmpty": {
-		//	"./testdata/resources/terraform_policy_empty.tf",
-		//	"./testdata/rules/terraform_policy.yml",
-		//	0,
-		//	"",
-		//},
-		//"BatchPrivileged": {
-		//	"./testdata/resources/batch_privileged.tf",
-		//	"./testdata/rules/batch_definition.yml",
-		//	1,
-		//	"BATCH_DEFINITION_PRIVILEGED",
-		//},
-		//"PublicEC2": {
-		//	"./testdata/resources/ec2_public.tf",
-		//	"./testdata/rules/ec2_public.yml",
-		//	0,
-		//	"",
-		//},
-		//"CloudfrontAccessLogs": {
-		//	"./testdata/resources/cloudfront_access_logs.tf",
-		//	"./testdata/rules/cloudfront_access_logs.yml",
-		//	0,
-		//	"",
-		//},
-		//"Module": {
-		//	"./testdata/resources/terraform_module.tf",
-		//	"./testdata/rules/terraform_module.yml",
-		//	1,
-		//	"MODULE_DESCRIPTION",
-		//},
-		//"ElastiCacheRest": {
-		//	"./testdata/resources/elasticache_encryption_rest.tf",
-		//	"./testdata/rules/elasticache_encryption_rest.yml",
-		//	1,
-		//	"ELASTICACHE_ENCRYPTION_REST",
-		//},
-		//"ElastiCacheTransit": {
-		//	"./testdata/resources/elasticache_encryption_transit.tf",
-		//	"./testdata/rules/elasticache_encryption_transit.yml",
-		//	1,
-		//	"ELASTICACHE_ENCRYPTION_TRANSIT",
-		//},
-		//"NeptuneClusterEncryption": {
-		//	"./testdata/resources/neptune_db_encryption.tf",
-		//	"./testdata/rules/neptune_db_encryption.yml",
-		//	1,
-		//	"NEPTUNE_DB_ENCRYPTION",
-		//},
-		//"RdsPublic": {
-		//	"./testdata/resources/rds_publicly_available.tf",
-		//	"./testdata/rules/rds_publicly_available.yml",
-		//	0,
-		//	"",
-		//},
-		//"KinesisKms": {
-		//	"./testdata/resources/kinesis_kms_stream.tf",
-		//	"./testdata/rules/kinesis_kms_stream.yml",
-		//	1,
-		//	"KINESIS_STREAM_KMS",
-		//},
-		//"DmsEncryption": {
-		//	"./testdata/resources/dms_endpoint_encryption.tf",
-		//	"./testdata/rules/dms_endpoint_encryption.yml",
-		//	0,
-		//	"",
-		//},
-		//"EmrClusterLogs": {
-		//	"./testdata/resources/emr_cluster_logs.tf",
-		//	"./testdata/rules/emr_cluster_logs.yml",
-		//	1,
-		//	"AWS_EMR_CLUSTER_LOGGING",
-		//},
-		//"KmsKeyRotation": {
-		//	"./testdata/resources/kms_key_rotation.tf",
-		//	"./testdata/rules/kms_key_rotation.yml",
-		//	1,
-		//	"AWS_KMS_KEY_ROTATION",
-		//},
-		//"SagemakerEndpoint": {
-		//	"./testdata/resources/sagemaker_endpoint_encryption.tf",
-		//	"./testdata/rules/sagemaker_endpoint_encryption.yml",
-		//	1,
-		//	"SAGEMAKER_ENDPOINT_ENCRYPTION",
-		//},
-		//"SagemakerNotebook": {
-		//	"./testdata/resources/sagemaker_notebook_encryption.tf",
-		//	"./testdata/rules/sagemaker_notebook_encryption.yml",
-		//	1,
-		//	"SAGEMAKER_NOTEBOOK_ENCRYPTION",
-		//},
-		//"TF12Variables": {
-		//	"./testdata/resources/uses_tf12_variables.tf",
-		//	"./testdata/rules/terraform_v12_variables.yml",
-		//	0,
-		//	"",
-		//},
+		"ParseError": {
+			"./testdata/resources/terraform_syntax_error.tf",
+			"./testdata/rules/terraform_provider.yml",
+			1,
+			"FILE_LOAD",
+		},
+		"Provider": {
+			"./testdata/resources/terraform_provider.tf",
+			"./testdata/rules/terraform_provider.yml",
+			1,
+			"AWS_PROVIDER",
+		},
+		"DataObject": {
+			"./testdata/resources/terraform_data.tf",
+			"./testdata/rules/terraform_data.yml",
+			1,
+			"DATA_NOT_CONTAINS",
+		},
+		"PoliciesWithVariables": {
+			"./testdata/resources/policy_with_variables.tf",
+			"./testdata/rules/policy_variable.yml",
+			0,
+			"",
+		},
+		"HereDocWithExpression": {
+			"./testdata/resources/policy_with_expression.tf",
+			"./testdata/rules/policy_variable.yml",
+			0,
+			"",
+		},
+		"Policies": {
+			"./testdata/resources/terraform_policy.tf",
+			"./testdata/rules/terraform_policy.yml",
+			1,
+			"TEST_POLICY",
+		},
+		"PolicyInvalidJSON": {
+			"./testdata/resources/terraform_policy_invalid_json.tf",
+			"./testdata/rules/terraform_policy.yml",
+			0,
+			"",
+		},
+		"PolicyEmpty": {
+			"./testdata/resources/terraform_policy_empty.tf",
+			"./testdata/rules/terraform_policy.yml",
+			0,
+			"",
+		},
+		"BatchPrivileged": {
+			"./testdata/resources/batch_privileged.tf",
+			"./testdata/rules/batch_definition.yml",
+			1,
+			"BATCH_DEFINITION_PRIVILEGED",
+		},
+		"PublicEC2": {
+			"./testdata/resources/ec2_public.tf",
+			"./testdata/rules/ec2_public.yml",
+			0,
+			"",
+		},
+		"CloudfrontAccessLogs": {
+			"./testdata/resources/cloudfront_access_logs.tf",
+			"./testdata/rules/cloudfront_access_logs.yml",
+			0,
+			"",
+		},
+		"Module": {
+			"./testdata/resources/terraform_module.tf",
+			"./testdata/rules/terraform_module.yml",
+			1,
+			"MODULE_DESCRIPTION",
+		},
+		"ElastiCacheRest": {
+			"./testdata/resources/elasticache_encryption_rest.tf",
+			"./testdata/rules/elasticache_encryption_rest.yml",
+			1,
+			"ELASTICACHE_ENCRYPTION_REST",
+		},
+		"ElastiCacheTransit": {
+			"./testdata/resources/elasticache_encryption_transit.tf",
+			"./testdata/rules/elasticache_encryption_transit.yml",
+			1,
+			"ELASTICACHE_ENCRYPTION_TRANSIT",
+		},
+		"NeptuneClusterEncryption": {
+			"./testdata/resources/neptune_db_encryption.tf",
+			"./testdata/rules/neptune_db_encryption.yml",
+			1,
+			"NEPTUNE_DB_ENCRYPTION",
+		},
+		"RdsPublic": {
+			"./testdata/resources/rds_publicly_available.tf",
+			"./testdata/rules/rds_publicly_available.yml",
+			0,
+			"",
+		},
+		"KinesisKms": {
+			"./testdata/resources/kinesis_kms_stream.tf",
+			"./testdata/rules/kinesis_kms_stream.yml",
+			1,
+			"KINESIS_STREAM_KMS",
+		},
+		"DmsEncryption": {
+			"./testdata/resources/dms_endpoint_encryption.tf",
+			"./testdata/rules/dms_endpoint_encryption.yml",
+			0,
+			"",
+		},
+		"EmrClusterLogs": {
+			"./testdata/resources/emr_cluster_logs.tf",
+			"./testdata/rules/emr_cluster_logs.yml",
+			1,
+			"AWS_EMR_CLUSTER_LOGGING",
+		},
+		"KmsKeyRotation": {
+			"./testdata/resources/kms_key_rotation.tf",
+			"./testdata/rules/kms_key_rotation.yml",
+			1,
+			"AWS_KMS_KEY_ROTATION",
+		},
+		"SagemakerEndpoint": {
+			"./testdata/resources/sagemaker_endpoint_encryption.tf",
+			"./testdata/rules/sagemaker_endpoint_encryption.yml",
+			1,
+			"SAGEMAKER_ENDPOINT_ENCRYPTION",
+		},
+		"SagemakerNotebook": {
+			"./testdata/resources/sagemaker_notebook_encryption.tf",
+			"./testdata/rules/sagemaker_notebook_encryption.yml",
+			1,
+			"SAGEMAKER_NOTEBOOK_ENCRYPTION",
+		},
+		"TF12Variables": {
+			"./testdata/resources/uses_tf12_variables.tf",
+			"./testdata/rules/terraform_v12_variables.yml",
+			0,
+			"",
+		},
 		"TF12ForLoop": {
 			"./testdata/resources/tf12_for_loop.tf",
 			"./testdata/rules/tf12_for_loop.yml",
