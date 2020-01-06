@@ -169,28 +169,29 @@ func attributesToMap(block tf12parser.Block) map[string]interface{} {
 }
 
 func ctyValueToString(value cty.Value) string {
-	if !value.IsKnown() {
+	// In case the value is nil but the type is not necessarily <nil>, return an empty string
+	if value.IsNull() || !value.IsKnown() {
 		return ""
-	}
-	switch value.Type() {
-	case cty.NilType:
-		return ""
-	case cty.Bool:
-		if value.True() {
-			return "true"
-		} else {
-			return "false"
+	} else {
+		switch value.Type() {
+		case cty.NilType:
+			return ""
+		case cty.Bool:
+			if value.True() {
+				return "true"
+			} else {
+				return "false"
+			}
+		case cty.String:
+			return strings.Trim(value.AsString(), "\n")
+		case cty.Number:
+			if value.RawEquals(cty.PositiveInfinity) || value.RawEquals(cty.NegativeInfinity) {
+				panic("cannot convert infinity to string")
+			}
+			return value.AsBigFloat().Text('f', -1)
+		default:
+			panic("unsupported primitive type")
 		}
-	case cty.String:
-		//TODO: This may not work in all cases?
-		return strings.Trim(value.AsString(), "\n")
-	case cty.Number:
-		if value.RawEquals(cty.PositiveInfinity) || value.RawEquals(cty.NegativeInfinity) {
-			panic("cannot convert infinity to string")
-		}
-		return value.AsBigFloat().Text('f', -1)
-	default:
-		panic("unsupported primitive type")
 	}
 }
 

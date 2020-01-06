@@ -1,0 +1,13 @@
+version: 1
+description: Rules for Terraform configuration files
+type: Terraform
+files:
+  - "nullable_value.tf"
+rules:
+
+  - id: NO_KEY_PAIR
+    message: Testing
+    resource: aws_instance
+    assertions:
+      - key: key_pair_name
+        op: absent

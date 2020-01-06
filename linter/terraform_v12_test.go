@@ -170,7 +170,6 @@ func TestTerraform12ProviderFileName(t *testing.T) {
 	assert.Equal(t, "./testdata/resources/terraform_provider.tf", resources[0].Filename)
 }
 
-// TODO: Enable these when Module processing is in
 func TestTerraform12ModuleLineNumber(t *testing.T) {
 	resources := loadResources12ToTest(t, "./testdata/resources/terraform_module.tf")
 	assert.Equal(t, 1, resources[0].LineNumber)
@@ -324,6 +323,12 @@ func TestTerraform12LinterCases(t *testing.T) {
 		"TF12ForLoop": {
 			"./testdata/resources/tf12_for_loop.tf",
 			"./testdata/rules/tf12_for_loop.yml",
+			0,
+			"",
+		},
+		"TF12NullValue": {
+			"./testdata/resources/nullable_value.tf",
+			"./testdata/rules/nullable_value.yml",
 			0,
 			"",
 		},
