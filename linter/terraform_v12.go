@@ -3,6 +3,7 @@ package linter
 import (
 	"github.com/zclconf/go-cty/cty"
 	"strconv"
+	"strings"
 
 	//"github.com/ghodss/yaml"
 	"github.com/stelligent/config-lint/assertion"
@@ -177,7 +178,7 @@ func ctyValueToString(value cty.Value) string {
 			return "false"
 		}
 	case cty.String:
-		return value.AsString()
+		return strings.Trim(value.AsString(), "\n")
 	case cty.Number:
 		if value.RawEquals(cty.PositiveInfinity) || value.RawEquals(cty.NegativeInfinity) {
 			panic("cannot convert infinity to string")

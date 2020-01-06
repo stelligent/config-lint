@@ -2,15 +2,14 @@ package tf12parser
 
 import (
 	"fmt"
-	"github.com/stelligent/config-lint/linter/terraform_funcs"
-	"github.com/zclconf/go-cty/cty"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
-	tfLang "github.com/hashicorp/terraform/lang"
+	"github.com/hashicorp/terraform/lang"
+	"github.com/zclconf/go-cty/cty"
 )
 
 const maxContextIterations = 32
@@ -139,14 +138,13 @@ func (parser *Parser) recursivelyParseDirectory(path string) error {
 
 // BuildEvaluationContext creates an *hcl.EvalContext by parsing values for all terraform variables (where available) then interpolating values into resource, local and data blocks until all possible values can be constructed
 func (parser *Parser) buildEvaluationContext(blocks hcl.Blocks, path string, inputVars map[string]cty.Value, isRoot bool) (Blocks, *hcl.EvalContext) {
-	scope := tfLang.Scope{
-		BaseDir: "",
+	scope := lang.Scope{
+		//TODO: I'm not 100% sure this will be right in all cases, but the single test around this passes
+		BaseDir: ".",
 	}
-	functions := scope.Functions()
-	functions["file"] = terraform_funcs.ReadFileContents
 	ctx := &hcl.EvalContext{
 		Variables: make(map[string]cty.Value),
-		Functions: functions,
+		Functions: scope.Functions(),
 }
 
 	ctx.Variables["module"] = cty.ObjectVal(make(map[string]cty.Value))
