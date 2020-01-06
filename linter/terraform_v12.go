@@ -2,7 +2,6 @@ package linter
 
 import (
 	"github.com/zclconf/go-cty/cty"
-	"os"
 	"strconv"
 	"strings"
 
@@ -193,10 +192,6 @@ func ctyValueToString(value cty.Value) string {
 	default:
 		panic("unsupported primitive type")
 	}
-}
-
-func getVariableFromEnvironment(key string) string {
-	return os.Getenv("TF_VAR_" + key)
 }
 
 // PostLoad resolves variable expressions
