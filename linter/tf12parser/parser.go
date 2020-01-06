@@ -2,16 +2,15 @@ package tf12parser
 
 import (
 	"fmt"
+	"github.com/stelligent/config-lint/linter/terraform_funcs"
 	"github.com/zclconf/go-cty/cty"
-	"github.com/zclconf/go-cty/cty/function"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
-	tfFuncs "github.com/hashicorp/terraform/lang/funcs"
-	"github.com/stelligent/config-lint/linter/terraform_funcs"
+	tfLang "github.com/hashicorp/terraform/lang"
 )
 
 const maxContextIterations = 32
@@ -140,14 +139,22 @@ func (parser *Parser) recursivelyParseDirectory(path string) error {
 
 // BuildEvaluationContext creates an *hcl.EvalContext by parsing values for all terraform variables (where available) then interpolating values into resource, local and data blocks until all possible values can be constructed
 func (parser *Parser) buildEvaluationContext(blocks hcl.Blocks, path string, inputVars map[string]cty.Value, isRoot bool) (Blocks, *hcl.EvalContext) {
+	//absPath, _ := filepath.Abs(path)
+	scope := tfLang.Scope{
+		//TODO: Can't hardcode this, obviously
+		BaseDir: "/home/mnewell/projects/config-lint/linter/",
+	}
+	functions := scope.Functions()
+	functions["file"] = terraform_funcs.ReadFileContents
 	ctx := &hcl.EvalContext{
 		Variables: make(map[string]cty.Value),
-		Functions: map[string]function.Function{
-			"lookup": tfFuncs.LookupFunc,
-			"file": terraform_funcs.ReadFileContents,
-			"cidrsubnet": terraform_funcs.CidrSubnetFunc,
-			"cidrsubnets": terraform_funcs.CidrSubnetsFunc,
-		},
+		Functions: functions,
+		//Functions: map[string]function.Function{
+		//	"lookup": tfFuncs.LookupFunc,
+		//	"file": tfFuncs.ReadFileContents,
+		//	"cidrsubnet": terraform_funcs.CidrSubnetFunc,
+		//	"cidrsubnets": terraform_funcs.CidrSubnetsFunc,
+		//},
 	}
 
 	ctx.Variables["module"] = cty.ObjectVal(make(map[string]cty.Value))
