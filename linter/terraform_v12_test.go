@@ -3,6 +3,7 @@ package linter
 import (
 	"github.com/stelligent/config-lint/assertion"
 	"github.com/stretchr/testify/assert"
+	"os"
 	"testing"
 )
 
@@ -80,14 +81,14 @@ func TestTerraform12LocalVariable(t *testing.T) {
 	assert.Equal(t, "myprojectbucket", properties["name"], "Unexpected value for name attribute")
 }
 
-//func TestTerraform12VariablesFromEnvironment(t *testing.T) {
-//	os.Setenv("TF_VAR_instance_type", "c4.large")
-//	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
-//	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
-//	properties := resources[0].Properties.(map[string]interface{})
-//	assert.Equal(t, properties["instance_type"], "c4.large", "Unexpected value for instance_type")
-//	os.Setenv("TF_VAR_instance_type", "")
-//}
+func TestTerraform12VariablesFromEnvironment(t *testing.T) {
+	os.Setenv("TF_VAR_instance_type", "c4.large")
+	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
+	properties := resources[0].Properties.(map[string]interface{})
+	assert.Equal(t, properties["instance_type"], "c4.large", "Unexpected value for instance_type")
+	os.Setenv("TF_VAR_instance_type", "")
+}
 
 
 func TestTerraform12FileFunction(t *testing.T) {

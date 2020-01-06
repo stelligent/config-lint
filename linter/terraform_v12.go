@@ -2,6 +2,7 @@ package linter
 
 import (
 	"github.com/zclconf/go-cty/cty"
+	"os"
 	"strconv"
 	"strings"
 
@@ -161,7 +162,12 @@ func attributesToMap(block tf12parser.Block) map[string]interface{} {
 				}
 			}
 		} else {
-			propertyMap[attribute.Name()] = ctyValueToString(attribute.Value())
+			environmentVariable := getVariableFromEnvironment(attribute.Name())
+			if environmentVariable == "" {
+				propertyMap[attribute.Name()] = ctyValueToString(attribute.Value())
+			} else {
+				propertyMap[attribute.Name()] = environmentVariable
+			}
 		}
 	}
 	return propertyMap
@@ -187,6 +193,10 @@ func ctyValueToString(value cty.Value) string {
 	default:
 		panic("unsupported primitive type")
 	}
+}
+
+func getVariableFromEnvironment(key string) string {
+	return os.Getenv("TF_VAR_" + key)
 }
 
 // PostLoad resolves variable expressions
