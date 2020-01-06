@@ -183,6 +183,7 @@ func ctyValueToString(value cty.Value) string {
 			return "false"
 		}
 	case cty.String:
+		//TODO: This may not work in all cases?
 		return strings.Trim(value.AsString(), "\n")
 	case cty.Number:
 		if value.RawEquals(cty.PositiveInfinity) || value.RawEquals(cty.NegativeInfinity) {
