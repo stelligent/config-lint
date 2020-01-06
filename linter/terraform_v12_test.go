@@ -322,6 +322,12 @@ func TestTerraform12LinterCases(t *testing.T) {
 			0,
 			"",
 		},
+		"TF12ForLoop": {
+			"./testdata/resources/tf12_for_loop.tf",
+			"./testdata/rules/tf12_for_loop.yml",
+			0,
+			"",
+		},
 	}
 	for name, tc := range testCases {
 		options := Options{
