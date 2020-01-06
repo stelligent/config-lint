@@ -40,7 +40,6 @@ func (l Terraform12ResourceLoader) Load(filename string) (FileResources, error) 
 	loaded.Resources = result.Resources
 
 	assertion.DebugJSON("loaded.Resources", loaded.Resources)
-
 	return loaded, nil
 }
 

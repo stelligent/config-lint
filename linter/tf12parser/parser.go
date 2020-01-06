@@ -10,6 +10,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
+	tfFuncs "github.com/hashicorp/terraform/lang/funcs"
 	"github.com/stelligent/config-lint/linter/terraform_funcs"
 )
 
@@ -142,9 +143,10 @@ func (parser *Parser) buildEvaluationContext(blocks hcl.Blocks, path string, inp
 	ctx := &hcl.EvalContext{
 		Variables: make(map[string]cty.Value),
 		Functions: map[string]function.Function{
-			"lookup": terraform_funcs.LookupFunc,
+			"lookup": tfFuncs.LookupFunc,
 			"file": terraform_funcs.ReadFileContents,
 			"cidrsubnet": terraform_funcs.CidrSubnetFunc,
+			"cidrsubnets": terraform_funcs.CidrSubnetsFunc,
 		},
 	}
 

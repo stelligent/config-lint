@@ -6,11 +6,12 @@ variable "vpc_id" {
 
 variable "subnet_numbers" {
   description = "List of 8-bit numbers of subnets of base_cidr_block that should be granted access."
-  default = [1, 2, 3]
+ default = [1, 2, 3]
 }
 
 data "aws_vpc" "example" {
   id = var.vpc_id
+  vpc_cidr = "10.1.0.0/16"
 }
 
 resource "aws_security_group" "example" {
@@ -30,7 +31,8 @@ resource "aws_security_group" "example" {
     #   ["10.1.1.0/24", "10.1.2.0/24", "10.1.3.0/24"]
     cidr_blocks = [
     for num in var.subnet_numbers:
-    cidrsubnet(data.aws_vpc.example.cidr_block, 8, num)
+    cidrsubnet(data.aws_vpc.example.vpc_cidr, 8, num)
+//    cidrsubnet(data.aws_vpc.example.cidr_block, 8, num)
     ]
   }
 }
