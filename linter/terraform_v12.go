@@ -154,18 +154,22 @@ func attributesToMap(block tf12parser.Block) map[string]interface{} {
 			iter := attribute.Value().ElementIterator()
 			for iter.Next() {
 				key, value := iter.Element()
-				innerMap[ctyValueToString(key)] = ctyValueToString(value)
+				setValue(innerMap, ctyValueToString(key), ctyValueToString(value))
 			}
 		} else {
-			environmentVariable := getVariableFromEnvironment(attribute.Name())
-			if environmentVariable == "" {
-				propertyMap[attribute.Name()] = ctyValueToString(attribute.Value())
-			} else {
-				propertyMap[attribute.Name()] = environmentVariable
-			}
+			setValue(propertyMap, attribute.Name(), ctyValueToString(attribute.Value()))
 		}
 	}
 	return propertyMap
+}
+
+func setValue(m map[string]interface{}, name string, value string) {
+	environmentVariable := getVariableFromEnvironment(name)
+	if environmentVariable == "" {
+		m[name] = value
+	} else {
+		m[name] = environmentVariable
+	}
 }
 
 func ctyValueToString(value cty.Value) string {
