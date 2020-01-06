@@ -9,5 +9,13 @@ rules:
     message: Testing
     resource: aws_security_group
     assertions:
-      - key: igress.cidr_blocks
-        op: absent
+      - every:
+          key: "ingress"
+          expressions:
+            # this says that it either must be a private IP, or not have IP regex (eg sg string, interpolation)
+            - every:
+                key: cidr_blocks
+                expressions:
+                  - key: "@"
+                    op: contains
+                    value: "/24"
