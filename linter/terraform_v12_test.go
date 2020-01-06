@@ -172,15 +172,15 @@ func TestTerraform12ProviderFileName(t *testing.T) {
 }
 
 // TODO: Enable these when Module processing is in
-// func TestTerraform12ModuleLineNumber(t *testing.T) {
-// 	resources := loadResources12ToTest(t, "./testdata/resources/terraform_module.tf")
-// 	assert.Equal(t, 1, resources[0].LineNumber)
-// }
+func TestTerraform12ModuleLineNumber(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/terraform_module.tf")
+	assert.Equal(t, 1, resources[0].LineNumber)
+}
 
-// func TestTerraform12ModuleFileName(t *testing.T) {
-// 	resources := loadResources12ToTest(t, "./testdata/resources/terraform_module.tf")
-// 	assert.Equal(t, "./testdata/resources/terraform_module.tf", resources[0].Filename)
-// }
+func TestTerraform12ModuleFileName(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/terraform_module.tf")
+	assert.Equal(t, "./testdata/resources/terraform_module.tf", resources[0].Filename)
+}
 
 func TestTerraform12LinterCases(t *testing.T) {
 	testCases := map[string]terraformLinterTestCase{
