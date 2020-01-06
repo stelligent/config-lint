@@ -55,7 +55,6 @@ func (l Terraform12ResourceLoader) LoadMany(filenames []string) (FileResources, 
 	loaded.Resources = result.Resources
 
 	assertion.DebugJSON("loaded.Resources", loaded.Resources)
-
 	return loaded, nil
 }
 
@@ -75,7 +74,7 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 	}
 
 	// Get all Terraform blocks of a given type and append to the slice of Resources
-	blockTypes := []string{"resource", "provider", "data"}
+	blockTypes := []string{"resource", "provider", "data", "module"}
 	for _, blockType := range blockTypes {
 		result.Resources = append(result.Resources, getBlocksOfType(blocks, blockType)...)
 	}
@@ -111,18 +110,29 @@ func getBlocksOfType(blocks tf12parser.Blocks, blockType string) []assertion.Res
 			id = strconv.Itoa(i)
 			i++
 		}
-
-		resource := assertion.Resource{
-			ID:         id,
-			Type:       block.Labels()[0],
-			Category:   blockType,
-			Properties: attributesToMap(*block),
-			Filename:   block.Range().Filename,
-			LineNumber: block.Range().StartLine,
+		if block.Type() != "module" {
+			resource := assertion.Resource{
+				ID: id,
+				Type:       block.Labels()[0],
+				Category:   blockType,
+				Properties: attributesToMap(*block),
+				Filename:   block.Range().Filename,
+				LineNumber: block.Range().StartLine,
+			}
+			resources = append(resources, resource)
+		} else {
+			moduleSource := block.GetAttribute("source")
+			resource := assertion.Resource{
+				ID: block.Labels()[0],
+				Type:       moduleSource.Value().AsString(),
+				Category:   blockType,
+				Properties: attributesToMap(*block),
+				Filename:   block.Range().Filename,
+				LineNumber: block.Range().StartLine,
+			}
+			resources = append(resources, resource)
 		}
-		resources = append(resources, resource)
 	}
-
 	return resources
 }
 
