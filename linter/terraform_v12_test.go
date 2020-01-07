@@ -47,7 +47,7 @@ func TestSingleResourceType(t *testing.T) {
 
 //The idea of this test is to confirm a particular difference between the original parser and the new
 //I know it's not clear. - MN
-func TestMultiLevel(t *testing.T) {
+func TestTupleType(t *testing.T) {
 	resources := loadResources12ToTest(t, "./testdata/resources/multi_level.tf")
 	assert.Equal(t, 1, len(resources), "Expecting 1 resource")
 	statement := resources[0].Properties.(map[string]interface{})["statement"]
