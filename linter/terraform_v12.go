@@ -145,19 +145,29 @@ func attributesToMap(block tf12parser.Block) map[string]interface{} {
 	}
 	attributes := block.GetAttributes()
 	for _, attribute := range attributes {
-		if attribute.Value().CanIterateElements() {
+		value := attribute.Value()
+		if value.Type().IsTupleType() {
+			innerArray := make([]interface{}, 0)
+
+			iter := value.ElementIterator()
+			for iter.Next() {
+				_, value := iter.Element()
+				innerArray = append(innerArray, ctyValueToString(value))
+			}
+			propertyMap[attribute.Name()] = innerArray
+		} else if value.CanIterateElements() {
 			var innerArray []interface{}
 			innerMap := make(map[string]interface{})
 			innerArray = append(innerArray, innerMap)
 			propertyMap[attribute.Name()] = innerArray
 
-			iter := attribute.Value().ElementIterator()
+			iter := value.ElementIterator()
 			for iter.Next() {
 				key, value := iter.Element()
 				setValue(innerMap, ctyValueToString(key), ctyValueToString(value))
 			}
 		} else {
-			setValue(propertyMap, attribute.Name(), ctyValueToString(attribute.Value()))
+			setValue(propertyMap, attribute.Name(), ctyValueToString(value))
 		}
 	}
 	return propertyMap
