@@ -28,9 +28,8 @@ func NewLinter(ruleSet assertion.RuleSet, vs assertion.ValueSource, filenames []
 	switch ruleSet.Type {
 	case "Kubernetes":
 		return FileLinter{Filenames: filenames, ValueSource: vs, Loader: KubernetesResourceLoader{}}, nil
+	//TODO: Maybe leave an option to force original TerraformResourceLoader
 	case "Terraform":
-		return FileLinter{Filenames: filenames, ValueSource: vs, Loader: TerraformResourceLoader{}}, nil
-	case "Terraform12":
 		return FileLinter{Filenames: filenames, ValueSource: vs, Loader: Terraform12ResourceLoader{}}, nil
 	case "LintRules":
 		return FileLinter{Filenames: filenames, ValueSource: vs, Loader: RulesResourceLoader{}}, nil
