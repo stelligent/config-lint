@@ -3,7 +3,7 @@ name: Beta Build & Deploy Version
 on:
   push:
     tags:
-      - 'beta-v*.*.*'
+      - 'v*.*.*-beta'
     branches-ignore:
       - '**'
 
@@ -17,10 +17,10 @@ jobs:
         run: go mod download
       - name: make test
         run: make test
-      # - name: release
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.goreleaser }}
-      #   if: success()
-      #   run: |
-      #     go get github.com/goreleaser/goreleaser
-      #     goreleaser release --skip-validate
+      - name: release
+        env:
+          GITHUB_TOKEN: ${{ secrets.goreleaser }}
+        if: success()
+        run: |
+          go get github.com/goreleaser/goreleaser
+          goreleaser release --skip-validate --skip-publish
