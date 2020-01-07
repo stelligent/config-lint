@@ -3,7 +3,7 @@ BETA_VERSION := $(shell git tag -l --sort=creatordate | grep "^v[0-9]*.[0-9]*.[0
 BETA_MAJOR_VERSION := $(word 1, $(subst ., ,$(BETA_VERSION)))
 BETA_MINOR_VERSION := $(word 2, $(subst ., ,$(BETA_VERSION)))
 BETA_PATCH_VERSION := $(word 3, $(subst ., ,$(BETA_VERSION)))
-BETA_NEXT_VERSION ?= $(BETA_MAJOR_VERSION).$(BETA_MINOR_VERSION).$(shell echo $(BETA_PATCH_VERSION)+1|bc)
+BETA_NEXT_VERSION ?= $(BETA_MAJOR_VERSION).$(BETA_MINOR_VERSION).$(shell echo $(BETA_PATCH_VERSION)+1|bc)-beta
 
 # Normal Versioning
 VERSION := $(shell git tag -l --sort=creatordate | grep "^v[0-9]*.[0-9]*.[0-9]*$$" | tail -1)
