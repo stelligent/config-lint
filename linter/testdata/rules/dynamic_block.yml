@@ -1,0 +1,13 @@
+version: 1
+description: Rules for Terraform configuration files
+type: Terraform12
+files:
+  - "dynamic_block.tf"
+rules:
+  - id: NO_SSH_ACCESS
+    message: Testing
+    resource: aws_security_group
+    assertions:
+      - key: "dynamic[*].for_each[]|[0].*[]"
+        op: not-contains
+        value: 22
