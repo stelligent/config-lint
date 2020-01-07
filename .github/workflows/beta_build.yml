@@ -8,11 +8,11 @@ on:
       - '**'
 
 jobs:
-  build:
+  beta-build:
     runs-on: ubuntu-latest
     container: golang:1.12
     steps:
-      - uses: actions/checkout@peter # TODO: change to 'beta' branch
+      - uses: actions/checkout@master
       - name: dependencies
         run: go mod download
       - name: make test
