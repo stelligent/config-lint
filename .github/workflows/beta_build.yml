@@ -1,0 +1,19 @@
+name: Beta Build
+
+on:
+  push:
+    branches:
+      - 'peter' # TODO: change to 'beta-**' branch
+    tags-ignore:
+      - '**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: golang:1.12
+    steps:
+      - uses: actions/checkout@peter # TODO: change to 'beta' branch
+      - name: dependencies
+        run: go mod download
+      - name: make test
+        run: make test
