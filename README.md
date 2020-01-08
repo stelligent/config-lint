@@ -37,12 +37,10 @@ Alternatively, you can install a `Pre-Release` manually from the [releases](http
 The program has a set of built-in rules for scanning the following types of files:
 
 * [Terraform](docs/terraform.md)
-* [Terraform v0.12][docs/terraform12.md] # TODO: create new terraform v0.12 docs and examples
 
 The program can also read files from a separate YAML file, and can scan these types of files:
 
 * [Terraform](docs/terraform.md)
-* [Terraform v0.12][docs/terraform12.md] # TODO: create new terraform v0.12 docs and examples
 * Kubernetes
 * LintRules
 * YAML
