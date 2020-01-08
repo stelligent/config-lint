@@ -138,10 +138,17 @@ func getBlocksOfType(blocks tf12parser.Blocks, blockType string) []assertion.Res
 
 func attributesToMap(block tf12parser.Block) map[string]interface{} {
 	propertyMap := make(map[string]interface{})
-	for _, block := range block.AllBlocks() {
+	allBlocks := block.AllBlocks()
+	for _, block := range allBlocks {
 		var toAppend []interface{}
 		toAppend = append(toAppend, attributesToMap(*block))
-		propertyMap[block.Type()] = toAppend
+		if propertyMap[block.Type()] == nil {
+			propertyMap[block.Type()] = toAppend
+		} else {
+			v := propertyMap[block.Type()].([]interface{})
+			v = append(v, toAppend[0])
+			propertyMap[block.Type()] = v
+		}
 	}
 	attributes := block.GetAttributes()
 	for _, attribute := range attributes {

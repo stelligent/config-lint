@@ -63,6 +63,14 @@ func TestTupleType(t *testing.T) {
 	assert.True(t, ok)
 }
 
+func TestMultipleBlocksOfSameType12(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/multiple_blocks_same.tf")
+	assert.Equal(t, 1, len(resources), "Expecting 1 resource")
+	properties := resources[0].Properties.(map[string]interface{})
+	ebsBlocks := properties["ebs_block_device"]
+	assert.Len(t, ebsBlocks, 2)
+}
+
 func TestTerraform12Variable(t *testing.T) {
 	loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
 	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
