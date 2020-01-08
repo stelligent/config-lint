@@ -1,10 +1,9 @@
-name: Build & Deploy
+name: Beta Build & Deploy Version
 
 on:
   push:
     tags:
-      - 'v*.*.*'
-      - '!v*.*.*-beta'
+      - 'v*.*.*-beta'
     branches-ignore:
       - '**'
 
@@ -18,10 +17,10 @@ jobs:
         run: go mod download
       - name: make test
         run: make test
-      - name: release
+      - name: beta release
         env:
           GITHUB_TOKEN: ${{ secrets.goreleaser }}
         if: success()
         run: |
           go get github.com/goreleaser/goreleaser
-          goreleaser release --skip-validate
+          goreleaser release --skip-validate --config=.beta-goreleaser.yml

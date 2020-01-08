@@ -1,4 +1,4 @@
-[![Build Status](https://circleci.com/gh/stelligent/config-lint.svg?style=shield)](https://circleci.com/gh/stelligent/config-lint) [![Join the chat at https://gitter.im/stelligent/config-lint](https://badges.gitter.im/stelligent/config-lint.svg)](https://gitter.im/stelligent/config-lint?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+![Build & Deploy](https://github.com/stelligent/config-lint/workflows/Build%20%26%20Deploy/badge.svg) [![Join the chat at https://gitter.im/stelligent/config-lint](https://badges.gitter.im/stelligent/config-lint.svg)](https://gitter.im/stelligent/config-lint?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # config-lint
 
@@ -16,6 +16,21 @@ brew install config-lint
 ```
 
 Alternatively, you can install manually from the [releases](https://github.com/stelligent/config-lint/releases).
+
+## Beta
+You can use [Homebrew](https://brew.sh/) to install a beta version:
+
+```
+brew tap stelligent/tap
+brew install beta/config-lint
+```
+
+To upgrade an already existing release:
+```
+brew upgrade beta/config-lint
+```
+
+Alternatively, you can install a `Pre-Release` manually from the [releases](https://github.com/stelligent/config-lint/releases).
 
 # Run
 
@@ -213,3 +228,7 @@ make lint
 ## Releasing
 To release a new version, run `make bumpversion` to increment the patch version and push a tag to GitHub to start the release process.
 
+Releases are created via GitHub Workflows. You can find more information about this [here](docs/github_workflow.md)
+
+### Beta
+To release a new beta version, run `make beta-bumpversion` to increment the patch version and push a tag to GitHub to start the beta release process. You can find more information about this [here](docs/github_workflow.md)

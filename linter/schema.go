@@ -1,10 +1,10 @@
 package linter
 
-import hcl2 "github.com/hashicorp/hcl/v2"
+import "github.com/hashicorp/hcl/v2"
 
 // lifted from terraform 0.12 source
-var terraformSchema = &hcl2.BodySchema{
-	Blocks: []hcl2.BlockHeaderSchema{
+var terraformSchema = &hcl.BodySchema{
+	Blocks: []hcl.BlockHeaderSchema{
 		{
 			Type: "terraform",
 		},
