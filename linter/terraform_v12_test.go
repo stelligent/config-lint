@@ -1,9 +1,13 @@
 package linter
 
 import (
+	"fmt"
 	"github.com/stelligent/config-lint/assertion"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
+	"log"
 	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -376,4 +380,89 @@ func TestTerraform12LinterCases(t *testing.T) {
 			assertViolationByRuleID(name, tc.ExpectedViolationRuleID, report.Violations, t)
 		}
 	}
+}
+
+func TestTerraform12FileFunctionMultiLineContent(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/reference_file_multi_line.tf")
+	assert.Equal(t, len(resources), 2, "Unexpected number of resources found")
+	properties_1 := resources[0].Properties.(map[string]interface{})
+	assert.Equal(t, properties_1["test_value"], "multi\nline\nexample", "Unexpected value for bucket property")
+	properties_2 := resources[1].Properties.(map[string]interface{})
+	assert.Equal(t, properties_2["test_value2"], properties_1["test_value"], "Unexpected value for bucket property")
+}
+
+func TestTerraform12FileFunctionResourceFileAbsolutePath(t *testing.T) {
+	absolutePath, _ := filepath.Abs("./testdata/resources/reference_file.tf")
+	resources := loadResources12ToTest(t, absolutePath)
+	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
+	properties := resources[0].Properties.(map[string]interface{})
+	assert.Equal(t, properties["bucket"], "example", "Unexpected value for bucket property")
+}
+
+func TestTerraform12FileFunctionTemplateFileFunction(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/template_file_function_basic.tf")
+	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
+	properties := resources[0].Properties.(map[string]interface{})
+	assert.Equal(t, properties["bucket"], "bucket-foo-example-bar", "Unexpected value for bucket property")
+}
+
+func TestTerraform12FileFunctionTemplateFileForLoop(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/template_file_function_for_loop.tf")
+	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
+	properties := resources[0].Properties.(map[string]interface{})
+	assert.Equal(t, properties["test_value"], "testing:foo\ntesting:bar", "Unexpected value for bucket property")
+}
+
+func TestTerraform12FileFunctionTemplateFileConditional(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/template_file_function_conditional.tf")
+	assert.Equal(t, len(resources), 2, "Unexpected number of resources found")
+	properties := resources[0].Properties.(map[string]interface{})
+	assert.Equal(t, properties["test_value"], "Foo", "Unexpected value for bucket property")
+	properties2 := resources[1].Properties.(map[string]interface{})
+	assert.Equal(t, properties2["test_value2"], "Bar", "Unexpected value for bucket property")
+}
+
+//func TestTerraform12FileFunctionReferenceAndResourceFileSameDir(t *testing.T) {
+//	resources := loadResources12ToTest(t, "./testdata/data/reference_relative.tf")
+//	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
+//	properties := resources[0].Properties.(map[string]interface{})
+//	assert.Equal(t, properties["bucket"], "example", "Unexpected value for bucket property")
+//}
+
+func TestTerraform12FileFunctionReferenceFileAbsoultePath(t *testing.T) {
+	path, _ := os.Getwd()
+	var err error
+	var tempResourceFile *os.File
+	var tempReferenceFile *os.File
+	var tempResourceDir string
+	var tempReferenceDir string
+
+	tempResourceDir, err = ioutil.TempDir(path, "tf_resource")
+	if err != nil{log.Fatal(err)}
+	tempReferenceDir, err = ioutil.TempDir(tempResourceDir, "tf_reference")
+	if err != nil{log.Fatal(err)}
+	tempResourceFile, err = ioutil.TempFile(tempResourceDir, "test_resource.tf")
+	if err != nil{log.Fatal(err)}
+	tempReferenceFile, err = ioutil.TempFile(tempReferenceDir, "test_reference.txt")
+	if err != nil{log.Fatal(err)}
+
+	// tempReferenceFile.Name() is returned as the Absolute Path of the temp reference file
+	tf12ResourceContent := fmt.Sprintf(`resource "aws_s3_bucket" "a_bucket" {
+ bucket = "${file("%v")}"
+}
+`, tempReferenceFile.Name())
+
+	tf12ReferenceContent := (`example
+`)
+	err = ioutil.WriteFile(tempResourceFile.Name(), []byte(tf12ResourceContent), 0644)
+	if err != nil{log.Fatal(err)}
+	err = ioutil.WriteFile(tempReferenceFile.Name(), []byte(tf12ReferenceContent), 0644)
+	if err != nil{log.Fatal(err)}
+
+	resources := loadResources12ToTest(t, tempResourceFile.Name())
+	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
+	properties := resources[0].Properties.(map[string]interface{})
+	assert.Equal(t, properties["bucket"], "example", "Unexpected value for bucket property")
+	os.RemoveAll(tempResourceDir)
+	os.RemoveAll(tempReferenceDir)
 }
