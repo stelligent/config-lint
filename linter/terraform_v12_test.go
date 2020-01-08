@@ -71,6 +71,15 @@ func TestMultipleBlocksOfSameType12(t *testing.T) {
 	assert.Len(t, ebsBlocks, 2)
 }
 
+func TestInnerObjects12(t *testing.T) {
+	resources := loadResources12ToTest(t, "./testdata/resources/terraform_inner_objects.tf")
+	assert.Equal(t, 2, len(resources), "Expecting 1 resource")
+	properties := resources[0].Properties.(map[string]interface{})
+	artifactStore := properties["artifact_store"].([]interface{})[0].(map[string]interface{})
+	encryptionKey := artifactStore["encryption_key"]
+	assert.NotNil(t, encryptionKey)
+}
+
 func TestTerraform12Variable(t *testing.T) {
 	loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
 	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")

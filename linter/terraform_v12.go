@@ -163,21 +163,29 @@ func attributesToMap(block tf12parser.Block) map[string]interface{} {
 			}
 			propertyMap[attribute.Name()] = innerArray
 		} else if value.CanIterateElements() {
-			var innerArray []interface{}
-			innerMap := make(map[string]interface{})
-			innerArray = append(innerArray, innerMap)
-			propertyMap[attribute.Name()] = innerArray
-
-			iter := value.ElementIterator()
-			for iter.Next() {
-				key, value := iter.Element()
-				setValue(innerMap, ctyValueToString(key), ctyValueToString(value))
-			}
+			iterateElements(propertyMap, attribute.Name(), value)
 		} else {
 			setValue(propertyMap, attribute.Name(), ctyValueToString(value))
 		}
 	}
 	return propertyMap
+}
+
+func iterateElements(propertyMap map[string]interface{}, name string, value cty.Value) {
+	var innerArray []interface{}
+	innerMap := make(map[string]interface{})
+	innerArray = append(innerArray, innerMap)
+	propertyMap[name] = innerArray
+
+	iter := value.ElementIterator()
+	for iter.Next() {
+		key, value := iter.Element()
+		if value.CanIterateElements() {
+			iterateElements(innerMap, ctyValueToString(key), value)
+		} else {
+			setValue(innerMap, ctyValueToString(key), ctyValueToString(value))
+		}
+	}
 }
 
 func setValue(m map[string]interface{}, name string, value string) {
