@@ -228,7 +228,7 @@ make lint
 ## Releasing
 To release a new version, run `make bumpversion` to increment the patch version and push a tag to GitHub to start the release process.
 
-Releases are created via GitHub Workflows. You can find the Build and Deploy workflow configs in `.github/workflows`.
+Releases are created via GitHub Workflows. You can find more information about this [here](docs/github_workflow.md)
 
 ### Beta
-To release a new beta version, run `make beta-bumpversion` to increment the patch version and push a tag to GitHub to start the beta release process.
+To release a new beta version, run `make beta-bumpversion` to increment the patch version and push a tag to GitHub to start the beta release process. You can find more information about this [here](docs/github_workflow.md)
