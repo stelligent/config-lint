@@ -6,7 +6,7 @@
 |-----------|------------------------------------------------------------------------------------|
 |version    |Currently ignored                                                                   |
 |description|Text description for the file, not currently used                                   |
-|type       |Terraform, Kubernetes, SecurityGroups, AWSConfig                                    |
+|type       |Terraform, Terraform12, Kubernetes, SecurityGroups, AWSConfig                                    |
 |files      |Filenames must match one of these patterns to be processed by this set of rules     |
 |rules      |A list of rules, see next section                                                   |
 

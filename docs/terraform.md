@@ -11,6 +11,14 @@ config-lint -terraform <FILE_OR_DIRECTORY_OF_TF_FILES>
 
 If you want to run most of the built-in rules, but not all, you can use a [profile](docs/profiles.md) to exclude some rules or resources.
 
+For Terraform files with Terraform 12 specific features, use the `-terraform12` flag:
+
+```
+config-lint -terraform12 <FILE_OR_DIRECTORY_OF_TF_FILES>
+```
+
+The Terraform12 parser is fully backwards compatible with previous versions of Terraform.
+
 ## Custom Terraform rules for your project or organization
 
 ```
@@ -111,6 +119,34 @@ rules:
     assertions:
       - key: num_servers
         op: present
+```
+
+### Terraform 12 Example
+
+Note the `type: Terraform12` item below. Rules targeting templates with Terraform 12-specific features must use the Terraform12 type.
+
+```yaml
+version: 1
+description: Rules for Terraform configuration files
+type: Terraform12
+files:
+  - "*.tf"
+rules:
+
+  - id: CIDR_SET
+    message: Testing
+    resource: aws_security_group
+    assertions:
+      - every:
+          key: "ingress"
+          expressions:
+            # this says that it either must be a private IP, or not have IP regex (eg sg string, interpolation)
+            - every:
+                key: cidr_blocks
+                expressions:
+                  - key: "@"
+                    op: contains
+                    value: "/24"
 ```
 
 ### Evaluating Terraform 12 Dynamic Blocks
