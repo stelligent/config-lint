@@ -3,7 +3,7 @@ module github.com/stelligent/config-lint
 go 1.12
 
 require (
-	github.com/Azure/go-autorest v12.2.0+incompatible
+	github.com/Azure/go-autorest v12.2.0+incompatible // manually added to fix multiple modules error from goreleaser
 	github.com/aws/aws-sdk-go v1.25.3
 	github.com/bmatcuk/doublestar v1.2.2 // indirect
 	github.com/fzipp/gocyclo v0.0.0-20150627053110-6acd4345c835 // indirect
