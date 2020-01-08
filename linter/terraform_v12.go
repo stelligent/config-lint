@@ -138,34 +138,55 @@ func getBlocksOfType(blocks tf12parser.Blocks, blockType string) []assertion.Res
 
 func attributesToMap(block tf12parser.Block) map[string]interface{} {
 	propertyMap := make(map[string]interface{})
-	for _, block := range block.AllBlocks() {
+	allBlocks := block.AllBlocks()
+	for _, block := range allBlocks {
 		var toAppend []interface{}
 		toAppend = append(toAppend, attributesToMap(*block))
-		propertyMap[block.Type()] = toAppend
+		if propertyMap[block.Type()] == nil {
+			propertyMap[block.Type()] = toAppend
+		} else {
+			v := propertyMap[block.Type()].([]interface{})
+			v = append(v, toAppend[0])
+			propertyMap[block.Type()] = v
+		}
 	}
 	attributes := block.GetAttributes()
 	for _, attribute := range attributes {
-		if attribute.Value().CanIterateElements() {
+		value := attribute.Value()
+		if value.Type().IsTupleType() {
+			innerArray := make([]interface{}, 0)
+
+			iter := value.ElementIterator()
+			for iter.Next() {
+				_, value := iter.Element()
+				innerArray = append(innerArray, ctyValueToString(value))
+			}
+			propertyMap[attribute.Name()] = innerArray
+		} else if value.CanIterateElements() {
 			var innerArray []interface{}
 			innerMap := make(map[string]interface{})
 			innerArray = append(innerArray, innerMap)
 			propertyMap[attribute.Name()] = innerArray
 
-			iter := attribute.Value().ElementIterator()
+			iter := value.ElementIterator()
 			for iter.Next() {
 				key, value := iter.Element()
-				innerMap[ctyValueToString(key)] = ctyValueToString(value)
+				setValue(innerMap, ctyValueToString(key), ctyValueToString(value))
 			}
 		} else {
-			environmentVariable := getVariableFromEnvironment(attribute.Name())
-			if environmentVariable == "" {
-				propertyMap[attribute.Name()] = ctyValueToString(attribute.Value())
-			} else {
-				propertyMap[attribute.Name()] = environmentVariable
-			}
+			setValue(propertyMap, attribute.Name(), ctyValueToString(value))
 		}
 	}
 	return propertyMap
+}
+
+func setValue(m map[string]interface{}, name string, value string) {
+	environmentVariable := getVariableFromEnvironment(name)
+	if environmentVariable == "" {
+		m[name] = value
+	} else {
+		m[name] = environmentVariable
+	}
 }
 
 func ctyValueToString(value cty.Value) string {
