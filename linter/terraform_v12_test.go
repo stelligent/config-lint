@@ -414,13 +414,6 @@ func TestTerraform12FileFunctionTemplateFileConditional(t *testing.T) {
 	assert.Equal(t, properties2["test_value2"], "Bar", "Unexpected value for bucket property")
 }
 
-//func TestTerraform12FileFunctionReferenceAndResourceFileSameDir(t *testing.T) {
-//	resources := loadResources12ToTest(t, "./testdata/data/reference_relative.tf")
-//	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
-//	properties := resources[0].Properties.(map[string]interface{})
-//	assert.Equal(t, properties["bucket"], "example", "Unexpected value for bucket property")
-//}
-
 func TestTerraform12FileFunctionReferenceFileAbsoultePath(t *testing.T) {
 	path, _ := os.Getwd()
 	var err error

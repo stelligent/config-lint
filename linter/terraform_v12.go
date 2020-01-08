@@ -4,12 +4,8 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	"strconv"
 	"strings"
-
-	//"github.com/ghodss/yaml"
 	"github.com/stelligent/config-lint/assertion"
-
 	"github.com/hashicorp/hcl/v2"
-	//hclsyntax "github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/stelligent/config-lint/linter/tf12parser"
 )
 
