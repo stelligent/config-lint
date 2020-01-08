@@ -35,13 +35,6 @@ func loadResources12ToTest(t *testing.T, filename string) []assertion.Resource {
 	return resources
 }
 
-//
-//func getResourceTags(r assertion.Resource) map[string]interface{} {
-//	properties := r.Properties.(map[string]interface{})
-//	tags := properties["tags"].([]interface{})
-//	return tags[0].(map[string]interface{})
-//}
-
 func TestSingleResourceType(t *testing.T) {
 	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
 	assert.Equal(t, 1, len(resources), "Expecting 1 resource")
@@ -125,7 +118,6 @@ func TestTerraform12VariablesFromEnvironment(t *testing.T) {
 	os.Setenv("TF_VAR_instance_type", "")
 }
 
-
 func TestTerraform12FileFunction(t *testing.T) {
 	resources := loadResources12ToTest(t, "./testdata/resources/reference_file.tf")
 	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
@@ -151,29 +143,12 @@ func TestTerraform12VariablesInDifferentFile(t *testing.T) {
 	assertViolationsCount("TestTerraformVariablesInDifferentFile ", 0, report.Violations, t)
 }
 
-//type TestingValueSource struct{}
-
-//func (s TestingValueSource) GetValue(a assertion.Expression) (string, error) {
-//	if a.ValueFrom.URL != "" {
-//		return "TEST", nil
-//	}
-//	return a.Value, nil
-//}
-
 func TestTerraform12DataLoader(t *testing.T) {
 	loader := TerraformResourceLoader{}
 	loaded, err := loader.Load("./testdata/resources/terraform_data.tf")
 	assert.Nil(t, err, "Expecting Load to run without error")
 	assert.Equal(t, len(loaded.Resources), 1, "Unexpected number of resources")
 }
-
-//type terraformLinterTestCase struct {
-//	ConfigurationFilename   string
-//	RulesFilename           string
-//	ExpectedViolationCount  int
-//	ExpectedViolationRuleID string
-//}
-//
 
 func TestTerraform12ResourceLineNumber(t *testing.T) {
 	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
@@ -367,12 +342,12 @@ func TestTerraform12LinterCases(t *testing.T) {
 			0,
 			"",
 		},
-		//"TF12DynamicBlock": {
-		//	"./testdata/resources/dynamic_block.tf",
-		//	"./testdata/rules/dynamic_block.yml",
-		//	1,
-		//	"NO_SSH_ACCESS",
-		//},
+		"TF12DynamicBlock": {
+			"./testdata/resources/dynamic_block.tf",
+			"./testdata/rules/dynamic_block.yml",
+			1,
+			"NO_SSH_ACCESS",
+		},
 	}
 	for name, tc := range testCases {
 		options := Options{

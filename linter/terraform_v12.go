@@ -112,7 +112,7 @@ func getBlocksOfType(blocks tf12parser.Blocks, blockType string) []assertion.Res
 		}
 		if block.Type() != "module" {
 			resource := assertion.Resource{
-				ID: id,
+				ID:         id,
 				Type:       block.Labels()[0],
 				Category:   blockType,
 				Properties: attributesToMap(*block),
@@ -123,7 +123,7 @@ func getBlocksOfType(blocks tf12parser.Blocks, blockType string) []assertion.Res
 		} else {
 			moduleSource := block.GetAttribute("source")
 			resource := assertion.Resource{
-				ID: block.Labels()[0],
+				ID:         block.Labels()[0],
 				Type:       moduleSource.Value().AsString(),
 				Category:   blockType,
 				Properties: attributesToMap(*block),

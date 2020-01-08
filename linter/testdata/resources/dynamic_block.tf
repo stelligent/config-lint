@@ -1,3 +1,7 @@
+terraform {
+  required_version = ">= 0.12.0"
+}
+
 variable "service_ports" {
   default = [22, 80, 1433, 6379]
 }
@@ -14,5 +18,9 @@ resource "aws_security_group" "example" {
     }
   }
 
-  egress = "-1"
+  egress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+  }
 }

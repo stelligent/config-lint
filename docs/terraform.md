@@ -156,7 +156,7 @@ rules:
     message: Testing
     resource: aws_security_group
     assertions:
-      - key: "dynamic[*].for_each[]|[0].*[]"
+      - key: "dynamic[*].for_each[]"
         op: not-contains
         value: 22
 ```
