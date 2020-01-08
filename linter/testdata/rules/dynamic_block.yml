@@ -1,6 +1,6 @@
 version: 1
 description: Rules for Terraform configuration files
-type: Terraform12
+type: Terraform
 files:
   - "dynamic_block.tf"
 rules:
@@ -8,6 +8,6 @@ rules:
     message: Testing
     resource: aws_security_group
     assertions:
-      - key: "dynamic[*].for_each[]|[0].*[]"
+      - key: "dynamic[*].for_each[]"
         op: not-contains
         value: 22

@@ -14,5 +14,9 @@ resource "aws_security_group" "example" {
     }
   }
 
-  egress = "-1"
+  egress {
+    from_port = 443
+    to_port = 443
+    protocol = "tcp"
+  }
 }

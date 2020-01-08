@@ -321,12 +321,12 @@ func TestTerraform12LinterCases(t *testing.T) {
 			0,
 			"",
 		},
-		//"TF12DynamicBlock": {
-		//	"./testdata/resources/dynamic_block.tf",
-		//	"./testdata/rules/dynamic_block.yml",
-		//	1,
-		//	"NO_SSH_ACCESS",
-		//},
+		"TF12DynamicBlock": {
+			"./testdata/resources/dynamic_block.tf",
+			"./testdata/rules/dynamic_block.yml",
+			1,
+			"NO_SSH_ACCESS",
+		},
 	}
 	for name, tc := range testCases {
 		options := Options{
