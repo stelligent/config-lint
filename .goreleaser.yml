@@ -5,16 +5,17 @@ builds:
 - main: ./cli
   env:
   - CGO_ENABLED=0
-archive:
-  replacements:
-    darwin: Darwin
-    linux: Linux
-    windows: Windows
-    386: i386
-    amd64: x86_64
-  format_overrides:
-    - goos: windows
-      format: zip
+archives:
+  - id: archive
+    replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -25,11 +26,12 @@ changelog:
     exclude:
     - '^docs:'
     - '^test:'
-brew:
-  github:
-    owner: stelligent
-    name: homebrew-tap
-  commit_author:
-    name: goreleaserbot
-    email: goreleaser@stelligent.com
-  folder: Formula
+brews:
+  -
+    github:
+      owner: stelligent
+      name: homebrew-tap
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@stelligent.com
+    folder: Formula
