@@ -6,7 +6,7 @@
 | [and](#and)                       | And            |
 | [contains](#contains)             | Contains       |
 | [does-not-contain](#does-not-contain)     | Does Not Contain   |
-| [end-with](#end-with)             | Ends With      |
+| [ends-with](#ends-with)             | Ends With      |
 | [eq](#eq)                         | Equal          |
 | [empty](#empty)                   | Empty          |
 | [every](#every)                   | Every          |
