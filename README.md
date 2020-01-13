@@ -7,13 +7,41 @@ The configurations files can be one of several formats, such as Terraform, JSON,
 There is a built-in set of rules provided for Terraform. Custom files are used
 for other formats.
 
-# Installation 
+# Installation
+
+There are three main ways that you can install `config-lint`
+
+* homebrew
+* docker
+* manually
+
+## Homebrew
+
 You can use [Homebrew](https://brew.sh/) to install the latest version:
 
-```
+``` bash
 brew tap stelligent/tap
 brew install config-lint
 ```
+
+## Docker
+
+You can pull the latest image from [DockerHub](https://hub.docker.com/r/stelligent/config-lint):
+
+``` bash
+docker pull stelligent/config-lint
+```
+
+Note that if you choose to install and run via `docker` then you will need mount a directory to the running container so that it has access to your configuration files.
+
+``` bash
+cd /path/to/your/configs/
+docker run -v $(pwd):/foobar stelligent/config-lint -terraform /foobar/foo.tf
+--- or ---
+docker run --mount src="$(pwd)",target=/foobar,type=bind stelligent/config-lint -terraform /foobar/foo.tf
+```
+
+## Manually
 
 Alternatively, you can install manually from the [releases](https://github.com/stelligent/config-lint/releases).
 
@@ -208,4 +236,3 @@ make lint
 
 ## Releasing
 To release a new version, run `make bumpversion` to increment the patch version and push a tag to GitHub to start the release process.
-
