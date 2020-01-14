@@ -14,12 +14,12 @@ jobs:
       -
         name: checkout
         uses: actions/checkout@master
-       -
+      -
         name: setup go
         uses: actions/setup-go@v1
         with:
           go-version: '1.12'
-       -
+      -
         name: dependencies
         run: |
           go mod download
@@ -30,16 +30,16 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.docker_password }}
         run: |
           echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
-      -
+      -  
         name: make test
         run: |
           export GOPATH=/home/runner/go
           export PATH="$PATH:$GOPATH/bin"
           make test
       - 
-         name: beta release
-         uses: goreleaser/goreleaser-action@v1
-         with:
-           args: release --skip-validate --config=.beta-goreleaser.yml
-         env:
-           GITHUB_TOKEN: ${{ secrets.goreleaser }}
+        name: beta release
+        uses: goreleaser/goreleaser-action@v1
+        with:
+          args: release --skip-validate --config=.beta-goreleaser.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.goreleaser }}
