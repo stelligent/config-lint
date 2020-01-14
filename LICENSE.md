@@ -1,6 +1,6 @@
 MIT License
 
-Copyright 2020 Stelligent  
+Copyright (c) 2018-2020 Stelligent
 Portions copyright 2019 Liam Galvin (https://github.com/liamg/tfsec)
 
 
