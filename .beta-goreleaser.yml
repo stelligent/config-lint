@@ -35,5 +35,10 @@ brews:
       name: goreleaserbot
       email: goreleaser@stelligent.com
     folder: Formula/beta
+dockers:
+   - 
+     dockerfile: .dockerhub/Dockerfile
+     image_templates:
+     - "stelligent/config-lint:{{ .Tag }}"
 release:
   prerelease: auto
