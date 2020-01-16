@@ -254,5 +254,4 @@ written in Terraform v0.12 syntax. Where should be the first place to check for 
            op: eq
            value: ami-f2d3638a
     ```
-3. **Q**
-    - **A**
+
