@@ -230,3 +230,29 @@ Releases are created via GitHub Workflows. You can find more information about t
 
 ### Beta
 To release a new beta version, run `make beta-bumpversion` to increment the patch version and push a tag to GitHub to start the beta release process. You can find more information about this [here](docs/github_workflow.md)
+
+### FAQs
+1. With the newest version of config-lint being able to handle configuration files written in Terraform v0.12 syntax, is it still
+backwards compatible with configuration files written in the Terraform v0.11?
+    - Yes the new version of config-lint is supposed to be able to handle parsing Terraform configuration files written in both v0.11 and v0.12 syntax.
+2. I'm running into errors when trying to run the newest version of config-lint against configuration files
+written in Terraform v0.12 syntax. Where should be the first place to check for resolving this?
+    - For configuration files that contain Terraform v0.12 syntax, you should confirm that whatever rule.yml file/files you pass in
+    have the `type:` key set to `Terraform12`. For example in this rule.yml file:
+    ```
+   version: 1
+   description: Rules for Terraform configuration files
+   type: Terraform12
+   files:
+     - "*.tf"
+   rules:
+     - id: AMI_SET
+       message: Testing
+       resource: aws_instance
+       assertions:
+         - key: ami
+           op: eq
+           value: ami-f2d3638a
+    ```
+3. **Q**
+    - **A**
