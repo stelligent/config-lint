@@ -10,17 +10,36 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: golang:1.12
     steps:
-      - uses: actions/checkout@master
-      - name: dependencies
-        run: go mod download
-      - name: make test
-        run: make test
-      - name: release
+      -
+        name: checkout
+        uses: actions/checkout@master
+      -
+        name: setup go
+        uses: actions/setup-go@v1
+        with:
+          go-version: '1.12'
+      -
+        name: dependencies
+        run: |
+          go mod download
+      -
+        name: docker login
+        env:
+          DOCKER_USER: ${{ secrets.docker_user }}
+          DOCKER_PASSWORD: ${{ secrets.docker_password }}
+        run: |
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
+      -  
+        name: make test
+        run: |
+          export GOPATH=/home/runner/go
+          export PATH="$PATH:$GOPATH/bin"
+          make test
+      - 
+        name: release
+        uses: goreleaser/goreleaser-action@v1
+        with:
+          args: release --skip-validate
         env:
           GITHUB_TOKEN: ${{ secrets.goreleaser }}
-        if: success()
-        run: |
-          go get github.com/goreleaser/goreleaser
-          goreleaser release --skip-validate
