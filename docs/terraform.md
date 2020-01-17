@@ -19,6 +19,8 @@ config-lint -terraform12 <FILE_OR_DIRECTORY_OF_TF_FILES>
 
 The Terraform12 parser is fully backwards compatible with previous versions of Terraform.
 
+If you wish to force a specific parser version, add the `-tfparser tf11|tf12` flag. This is useful if you have a lot of rules with `Type: Terraform` but your Terraform files include Terraform 12 syntax. 
+
 ## Custom Terraform rules for your project or organization
 
 ```

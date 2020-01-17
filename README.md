@@ -124,6 +124,8 @@ view them via the -help option.
  * -verbose - Output a verbose report
  
  * -version - Get program version
+ 
+ * -tfparser - Set the Terraform parser version. Options are `tf11` or `tf12`.
 
 # Rules
 
