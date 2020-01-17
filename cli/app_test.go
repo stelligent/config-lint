@@ -109,7 +109,7 @@ func TestBuiltRules(t *testing.T) {
 	}
 	vs := assertion.StandardValueSource{}
 	filenames := []string{"assets/terraform.yml", "assets/lint-rules.yml"}
-	l, err := linter.NewLinter(ruleSet, vs, filenames)
+	l, err := linter.NewLinter(ruleSet, vs, filenames, "")
 	if err != nil {
 		t.Errorf("Expecting NewLinter to not return error: %s", err.Error())
 	}
