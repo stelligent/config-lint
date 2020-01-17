@@ -29,6 +29,7 @@ type (
 		SearchExpression string
 		ExcludePatterns  []string
 		Variables        map[string]string
+		TerraformParser  string
 	}
 
 	// ProfileOptions for default options from a project file
@@ -60,6 +61,7 @@ type (
 		ExcludePatterns         arrayFlags
 		ExcludeFromFilenames    arrayFlags
 		Variables               arrayFlags
+		TerraformParser         *string
 		ProfileFilename         *string
 		TerraformBuiltInRules   *bool
 		Terraform12BuiltInRules *bool
@@ -254,11 +256,12 @@ func applyRules(ruleSets []assertion.RuleSet, args arrayFlags, options LinterOpt
 		ResourcesScanned: []assertion.ScannedResource{},
 	}
 
+	parser := options.TerraformParser
 	filenames := excludeFilenames(getFilenames(args), options.ExcludePatterns)
 	vs := assertion.StandardValueSource{Variables: options.Variables}
 
 	for _, ruleSet := range ruleSets {
-		l, err := linter.NewLinter(ruleSet, vs, filenames)
+		l, err := linter.NewLinter(ruleSet, vs, filenames, parser)
 		if err != nil {
 			fmt.Println(err)
 			return -1

@@ -14,6 +14,7 @@ func emptyCommandLineOptions() CommandLineOptions {
 		QueryExpression:  &emptyString,
 		SearchExpression: &emptyString,
 		VerboseReport:    &verbose,
+		TerraformParser:  &emptyString,
 	}
 }
 

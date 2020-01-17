@@ -25,7 +25,7 @@ func TestNewLinter(t *testing.T) {
 	vs := MockValueSource{}
 	for _, tc := range testCases {
 		ruleSet := loadRulesForTest(tc.Filename, t)
-		l, err := NewLinter(ruleSet, vs, []string{})
+		l, err := NewLinter(ruleSet, vs, []string{}, "")
 		if err != nil {
 			t.Errorf("Expecting TestNewLinter to not return an error: %s", err.Error())
 		}
@@ -39,7 +39,7 @@ func TestNewLinter(t *testing.T) {
 func TestUnknownLinterType(t *testing.T) {
 	ruleSet := loadRulesForTest("./testdata/rules/unknown.yml", t)
 	vs := MockValueSource{}
-	_, err := NewLinter(ruleSet, vs, []string{})
+	_, err := NewLinter(ruleSet, vs, []string{}, "")
 	if err == nil {
 		t.Errorf("Expecting NewLinter to return an error for unsupported type")
 	}
