@@ -122,3 +122,22 @@ func TestLoadProfile(t *testing.T) {
 		t.Errorf("Expecting single tag in profile: %v\n", p.Tags)
 	}
 }
+
+func TestValidateParser(t *testing.T) {
+	parser, err := validateParser("")
+	if err != nil {
+		t.Errorf("Expected %s, got %v", parser, err)
+	}
+	parser, err = validateParser("tf11")
+	if err != nil {
+		t.Errorf("Expected %s, got %v", parser, err)
+	}
+	parser, err = validateParser("tf12")
+	if err != nil {
+		t.Errorf("Expected %s, got %v", parser, err)
+	}
+	parser, err = validateParser("tf13")
+	if err == nil {
+		t.Errorf("Expected %v, got nil", err)
+	}
+}
