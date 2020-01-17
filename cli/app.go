@@ -256,12 +256,12 @@ func applyRules(ruleSets []assertion.RuleSet, args arrayFlags, options LinterOpt
 		ResourcesScanned: []assertion.ScannedResource{},
 	}
 
-	parser := options.TerraformParser
+	tfParser := options.TerraformParser
 	filenames := excludeFilenames(getFilenames(args), options.ExcludePatterns)
 	vs := assertion.StandardValueSource{Variables: options.Variables}
 
 	for _, ruleSet := range ruleSets {
-		l, err := linter.NewLinter(ruleSet, vs, filenames, parser)
+		l, err := linter.NewLinter(ruleSet, vs, filenames, tfParser)
 		if err != nil {
 			fmt.Println(err)
 			return -1
