@@ -3,18 +3,22 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/ghodss/yaml"
-	"github.com/stelligent/config-lint/assertion"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
+
+	"github.com/ghodss/yaml"
+	"github.com/stelligent/config-lint/assertion"
 )
 
 func getCommandLineOptions() CommandLineOptions {
 
 	commandLineOptions := CommandLineOptions{}
 	commandLineOptions.TerraformBuiltInRules = flag.Bool("terraform", false, "Use built-in rules for Terraform")
+	commandLineOptions.Terraform12BuiltInRules = flag.Bool("terraform12", false, "Use built-in rules for Terraform v0.12")
 	flag.Var(&commandLineOptions.RulesFilenames, "rules", "Rules file, can be specified multiple times")
+	//flag.Var(&commandLineOptions.Parser, "parser", "Version of Terraform parser to use (either tf12 or tf11")
+	commandLineOptions.TerraformParser = flag.String("tfparser", "", "Version of Terraform parser to use (must be either 'tf12' or 'tf11')")
 	commandLineOptions.Tags = flag.String("tags", "", "Run only tests with tags in this comma separated list")
 	commandLineOptions.Ids = flag.String("ids", "", "Run only the rules in this comma separated list")
 	commandLineOptions.IgnoreIds = flag.String("ignore-ids", "", "Ignore the rules in this comma separated list")
@@ -40,6 +44,10 @@ func getLinterOptions(o CommandLineOptions, p ProfileOptions) (LinterOptions, er
 	if err != nil {
 		return LinterOptions{}, err
 	}
+	tfParser, err := validateParser(*o.TerraformParser)
+	if err != nil {
+		return LinterOptions{}, err
+	}
 	linterOptions := LinterOptions{
 		Tags:             makeTagList(*o.Tags, p.Tags),
 		RuleIDs:          makeRulesList(*o.Ids, p.IDs),
@@ -48,6 +56,7 @@ func getLinterOptions(o CommandLineOptions, p ProfileOptions) (LinterOptions, er
 		SearchExpression: *o.SearchExpression,
 		ExcludePatterns:  allExcludePatterns,
 		Variables:        mergeVariables(p.Variables, parseVariables(o.Variables)),
+		TerraformParser:  tfParser,
 	}
 	return linterOptions, nil
 }
@@ -161,4 +170,14 @@ func loadExcludePatterns(patterns []string, excludeFromFilenames []string) ([]st
 		}
 	}
 	return patterns, nil
+}
+
+func validateParser(parser string) (string, error) {
+	validOptions := []string{"", "tf11", "tf12"}
+	for _, option := range validOptions {
+		if parser == option {
+			return parser, nil
+		}
+	}
+	return "", fmt.Errorf("tf-parser \"%s\" is not valid. Choose from [\"tf11\", \"tf12\"].\n", parser)
 }

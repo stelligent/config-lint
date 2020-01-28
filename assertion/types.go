@@ -4,7 +4,7 @@ type (
 
 	// Resource describes a resource to be linted
 	Resource struct {
-		ID         string
+		ID         string       `cty:"aws_instance"`
 		Type       string
 		Category   string // default is "resource", can be "data", "provider" for Terraform
 		Properties interface{}

@@ -1,4 +1,4 @@
-[![Build Status](https://circleci.com/gh/stelligent/config-lint.svg?style=shield)](https://circleci.com/gh/stelligent/config-lint) [![Join the chat at https://gitter.im/stelligent/config-lint](https://badges.gitter.im/stelligent/config-lint.svg)](https://gitter.im/stelligent/config-lint?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+![Build & Deploy](https://github.com/stelligent/config-lint/workflows/Build%20%26%20Deploy/badge.svg) [![Join the chat at https://gitter.im/stelligent/config-lint](https://badges.gitter.im/stelligent/config-lint.svg)](https://gitter.im/stelligent/config-lint?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # config-lint
 
@@ -44,6 +44,21 @@ docker run --mount src="$(pwd)",target=/foobar,type=bind stelligent/config-lint 
 ## Manually
 
 Alternatively, you can install manually from the [releases](https://github.com/stelligent/config-lint/releases).
+
+## Beta
+You can use [Homebrew](https://brew.sh/) to install a beta version:
+
+```
+brew tap stelligent/tap
+brew install beta/config-lint
+```
+
+To upgrade an already existing release:
+```
+brew upgrade beta/config-lint
+```
+
+Alternatively, you can install a `Pre-Release` manually from the [releases](https://github.com/stelligent/config-lint/releases).
 
 # Run
 
@@ -127,6 +142,8 @@ view them via the -help option.
  * -tags string - Run only tests with tags in this comma separated list
  
  * -terraform - Use built-in rules for Terraform
+
+* -terraform12 - Use built-in rules for Terraform v0.12
  
  * -validate - Validate rules file
  
@@ -135,6 +152,8 @@ view them via the -help option.
  * -verbose - Output a verbose report
  
  * -version - Get program version
+ 
+ * -tfparser - Set the Terraform parser version. Options are `tf11` or `tf12`.
 
 # Rules
 
@@ -236,3 +255,8 @@ make lint
 
 ## Releasing
 To release a new version, run `make bumpversion` to increment the patch version and push a tag to GitHub to start the release process.
+
+Releases are created via GitHub Workflows. You can find more information about this [here](docs/github_workflow.md)
+
+### Beta
+To release a new beta version, run `make beta-bumpversion` to increment the patch version and push a tag to GitHub to start the beta release process. You can find more information about this [here](docs/github_workflow.md)

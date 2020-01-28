@@ -13,7 +13,7 @@ rules:
     assertions:
       - key: type
         op: in
-        value: Terraform,Kubernetes,LintRules,YAML,JSON,CSV
+        value: Terraform,Terraform12,Kubernetes,LintRules,YAML,JSON,CSV
 
   - id: VALID_VERSION
     message: RuleSet must have a supported version
