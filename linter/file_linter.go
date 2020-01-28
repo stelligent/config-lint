@@ -2,9 +2,10 @@ package linter
 
 import (
 	"fmt"
-	"github.com/stelligent/config-lint/assertion"
 	"io"
 	"time"
+
+	"github.com/stelligent/config-lint/assertion"
 )
 
 type (
@@ -33,7 +34,6 @@ type (
 
 // Validate validates a collection of filenames using a RuleSet
 func (fl FileLinter) Validate(ruleSet assertion.RuleSet, options Options) (assertion.ValidationReport, error) {
-
 	rules := assertion.FilterRulesByTagAndID(ruleSet.Rules, options.Tags, options.RuleIDs, options.IgnoreRuleIDs)
 	rl := ResourceLinter{ValueSource: fl.ValueSource}
 
@@ -42,7 +42,47 @@ func (fl FileLinter) Validate(ruleSet assertion.RuleSet, options Options) (asser
 	filesScanned := []string{}
 
 	loadViolations := []assertion.Violation{}
+	var resourcesToValidate []assertion.Resource
 
+	//TODO: This is ugly in several ways
+	if tf12Loader, ok := fl.Loader.(Terraform12ResourceLoader); ok {
+		filteredFilenames := filterFiles(fl.Filenames, ruleSet.Files)
+		result, err := tf12Loader.LoadMany(filteredFilenames)
+		if err != nil {
+			//TODO: It would probably be nice if we mapped this back to the correct file
+			loadViolations = append(loadViolations, makeLoadViolation(fl.Filenames[0], err))
+		}
+		resourcesToValidate = result.Resources
+		filesScanned = append(filesScanned, fl.Filenames...)
+	} else {
+		filesScanned, loadViolations, resources, variables = iterateFiles(fl, ruleSet, filesScanned, loadViolations, resources, variables)
+		var err error
+		resourcesToValidate, err = fl.Loader.PostLoad(FileResources{Resources: resources, Variables: variables})
+		if err != nil {
+			return assertion.ValidationReport{}, err
+		}
+	}
+
+	report, err := rl.ValidateResources(resourcesToValidate, rules)
+	if err != nil {
+		return report, err
+	}
+	report.FilesScanned = filesScanned
+	report.Violations = append(report.Violations, loadViolations...)
+	return report, nil
+}
+
+func filterFiles(fileNames []string, patterns []string) (ret []string) {
+	for _, s := range fileNames {
+		ok, _ := assertion.ShouldIncludeFile(patterns, s)
+		if ok {
+			ret = append(ret, s)
+		}
+	}
+	return
+}
+
+func iterateFiles(fl FileLinter, ruleSet assertion.RuleSet, filesScanned []string, loadViolations []assertion.Violation, resources []assertion.Resource, variables []Variable) ([]string, []assertion.Violation, []assertion.Resource, []Variable) {
 	for _, filename := range fl.Filenames {
 		include, err := assertion.ShouldIncludeFile(ruleSet.Files, filename)
 		if err == nil && include {
@@ -58,17 +98,7 @@ func (fl FileLinter) Validate(ruleSet assertion.RuleSet, options Options) (asser
 			variables = append(variables, loaded.Variables...)
 		}
 	}
-	resourcesToValidate, err := fl.Loader.PostLoad(FileResources{Resources: resources, Variables: variables})
-	if err != nil {
-		return assertion.ValidationReport{}, err
-	}
-	report, err := rl.ValidateResources(resourcesToValidate, rules)
-	if err != nil {
-		return report, err
-	}
-	report.FilesScanned = filesScanned
-	report.Violations = append(report.Violations, loadViolations...)
-	return report, nil
+	return filesScanned, loadViolations, resources, variables
 }
 
 func makeLoadViolation(filename string, err error) assertion.Violation {

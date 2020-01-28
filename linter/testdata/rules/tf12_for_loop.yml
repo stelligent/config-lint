@@ -1,0 +1,21 @@
+version: 1
+description: Rules for Terraform configuration files
+type: Terraform
+files:
+  - "*.tf"
+rules:
+
+  - id: CIDR_SET
+    message: Testing
+    resource: aws_security_group
+    assertions:
+      - every:
+          key: "ingress"
+          expressions:
+            # this says that it either must be a private IP, or not have IP regex (eg sg string, interpolation)
+            - every:
+                key: cidr_blocks
+                expressions:
+                  - key: "@"
+                    op: contains
+                    value: "/24"

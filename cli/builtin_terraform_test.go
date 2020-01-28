@@ -108,13 +108,12 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"ecs.tf", "ECS_ENVIRONMENT_SECRETS", 0, 1},
 	}
 	for _, tc := range testCases {
-
 		filenames := []string{"testdata/builtin/terraform/" + tc.Filename}
 		options := linter.Options{
 			RuleIDs: []string{tc.RuleID},
 		}
 		vs := assertion.StandardValueSource{}
-		l, err := linter.NewLinter(ruleSet, vs, filenames)
+		l, err := linter.NewLinter(ruleSet, vs, filenames, "")
 		report, err := l.Validate(ruleSet, options)
 		assert.Nil(t, err, "Validate failed for file")
 		warningMessage := fmt.Sprintf("Expecting %d warnings for RuleID %s in File %s", tc.WarningCount, tc.RuleID, tc.Filename)

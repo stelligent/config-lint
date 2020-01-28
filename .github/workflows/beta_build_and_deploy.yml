@@ -1,10 +1,9 @@
-name: Build & Deploy
+name: Beta Build & Deploy Version
 
 on:
   push:
     tags:
-      - 'v*.*.*'
-      - '!v*.*.*-beta'
+      - 'v*.*.*-beta'
     branches-ignore:
       - '**'
 
@@ -38,9 +37,9 @@ jobs:
           export PATH="$PATH:$GOPATH/bin"
           make test
       - 
-        name: release
+        name: beta release
         uses: goreleaser/goreleaser-action@v1
         with:
-          args: release --skip-validate
+          args: release --skip-validate --config=.beta-goreleaser.yml
         env:
           GITHUB_TOKEN: ${{ secrets.goreleaser }}

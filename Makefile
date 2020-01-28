@@ -1,3 +1,11 @@
+# Beta Versioning
+BETA_VERSION := $(shell git tag -l --sort=creatordate | grep "^v[0-9]*.[0-9]*.[0-9]*-beta$$" | tail -1)
+BETA_MAJOR_VERSION := $(word 1, $(subst ., ,$(BETA_VERSION)))
+BETA_MINOR_VERSION := $(word 2, $(subst ., ,$(BETA_VERSION)))
+BETA_PATCH_VERSION := $(word 3, $(subst ., ,$(BETA_VERSION)))
+BETA_NEXT_VERSION ?= $(BETA_MAJOR_VERSION).$(BETA_MINOR_VERSION).$(shell echo $(BETA_PATCH_VERSION)+1|bc)-beta
+
+# Normal Versioning
 VERSION := $(shell git tag -l --sort=creatordate | grep "^v[0-9]*.[0-9]*.[0-9]*$$" | tail -1)
 MAJOR_VERSION := $(word 1, $(subst ., ,$(VERSION)))
 MINOR_VERSION := $(word 2, $(subst ., ,$(VERSION)))
@@ -61,6 +69,11 @@ test: lint cyclo
 testtf: lint cyclo
 	@echo "=== testing ==="
 	@go test -v ./cli/... -run TestTerraformBuiltInRules
+
+beta-bumpversion:
+	@echo "=== promoting $(BETA_NEXT_VERSION) ==="
+	@git tag -a -m "$(BETA_VERSION) -> $(BETA_NEXT_VERSION)" $(BETA_NEXT_VERSION)
+	@git push --follow-tags origin
 
 bumpversion:
 	@echo "=== promoting $(NEXT_VERSION) ==="
