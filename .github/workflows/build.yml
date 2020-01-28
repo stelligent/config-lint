@@ -10,10 +10,22 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: golang:1.12
     steps:
-      - uses: actions/checkout@master
-      - name: dependencies
-        run: go mod download
-      - name: make test
-        run: make test
+      - 
+        name: checkout
+        uses: actions/checkout@master
+      -
+        name: setup go
+        uses: actions/setup-go@v1
+        with:
+          go-version: '1.13'
+      -
+        name: dependencies
+        run: |
+          go mod download
+      -  
+        name: make test
+        run: |
+          export GOPATH=/home/runner/go
+          export PATH="$PATH:$GOPATH/bin"
+          make test
