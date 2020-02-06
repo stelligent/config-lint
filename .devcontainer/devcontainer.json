@@ -4,6 +4,8 @@
 	"appPort": 9000,
 	"remote.containers.workspaceMountConsistency": "consistent",
 	"mounts": [
+		// Bash History
+		"source=config-lint-bash_history,target=/commandhistory,type=volume",
 		// SSH
 		"source=${localEnv:HOME}/.ssh,target=/home/config-lint-dev/.ssh,type=bind,readonly",
 		// GPG
