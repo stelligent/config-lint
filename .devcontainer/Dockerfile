@@ -30,3 +30,18 @@ RUN go get -x -d github.com/stamblerre/gocode \
 	github.com/sqs/goreturns \
 	golang.org/x/lint/golint \
 	github.com/ramya-rao-a/go-outline
+
+# Create a non-root user and provide sudo rights
+ARG USERNAME=config-lint-dev
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+RUN groupadd --gid $USER_GID $USERNAME \
+  && useradd --uid $USER_UID --gid $USER_GID --shell /bin/bash -m $USERNAME
+
+# Prompt gpg window inside container for signing commits & setup folder permissions for non-root user
+RUN echo 'export GPG_TTY="$(tty)"' >> /home/$USERNAME/.bashrc \
+  && mkdir /home/$USERNAME/.gnupg \
+  && chown -R $USERNAME /home/$USERNAME/.gnupg
+
+# Enter container as non-root user
+USER $USERNAME

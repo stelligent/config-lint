@@ -2,6 +2,15 @@
 	"name": "Go",
 	"dockerFile": "Dockerfile",
 	"appPort": 9000,
+	"remote.containers.workspaceMountConsistency": "consistent",
+	"mounts": [
+		// SSH
+		"source=${localEnv:HOME}/.ssh,target=/home/config-lint-dev/.ssh,type=bind,readonly",
+		// GPG
+		"source=${localEnv:HOME}/.gnupg/private-keys-v1.d,target=/home/config-lint-dev/.gnupg/private-keys-v1.d,type=bind,readonly",
+		"source=${localEnv:HOME}/.gnupg/pubring.kbx,target=/home/config-lint-dev/.gnupg/pubring.kbx,type=bind,readonly",
+		"source=${localEnv:HOME}/.gnupg/trustdb.gpg,target=/home/config-lint-dev/.gnupg/trustdb.gpg,type=bind,readonly"
+	],
 	"extensions": [
 		"ms-vscode.go"
 	],
