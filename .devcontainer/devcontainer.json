@@ -5,17 +5,19 @@
 	"extensions": [
 		"ms-vscode.go"
 	],
-	"runArgs": [
-		// Comment out the next two lines to run as root instead. Linux users, 
-		// update Dockerfile with your user's UID/GID if not 1000.
-		"--cap-add=SYS_PTRACE",
-		"--security-opt",
-		"seccomp=unconfined"
-	],
 	"settings": {
 		"go.gopath": "/go",
 		"go.inferGopath": true,
-		"go.useLanguageServer": true
+		"go.useLanguageServer": true,
+		"[go]": {
+				"editor.formatOnSave": true,
+				"editor.codeActionsOnSave": {
+						"source.organizeImports": true
+				}
+		},
+		"gopls": {
+				"usePlaceholders": true
+		}
 	},
-	"postCreateCommand": "echo 'make vscoderemotedev'; make vscoderemotedev"
+	"postCreateCommand": "make deps"
 }
