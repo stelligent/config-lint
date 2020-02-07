@@ -2,14 +2,14 @@
 
 ## Validate Terraform files with built-in rules
 
-There is a set of [built-in rules](cli/assets/terraform.yml) that cover some best practices for AWS resources.
+There is a set of [built-in rules](/cli/assets/terraform.yml) that cover some best practices for AWS resources.
 There
 
 ```
 config-lint -terraform <FILE_OR_DIRECTORY_OF_TF_FILES>
 ```
 
-If you want to run most of the built-in rules, but not all, you can use a [profile](docs/profiles.md) to exclude some rules or resources.
+If you want to run most of the built-in rules, but not all, you can use a [profile](profiles.md) to exclude some rules or resources.
 
 For Terraform files with Terraform 12 specific features, use the `-terraform12` flag:
 
