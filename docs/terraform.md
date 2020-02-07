@@ -2,7 +2,7 @@
 
 ## Validate Terraform files with built-in rules
 
-There is a set of [built-in rules](cli/assets/terraform.yml) that cover some best practices for AWS resources.
+There is a set of [built-in rules](/cli/assets/terraform.yml) that cover some best practices for AWS resources.
 There
 
 ```
