@@ -1,37 +1,37 @@
 ## Assertion Operations
 
-| Operation                         | Description    |
-|-----------------------------------|----------------|
-| [absent](#absent)                 | Absent         |
-| [and](#and)                       | And            |
-| [contains](#contains)             | Contains       |
-| [does-not-contain](#does-not-contain)     | Does Not Contain   |
-| [ends-with](#ends-with)             | Ends With      |
-| [eq](#eq)                         | Equal          |
-| [empty](#empty)                   | Empty          |
-| [every](#every)                   | Every          |
-| [has-properties](#has-properties) | Has Properties |
-| [in](#in)                         | In             |
-| [is-array](#is-array)             | Is Array       |
-| [is-false](#is-false)             | Is False       |
-| [is-not-array](#is-not-array)     | Is Not Array   |
-| [is-true](#is-true)               | Is True        |
-| [ne](#ne)                         | Not equal      |
-| [none](#none)                     | None           |
-| [not](#not)                       | Not            |
-| [not-contains](#does-not-contain) | Does Not Contain |
-| [not-empty](#not-empty)           | Not Empty      |
-| [not-in](#not-in)                 | Not In         |
-| [exactly-one](#exactly-one)       | Exactly One    |
-| [or](#or)                         | Or             |
-| [present](#present)               | Present        |
-| [regex](#regex)                   | Regex          |
-| [starts-with](#starts-with)       | Starts With    |
-| [some](#some)                     | Some           |
-| [xor](#xor)                       | Xor            |
-| [is-subnet](#is-subnet)           | Is Subnet      |
-| [is-private-ip](#is-private-ip)           | Is Private IP      |
-| [exposed-hosts](#exposed-hosts)           | Number of hosts exposed to |
+| Operation                              | Description                |
+|----------------------------------------|----------------------------|
+| [absent](#absent)                      | Absent                     |
+| [and](#and)                            | And                        |
+| [contains](#contains)                  | Contains                   |
+| [does-not-contain](#does-not-contain)  | Does Not Contain           |
+| [ends-with](#ends-with)                | Ends With                  |
+| [eq](#eq)                              | Equal                      |
+| [empty](#empty)                        | Empty                      |
+| [every](#every)                        | Every                      |
+| [has-properties](#has-properties)      | Has Properties             |
+| [in](#in)                              | In                         |
+| [is-array](#is-array)                  | Is Array                   |
+| [is-false](#is-false)                  | Is False                   |
+| [is-not-array](#is-not-array)          | Is Not Array               |
+| [is-true](#is-true)                    | Is True                    |
+| [ne](#ne)                              | Not equal                  |
+| [none](#none)                          | None                       |
+| [not](#not)                            | Not                        |
+| [not-contains](#does-not-contain)      | Does Not Contain           |
+| [not-empty](#not-empty)                | Not Empty                  |
+| [not-in](#not-in)                      | Not In                     |
+| [exactly-one](#exactly-one)            | Exactly One                |
+| [or](#or)                              | Or                         |
+| [present](#present)                    | Present                    |
+| [regex](#regex)                        | Regex                      |
+| [starts-with](#starts-with)            | Starts With                |
+| [some](#some)                          | Some                       |
+| [xor](#xor)                            | Xor                        |
+| [is-subnet](#is-subnet)                | Is Subnet                  |
+| [is-private-ip](#is-private-ip)        | Is Private IP              |
+| [exposed-hosts](#exposed-hosts)        | Number of hosts exposed to |
 
 ## eq
 
@@ -119,7 +119,7 @@ Attribute is not present
 
 Attribute is empty
 
-## not-empty 
+## not-empty
 
 Attribute is not empty
 
