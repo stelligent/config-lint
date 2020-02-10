@@ -1,0 +1,52 @@
+name: VS Code Build & Deploy
+
+on:
+  push:
+    tags:
+      - '*.*-vscode'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        uses: actions/checkout@master
+      -
+        name: Setup Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: '1.13'
+      -
+        name: dependencies
+        run: |
+          go mod download
+      -
+        name: docker login
+        env:
+          DOCKER_USER: ${{ secrets.docker_user }}
+          DOCKER_PASSWORD: ${{ secrets.docker_password }}
+        run: |
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
+      -  
+        name: make test
+        run: |
+          export GOPATH=/home/runner/go
+          export PATH="$PATH:$GOPATH/bin"
+          make test
+      # - 
+      #   name: docker release
+      #   uses: goreleaser/goreleaser-action@v1
+      #   with:
+      #     args: release --skip-validate --config=.docker-goreleaser.yml
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.goreleaser }}
+      -
+        name: Get the tag name
+        id: get_tag
+        run: echo ::set-output name=TAG::${GITHUB_REF/refs\/tags\//}
+      -
+        name: VS Code DockerHub
+        env:
+          DOCKER_ORG: stelligent
+          NEW_VERSION: ${{ steps.get_tag.outputs.TAG }}
+        run: bash ./.devcontainer/build/dockerhub.sh
