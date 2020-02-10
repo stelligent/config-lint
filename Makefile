@@ -24,24 +24,6 @@ devdeps:
 	@go get -u golang.org/x/lint/golint
 	@go get "github.com/fzipp/gocyclo"
 
-vscoderemotedeps:
-	@echo "=== vscode remote dev dependencies ==="
-	# Install gocode-gomod
-	@go get -x -d github.com/stamblerre/gocode 2>&1 \
-	&& go build -o gocode-gomod github.com/stamblerre/gocode \
-	&& mv gocode-gomod $$GOPATH/bin/ \
-	&& go get -u -v \
-	github.com/mdempsky/gocode \
-	github.com/uudashr/gopkgs/cmd/gopkgs \
-	github.com/ramya-rao-a/go-outline \
-	github.com/acroca/go-symbols \
-	golang.org/x/tools/cmd/gopls \
-	golang.org/x/tools/cmd/guru \
-	golang.org/x/tools/cmd/gorename \
-	github.com/go-delve/delve/cmd/dlv \
-	golang.org/x/tools/cmd/goimports \
-	github.com/rogpeppe/godef  2>&1
-
 deps:
 	@echo "=== dependencies ==="
 	go mod download
@@ -89,7 +71,6 @@ build: gen $(BUILD_DIR)/config-lint
 
 all: clean deps test build
 dev: deps devdeps
-vscoderemotedev: deps devdeps vscoderemotedeps
 
 clean:
 	@echo "=== cleaning ==="
