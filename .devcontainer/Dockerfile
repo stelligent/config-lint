@@ -18,6 +18,7 @@ RUN apt-get -y install --no-install-recommends apt-utils dialog 2>&1
 # Install build tools
 RUN apt-get install -y --no-install-recommends build-essential \
 		bc \
+		unzip \
     git
 
 # Install VS Code Go Dependencies
@@ -40,7 +41,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
   && useradd --uid $USER_UID --gid $USER_GID --shell /bin/bash -m $USERNAME \
 	&& apt-get install -y sudo \
 	&& echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
-	&& chmod 0440 /etc/sudoers.d/$USERNAME \
+	&& chmod 0440 /etc/sudoers.d/$USERNAME
 
 # Prompt gpg window inside container for signing commits & setup folder permissions for non-root user
 RUN echo 'export GPG_TTY="$(tty)"' >> /home/$USERNAME/.bashrc \
@@ -59,6 +60,13 @@ RUN chown -R $USERNAME $GOPATH
 
 # Add write permission for /go/pkg
 RUN chmod -R a+w /go/pkg
+
+# Install Terraform
+ARG TERRAFORM_VERSION=0.12.20
+RUN cd /tmp \
+	&& wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
+	&& unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
+	&& mv terraform /usr/local/bin/
 
 # Enter container as non-root user
 USER $USERNAME
