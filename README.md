@@ -218,6 +218,15 @@ The preferred method of developing is to use the VS Code Remote development func
 - When prompted "`Folder contains a dev container configuration file. Reopen folder to develop in a container`" click the "`Reopen in Container`" button
 - When opening in the future use the "`config-lint [Dev Container]`" option
 
+## VS Code Dependencies
+
+There are a couple of dependencies that you need to configure locally before being able to fully utizlize the Remote Developemnt environment.
+- Docker needs to be installed
+- [GPG](https://gpgtools.org) needs to be installed
+  - The following items need to exist in order for the docker mounts to be successful. If they don't exist and/or you don't want to install `gpg` then you can just touch these files.
+    - `~/.gnupg/private-keys-v1.d/`
+    - `~/.gnupg/pubring.kbx`
+    - `~/.gnupg/trustdb.gpg`
 
 # Local Development
 
