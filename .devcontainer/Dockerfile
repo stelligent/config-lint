@@ -3,8 +3,7 @@
 # Licensed under the MIT License. See https://go.microsoft.com/fwlink/?linkid=2090316 for license information.
 #-------------------------------------------------------------------------------------------------------------
 
-FROM golang:1.13
-ENV GO111MODULE=on
+FROM ubuntu:latest
 
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
@@ -16,10 +15,33 @@ RUN apt-get update
 RUN apt-get -y install --no-install-recommends apt-utils dialog 2>&1
 
 # Install build tools
-RUN apt-get install -y --no-install-recommends build-essential \
+RUN apt-get install -y build-essential \
 		bc \
 		unzip \
-    git
+		wget \
+    git \
+		g++ \
+		gcc \
+		libc6-dev \
+		make \
+		pkg-config \
+		ca-certificates \
+		gnupg-agent
+
+# Install Go
+ENV GOLANG_VERSION 1.13.7
+RUN set -eux; \
+	goRelArch='linux-amd64'; \
+	goRelSha256='b3dd4bd781a0271b33168e627f7f43886b4c5d1c794a4015abf34e99c6526ca3'; \
+	url="https://golang.org/dl/go${GOLANG_VERSION}.${goRelArch}.tar.gz"; \
+	wget -O go.tgz "$url"; \
+	echo "${goRelSha256} *go.tgz" | sha256sum -c -; \
+	tar -C /usr/local -xzf go.tgz; \
+	rm go.tgz
+ENV GOPATH /go
+ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
+ENV GO111MODULE=on
 
 # Install VS Code Go Dependencies
 RUN go get -x -d github.com/stamblerre/gocode \
@@ -46,7 +68,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
 # Prompt gpg window inside container for signing commits & setup folder permissions for non-root user
 RUN echo 'export GPG_TTY="$(tty)"' >> /home/$USERNAME/.bashrc \
   && mkdir /home/$USERNAME/.gnupg \
-  && chown -R $USERNAME /home/$USERNAME/.gnupg
+  && chown -R $USERNAME:$USERNAME /home/$USERNAME/.gnupg
 
 # Persist bash history between runs
 RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
