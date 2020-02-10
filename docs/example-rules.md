@@ -1,4 +1,4 @@
-# Example Rules 
+# Example Rules
 
 Add these rules to a YAML file, and pass the filename to config-lint using the -rules option.
 Each rule contains a list of assertions, and these assertions use operations that are [documented here](operations.md).
@@ -10,7 +10,6 @@ Each rule contains a list of assertions, and these assertions use operations tha
 * [Dynamic Values](#dynamic-values)
 * [Conditions](#conditions)
 * [Macros](#macros)
-
 
 ## simple-expressions
 
@@ -229,4 +228,4 @@ rules:
         value: Name
 ```
 
-The assertions and operations were inspired by those in Cloud Custodian: http://capitalone.github.io/cloud-custodian/docs/
+The assertions and operations were inspired by those in Cloud Custodian: https://cloud-custodian.github.io/cloud-custodian/docs/

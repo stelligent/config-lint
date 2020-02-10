@@ -8,7 +8,7 @@ An example profile:
 ```
 # A list of files containing rules for linting
 rules:
-  - example-files/rules/generic.yml
+  - example-files/rules/generic-yaml.yml
 
 # A list of files to scan
 files:
