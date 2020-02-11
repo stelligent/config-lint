@@ -1,0 +1,33 @@
+name: VS Code Remote Development DockerHub Build & Push
+
+on:
+  push:
+    branches:
+      - 'feature/update_vscode_dev_setup' # TODO: change to 'master'
+    paths:
+      - '.devcontainer/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: checkout
+        uses: actions/checkout@master
+      -
+        name: docker login
+        env:
+          DOCKER_USER: ${{ secrets.docker_user }}
+          DOCKER_PASSWORD: ${{ secrets.docker_password }}
+        run: |
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
+      -
+        name: Get the tag name
+        id: get_tag
+        run: echo ::set-output name=TAG::${GITHUB_REF/refs\/tags\//}
+      -
+        name: Build & Push to DockerHub
+        env:
+          DOCKER_ORG: stelligent
+          NEW_VERSION: ${{ steps.get_tag.outputs.TAG }}
+        run: bash ./.devcontainer/build/dockerhub.sh
