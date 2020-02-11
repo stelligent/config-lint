@@ -6,12 +6,14 @@
 	"mounts": [
 		// Bash History
 		"source=config-lint-bash_history,target=/commandhistory,type=volume",
+	],
+	"runArgs": [
 		// SSH
-		"source=${localEnv:HOME}/.ssh,target=/home/config-lint-dev/.ssh,type=bind,readonly",
+		"-v", "${localEnv:HOME}/.ssh:/home/config-lint-dev/.ssh:ro",
 		// GPG
-		"source=${localEnv:HOME}/.gnupg/private-keys-v1.d,target=/home/config-lint-dev/.gnupg/private-keys-v1.d,type=bind,readonly",
-		"source=${localEnv:HOME}/.gnupg/pubring.kbx,target=/home/config-lint-dev/.gnupg/pubring.kbx,type=bind,readonly",
-		"source=${localEnv:HOME}/.gnupg/trustdb.gpg,target=/home/config-lint-dev/.gnupg/trustdb.gpg,type=bind,readonly"
+		"-v", "${localEnv:HOME}/.gnupg/private-keys-v1.d:/home/config-lint-dev/.gnupg/private-keys-v1.d:ro",
+		"-v", "${localEnv:HOME}/.gnupg/pubring.kbx:/home/config-lint-dev/.gnupg/pubring.kbx:ro",
+		"-v", "${localEnv:HOME}/.gnupg/trustdb.gpg:/home/config-lint-dev/.gnupg/trustdb.gpg:ro"
 	],
 	"extensions": [
 		// General
