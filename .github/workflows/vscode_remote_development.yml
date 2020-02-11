@@ -3,7 +3,7 @@ name: VS Code DockerHub Build & Push
 on:
   push:
     branches:
-      - 'feature/update_vscode_dev_setup' # TODO: change to 'master'
+      - 'master'
     paths:
       - '.devcontainer/**'
 
