@@ -8,7 +8,7 @@ RUN apt-get update \
 		# Install apt-utils and suppress package configuration warning
 		&& apt-get -y install --no-install-recommends apt-utils dialog 2>&1 \
 		# Install build tools
-		&& apt-get install -y --no-install-recommends \
+		&& apt-get install -y \
 		bc \
 		unzip \
 		wget \
@@ -20,7 +20,6 @@ RUN apt-get update \
 		pkg-config \
 		ca-certificates \
 		gnupg-agent \
-		gpg \
 		# Cleanup apt lists
 		&& rm -rf /var/lib/apt/lists/*
 
