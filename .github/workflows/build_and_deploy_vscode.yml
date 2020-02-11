@@ -48,7 +48,5 @@ jobs:
         name: VS Code DockerHub
         env:
           DOCKER_ORG: stelligent
-          DOCKER_USER: ${{ secrets.docker_user }}
-          DOCKER_PASSWORD: ${{ secrets.docker_password }}
           NEW_VERSION: ${{ steps.get_tag.outputs.TAG }}
         run: bash ./.devcontainer/build/dockerhub.sh
