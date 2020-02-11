@@ -1,5 +1,5 @@
 {
-	"name": "Go",
+	"name": "config-lint Development",
 	"dockerFile": "Dockerfile",
 	"appPort": 9000,
 	"remote.containers.workspaceMountConsistency": "consistent",
