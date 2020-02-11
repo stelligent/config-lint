@@ -3,25 +3,26 @@ FROM ubuntu:latest
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update package tool
-RUN apt-get update
-
-# Install apt-utils and suppress package configuration warning
-RUN apt-get -y install --no-install-recommends apt-utils dialog 2>&1
-
-# Install build tools
-RUN apt-get install -y build-essential \
+# Install packages
+RUN apt-get update \
+		# Install apt-utils and suppress package configuration warning
+		&& apt-get -y install --no-install-recommends apt-utils dialog 2>&1 \
+		# Install build tools
+		&& apt-get install -y --no-install-recommends \
 		bc \
 		unzip \
 		wget \
-    git \
+		git \
 		g++ \
 		gcc \
 		libc6-dev \
 		make \
 		pkg-config \
 		ca-certificates \
-		gnupg-agent
+		gnupg-agent \
+		gpg \
+		# Cleanup apt lists
+		&& rm -rf /var/lib/apt/lists/*
 
 # Install Go
 ENV GOLANG_VERSION 1.13.7
@@ -50,15 +51,12 @@ RUN go get -x -d github.com/stamblerre/gocode \
 	golang.org/x/lint/golint \
 	github.com/ramya-rao-a/go-outline
 
-# Create a non-root user and provide sudo rights
+# Create a non-root user
 ARG USERNAME=config-lint-dev
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 RUN groupadd --gid $USER_GID $USERNAME \
-  && useradd --uid $USER_UID --gid $USER_GID --shell /bin/bash -m $USERNAME \
-	&& apt-get install -y sudo \
-	&& echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
-	&& chmod 0440 /etc/sudoers.d/$USERNAME
+  && useradd --uid $USER_UID --gid $USER_GID --shell /bin/bash -m $USERNAME
 
 # Prompt gpg window inside container for signing commits & setup folder permissions for non-root user
 RUN echo 'export GPG_TTY="$(tty)"' >> /home/$USERNAME/.bashrc \
@@ -73,17 +71,17 @@ RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhisto
     && echo $SNIPPET >> "/home/$USERNAME/.bashrc"
 
 # Add non-root user to $GOPATH
-RUN chown -R $USERNAME $GOPATH
-
-# Add write permission for /go/pkg
-RUN chmod -R a+w /go/pkg
+RUN chown -R $USERNAME $GOPATH \
+		# Add write permission for /go/pkg
+		&& chmod -R a+w /go/pkg
 
 # Install Terraform
 ARG TERRAFORM_VERSION=0.12.20
 RUN cd /tmp \
 	&& wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
 	&& unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
-	&& mv terraform /usr/local/bin/
+	&& mv terraform /usr/local/bin/ \
+	&& rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip
 
 # Enter container as non-root user
 USER $USERNAME
