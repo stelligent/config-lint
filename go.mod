@@ -17,6 +17,6 @@ require (
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af
 	github.com/stretchr/testify v1.4.0
 	github.com/zclconf/go-cty v1.1.1
-	golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f // indirect
-	golang.org/x/tools v0.0.0-20200117170720-ade7f2547e48 // indirect
+	golang.org/x/lint v0.0.0-20200130185559-910be7a94367 // indirect
+	golang.org/x/tools v0.0.0-20200212150539-ea181f53ac56 // indirect
 )
