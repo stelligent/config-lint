@@ -5,7 +5,7 @@
 	"remote.containers.workspaceMountConsistency": "consistent",
 	"mounts": [
 		// Bash History
-		"source=config-lint-bash_history,target=/commandhistory,type=volume",
+		"source=config-lint-bash_history,target=/commandhistory,type=volume"
 	],
 	"runArgs": [
 		// SSH
