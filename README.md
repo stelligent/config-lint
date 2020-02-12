@@ -221,12 +221,12 @@ The preferred method of developing is to use the VS Code Remote development func
 ## VS Code Dependencies
 
 There are a couple of dependencies that you need to configure locally before being able to fully utizlize the Remote Developemnt environment.
-- Docker needs to be installed
-- [GPG](https://gpgtools.org) needs to be installed
-  - The following items need to exist in order for the docker mounts to be successful. If they don't exist and/or you don't want to install `gpg` then you can just touch these files.
-    - `~/.gnupg/private-keys-v1.d/`
-    - `~/.gnupg/pubring.kbx`
-    - `~/.gnupg/trustdb.gpg`
+- [Docker](https://www.docker.com/products/docker-desktop)
+  - Needs to be installed in order to use the remote development container
+- [GPG](https://gpgtools.org)
+  - Should to be installed in `~/.gnupg/` to be able to sign git commits with gpg
+- SSH
+  - Should to be installed in `~/.ssh` to be able to use your ssh config and keys.
 
 # Local Development
 
