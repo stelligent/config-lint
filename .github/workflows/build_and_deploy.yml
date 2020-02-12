@@ -44,3 +44,4 @@ jobs:
           args: release --skip-validate
         env:
           GITHUB_TOKEN: ${{ secrets.goreleaser }}
+

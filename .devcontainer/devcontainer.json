@@ -1,21 +1,89 @@
 {
-	"name": "Go",
+	"name": "config-lint Development",
 	"dockerFile": "Dockerfile",
 	"appPort": 9000,
-	"extensions": [
-		"ms-vscode.go"
+	"remote.containers.workspaceMountConsistency": "consistent",
+	"mounts": [
+		// Bash History
+		"source=config-lint-bash_history,target=/commandhistory,type=volume"
 	],
 	"runArgs": [
-		// Comment out the next two lines to run as root instead. Linux users, 
-		// update Dockerfile with your user's UID/GID if not 1000.
-		"--cap-add=SYS_PTRACE",
-		"--security-opt",
-		"seccomp=unconfined"
+		// SSH
+		"-v", "${localEnv:HOME}/.ssh:/home/config-lint-dev/.ssh:ro",
+		// GPG
+		"-v", "${localEnv:HOME}/.gnupg/private-keys-v1.d:/home/config-lint-dev/.gnupg/private-keys-v1.d:ro",
+		"-v", "${localEnv:HOME}/.gnupg/pubring.kbx:/home/config-lint-dev/.gnupg/pubring.kbx:ro",
+		"-v", "${localEnv:HOME}/.gnupg/trustdb.gpg:/home/config-lint-dev/.gnupg/trustdb.gpg:ro"
+	],
+	"extensions": [
+		// General
+		"CoenraadS.bracket-pair-colorizer",
+		"fabiospampinato.vscode-diff",
+		"mrmlnc.vscode-duplicate",
+		"ms-azuretools.vscode-docker",
+		"wayou.vscode-todo-highlight",
+		// Go
+		"ms-vscode.go",
+		// Terraform
+		"mauve.terraform",
+		// JSON
+		"mohsen1.prettify-json",
+		// YAML
+		"redhat.vscode-yaml"
 	],
 	"settings": {
+		// Bracket Pair Colorizer
+		"bracketPairColorizer.forceUniqueOpeningColor": false,
+		"bracketPairColorizer.colorMode": "Consecutive",
+		"bracketPairColorizer.highlightActiveScope": true,
+		"bracketPairColorizer.activeScopeCSS": [
+			"borderStyle : solid",
+			"borderWidth : 1px",
+			"borderColor : {color}; opacity: 0.5",
+			"backgroundColor : {color}"
+		],
+		"editor.matchBrackets": "never",
+		"bracketPairColorizer.showBracketsInGutter": true,
+		// Go
 		"go.gopath": "/go",
 		"go.inferGopath": true,
-		"go.useLanguageServer": true
+		"go.useLanguageServer": true,
+		"[go]": {
+				"editor.insertSpaces": true,
+				"editor.tabSize": 4,
+				"editor.formatOnSave": true,
+				"editor.codeActionsOnSave": {
+						"source.organizeImports": true
+				}
+		},
+		"gopls": {
+				"usePlaceholders": true
+		},
+		// Terraform
+		"[terraform]": {
+			"editor.formatOnSave": true
+		},
+		"terraform.languageServer": {
+			"enabled": false,
+			"args": []
+		},
+		"terraform.indexing": {
+			"enabled": false,
+			"liveIndexing": false
+		},
+		// YAML
+		"[yaml]": {
+			"editor.insertSpaces": true,
+			"editor.tabSize": 2
+		},
+		"yaml.format.enable": true,
+		"yaml.format.singleQuote": true,
+		"yaml.format.bracketSpacing": true,
+		"yaml.format.printWidth": 120,
+		"yaml.format.proseWrap": "always",
+		// TODO
+		"todohighlight.isEnable": true,
+		"todohighlight.isCaseSensitive": false
 	},
-	"postCreateCommand": "echo 'make vscoderemotedev'; make vscoderemotedev"
+	"postCreateCommand": "make deps"
 }

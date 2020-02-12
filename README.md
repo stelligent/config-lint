@@ -218,6 +218,16 @@ The preferred method of developing is to use the VS Code Remote development func
 - When prompted "`Folder contains a dev container configuration file. Reopen folder to develop in a container`" click the "`Reopen in Container`" button
 - When opening in the future use the "`config-lint [Dev Container]`" option
 
+## VS Code Dependencies
+
+There are a couple of dependencies that you need to configure locally before being able to fully utizlize the Remote Developemnt environment.
+- Requires `ms-vscode-remote.remote-containers` >= `0.101.0`
+- [Docker](https://www.docker.com/products/docker-desktop)
+  - Needs to be installed in order to use the remote development container
+- [GPG](https://gpgtools.org)
+  - Should to be installed in `~/.gnupg/` to be able to sign git commits with gpg
+- SSH
+  - Should to be installed in `~/.ssh` to be able to use your ssh config and keys.
 
 # Local Development
 
