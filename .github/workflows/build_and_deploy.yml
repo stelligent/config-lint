@@ -44,13 +44,4 @@ jobs:
           args: release --skip-validate
         env:
           GITHUB_TOKEN: ${{ secrets.goreleaser }}
-      -
-        name: Get the tag name
-        id: get_tag
-        run: echo ::set-output name=TAG::${GITHUB_REF/refs\/tags\//}
-      -
-        name: VS Code Remote Development DockerHub
-        env:
-          DOCKER_ORG: stelligent
-          NEW_VERSION: ${{ steps.get_tag.outputs.TAG }}
-        run: bash ./.devcontainer/build/dockerhub.sh
+
