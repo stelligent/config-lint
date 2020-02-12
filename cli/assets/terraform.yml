@@ -444,6 +444,22 @@ rules:
     tags:
       - s3
 
+  - id: S3_BUCKET_POLICY_ONLY_HTTPS
+    message: Should only allow HTTPS access to a bucket.
+    resource: aws_s3_bucket_policy
+    severity: FAILURE
+    assertions:
+      - some:
+          key: policy.Statement[]
+          expressions:
+            - key: Effect
+              op: eq
+              value: Allow
+            - key: Condition.Bool."aws:SecureTransport"
+              op: is-true
+    tags:
+      - s3
+
   - id: S3_BUCKET_ENCRYPTION
     message: S3 bucket should be encrypted
     resource: aws_s3_bucket
