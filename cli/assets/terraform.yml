@@ -873,6 +873,16 @@ rules:
     tags:
       - redshift
 
+  - id: REDSHIFT_CLUSTER_AUDIT_LOGGING
+    message: RedshiftCluster should have audit logging enabled
+    resource: aws_redshift_cluster
+    severity: WARNING
+    assertions:
+      - key: logging.enable
+        op: is-true
+    tags:
+      - redshift
+
   - id: S3_BUCKET_OBJECT_ENCRYPTION
     message: S3 Bucket Object should be encrypted
     resource: aws_s3_bucket_object
