@@ -847,6 +847,16 @@ rules:
     tags:
       - redshift
 
+  - id: REDSHIFT_CLUSTER_KMS_KEY_ID
+    message: RedshiftCluster should specify kms_key_id
+    resource: aws_redshift_cluster
+    severity: WARNING
+    assertions:
+      - key: kms_key_id
+        op: present
+    tags:
+      - redshift
+
   - id: S3_BUCKET_OBJECT_ENCRYPTION
     message: S3 Bucket Object should be encrypted
     resource: aws_s3_bucket_object
