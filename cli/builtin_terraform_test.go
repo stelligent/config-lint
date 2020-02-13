@@ -104,7 +104,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"db.tf", "RDS_CLUSTER_ENCYPTION", 0, 2},
 		{"efs.tf", "EFS_ENCRYPTED", 0, 1},
 		{"kinesis.tf", "KINESIS_FIREHOSE_DELIVERY_STREAM_ENCRYPTION", 0, 1},
-		{"redshift.tf", "REDSHIFT_CLUSTER_ENCRYPTION", 0, 1},
+		{"redshift.tf", "REDSHIFT_CLUSTER_ENCRYPTION", 0, 2},
 		{"ecs.tf", "ECS_ENVIRONMENT_SECRETS", 0, 1},
 	}
 	for _, tc := range testCases {
