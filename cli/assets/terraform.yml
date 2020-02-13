@@ -873,6 +873,16 @@ rules:
     tags:
       - redshift
 
+  - id: REDSHIFT_CLUSTER_PUBLICLY_ACCESSIBLE
+    message: RedshiftCluster should not be publicly accessible
+    resource: aws_redshift_cluster
+    severity: FAILURE
+    assertions:
+      - key: publicly_accessible
+        op: is-false
+    tags:
+      - redshift
+
   - id: S3_BUCKET_OBJECT_ENCRYPTION
     message: S3 Bucket Object should be encrypted
     resource: aws_s3_bucket_object
