@@ -858,11 +858,18 @@ rules:
     resource: aws_redshift_cluster
     severity: FAILURE
     assertions:
-      - and:
-        - key: encrypted
-          op: is-true
-        - key: kms_key_id
-          op: present
+      - key: encrypted
+        op: is-true
+    tags:
+      - redshift
+
+  - id: REDSHIFT_CLUSTER_KMS_KEY_ID
+    message: RedshiftCluster should specify kms_key_id
+    resource: aws_redshift_cluster
+    severity: WARNING
+    assertions:
+      - key: kms_key_id
+        op: present
     tags:
       - redshift
 
