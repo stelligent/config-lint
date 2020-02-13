@@ -46,10 +46,10 @@ cyclo:
 
 test: lint cyclo
 	@echo "=== testing ==="
-	@go test ./...
+	@go test -v ./...
 
 testtf: lint cyclo
-	@echo "=== testing ==="
+	@echo "=== testing Terraform Built In Rules ==="
 	@go test -v ./cli/... -run TestTerraformBuiltInRules
 
 beta-bumpversion:
