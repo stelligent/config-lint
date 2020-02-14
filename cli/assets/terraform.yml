@@ -878,8 +878,13 @@ rules:
     resource: aws_redshift_cluster
     severity: WARNING
     assertions:
-      - key: logging.enable
-        op: is-true
+      - key: logging
+        op: present
+      - every:
+          key: logging
+          expressions:
+            - key: enable
+              op: is-true
     tags:
       - redshift
 

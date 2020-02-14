@@ -106,7 +106,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"kinesis.tf", "KINESIS_FIREHOSE_DELIVERY_STREAM_ENCRYPTION", 0, 1},
 		{"redshift_encryption.tf", "REDSHIFT_CLUSTER_ENCRYPTION", 0, 2},
 		{"redshift_kms.tf", "REDSHIFT_CLUSTER_KMS_KEY_ID", 1, 0},
-		{"redshift_logging.tf", "REDSHIFT_CLUSTER_AUDIT_LOGGING", 0, 0}, // TODO: fix Warning count
+		{"redshift_logging.tf", "REDSHIFT_CLUSTER_AUDIT_LOGGING", 2, 0},
 		{"ecs.tf", "ECS_ENVIRONMENT_SECRETS", 0, 1},
 	}
 	for _, tc := range testCases {
