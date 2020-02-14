@@ -873,6 +873,24 @@ rules:
     tags:
       - redshift
 
+  - id: REDSHIFT_CLUSTER_PARAMETER_GROUP_REQUIRE_SSL
+    message: RedshiftCluster Parameter Group should set require_ssl to true
+    resource: aws_redshift_parameter_group
+    severity: WARNING
+    assertions:
+      - key: parameter
+        op: present
+      - every:
+          key: parameter
+          expressions:
+            - key: name
+              op: eq
+              value: require_ssl
+            - key: value
+              op: is-true
+    tags:
+      - redshift
+
   - id: S3_BUCKET_OBJECT_ENCRYPTION
     message: S3 Bucket Object should be encrypted
     resource: aws_s3_bucket_object
