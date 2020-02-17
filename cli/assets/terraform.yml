@@ -880,6 +880,43 @@ rules:
     assertions:
       - key: enhanced_vpc_routing
         op: is-true
+
+  - id: REDSHIFT_CLUSTER_PARAMETER_GROUP_REQUIRE_SSL
+    message: RedshiftCluster Parameter Group should set require_ssl to true
+    resource: aws_redshift_parameter_group
+    severity: WARNING
+    assertions:
+      - key: parameter
+        op: present
+      - every:
+          key: parameter
+          expressions:
+            - key: name
+              op: eq
+              value: require_ssl
+            - key: value
+              op: is-true
+
+  - id: REDSHIFT_CLUSTER_AUDIT_LOGGING
+    message: RedshiftCluster should have audit logging enabled
+    resource: aws_redshift_cluster
+    severity: WARNING
+    assertions:
+      - key: logging
+        op: present
+      - every:
+          key: logging
+          expressions:
+            - key: enable
+              op: is-true
+
+  - id: REDSHIFT_CLUSTER_PUBLICLY_ACCESSIBLE
+    message: RedshiftCluster should not be publicly accessible
+    resource: aws_redshift_cluster
+    severity: FAILURE
+    assertions:
+      - key: publicly_accessible
+        op: is-false
     tags:
       - redshift
 
