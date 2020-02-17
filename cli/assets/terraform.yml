@@ -17,7 +17,7 @@ rules:
           - key: "ingress[].cidr_blocks[]"
             op: contains
             value: "0.0.0.0/0"
-          - key: "ingress[].cidr_blocks[]"
+          - key: "ingress[].ipv6_cidr_blocks[]"
             op: contains
             value: "::/0"
     tags:
@@ -34,7 +34,7 @@ rules:
           - key: "egress[].cidr_blocks[]"
             op: contains
             value: "0.0.0.0/0"
-          - key: "egress[].cidr_blocks[]"
+          - key: "egress[].ipv6_cidr_blocks[]"
             op: contains
             value: "::/0"
     tags:
