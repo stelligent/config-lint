@@ -48,7 +48,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"aws/security_group/world_ingress.tf", "SG_WORLD_INGRESS", 2, 0},
 		{"aws/security_group/world_egress.tf", "SG_WORLD_EGRESS", 2, 0},
 		{"aws/security_group/ssh_world_ingress.tf", "SG_SSH_WORLD_INGRESS", 0, 2},
-		{"aws/security-groups.tf", "SG_RD_WORLD_INGRESS", 0, 0},
+		{"aws/security_group/rdp_world_ingress.tf", "SG_RDP_WORLD_INGRESS", 0, 2},
 		{"aws/security-groups.tf", "SG_NON_32_INGRESS", 2, 0},
 		{"aws/security-groups.tf", "SG_INGRESS_PORT_RANGE", 0, 0},
 		{"aws/security-groups.tf", "SG_EGRESS_PORT_RANGE", 0, 0},
