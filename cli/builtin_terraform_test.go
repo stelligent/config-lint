@@ -107,6 +107,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"redshift_encryption.tf", "REDSHIFT_CLUSTER_ENCRYPTION", 0, 2},
 		{"redshift_kms.tf", "REDSHIFT_CLUSTER_KMS_KEY_ID", 1, 0},
 		{"redshift_logging.tf", "REDSHIFT_CLUSTER_AUDIT_LOGGING", 2, 0},
+		{"redshift_public_access.tf", "REDSHIFT_CLUSTER_PUBLICLY_ACCESSIBLE", 0, 2},
 		{"ecs.tf", "ECS_ENVIRONMENT_SECRETS", 0, 1},
 	}
 	for _, tc := range testCases {

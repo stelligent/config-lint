@@ -885,6 +885,14 @@ rules:
           expressions:
             - key: enable
               op: is-true
+
+  - id: REDSHIFT_CLUSTER_PUBLICLY_ACCESSIBLE
+    message: RedshiftCluster should not be publicly accessible
+    resource: aws_redshift_cluster
+    severity: FAILURE
+    assertions:
+      - key: publicly_accessible
+        op: is-false
     tags:
       - redshift
 
