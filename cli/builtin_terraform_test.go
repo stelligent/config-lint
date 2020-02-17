@@ -110,7 +110,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"ecs.tf", "ECS_ENVIRONMENT_SECRETS", 0, 1},
 	}
 	for _, tc := range testCases {
-		filenames := []string{"testdata/builtin/terraform/" + tc.Filename}
+		filenames := []string{"testdata/builtin/terraform/aws/" + tc.Filename}
 		options := linter.Options{
 			RuleIDs: []string{tc.RuleID},
 		}
