@@ -104,12 +104,12 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"db.tf", "RDS_CLUSTER_ENCYPTION", 0, 2},
 		{"efs.tf", "EFS_ENCRYPTED", 0, 1},
 		{"kinesis.tf", "KINESIS_FIREHOSE_DELIVERY_STREAM_ENCRYPTION", 0, 1},
-		{"redshift_cluster/encrypted.tf", "REDSHIFT_CLUSTER_ENCRYPTION", 0, 2},
-		{"redshift_cluster/kms_key_id.tf", "REDSHIFT_CLUSTER_KMS_KEY_ID", 1, 0},
-		{"redshift_cluster/enhanced_vpc_routing.tf", "REDSHIFT_CLUSTER_ENHANCED_VPC_ROUTING", 2, 0},
-		{"redshift_cluster/parameter_require_ssl.tf", "REDSHIFT_CLUSTER_PARAMETER_GROUP_REQUIRE_SSL", 2, 0},
-		{"redshift_cluster/logging.tf", "REDSHIFT_CLUSTER_AUDIT_LOGGING", 2, 0},
-		{"redshift_cluster/publicly_accessible.tf", "REDSHIFT_CLUSTER_PUBLICLY_ACCESSIBLE", 0, 2},
+		{"redshift/cluster/encrypted.tf", "REDSHIFT_CLUSTER_ENCRYPTION", 0, 2},
+		{"redshift/cluster/enhanced_vpc_routing.tf", "REDSHIFT_CLUSTER_ENHANCED_VPC_ROUTING", 2, 0},
+		{"redshift/cluster/kms_key_id.tf", "REDSHIFT_CLUSTER_KMS_KEY_ID", 1, 0},
+		{"redshift/cluster/logging.tf", "REDSHIFT_CLUSTER_AUDIT_LOGGING", 2, 0},
+		{"redshift/cluster/publicly_accessible.tf", "REDSHIFT_CLUSTER_PUBLICLY_ACCESSIBLE", 0, 2},
+		{"redshift/parameter_group/require_ssl.tf", "REDSHIFT_CLUSTER_PARAMETER_GROUP_REQUIRE_SSL", 2, 0},
 		{"ecs.tf", "ECS_ENVIRONMENT_SECRETS", 0, 1},
 	}
 	for _, tc := range testCases {
