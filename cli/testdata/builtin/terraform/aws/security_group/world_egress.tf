@@ -29,7 +29,7 @@ resource "aws_security_group" "egress_cidr_blocks_set_to_ip" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["1.2.3.4/32"]
+    cidr_blocks = ["10.0.0.100/32"]
   }
 }
 
@@ -64,6 +64,6 @@ resource "aws_security_group" "egress_ipv6_cidr_blocks_set_to_ip" {
     from_port        = 80
     to_port          = 80
     protocol         = "tcp"
-    ipv6_cidr_blocks = ["0:0:0:0:0:ffff:102:304/32"]
+    ipv6_cidr_blocks = ["0:0:0:0:0:ffff:a00:64/32"]
   }
 }
