@@ -81,11 +81,11 @@ rules:
     severity: WARNING
     assertions:
       - every:
-          key: "ingress[].cidr_blocks"
+          key: "ingress[].cidr_blocks[]"
           expressions:
             - key: "@"
               op: regex
-              value: ".*/32$"
+              value: .*/32$
     tags:
       - sg
       - ec2
