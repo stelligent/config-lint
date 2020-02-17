@@ -51,7 +51,7 @@ rules:
           - key: "ingress[?(from_port==`22`)].cidr_blocks[]"
             op: contains
             value: "0.0.0.0/0"
-          - key: "ingress[?(from_port==`22`)].cidr_blocks[]"
+          - key: "ingress[?(from_port==`22`)].ipv6_cidr_blocks[]"
             op: contains
             value: "::/0"
     tags:
