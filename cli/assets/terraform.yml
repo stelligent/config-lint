@@ -158,16 +158,16 @@ rules:
       - cloudfront
 
   - id: CLOUDFRONT_DISTRIBUTION_ORIGIN_POLICY
-    message: CloudFront Distribution origin policy should be https-only
+    message: CloudFront Distribution custom_origin_config origin_protocol_policy should be https-only
     resource: aws_cloudfront_distribution
     severity: FAILURE
     assertions:
       - or:
-        - key: origin.custom_origin_policy
+        - key: "origin[].custom_origin_config"
           op: absent
-        - key: origin.custom_origin_policy.origin_protocol_policy
-          op: eq
-          value: https-only
+        - key: "origin[].custom_origin_config[].origin_protocol_policy"
+          op: regex
+          value: "https-only"
     tags:
       - cloudfront
 
