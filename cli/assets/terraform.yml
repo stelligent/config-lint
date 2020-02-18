@@ -281,9 +281,9 @@ rules:
       - policy
 
   - id: IAM_ROLE_POLICY_WILDCARD_RESOURCE
-    message: Should not use wildcard resource in IAM policy
+    message: Should not use wildcard resource in an Allow IAM policy
     resource: aws_iam_role_policy
-    severity: WARNING
+    severity: FAILURE
     assertions:
       - none:
           key: policy.Statement[]
