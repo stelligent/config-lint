@@ -11,8 +11,8 @@ resource "aws_security_group" "ingress_port_range_matches" {
 
 # Warn
 resource "aws_security_group" "ingress_port_range_does_not_match" {
-  name        = "allow_http"
-  description = "Allow HTTP traffic"
+  name        = "allow_foo"
+  description = "Allow FOO traffic"
   ingress {
     from_port = 10000
     to_port   = 10200
