@@ -61,6 +61,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"aws/iam_role/assume_role_policy_notaction.tf", "IAM_ROLE_NOT_ACTION", 1, 0},
 		{"aws/iam_role/assume_role_policy_notprincipal.tf", "IAM_ROLE_NOT_PRINCIPAL", 1, 0},
 		{"aws/iam_role/assume_role_policy_action_wildcard.tf", "IAM_ROLE_WILDCARD_ACTION", 0, 1},
+		{"aws/iam_role_policy/notaction.tf", "IAM_ROLE_POLICY_NOT_ACTION", 1, 0},
 		{"aws/iam.tf", "IAM_ROLE_POLICY_NOT_RESOURCE", 0, 0},
 		{"aws/iam.tf", "IAM_ROLE_POLICY_WILDCARD_ACTION", 0, 0},
 		{"aws/iam.tf", "IAM_ROLE_POLICY_WILDCARD_RESOURCE", 0, 0},
