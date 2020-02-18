@@ -202,7 +202,7 @@ rules:
   - id: IAM_ROLE_NOT_PRINCIPAL
     message: Should not use NotPrincipal in role assume policy document
     resource: aws_iam_role
-    severity: FAILURE
+    severity: WARNING
     assertions:
       - none:
           key: assume_role_policy.Statement[]

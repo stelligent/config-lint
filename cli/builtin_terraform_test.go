@@ -59,6 +59,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"aws/cloudfront_distribution/custom_origin_config.tf", "CLOUDFRONT_DISTRIBUTION_ORIGIN_POLICY", 0, 2},
 		{"aws/cloudfront_distribution/viewer_protocol_policy.tf", "CLOUDFRONT_DISTRIBUTION_PROTOCOL", 0, 2},
 		{"aws/iam_role/assume_role_policy_notaction.tf", "IAM_ROLE_NOT_ACTION", 1, 0},
+		{"aws/iam_role/assume_role_policy_notprincipal.tf", "IAM_ROLE_NOT_PRINCIPAL", 1, 0},
 		{"aws/iam.tf", "IAM_ROLE_POLICY_NOT_RESOURCE", 0, 0},
 		{"aws/iam.tf", "IAM_ROLE_POLICY_WILDCARD_ACTION", 0, 0},
 		{"aws/iam.tf", "IAM_ROLE_POLICY_WILDCARD_RESOURCE", 0, 0},
