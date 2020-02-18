@@ -176,11 +176,11 @@ rules:
     resource: aws_cloudfront_distribution
     severity: FAILURE
     assertions:
-      - key: default_cache_behavior.viewer_protocol_policy
-        op: ne
+      - key: "default_cache_behavior[].viewer_protocol_policy"
+        op: does-not-contain
         value: allow-all
-      - key: cache_behavior.viewer_protocol_policy
-        op: ne
+      - key: "ordered_cache_behavior[].viewer_protocol_policy"
+        op: does-not-contain
         value: allow-all
     tags:
       - cloudfront
