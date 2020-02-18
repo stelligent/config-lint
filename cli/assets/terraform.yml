@@ -17,7 +17,7 @@ rules:
           - key: "ingress[].cidr_blocks[]"
             op: contains
             value: "0.0.0.0/0"
-          - key: "ingress[].cidr_blocks[]"
+          - key: "ingress[].ipv6_cidr_blocks[]"
             op: contains
             value: "::/0"
     tags:
@@ -34,7 +34,7 @@ rules:
           - key: "egress[].cidr_blocks[]"
             op: contains
             value: "0.0.0.0/0"
-          - key: "egress[].cidr_blocks[]"
+          - key: "egress[].ipv6_cidr_blocks[]"
             op: contains
             value: "::/0"
     tags:
@@ -51,16 +51,16 @@ rules:
           - key: "ingress[?(from_port==`22`)].cidr_blocks[]"
             op: contains
             value: "0.0.0.0/0"
-          - key: "ingress[?(from_port==`22`)].cidr_blocks[]"
+          - key: "ingress[?(from_port==`22`)].ipv6_cidr_blocks[]"
             op: contains
             value: "::/0"
     tags:
       - sg
       - ec2
 
-  - id: SG_RD_WORLD_INGRESS
+  - id: SG_RDP_WORLD_INGRESS
     resource: aws_security_group
-    message: Security group should not allow RD ingress from 0.0.0.0/0 or ::/0
+    message: Security group should not allow RDP ingress from 0.0.0.0/0 or ::/0
     severity: FAILURE
     assertions:
       - not:
@@ -68,7 +68,7 @@ rules:
           - key: "ingress[?(from_port==`3389`)].cidr_blocks[]"
             op: contains
             value: "0.0.0.0/0"
-          - key: "ingress[?(from_port==`3389`)].cidr_blocks[]"
+          - key: "ingress[?(from_port==`3389`)].ipv6_cidr_blocks[]"
             op: contains
             value: "::/0"
     tags:
@@ -81,11 +81,11 @@ rules:
     severity: WARNING
     assertions:
       - every:
-          key: "ingress[].cidr_blocks"
+          key: "ingress[].cidr_blocks[]"
           expressions:
             - key: "@"
               op: regex
-              value: ".*/32$"
+              value: .*/32$
     tags:
       - sg
       - ec2
@@ -126,24 +126,24 @@ rules:
   - id: SG_INGRESS_ALL_PROTOCOLS
     resource: aws_security_group
     message: Best practices recommend not opening all protocols and ports to ingress traffic
+    severity: WARNING
     assertions:
       - not:
         - key: "ingress[].protocol"
           op: contains
           value: "-1"
-    severity: WARNING
     tags:
       - sg
 
   - id: SG_EGRESS_ALL_PROTOCOLS
     resource: aws_security_group
     message: Best practices recommend not opening all protocols and ports to egress traffic
+    severity: WARNING
     assertions:
       - not:
         - key: "egress[].protocol"
           op: contains
           value: "-1"
-    severity: WARNING
     tags:
       - sg
 
