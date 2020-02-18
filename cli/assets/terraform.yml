@@ -582,12 +582,12 @@ rules:
     tags:
       - sqs
 
-  - id: IAM_USER
-    message: IAM User should not have an inline policy (make member of group instead)
-    resource: aws_iam_user
+  - id: IAM_USER_POLICY
+    message: IAM User Policy should not be used (make user a member of group instead)
+    resource: aws_iam_user_policy
     severity: FAILURE
     assertions:
-      - key: policy
+      - key: "@"
         op: absent
     tags:
       - iam
