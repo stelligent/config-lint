@@ -138,12 +138,12 @@ rules:
   - id: SG_EGRESS_ALL_PROTOCOLS
     resource: aws_security_group
     message: Best practices recommend not opening all protocols and ports to egress traffic
+    severity: WARNING
     assertions:
       - not:
         - key: "egress[].protocol"
           op: contains
           value: "-1"
-    severity: WARNING
     tags:
       - sg
 

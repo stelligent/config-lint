@@ -54,7 +54,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"aws/security_group/egress_port_range.tf", "SG_EGRESS_PORT_RANGE", 1, 0},
 		{"aws/security_group/missing_egress.tf", "SG_MISSING_EGRESS", 1, 0},
 		{"aws/security_group/ingress_all_protocols.tf", "SG_INGRESS_ALL_PROTOCOLS", 1, 0},
-		{"aws/security-groups.tf", "SG_EGRESS_ALL_PROTOCOLS", 3, 0},
+		{"aws/security_group/egress_all_protocols.tf", "SG_EGRESS_ALL_PROTOCOLS", 1, 0},
 		{"aws/cloudfront.tf", "CLOUDFRONT_DISTRIBUTION_LOGGING", 0, 1},
 		{"aws/cloudfront.tf", "CLOUDFRONT_DISTRIBUTION_ORIGIN_POLICY", 0, 0},
 		{"aws/cloudfront.tf", "CLOUDFRONT_DISTRIBUTION_DISTRIBUTION_PROTOCOl", 0, 0},
