@@ -166,8 +166,8 @@ rules:
         - key: "origin[].custom_origin_config"
           op: absent
         - key: "origin[].custom_origin_config[].origin_protocol_policy"
-          op: regex
-          value: "https-only"
+          op: contains
+          value: https-only
     tags:
       - cloudfront
 
