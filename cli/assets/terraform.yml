@@ -609,7 +609,7 @@ rules:
     severity: FAILURE
     assertions:
       - key: group
-        op: present
+        op: not-empty
       - key: users
         op: not-empty
     tags:
