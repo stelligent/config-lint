@@ -262,7 +262,7 @@ rules:
       - policy
 
   - id: IAM_ROLE_POLICY_WILDCARD_ACTION
-    message: Should not use wildcard action in IAM policy
+    message: Should not use wildcard action in an Allow IAM policy
     resource: aws_iam_role_policy
     severity: FAILURE
     assertions:
