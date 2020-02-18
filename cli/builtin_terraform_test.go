@@ -68,7 +68,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"aws/iam_policy/policy_notaction.tf", "IAM_POLICY_NOT_ACTION", 1, 0},
 		{"aws/iam_policy/policy_notresource.tf", "IAM_POLICY_NOT_RESOURCE", 1, 0},
 		{"aws/iam_policy/policy_action_wildcard.tf", "IAM_POLICY_WILDCARD_ACTION", 0, 1},
-		{"aws/iam.tf", "IAM_POLICY_WILDCARD_RESOURCE", 1, 0},
+		{"aws/iam_policy/policy_resource_wildcard.tf", "IAM_POLICY_WILDCARD_RESOURCE", 0, 1},
 		{"aws/iam.tf", "IAM_USER", 0, 0},
 		{"aws/iam.tf", "IAM_USER_POLICY_ATTACHMENT", 0, 1},
 		{"aws/iam.tf", "IAM_USER_GROUP", 0, 0},
