@@ -55,7 +55,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"aws/security-groups.tf", "SG_MISSING_EGRESS", 0, 0},
 		{"aws/security-groups.tf", "SG_INGRESS_ALL_PROTOCOLS", 1, 0},
 		{"aws/security-groups.tf", "SG_EGRESS_ALL_PROTOCOLS", 3, 0},
-		{"aws/cloudfront.tf", "CLOUDFRONT_DISTRIBUTION_LOGGING", 0, 1},
+		{"aws/cloudfront_distribution/logging_config.tf", "CLOUDFRONT_DISTRIBUTION_LOGGING", 0, 1},
 		{"aws/cloudfront.tf", "CLOUDFRONT_DISTRIBUTION_ORIGIN_POLICY", 0, 0},
 		{"aws/cloudfront.tf", "CLOUDFRONT_DISTRIBUTION_DISTRIBUTION_PROTOCOl", 0, 0},
 		{"aws/iam.tf", "IAM_ROLE_POLICY_NOT_ACTION", 0, 0},
