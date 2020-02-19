@@ -20,7 +20,7 @@ EOF
 
 # Resource required for creating project
 resource "aws_iam_role_policy" "build" {
-  role        = "${aws_iam_role.build.name}"
+  role = "${aws_iam_role.build.name}"
 
   policy = <<POLICY
 {
@@ -51,7 +51,7 @@ resource "aws_codebuild_project" "fail_artifact_encryption" {
   service_role  = "${aws_iam_role.build.arn}"
 
   artifacts {
-    type = "S3"
+    type                = "S3"
     encryption_disabled = true
   }
 
@@ -62,10 +62,10 @@ resource "aws_codebuild_project" "fail_artifact_encryption" {
   }
 
   source {
-    type            = "GITHUB"
-    location        = "https://gist.github.com/blahblahblah.git"
+    type     = "GITHUB"
+    location = "https://gist.github.com/blahblahblah.git"
   }
-  encryption_key      = "iamanencryptionkey"
+  encryption_key = "iamanencryptionkey"
 }
 
 # project with encryption key, and artifact encryption is not disabled. 
@@ -87,11 +87,11 @@ resource "aws_codebuild_project" "pass_artifact_encryption" {
   }
 
   source {
-    type            = "GITHUB"
-    location        = "https://gist.github.com/blahblahblah.git"
+    type     = "GITHUB"
+    location = "https://gist.github.com/blahblahblah.git"
   }
 
-  encryption_key      = "iamanencryptionkey"
+  encryption_key = "iamanencryptionkey"
 }
 
 # project with encryption key, but secondary artifact encryption is disabled. 
@@ -107,7 +107,7 @@ resource "aws_codebuild_project" "fail_secondary_artifact_encryption" {
   }
 
   secondary_artifacts {
-    type = "S3"
+    type                = "S3"
     artifact_identifier = "i_am_an_identifier"
     encryption_disabled = true
   }
@@ -119,11 +119,11 @@ resource "aws_codebuild_project" "fail_secondary_artifact_encryption" {
   }
 
   source {
-    type            = "GITHUB"
-    location        = "https://gist.github.com/blahblahblah.git"
+    type     = "GITHUB"
+    location = "https://gist.github.com/blahblahblah.git"
   }
 
-  encryption_key      = "iamanencryptionkey"
+  encryption_key = "iamanencryptionkey"
 }
 
 # project with encryption key, and secondary artifact encryption is not disabled. 
@@ -139,7 +139,7 @@ resource "aws_codebuild_project" "pass_secondary_artifact_encryption" {
   }
 
   secondary_artifacts {
-    type = "S3"
+    type                = "S3"
     artifact_identifier = "i_am_an_identifier"
   }
 
@@ -150,11 +150,11 @@ resource "aws_codebuild_project" "pass_secondary_artifact_encryption" {
   }
 
   source {
-    type            = "GITHUB"
-    location        = "https://gist.github.com/blahblahblah.git"
+    type     = "GITHUB"
+    location = "https://gist.github.com/blahblahblah.git"
   }
 
-  encryption_key      = "iamanencryptionkey"
+  encryption_key = "iamanencryptionkey"
 }
 
 # project with encryption key, but S3 encryption is disabled. 
@@ -170,8 +170,8 @@ resource "aws_codebuild_project" "fail_s3_encryption" {
   }
 
   s3_logs {
-    status = "ENABLED"
-    location = "iamabucket/path/to/a/location"
+    status              = "ENABLED"
+    location            = "iamabucket/path/to/a/location"
     encryption_disabled = true
   }
 
@@ -182,11 +182,11 @@ resource "aws_codebuild_project" "fail_s3_encryption" {
   }
 
   source {
-    type            = "GITHUB"
-    location        = "https://gist.github.com/blahblahblah.git"
+    type     = "GITHUB"
+    location = "https://gist.github.com/blahblahblah.git"
   }
 
-  encryption_key      = "iamanencryptionkey"
+  encryption_key = "iamanencryptionkey"
 }
 
 # project with encryption key, and S3 encryption is not disabled. 
@@ -202,7 +202,7 @@ resource "aws_codebuild_project" "pass_s3_encryption" {
   }
 
   s3_logs {
-    status = "ENABLED"
+    status   = "ENABLED"
     location = "iamabucket/path/to/a/location"
   }
 
@@ -213,10 +213,10 @@ resource "aws_codebuild_project" "pass_s3_encryption" {
   }
 
   source {
-    type            = "GITHUB"
-    location        = "https://gist.github.com/blahblahblah.git"
+    type     = "GITHUB"
+    location = "https://gist.github.com/blahblahblah.git"
   }
 
-  encryption_key      = "iamanencryptionkey"
+  encryption_key = "iamanencryptionkey"
 }
 

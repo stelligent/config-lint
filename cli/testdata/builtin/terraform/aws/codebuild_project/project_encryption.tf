@@ -20,7 +20,7 @@ EOF
 
 # Resource required for creating project
 resource "aws_iam_role_policy" "build" {
-  role        = "${aws_iam_role.build.name}"
+  role = "${aws_iam_role.build.name}"
 
   policy = <<POLICY
 {
@@ -61,11 +61,11 @@ resource "aws_codebuild_project" "pass_encryption" {
   }
 
   source {
-    type            = "GITHUB"
-    location        = "https://gist.github.com/blahblahblah.git"
+    type     = "GITHUB"
+    location = "https://gist.github.com/blahblahblah.git"
   }
 
-  encryption_key    = "iamanencryptionkey"
+  encryption_key = "iamanencryptionkey"
 }
 
 # project without encryption. 
@@ -87,8 +87,8 @@ resource "aws_codebuild_project" "fail_encryption" {
   }
 
   source {
-    type            = "GITHUB"
-    location        = "https://gist.github.com/blahblahblah.git"
+    type     = "GITHUB"
+    location = "https://gist.github.com/blahblahblah.git"
   }
 }
 
