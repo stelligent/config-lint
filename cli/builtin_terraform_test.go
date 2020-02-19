@@ -74,7 +74,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"aws/iam_group_membership/group_and_users.tf", "IAM_USER_GROUP", 0, 4},
 		{"aws/iam_policy/policy_version.tf", "POLICY_VERSION", 0, 1},
 		{"aws/iam_role_policy/policy_version.tf", "POLICY_VERSION", 0, 1},
-		{"aws/iam.tf", "ASSUME_ROLEPOLICY_VERSION", 0, 1},
+		{"aws/iam_role/assume_role_policy_version.tf", "ASSUME_ROLEPOLICY_VERSION", 0, 1},
 		{"aws/elb.tf", "ELB_ACCESS_LOGGING", 1, 0},
 		{"aws/s3.tf", "S3_BUCKET_ACL", 0, 0},
 		{"aws/s3.tf", "S3_NOT_ACTION", 0, 0},

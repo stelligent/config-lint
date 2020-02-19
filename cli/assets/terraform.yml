@@ -997,8 +997,8 @@ rules:
 
   - id: ASSUME_ROLEPOLICY_VERSION
     message: Version in IAM Policy should be 2012-10-17
-    resources:
-      - aws_iam_role
+    resource: aws_iam_role
+    severity: FAILURE
     assertions:
       - key: assume_role_policy.Version
         op: eq
