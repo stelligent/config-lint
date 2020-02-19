@@ -42,22 +42,24 @@ func numberOfFailures(violations []assertion.Violation) int {
 	return n
 }
 
-func getViolationsString(violations []assertion.Violation) string{
+func getViolationsString(severity string, violations []assertion.Violation) string{
   // String build message for violations. Debug helper
   var violationsReported string
   for count, v := range violations {
-    violationsReported += strconv.Itoa(count + 1) + ". Violation:"
-    violationsReported += "\n\tRule Message: " + v.RuleMessage
-    violationsReported += "\n\tRule Id: " + v.RuleID
-    violationsReported += "\n\tResource ID: " + v.ResourceID
-    violationsReported += "\n\tResource Type: " + v.ResourceType
-    violationsReported += "\n\tCategory: " + v.Category
-    violationsReported += "\n\tStatus: " + v.Status
-    violationsReported += "\n\tRule Message: " + v.RuleMessage
-    violationsReported += "\n\tAssertion Message: " + v.AssertionMessage
-    violationsReported += "\n\tFilename: " + v.Filename
-    violationsReported += "\n\tLine Number: " + strconv.Itoa(v.LineNumber)
-    violationsReported += "\n\tCreated At: " + v.CreatedAt
+    if v.Status == severity {
+      violationsReported += strconv.Itoa(count + 1) + ". Violation:"
+      violationsReported += "\n\tRule Message: " + v.RuleMessage
+      violationsReported += "\n\tRule Id: " + v.RuleID
+      violationsReported += "\n\tResource ID: " + v.ResourceID
+      violationsReported += "\n\tResource Type: " + v.ResourceType
+      violationsReported += "\n\tCategory: " + v.Category
+      violationsReported += "\n\tStatus: " + v.Status
+      violationsReported += "\n\tRule Message: " + v.RuleMessage
+      violationsReported += "\n\tAssertion Message: " + v.AssertionMessage
+      violationsReported += "\n\tFilename: " + v.Filename
+      violationsReported += "\n\tLine Number: " + strconv.Itoa(v.LineNumber)
+      violationsReported += "\n\tCreated At: " + v.CreatedAt
+    }
   }
   return violationsReported
 }
@@ -153,10 +155,11 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		report, err := l.Validate(ruleSet, options)
 		assert.Nil(t, err, "Validate failed for file")
 
-    violationsReported := getViolationsString(report.Violations)
-		warningMessage := fmt.Sprintf("Expecting %d warnings for RuleID %s in File %s:\n %s", tc.WarningCount, tc.RuleID, tc.Filename, violationsReported)
+    warningViolationsReported := getViolationsString("WARNING", report.Violations)
+		warningMessage := fmt.Sprintf("Expecting %d warnings for RuleID %s in File %s:\n %s", tc.WarningCount, tc.RuleID, tc.Filename, warningViolationsReported)
 		assert.Equal(t, tc.WarningCount, numberOfWarnings(report.Violations), warningMessage)
-    failureMessage := fmt.Sprintf("Expecting %d failures for RuleID %s in File %s:\n %s", tc.FailureCount, tc.RuleID, tc.Filename, violationsReported)
+    failureViolationsReported := getViolationsString("FAILURE", report.Violations)
+    failureMessage := fmt.Sprintf("Expecting %d failures for RuleID %s in File %s:\n %s", tc.FailureCount, tc.RuleID, tc.Filename, failureViolationsReported)
 		assert.Equal(t, tc.FailureCount, numberOfFailures(report.Violations), failureMessage)
 	}
 }
