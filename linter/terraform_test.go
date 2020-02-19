@@ -3,6 +3,7 @@ package linter
 import (
 	"os"
 	"testing"
+  "fmt" // TODO remove
 
 	"github.com/stelligent/config-lint/assertion"
 	"github.com/stretchr/testify/assert"
@@ -33,6 +34,7 @@ func loadResourcesToTest(t *testing.T, filename string) []assertion.Resource {
 }
 
 func getResourceTags(r assertion.Resource) map[string]interface{} {
+  fmt.Print("get tags") // TODO remove
 	properties := r.Properties.(map[string]interface{})
 	tags := properties["tags"].([]interface{})
 	return tags[0].(map[string]interface{})

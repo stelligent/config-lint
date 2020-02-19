@@ -363,16 +363,6 @@ rules:
       - iam
       - policy
 
-  - id: ELB_ACCESS_LOGGING
-    message: ELB should enable access logging
-    resource: aws_elb
-    severity: WARNING
-    assertions:
-      - key: access_logs
-        op: present
-    tags:
-      - elb
-
   - id: S3_BUCKET_ACL
     message: S3 Bucket should not be public
     resource: aws_s3_bucket
