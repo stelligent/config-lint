@@ -443,9 +443,9 @@ rules:
       - s3
 
   - id: S3_BUCKET_POLICY_WILDCARD_ACTION
-    message: Should not use wildcard Principal in S3 bucket policy
+    message: Should not use wildcard Action in an Allow S3 bucket policy
     resource: aws_s3_bucket_policy
-    severity: WARNING
+    severity: FAILURE
     assertions:
       - none:
           key: policy.Statement[]
