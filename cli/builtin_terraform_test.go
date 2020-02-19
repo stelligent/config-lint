@@ -42,6 +42,26 @@ func numberOfFailures(violations []assertion.Violation) int {
 	return n
 }
 
+func getViolationsString(violations []assertion.Violation) string{
+  // String build message for violations. Debug helper
+  var violationsReported string
+  for count, v := range violations {
+    violationsReported += strconv.Itoa(count + 1) + ". Violation:"
+    violationsReported += "\n\tRule Message: " + v.RuleMessage
+    violationsReported += "\n\tRule Id: " + v.RuleID
+    violationsReported += "\n\tResource ID: " + v.ResourceID
+    violationsReported += "\n\tResource Type: " + v.ResourceType
+    violationsReported += "\n\tCategory: " + v.Category
+    violationsReported += "\n\tStatus: " + v.Status
+    violationsReported += "\n\tRule Message: " + v.RuleMessage
+    violationsReported += "\n\tAssertion Message: " + v.AssertionMessage
+    violationsReported += "\n\tFilename: " + v.Filename
+    violationsReported += "\n\tLine Number: " + strconv.Itoa(v.LineNumber)
+    violationsReported += "\n\tCreated At: " + v.CreatedAt
+  }
+  return violationsReported
+}
+
 func TestTerraformBuiltInRules(t *testing.T) {
 	ruleSet := loadRules(t, "terraform.yml")
 	testCases := []BuiltInTestCase{
@@ -132,26 +152,11 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		l, err := linter.NewLinter(ruleSet, vs, filenames, "")
 		report, err := l.Validate(ruleSet, options)
 		assert.Nil(t, err, "Validate failed for file")
-		warningMessage := fmt.Sprintf("Expecting %d warnings for RuleID %s in File %s", tc.WarningCount, tc.RuleID, tc.Filename)
+
+    violationsReported := getViolationsString(report.Violations)
+		warningMessage := fmt.Sprintf("Expecting %d warnings for RuleID %s in File %s:\n %s", tc.WarningCount, tc.RuleID, tc.Filename, violationsReported)
 		assert.Equal(t, tc.WarningCount, numberOfWarnings(report.Violations), warningMessage)
-
-    var violationsReported string
-    for count, v := range report.Violations {
-      violationsReported += strconv.Itoa(count + 1) + ". Violation:"
-      violationsReported += "\n\tRule Message: " + v.RuleMessage
-      violationsReported += "\n\tRule Id: " + v.RuleID
-      violationsReported += "\n\tResource ID: " + v.ResourceID
-      violationsReported += "\n\tResource Type: " + v.ResourceType
-      violationsReported += "\n\tCategory: " + v.Category
-      violationsReported += "\n\tStatus: " + v.Status
-      violationsReported += "\n\tRule Message: " + v.RuleMessage
-      violationsReported += "\n\tAssertion Message: " + v.AssertionMessage
-      violationsReported += "\n\tFilename: " + v.Filename
-      violationsReported += "\n\tLine Number: " + strconv.Itoa(v.LineNumber)
-      violationsReported += "\n\tCreated At: " + v.CreatedAt
-    }
     failureMessage := fmt.Sprintf("Expecting %d failures for RuleID %s in File %s:\n %s", tc.FailureCount, tc.RuleID, tc.Filename, violationsReported)
-
 		assert.Equal(t, tc.FailureCount, numberOfFailures(report.Violations), failureMessage)
 	}
 }
