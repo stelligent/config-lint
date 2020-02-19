@@ -88,6 +88,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"aws/sns.tf", "SNS_TOPIC_POLICY_WILDCARD_PRINCIPAL", 1, 0},
 		{"aws/sns.tf", "SNS_TOPIC_POLICY_NOT_ACTION", 0, 0},
 		{"aws/sns.tf", "SNS_TOPIC_POLICY_NOT_PRINCIPAL", 0, 0},
+		{"aws/sqs_queue_policy/policy_version.tf", "POLICY_VERSION", 0, 1},
 		{"aws/sqs.tf", "SQS_QUEUE_POLICY_WILDCARD_PRINCIPAL", 1, 0},
 		{"aws/sqs.tf", "SQS_QUEUE_POLICY_WILDCARD_ACTION", 0, 0},
 		{"aws/sqs.tf", "SQS_QUEUE_POLICY_NOT_ACTION", 0, 0},
