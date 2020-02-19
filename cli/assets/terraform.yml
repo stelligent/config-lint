@@ -370,17 +370,21 @@ rules:
     assertions:
       # Check if 'access_logs' is present and if it is then we can check to see if the 
       # key 'enabled' exists within the 'access_logs' array.
-      # If it does NOT exist, then the value is True by default and therefor should be allowed.
-      # If it does exist, the only allowed value type is Boolean, so a string such as 'foo'
-      # can't match the value return for key 'enabled'. We then check to see if the value for
-      # the key 'enabled' is set to True
+      # If it does NOT exist, then the value is True by default.
+      # If it does exist, then the value should be set to True.
       - key: access_logs
         op: present
-      - every:
-          key: "access_logs[?enabled!=foo]"
-          expressions:
-            - key: enabled
-              op: is-true
+      - or:
+        - every:
+            key: access_logs[]
+            expressions:
+              - key: enabled
+                op: absent
+        - every:
+            key: access_logs[]
+            expressions:
+              - key: enabled
+                op: is-true
     tags:
       - elb
 
