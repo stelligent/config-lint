@@ -975,8 +975,11 @@ rules:
     resource: aws_s3_bucket_object
     severity: FAILURE
     assertions:
-      - key: kms_key_id
-        op: present
+      - or:
+        - key: kms_key_id
+          op: present
+        - key: server_side_encryption
+          op: present
     tags:
       - s3
 
