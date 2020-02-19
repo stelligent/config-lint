@@ -79,6 +79,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"aws/s3.tf", "S3_BUCKET_ACL", 0, 0},
 		{"aws/s3.tf", "S3_NOT_ACTION", 0, 0},
 		{"aws/s3.tf", "S3_NOT_PRINCIPAL", 0, 0},
+		{"aws/s3_bucket_policy/policy_version.tf", "POLICY_VERSION", 0, 1},
 		{"aws/s3.tf", "S3_BUCKET_POLICY_WILDCARD_PRINCIPAL", 1, 0},
 		{"aws/s3.tf", "S3_BUCKET_POLICY_WILDCARD_ACTION", 1, 0},
 		{"aws/s3.tf", "S3_BUCKET_ENCRYPTION", 0, 1},
