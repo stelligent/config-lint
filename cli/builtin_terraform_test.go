@@ -80,7 +80,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"aws/s3_bucket_policy/policy_statement_notaction.tf", "S3_NOT_ACTION", 1, 0},
 		{"aws/s3_bucket_policy/policy_statement_notprincipal.tf", "S3_NOT_PRINCIPAL", 1, 0},
 		{"aws/s3_bucket_policy/policy_version.tf", "POLICY_VERSION", 0, 1},
-		{"aws/s3.tf", "S3_BUCKET_POLICY_WILDCARD_PRINCIPAL", 1, 0},
+		{"aws/s3_bucket_policy/policy_statement_principal_wildcard.tf", "S3_BUCKET_POLICY_WILDCARD_PRINCIPAL", 0, 1},
 		{"aws/s3.tf", "S3_BUCKET_POLICY_WILDCARD_ACTION", 1, 0},
 		{"aws/s3.tf", "S3_BUCKET_ENCRYPTION", 0, 1},
 		{"aws/s3.tf", "S3_BUCKET_OBJECT_ENCRYPTION", 0, 1},
