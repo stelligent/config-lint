@@ -410,6 +410,7 @@ rules:
             - key: NotAction
               op: present
     tags:
+      - policy
       - s3
 
   - id: S3_NOT_PRINCIPAL
@@ -423,6 +424,7 @@ rules:
             - key: NotPrincipal
               op: present
     tags:
+      - policy
       - s3
 
   - id: S3_BUCKET_POLICY_WILDCARD_PRINCIPAL
@@ -440,6 +442,7 @@ rules:
               op: contains
               value: "*"
     tags:
+      - policy
       - s3
 
   - id: S3_BUCKET_POLICY_WILDCARD_ACTION
@@ -457,6 +460,7 @@ rules:
               op: contains
               value: "*"
     tags:
+      - policy
       - s3
 
   - id: S3_BUCKET_POLICY_ONLY_HTTPS
@@ -473,6 +477,7 @@ rules:
             - key: Condition.Bool."aws:SecureTransport"
               op: is-false
     tags:
+      - policy
       - s3
 
   - id: S3_BUCKET_ENCRYPTION
@@ -1039,6 +1044,7 @@ rules:
         value: "2012-10-17"
     tags:
       - iam
+      - policy
 
   - id: ASSUME_ROLEPOLICY_VERSION
     message: Version in IAM Policy should be 2012-10-17
@@ -1050,6 +1056,7 @@ rules:
         value: "2012-10-17"
     tags:
       - iam
+      - policy
 
   - id: BATCH_DEFINITION_PRIVILEGED
     message: Batch Job Definition Container Properties should not have Privileged set to true
