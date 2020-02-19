@@ -202,7 +202,7 @@ rules:
   - id: IAM_ROLE_NOT_PRINCIPAL
     message: Should not use NotPrincipal in role assume policy document
     resource: aws_iam_role
-    severity: FAILURE
+    severity: WARNING
     assertions:
       - none:
           key: assume_role_policy.Statement[]
@@ -262,7 +262,7 @@ rules:
       - policy
 
   - id: IAM_ROLE_POLICY_WILDCARD_ACTION
-    message: Should not use wildcard action in IAM policy
+    message: Should not use wildcard action in an Allow IAM policy
     resource: aws_iam_role_policy
     severity: FAILURE
     assertions:
@@ -281,9 +281,9 @@ rules:
       - policy
 
   - id: IAM_ROLE_POLICY_WILDCARD_RESOURCE
-    message: Should not use wildcard resource in IAM policy
+    message: Should not use wildcard resource in an Allow IAM policy
     resource: aws_iam_role_policy
-    severity: WARNING
+    severity: FAILURE
     assertions:
       - none:
           key: policy.Statement[]
@@ -328,7 +328,7 @@ rules:
       - policy
 
   - id: IAM_POLICY_WILDCARD_ACTION
-    message: Should not use wildcard action in IAM policy
+    message: Should not use wildcard action in an Allow IAM policy
     resource: aws_iam_policy
     severity: FAILURE
     assertions:
@@ -346,9 +346,9 @@ rules:
       - policy
 
   - id: IAM_POLICY_WILDCARD_RESOURCE
-    message: Should not use wildcard resource in IAM policy
+    message: Should not use wildcard resource in an Allow IAM policy
     resource: aws_iam_policy
-    severity: WARNING
+    severity: FAILURE
     assertions:
       - none:
           key: policy.Statement[]
@@ -582,12 +582,12 @@ rules:
     tags:
       - sqs
 
-  - id: IAM_USER
-    message: IAM User should not have an inline policy (make member of group instead)
-    resource: aws_iam_user
+  - id: IAM_USER_POLICY
+    message: IAM User Policy should not be used (make user a member of group instead)
+    resource: aws_iam_user_policy
     severity: FAILURE
     assertions:
-      - key: policy
+      - key: "@"
         op: absent
     tags:
       - iam
@@ -609,7 +609,7 @@ rules:
     severity: FAILURE
     assertions:
       - key: group
-        op: present
+        op: not-empty
       - key: users
         op: not-empty
     tags:
@@ -1017,6 +1017,7 @@ rules:
       - aws_sqs_queue_policy
       - aws_iam_policy
       - aws_iam_role_policy
+    severity: FAILURE
     assertions:
       - key: policy.Version
         op: eq
@@ -1026,8 +1027,8 @@ rules:
 
   - id: ASSUME_ROLEPOLICY_VERSION
     message: Version in IAM Policy should be 2012-10-17
-    resources:
-      - aws_iam_role
+    resource: aws_iam_role
+    severity: FAILURE
     assertions:
       - key: assume_role_policy.Version
         op: eq
