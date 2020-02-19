@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"testing"
+  "strconv"
 
 	"github.com/stelligent/config-lint/assertion"
 	"github.com/stelligent/config-lint/linter"
@@ -75,7 +76,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"aws/iam_policy/policy_version.tf", "POLICY_VERSION", 0, 1},
 		{"aws/iam_role_policy/policy_version.tf", "POLICY_VERSION", 0, 1},
 		{"aws/iam_role/assume_role_policy_version.tf", "ASSUME_ROLEPOLICY_VERSION", 0, 1},
-		{"aws/elb.tf", "ELB_ACCESS_LOGGING", 1, 0},
+		{"aws/elb/access_logs_enabled.tf", "ELB_ACCESS_LOGGING", 2, 0},
 		{"aws/s3.tf", "S3_BUCKET_ACL", 0, 0},
 		{"aws/s3.tf", "S3_NOT_ACTION", 0, 0},
 		{"aws/s3.tf", "S3_NOT_PRINCIPAL", 0, 0},
@@ -120,6 +121,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"aws/redshift/cluster/publicly_accessible.tf", "REDSHIFT_CLUSTER_PUBLICLY_ACCESSIBLE", 0, 2},
 		{"aws/redshift/parameter_group/require_ssl.tf", "REDSHIFT_CLUSTER_PARAMETER_GROUP_REQUIRE_SSL", 2, 0},
 		{"aws/ecs.tf", "ECS_ENVIRONMENT_SECRETS", 0, 1},
+		{".test/test12.tf", "[INFRA004] DATA_CLASS_TAG_VALID", 0, 3}, // TODO remove, testing
 	}
 	for _, tc := range testCases {
 		filenames := []string{"testdata/builtin/terraform/" + tc.Filename}
@@ -132,7 +134,24 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		assert.Nil(t, err, "Validate failed for file")
 		warningMessage := fmt.Sprintf("Expecting %d warnings for RuleID %s in File %s", tc.WarningCount, tc.RuleID, tc.Filename)
 		assert.Equal(t, tc.WarningCount, numberOfWarnings(report.Violations), warningMessage)
-		failureMessage := fmt.Sprintf("Expecting %d failures for RuleID %s in File %s", tc.FailureCount, tc.RuleID, tc.Filename)
+
+    var violationsReported string
+    for count, v := range report.Violations {
+      violationsReported += strconv.Itoa(count + 1) + ". Violation:"
+      violationsReported += "\n\tRule Message: " + v.RuleMessage
+      violationsReported += "\n\tRule Id: " + v.RuleID
+      violationsReported += "\n\tResource ID: " + v.ResourceID
+      violationsReported += "\n\tResource Type: " + v.ResourceType
+      violationsReported += "\n\tCategory: " + v.Category
+      violationsReported += "\n\tStatus: " + v.Status
+      violationsReported += "\n\tRule Message: " + v.RuleMessage
+      violationsReported += "\n\tAssertion Message: " + v.AssertionMessage
+      violationsReported += "\n\tFilename: " + v.Filename
+      violationsReported += "\n\tLine Number: " + strconv.Itoa(v.LineNumber)
+      violationsReported += "\n\tCreated At: " + v.CreatedAt
+    }
+    failureMessage := fmt.Sprintf("Expecting %d failures for RuleID %s in File %s:\n %s", tc.FailureCount, tc.RuleID, tc.Filename, violationsReported)
+
 		assert.Equal(t, tc.FailureCount, numberOfFailures(report.Violations), failureMessage)
 	}
 }
