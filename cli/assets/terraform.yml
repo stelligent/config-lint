@@ -464,14 +464,14 @@ rules:
     resource: aws_s3_bucket_policy
     severity: FAILURE
     assertions:
-      - some:
+      - none:
           key: policy.Statement[]
           expressions:
             - key: Effect
               op: eq
               value: Allow
             - key: Condition.Bool."aws:SecureTransport"
-              op: is-true
+              op: is-false
     tags:
       - s3
 
