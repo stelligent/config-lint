@@ -987,6 +987,7 @@ rules:
       - aws_sqs_queue_policy
       - aws_iam_policy
       - aws_iam_role_policy
+    severity: FAILURE
     assertions:
       - key: policy.Version
         op: eq
