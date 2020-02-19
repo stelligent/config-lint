@@ -740,12 +740,42 @@ rules:
       - cloudtrail
 
   - id: CODEBUILD_PROJECT_ENCRYPTION
-    message: CodeBuild Project artifacts should be encrypted
+    message: CodeBuild Project should be encrypted
     resource: aws_codebuild_project
     severity: FAILURE
     assertions:
       - key: encryption_key
         op: present
+    tags:
+      - codebuild
+
+  - id: CODEBUILD_PROJECT_ARTIFACT_ENCRYPTION
+    message: CodeBuild Project artifacts should be encrypted
+    resource: aws_codebuild_project
+    severity: FAILURE
+    assertions:
+      - not:  
+        - every: # artifacts are required; encryption must be enabled
+            key: artifacts[]
+            expressions:
+              - key: encryption_disabled
+                op: is-true
+        - and: # If 2nd artifacts exist, encryption must be enabled
+          - key: secondary_artifacts
+            op: present
+          - every:
+              key: secondary_artifacts[]
+              expressions:
+                - key: encryption_disabled
+                  op: is-true
+        - and: # If s3 logs exist, encryption must be enabled
+          - key: s3_logs 
+            op: present
+          - every:
+              key: s3_logs[]
+              expressions:
+                - key: encryption_disabled
+                  op: is-true
     tags:
       - codebuild
 
@@ -846,7 +876,7 @@ rules:
   - id: KINESIS_STREAM_KMS
     message: Kinesis streams should be associated with a kms key
     resource: aws_kinesis_stream
-    severity: FAILING
+    severity: FAILURE
     assertions:
       - key: kms_key_id
         op: present
@@ -1031,7 +1061,7 @@ rules:
   - id: ELASTICACHE_ENCRYPTION_REST
     message: ElastiCache ReplicationGroup should have encryption enabled for at rest
     resource: aws_elasticache_replication_group
-    severity: FAILING
+    severity: FAILURE
     assertions:
     - key: at_rest_encryption_enabled
       op: is-true
@@ -1041,7 +1071,7 @@ rules:
   - id: ELASTICACHE_ENCRYPTION_TRANSIT
     message: ElastiCache ReplicationGroup should have encryption enabled for in transit
     resource: aws_elasticache_replication_group
-    severity: FAILING
+    severity: FAILURE
     assertions:
     - key: transit_encryption_enabled
       op: is-true
@@ -1051,7 +1081,7 @@ rules:
   - id: NEPTUNE_DB_ENCRYPTION
     message: Neptune database cluster storage should have encryption enabled
     resource: aws_neptune_cluster
-    severity: FAILING
+    severity: FAILURE
     assertions:
     - key: storage_encrypted
       op: is-true
@@ -1061,7 +1091,7 @@ rules:
   - id: RDS_PUBLIC_AVAILABILITY
     message: RDS instance should not be publicly accessible
     resource: aws_db_instance
-    severity: FAILING
+    severity: FAILURE
     assertions:
     - not:
       - key: publicly_accessible

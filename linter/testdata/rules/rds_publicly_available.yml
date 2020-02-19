@@ -7,7 +7,7 @@ rules:
   - id: RDS_PUBLIC_AVAILABILITY
     message: RDS instance should not be publicly accessible
     resource: aws_db_instance
-    severity: FAILING
+    severity: FAILURE
     assertions:
       - not:
         - key: publicly_accessible

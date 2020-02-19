@@ -7,7 +7,7 @@ rules:
   - id: KINESIS_STREAM_KMS
     message: Kinesis streams should be associated with a kms key
     resource: aws_kinesis_stream
-    severity: FAILING
+    severity: FAILURE
     assertions:
       - key: kms_key_id
         op: present
