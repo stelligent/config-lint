@@ -492,9 +492,9 @@ rules:
       - s3
 
   - id: SNS_TOPIC_POLICY_WILDCARD_PRINCIPAL
-    message: Should not use wildcard Principal in SNS topic policy
+    message: Should not use wildcard Principal in an Allow SNS topic policy
     resource: aws_sns_topic_policy
-    severity: WARNING
+    severity: FAILURE
     assertions:
       - none:
           key: policy.Statement[]
@@ -507,6 +507,7 @@ rules:
               value: "*"
     tags:
       - sns
+      - policy
 
   - id: SNS_TOPIC_POLICY_NOT_ACTION
     message: Should not use NotAction in SNS topic policy
@@ -520,6 +521,7 @@ rules:
               op: present
     tags:
       - sns
+      - policy
 
   - id: SNS_TOPIC_POLICY_NOT_PRINCIPAL
     message: Should not use NotPrincipal in SNS topic policy
@@ -530,6 +532,7 @@ rules:
         op: absent
     tags:
       - sns
+      - policy
 
   - id: SQS_QUEUE_POLICY_WILDCARD_PRINCIPAL
     message: Should not use wildcard principal in SQS queue policy

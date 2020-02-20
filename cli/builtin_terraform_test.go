@@ -86,7 +86,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"aws/s3_bucket/server_side_encryption_enabled.tf", "S3_BUCKET_ENCRYPTION", 0, 1},
 		{"aws/s3_bucket_object/encryption_enabled.tf", "S3_BUCKET_OBJECT_ENCRYPTION", 0, 1},
 		{"aws/sns_topic_policy/policy_version.tf", "POLICY_VERSION", 0, 1},
-		{"aws/sns.tf", "SNS_TOPIC_POLICY_WILDCARD_PRINCIPAL", 1, 0},
+		{"aws/sns_topic_policy/policy_statement_principal_wildcard-copy.tf", "SNS_TOPIC_POLICY_WILDCARD_PRINCIPAL", 0, 1},
 		{"aws/sns.tf", "SNS_TOPIC_POLICY_NOT_ACTION", 0, 0},
 		{"aws/sns.tf", "SNS_TOPIC_POLICY_NOT_PRINCIPAL", 0, 0},
 		{"aws/sqs_queue_policy/policy_version.tf", "POLICY_VERSION", 0, 1},
