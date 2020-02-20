@@ -532,9 +532,9 @@ rules:
       - sns
 
   - id: SQS_QUEUE_POLICY_WILDCARD_PRINCIPAL
-    message: Should not use wildcard principal in SQS queue policy
+    message: Should not use wildcard Principal in an Allow SQS queue policy
     resource: aws_sqs_queue_policy
-    severity: WARNING
+    severity: FAILURE
     assertions:
       - none:
           key: policy.Statement[]
@@ -547,6 +547,7 @@ rules:
               value: "*"
     tags:
       - sqs
+      - policy
 
   - id: SQS_QUEUE_POLICY_WILDCARD_ACTION
     message: Should not use wildcard action in SQS queue policy
@@ -564,6 +565,7 @@ rules:
               value: "*"
     tags:
       - sqs
+      - policy
 
   - id: SQS_QUEUE_POLICY_NOT_ACTION
     message: Should not use NotAction in SQS queue policy
@@ -577,6 +579,7 @@ rules:
               op: present
     tags:
       - sqs
+      - policy
 
   - id: SQS_QUEUE_POLICY_NOT_PRINCIPAL
     message: Should not use NotPrincipal in SQS queue policy
@@ -590,6 +593,7 @@ rules:
               op: present
     tags:
       - sqs
+      - policy
 
   - id: SQS_QUEUE_ENCRYPTION
     message: SQSQueue should use encryption
