@@ -94,7 +94,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"aws/sqs_queue_policy/policy_statement_action_wildcard.tf", "SQS_QUEUE_POLICY_WILDCARD_ACTION", 0, 1},
 		{"aws/sqs_queue_policy/policy_statement_notaction.tf", "SQS_QUEUE_POLICY_NOT_ACTION", 1, 0},
 		{"aws/sqs_queue_policy/policy_statement_notprincipal.tf", "SQS_QUEUE_POLICY_NOT_PRINCIPAL", 1, 0},
-		{"aws/sqs.tf", "SQS_QUEUE_ENCRYPTION", 0, 1},
+		{"aws/sqs_queue/encryption.tf", "SQS_QUEUE_ENCRYPTION", 0, 1},
 		{"aws/lambda.tf", "LAMBDA_PERMISSION_INVOKE_ACTION", 0, 0},
 		{"aws/lambda.tf", "LAMBDA_PERMISSION_WILDCARD_PRINCIPAL", 0, 0},
 		{"aws/lambda.tf", "LAMBDA_FUNCTION_ENCRYPTION", 1, 0},

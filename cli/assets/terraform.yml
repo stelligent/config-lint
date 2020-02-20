@@ -602,7 +602,7 @@ rules:
     assertions:
       - key: "@"
         op: has-properties
-        value: kms_master_key_id,kms_data_key_reuse_period_seconds
+        value: kms_master_key_id
     tags:
       - sqs
 
