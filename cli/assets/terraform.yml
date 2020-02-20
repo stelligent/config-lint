@@ -528,8 +528,11 @@ rules:
     resource: aws_sns_topic_policy
     severity: WARNING
     assertions:
-      - key: policy.Statement[].NotPrincipal
-        op: absent
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: NotPrincipal
+              op: present
     tags:
       - sns
       - policy
