@@ -662,7 +662,7 @@ rules:
     severity: FAILURE
     assertions:
       - key: principal
-        op: ne
+        op: does-not-contain
         value: "*"
     tags:
       - lambda
