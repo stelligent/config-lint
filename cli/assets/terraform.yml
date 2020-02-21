@@ -745,8 +745,6 @@ rules:
           key: access_logs
           expressions:
             - key: enabled
-              op: present
-            - key: enabled
               op: is-true
     tags:
       - alb
