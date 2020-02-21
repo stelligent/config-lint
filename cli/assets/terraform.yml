@@ -741,6 +741,13 @@ rules:
     assertions:
       - key: access_logs
         op: present
+      - every:
+          key: access_logs
+          expressions:
+            - key: enabled
+              op: present
+            - key: enabled
+              op: is-true
     tags:
       - alb
       - lb
