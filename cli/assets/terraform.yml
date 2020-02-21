@@ -662,13 +662,13 @@ rules:
     severity: FAILURE
     assertions:
       - key: principal
-        op: ne
+        op: does-not-contain
         value: "*"
     tags:
       - lambda
 
   - id: LAMBDA_FUNCTION_ENCRYPTION
-    message: Lambda function should use encryption
+    message: Lambda function should specify kms_key_arn to use a non-default service key
     resource: aws_lambda_function
     severity: WARNING
     assertions:
@@ -1037,22 +1037,29 @@ rules:
     message: Environment for Lambda function should not include AWS secrets
     resource: aws_lambda_function
     severity: FAILURE
-    # this rule fails is it finds a regex match for both the key and the secret key
+    # this rule fails if it finds a regex match for either the Access Key ID and/or the Secret Access Key
     assertions:
       - not:
-        - and:
-          - some:
-              key: "environment[].variables[]|[0]|values(@)"
-              expressions:
+        - some:
+            key: "environment[].variables[]|[0]|values(@)"
+            expressions:
+              # Check if the string starts with any known 4 character ACCESS_KEY sequence
+              # and is 20 capital alpha-numeric characters long in total
+              - key: "@"
+                op: regex
+                value: "^(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}$"
+        - some:
+            key: "environment[].variables[]|[0]|values(@)"
+            expressions:
+              - and:
+                # Check if the string is exactly 40 characters long
                 - key: "@"
                   op: regex
-                  value: "^(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}$"
-          - some:
-              key: "environment[].variables[]|[0]|values(@)"
-              expressions:
+                  value: "^.{40}$"
+                # Check if the string contains only alpha-numeric-slash-plus characters with at least 1 / or +
                 - key: "@"
                   op: regex
-                  value: "^[A-Za-z0-9/\\+=]{40}$"
+                  value: "^[a-zA-Z0-9/+]+[/+]+[a-zA-Z0-9/+]+$"
     tags:
       - lambda
 
