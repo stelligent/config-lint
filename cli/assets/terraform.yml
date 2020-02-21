@@ -774,9 +774,9 @@ rules:
       - ami
 
   - id: CLOUDTRAIL_ENCRYPTION
-    message: CloudTrail should use encryption
+    message: CloudTrail should specify a non-default KMS Key
     resource: aws_cloudtrail
-    severity: FAILURE
+    severity: WARNING
     assertions:
       - key: kms_key_id
         op: present
