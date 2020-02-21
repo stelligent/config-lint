@@ -25,14 +25,30 @@ rules:
     resource: aws_db_instance
     severity: FAILURE
     assertions:
-      - and:
-        # Must exist
-        - key: tags.data_class
-          op: present
-        # And must be valid
-        - every:
-            key: tags[]
-            expression:
-              key: data_class
-              op: in
-              value: public,internal,confidential
+      - or:
+          - key: tags[0].data_class
+            op: in
+            value: public,internal,confidential
+          - key: tags.data_class
+            op: in
+            value: public,internal,confidential
+          # Fuzzy matching for nested modules that cant be resolved
+          - key: tags
+            op: contains
+            value: tags
+          - key: tags
+            op: contains
+            value: TAGS
+
+            #     assertions:
+            #       - and:
+            #         # Must exist
+            #         - key: tags.data_class
+            #           op: present
+            #         # And must be valid
+            #         - every:
+            #             key: tags[]
+            #             expression:
+            #               key: data_class
+            #               op: in
+            #               value: public,internal,confidential
