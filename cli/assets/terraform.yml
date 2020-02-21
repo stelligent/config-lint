@@ -706,12 +706,12 @@ rules:
         value: "(?i)HTTPS"
       - key: ssl_policy
         op: present
-      - key: ssl_policy
-        op: ne
-        value: ELBSecurityPolicy-2015-05
-      - key: ssl_policy
-        op: ne
-        value: ELBSecurityPolicy-TLS-1-0-2015-04
+      # - key: ssl_policy
+      #   op: ne
+      #   value: ELBSecurityPolicy-2015-05
+      # - key: ssl_policy
+      #   op: ne
+      #   value: ELBSecurityPolicy-TLS-1-0-2015-04
       - key: certificate_arn
         op: present
     tags:
