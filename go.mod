@@ -25,5 +25,5 @@ require (
 	golang.org/x/crypto v0.0.0-20200214034016-1d94cc7ab1c6 // indirect
 	golang.org/x/lint v0.0.0-20200130185559-910be7a94367 // indirect
 	golang.org/x/sys v0.0.0-20200217220822-9197077df867 // indirect
-	golang.org/x/tools v0.0.0-20200220051852-2086a0a691c0 // indirect
+	golang.org/x/tools v0.0.0-20200220224806-8a925fa4c0df // indirect
 )
