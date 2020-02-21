@@ -410,6 +410,7 @@ rules:
             - key: NotAction
               op: present
     tags:
+      - policy
       - s3
 
   - id: S3_NOT_PRINCIPAL
@@ -423,12 +424,13 @@ rules:
             - key: NotPrincipal
               op: present
     tags:
+      - policy
       - s3
 
   - id: S3_BUCKET_POLICY_WILDCARD_PRINCIPAL
-    message: Should not use wildcard principal in S3 bucket policy
+    message: Should not use wildcard Principal in an Allow S3 bucket policy
     resource: aws_s3_bucket_policy
-    severity: WARNING
+    severity: FAILURE
     assertions:
       - none:
           key: policy.Statement[]
@@ -440,12 +442,13 @@ rules:
               op: contains
               value: "*"
     tags:
+      - policy
       - s3
 
   - id: S3_BUCKET_POLICY_WILDCARD_ACTION
-    message: Should not use wildcard Principal in S3 bucket policy
+    message: Should not use wildcard Action in an Allow S3 bucket policy
     resource: aws_s3_bucket_policy
-    severity: WARNING
+    severity: FAILURE
     assertions:
       - none:
           key: policy.Statement[]
@@ -457,6 +460,7 @@ rules:
               op: contains
               value: "*"
     tags:
+      - policy
       - s3
 
   - id: S3_BUCKET_POLICY_ONLY_HTTPS
@@ -464,15 +468,16 @@ rules:
     resource: aws_s3_bucket_policy
     severity: FAILURE
     assertions:
-      - some:
+      - none:
           key: policy.Statement[]
           expressions:
             - key: Effect
               op: eq
               value: Allow
             - key: Condition.Bool."aws:SecureTransport"
-              op: is-true
+              op: is-false
     tags:
+      - policy
       - s3
 
   - id: S3_BUCKET_ENCRYPTION
@@ -487,9 +492,9 @@ rules:
       - s3
 
   - id: SNS_TOPIC_POLICY_WILDCARD_PRINCIPAL
-    message: Should not use wildcard Principal in SNS topic policy
+    message: Should not use wildcard Principal in an Allow SNS topic policy
     resource: aws_sns_topic_policy
-    severity: WARNING
+    severity: FAILURE
     assertions:
       - none:
           key: policy.Statement[]
@@ -502,6 +507,7 @@ rules:
               value: "*"
     tags:
       - sns
+      - policy
 
   - id: SNS_TOPIC_POLICY_NOT_ACTION
     message: Should not use NotAction in SNS topic policy
@@ -515,21 +521,26 @@ rules:
               op: present
     tags:
       - sns
+      - policy
 
   - id: SNS_TOPIC_POLICY_NOT_PRINCIPAL
     message: Should not use NotPrincipal in SNS topic policy
     resource: aws_sns_topic_policy
     severity: WARNING
     assertions:
-      - key: policy.Statement[].NotPrincipal
-        op: absent
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: NotPrincipal
+              op: present
     tags:
       - sns
+      - policy
 
   - id: SQS_QUEUE_POLICY_WILDCARD_PRINCIPAL
-    message: Should not use wildcard principal in SQS queue policy
+    message: Should not use wildcard Principal in an Allow SQS queue policy
     resource: aws_sqs_queue_policy
-    severity: WARNING
+    severity: FAILURE
     assertions:
       - none:
           key: policy.Statement[]
@@ -542,11 +553,12 @@ rules:
               value: "*"
     tags:
       - sqs
+      - policy
 
   - id: SQS_QUEUE_POLICY_WILDCARD_ACTION
     message: Should not use wildcard action in SQS queue policy
     resource: aws_sqs_queue_policy
-    severity: WARNING
+    severity: FAILURE
     assertions:
       - none:
           key: policy.Statement[]
@@ -559,6 +571,7 @@ rules:
               value: "*"
     tags:
       - sqs
+      - policy
 
   - id: SQS_QUEUE_POLICY_NOT_ACTION
     message: Should not use NotAction in SQS queue policy
@@ -572,6 +585,7 @@ rules:
               op: present
     tags:
       - sqs
+      - policy
 
   - id: SQS_QUEUE_POLICY_NOT_PRINCIPAL
     message: Should not use NotPrincipal in SQS queue policy
@@ -585,6 +599,7 @@ rules:
               op: present
     tags:
       - sqs
+      - policy
 
   - id: SQS_QUEUE_ENCRYPTION
     message: SQSQueue should use encryption
@@ -593,7 +608,7 @@ rules:
     assertions:
       - key: "@"
         op: has-properties
-        value: kms_master_key_id,kms_data_key_reuse_period_seconds
+        value: kms_master_key_id
     tags:
       - sqs
 
@@ -647,13 +662,13 @@ rules:
     severity: FAILURE
     assertions:
       - key: principal
-        op: ne
+        op: does-not-contain
         value: "*"
     tags:
       - lambda
 
   - id: LAMBDA_FUNCTION_ENCRYPTION
-    message: Lambda function should use encryption
+    message: Lambda function should specify kms_key_arn to use a non-default service key
     resource: aws_lambda_function
     severity: WARNING
     assertions:
@@ -691,14 +706,28 @@ rules:
         value: "(?i)HTTPS"
       - key: ssl_policy
         op: present
-      - key: ssl_policy
-        op: ne
-        value: ELBSecurityPolicy-2015-05
-      - key: ssl_policy
-        op: ne
-        value: ELBSecurityPolicy-TLS-1-0-2015-04
       - key: certificate_arn
         op: present
+    tags:
+      - alb
+      - lb
+
+  - id: ALB_LISTENER_SSL_POLICY
+    message: ALB listener shouldn't use outdated Predefined Security Policies
+    resources:
+      - aws_alb_listener
+      - aws_lb_listener
+    severity: FAILURE
+    assertions:
+      - key: ssl_policy
+        op: not-in
+        value: ELBSecurityPolicy-2015-05,ELBSecurityPolicy-2015-03,ELBSecurityPolicy-2015-02
+      - key: ssl_policy
+        op: not-in
+        value: ELBSecurityPolicy-2014-10,ELBSecurityPolicy-2014-01
+      - key: ssl_policy
+        op: not-in
+        value: ELBSecurityPolicy-2011-08
     tags:
       - alb
       - lb
@@ -712,6 +741,11 @@ rules:
     assertions:
       - key: access_logs
         op: present
+      - every:
+          key: access_logs
+          expressions:
+            - key: enabled
+              op: is-true
     tags:
       - alb
       - lb
@@ -726,8 +760,6 @@ rules:
          expressions:
            - key: encrypted
              op: is-true
-           - key: kms_key_id
-             op: present
     tags:
       - ami
 
@@ -736,11 +768,8 @@ rules:
     resource: aws_ami_copy
     severity: FAILURE
     assertions:
-      - and:
-        - key: encrypted
-          op: is-true
-        - key: kms_key_id
-          op: present
+      - key: encrypted
+        op: is-true
     tags:
       - ami
 
@@ -970,8 +999,11 @@ rules:
     resource: aws_s3_bucket_object
     severity: FAILURE
     assertions:
-      - key: kms_key_id
-        op: present
+      - or:
+        - key: kms_key_id
+          op: present
+        - key: server_side_encryption
+          op: present
     tags:
       - s3
 
@@ -1005,22 +1037,29 @@ rules:
     message: Environment for Lambda function should not include AWS secrets
     resource: aws_lambda_function
     severity: FAILURE
-    # this rule fails is it finds a regex match for both the key and the secret key
+    # this rule fails if it finds a regex match for either the Access Key ID and/or the Secret Access Key
     assertions:
       - not:
-        - and:
-          - some:
-              key: "environment[].variables[]|[0]|values(@)"
-              expressions:
+        - some:
+            key: "environment[].variables[]|[0]|values(@)"
+            expressions:
+              # Check if the string starts with any known 4 character ACCESS_KEY sequence
+              # and is 20 capital alpha-numeric characters long in total
+              - key: "@"
+                op: regex
+                value: "^(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}$"
+        - some:
+            key: "environment[].variables[]|[0]|values(@)"
+            expressions:
+              - and:
+                # Check if the string is exactly 40 characters long
                 - key: "@"
                   op: regex
-                  value: "^(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}$"
-          - some:
-              key: "environment[].variables[]|[0]|values(@)"
-              expressions:
+                  value: "^.{40}$"
+                # Check if the string contains only alpha-numeric-slash-plus characters with at least 1 / or +
                 - key: "@"
                   op: regex
-                  value: "^[A-Za-z0-9/\\+=]{40}$"
+                  value: "^[a-zA-Z0-9/+]+[/+]+[a-zA-Z0-9/+]+$"
     tags:
       - lambda
 
@@ -1039,6 +1078,7 @@ rules:
         value: "2012-10-17"
     tags:
       - iam
+      - policy
 
   - id: ASSUME_ROLEPOLICY_VERSION
     message: Version in IAM Policy should be 2012-10-17
@@ -1050,6 +1090,7 @@ rules:
         value: "2012-10-17"
     tags:
       - iam
+      - policy
 
   - id: BATCH_DEFINITION_PRIVILEGED
     message: Batch Job Definition Container Properties should not have Privileged set to true
