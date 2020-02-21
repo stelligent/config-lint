@@ -113,7 +113,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"aws/cloudtrail/kms_key_id.tf", "CLOUDTRAIL_ENCRYPTION", 1, 0},
 		{"aws/codebuild_project/project_encryption.tf", "CODEBUILD_PROJECT_ENCRYPTION", 0, 1},
 		{"aws/codebuild_project/artifact_encryption.tf", "CODEBUILD_PROJECT_ARTIFACT_ENCRYPTION", 0, 3},
-		{"aws/codepipeline.tf", "CODEPIPELINE_ENCRYPTION", 0, 0},
+		{"aws/codepipeline/encryption_key.tf", "CODEPIPELINE_ENCRYPTION", 1, 0},
 		{"aws/db.tf", "DB_INSTANCE_ENCRYPTION", 0, 1},
 		{"aws/db.tf", "RDS_CLUSTER_ENCYPTION", 0, 2},
 		{"aws/efs.tf", "EFS_ENCRYPTED", 0, 1},

@@ -824,15 +824,17 @@ rules:
       - codebuild
 
   - id: CODEPIPELINE_ENCRYPTION
-    message: CodePipeline should encrypt artifacts
+    message: CodePipeline should specify a non-default KMS Key to encrypt artifacts
     resource: aws_codepipeline
-    severity: FAILURE
+    severity: WARNING
     assertions:
       - every:
           key: artifact_store
           expressions:
             - key: encryption_key
               op: present
+    tags:
+      - codepipeline
 
   - id: DB_INSTANCE_ENCRYPTION
     message: DB Instance encryption
