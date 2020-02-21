@@ -6,23 +6,22 @@ files:
   - "*.tf"
   - "*.tfvars"
 rules:
-  #     resources:
-  #       - aws_db_instance
-  #       - aws_dynamodb_table
-  #       - aws_ebs_volume
-  #       - aws_efs_file_system
-  #       - aws_elasticsearch_domain
-  #       - aws_emr_cluste
-  #       - aws_kinesis_stream
-  #       - aws_rds_cluster
-  #       - aws_redshift_cluster
-  #       - aws_s3_bucket
-  #       - aws_sqs_queue
-  #     category: resource
 
-  - id: "[INFRA004] DATA_CLASS_TAG_VALID"
-    message: "all data sources must have the data_class tag present. see the AWS required tagging standard here: xxxx"
-    resource: aws_db_instance
+  - id: "TAG_VALID"
+    message: "test: all data sources must have the data_class tag present."
+    resources:
+      - aws_db_instance
+      - aws_dynamodb_table
+      - aws_ebs_volume
+      - aws_efs_file_system
+      - aws_elasticsearch_domain
+      - aws_emr_cluste
+      - aws_kinesis_stream
+      - aws_rds_cluster
+      - aws_redshift_cluster
+      - aws_s3_bucket
+      - aws_sqs_queue
+    category: resource
     severity: FAILURE
     assertions:
       - or:

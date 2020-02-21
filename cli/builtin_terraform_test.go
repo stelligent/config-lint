@@ -68,6 +68,7 @@ func getViolationsString(severity string, violations []assertion.Violation) stri
 func TestTerraformBuiltInRules(t *testing.T) {
   RunTestTerraformBuiltInRules(t, "tf")
 }
+
 func TestTerraform12BuiltInRules(t *testing.T) {
   RunTestTerraformBuiltInRules(t, "tf12")
 }
@@ -162,7 +163,6 @@ func RunTestTerraformBuiltInRules(t *testing.T, terraformVersion string) {
 		{"tf", "aws/redshift/cluster/publicly_accessible.tf", "REDSHIFT_CLUSTER_PUBLICLY_ACCESSIBLE", 0, 2},
 		{"tf", "aws/redshift/parameter_group/require_ssl.tf", "REDSHIFT_CLUSTER_PARAMETER_GROUP_REQUIRE_SSL", 2, 0},
 		{"both", "aws/ecs.tf", "ECS_ENVIRONMENT_SECRETS", 0, 1},
-		{"tf12", ".test/test.tf", "[INFRA004] DATA_CLASS_TAG_VALID", 0, 3}, // TODO REMOVE
 	}
 
   // Run test cases

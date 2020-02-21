@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+  "strconv"
 )
 
 func TestTerraformV12Linter(t *testing.T) {
@@ -195,6 +196,27 @@ func TestTerraform12ModuleFileName(t *testing.T) {
 	assert.Equal(t, "./testdata/resources/terraform_module.tf", resources[0].Filename)
 }
 
+// String build message for violations. Debug helper
+//  TODO move to class. remove copy pasted function in tt 12 test
+func getViolationsString(violations []assertion.Violation) string{
+  var violationsReported string
+  for count, v := range violations {
+    violationsReported += strconv.Itoa(count + 1) + ". Violation:"
+    violationsReported += "\n\tRule Message: " + v.RuleMessage
+    violationsReported += "\n\tRule Id: " + v.RuleID
+    violationsReported += "\n\tResource ID: " + v.ResourceID
+    violationsReported += "\n\tResource Type: " + v.ResourceType
+    violationsReported += "\n\tCategory: " + v.Category
+    violationsReported += "\n\tStatus: " + v.Status
+    violationsReported += "\n\tRule Message: " + v.RuleMessage
+    violationsReported += "\n\tAssertion Message: " + v.AssertionMessage
+    violationsReported += "\n\tFilename: " + v.Filename
+    violationsReported += "\n\tLine Number: " + strconv.Itoa(v.LineNumber)
+    violationsReported += "\n\tCreated At: " + v.CreatedAt + "\n"
+  }
+  return violationsReported
+}
+
 func TestTerraform12LinterCases(t *testing.T) {
 	testCases := map[string]terraformLinterTestCase{
 		"ParseError": {
@@ -353,6 +375,12 @@ func TestTerraform12LinterCases(t *testing.T) {
 			1,
 			"NO_SSH_ACCESS",
 		},
+		"TF12Tagging": {
+      "./testdata/resources/tagging.tf",
+			"./testdata/rules/tagging.yml",
+			5,
+			"TAG_VALID",
+		},
 	}
 	for name, tc := range testCases {
 		options := Options{
@@ -371,7 +399,8 @@ func TestTerraform12LinterCases(t *testing.T) {
 		}
 		if len(report.Violations) != tc.ExpectedViolationCount {
 			t.Errorf("%s returned %d violations, expecting %d", name, len(report.Violations), tc.ExpectedViolationCount)
-			t.Errorf("Violations: %v", report.Violations)
+      violationsReported := getViolationsString(report.Violations)
+			t.Errorf("\nViolations: %v", violationsReported)
 		}
 		if tc.ExpectedViolationRuleID != "" {
 			assertViolationByRuleID(name, tc.ExpectedViolationRuleID, report.Violations, t)
