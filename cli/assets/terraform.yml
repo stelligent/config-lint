@@ -768,11 +768,8 @@ rules:
     resource: aws_ami_copy
     severity: FAILURE
     assertions:
-      - and:
-        - key: encrypted
-          op: is-true
-        - key: kms_key_id
-          op: present
+      - key: encrypted
+        op: is-true
     tags:
       - ami
 

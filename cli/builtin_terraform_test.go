@@ -107,7 +107,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"aws/alb/access_logs_enabled.tf", "ALB_ACCESS_LOGS", 0, 3},
 		{"aws/lb/access_logs_enabled.tf", "ALB_ACCESS_LOGS", 0, 3},
 		{"aws/ami/ebs_block_device_encrypted.tf", "AMI_VOLUMES_ENCRYPTED", 0, 2},
-		{"aws/ami.tf", "AMI_COPY_SNAPSHOTS_ENCRYPTED", 0, 1},
+		{"aws/ami_copy/encrypted.tf", "AMI_COPY_SNAPSHOTS_ENCRYPTED", 0, 2},
 		{"aws/ec2.tf", "EBS_BLOCK_DEVICE_ENCRYPTED", 0, 0},
 		{"aws/ec2.tf", "EBS_VOLUME_ENCRYPTION", 0, 2},
 		{"aws/cloudtrail.tf", "CLOUDTRAIL_ENCRYPTION", 0, 1},
