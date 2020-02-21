@@ -98,7 +98,7 @@ func TestTerraformBuiltInRules(t *testing.T) {
 		{"aws/lambda_permission/action.tf", "LAMBDA_PERMISSION_INVOKE_ACTION", 1, 0},
 		{"aws/lambda_permission/principal_wildcard.tf", "LAMBDA_PERMISSION_WILDCARD_PRINCIPAL", 0, 2},
 		{"aws/lambda_function/encryption.tf", "LAMBDA_FUNCTION_ENCRYPTION", 1, 0},
-		{"aws/lambda.tf", "LAMBDA_ENVIRONMENT_SECRETS", 0, 1},
+		{"aws/lambda_function/environment_variables_aws_secrets.tf", "LAMBDA_ENVIRONMENT_SECRETS", 0, 3},
 		{"aws/waf.tf", "WAF_WEB_ACL", 0, 0},
 		{"aws/alb.tf", "ALB_LISTENER_HTTPS", 0, 3},
 		{"aws/alb.tf", "ALB_ACCESS_LOGS", 0, 0},
