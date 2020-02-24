@@ -916,8 +916,6 @@ rules:
       - and:
         - key: encrypted
           op: is-true
-        - key: kms_key_id
-          op: present
     tags:
       - efs
 
