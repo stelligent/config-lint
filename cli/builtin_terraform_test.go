@@ -172,6 +172,7 @@ func RunTestTerraformBuiltInRules(t *testing.T, terraformVersion string) {
 		{"tf", "aws/ecs_task_definition/secrets.tf", "ECS_ENVIRONMENT_SECRETS", 0, 3},
 		{"tf", "aws/emr_cluster/logging.tf", "AWS_EMR_CLUSTER_LOGGING", 1, 0},
 		{"tf", "aws/elasticache_replication_group/encryption_at_rest.tf", "ELASTICACHE_ENCRYPTION_REST", 0, 2},
+		{"tf", "aws/elasticache_replication_group/encryption_in_transit.tf", "ELASTICACHE_ENCRYPTION_TRANSIT", 0, 2},
 	}
 
 	// Run test cases
