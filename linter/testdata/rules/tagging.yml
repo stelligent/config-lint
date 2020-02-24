@@ -6,7 +6,7 @@ files:
   - "*.tf"
   - "*.tfvars"
 rules:
-
+  # This test rule is intended to recreate a reported bug, issue 112
   - id: "TAG_VALID"
     message: "test: all data sources must have the data_class tag present."
     resources:
@@ -38,16 +38,3 @@ rules:
           - key: tags
             op: contains
             value: TAGS
-
-            #     assertions:
-            #       - and:
-            #         # Must exist
-            #         - key: tags.data_class
-            #           op: present
-            #         # And must be valid
-            #         - every:
-            #             key: tags[]
-            #             expression:
-            #               key: data_class
-            #               op: in
-            #               value: public,internal,confidential

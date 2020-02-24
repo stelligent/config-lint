@@ -208,7 +208,6 @@ func getViolationsString(violations []assertion.Violation) string{
     violationsReported += "\n\tResource Type: " + v.ResourceType
     violationsReported += "\n\tCategory: " + v.Category
     violationsReported += "\n\tStatus: " + v.Status
-    violationsReported += "\n\tRule Message: " + v.RuleMessage
     violationsReported += "\n\tAssertion Message: " + v.AssertionMessage
     violationsReported += "\n\tFilename: " + v.Filename
     violationsReported += "\n\tLine Number: " + strconv.Itoa(v.LineNumber)
