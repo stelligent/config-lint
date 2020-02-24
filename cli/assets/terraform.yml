@@ -1031,25 +1031,29 @@ rules:
     message: Environment for ECS task definition should not include AWS secrets
     resource: aws_ecs_task_definition
     severity: FAILURE
+    # this rule fails if it finds a regex match for either the Access Key ID and/or the Secret Access Key
     assertions:
-      - none:
-          key: container_definitions[].environment[]
-          expressions:
-            - or:
+      - not:
+        - some:
+            key: container_definitions[].environment[]
+            expressions:
+              # Check if the string starts with any known 4 character ACCESS_KEY sequence
+              # and is 20 capital alpha-numeric characters long in total
+              - key: value
+                op: regex
+                value: "^(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}$"
+        - some:
+            key: container_definitions[].environment[]
+            expressions:
               - and:
-                - key: name
-                  op: contains
-                  value: KEY
+                # Check if the string is exactly 40 characters long
                 - key: value
                   op: regex
-                  value: "^(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}$"
-              - and:
-                - key: name
-                  op: contains
-                  value: SECRET
+                  value: "^.{40}$"
+                # Check if the string contains only alpha-numeric-slash-plus characters with at least 1 / or +
                 - key: value
                   op: regex
-                  value: "^[A-Za-z0-9/\\+=]{40}$"
+                  value: "^[a-zA-Z0-9/+]+[/+]+[a-zA-Z0-9/+]+$"
     tags:
       - ecs
 
