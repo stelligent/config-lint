@@ -170,6 +170,7 @@ func RunTestTerraformBuiltInRules(t *testing.T, terraformVersion string) {
 		{"tf", "aws/redshift/cluster/publicly_accessible.tf", "REDSHIFT_CLUSTER_PUBLICLY_ACCESSIBLE", 0, 2},
 		{"tf", "aws/redshift/parameter_group/require_ssl.tf", "REDSHIFT_CLUSTER_PARAMETER_GROUP_REQUIRE_SSL", 2, 0},
 		{"tf", "aws/ecs_task_definition/secrets.tf", "ECS_ENVIRONMENT_SECRETS", 0, 3},
+		{"tf", "aws/emr_cluster/logging.tf", "AWS_EMR_CLUSTER_LOGGING", 1, 0},
 	}
 
 	// Run test cases
