@@ -774,9 +774,9 @@ rules:
       - ami
 
   - id: CLOUDTRAIL_ENCRYPTION
-    message: CloudTrail should use encryption
+    message: CloudTrail should specify a non-default KMS Key
     resource: aws_cloudtrail
-    severity: FAILURE
+    severity: WARNING
     assertions:
       - key: kms_key_id
         op: present
@@ -824,38 +824,62 @@ rules:
       - codebuild
 
   - id: CODEPIPELINE_ENCRYPTION
-    message: CodePipeline should encrypt artifacts
+    message: CodePipeline should specify a non-default KMS Key to encrypt artifacts
     resource: aws_codepipeline
-    severity: FAILURE
+    severity: WARNING
     assertions:
       - every:
           key: artifact_store
           expressions:
             - key: encryption_key
               op: present
+    tags:
+      - codepipeline
 
   - id: DB_INSTANCE_ENCRYPTION
-    message: DB Instance encryption
+    message: DB Instance should have storage_encrypted set to True
     resource: aws_db_instance
+    severity: FAILURE
+    assertions:
+      - or:
+          - key: storage_encrypted
+            op: is-true
+          - key: replicate_source_db
+            op: present
+    tags:
+      - rds
+
+  - id: REPLICA_DB_INSTANCE_ENCRYPTION
+    message: Replica DB Instance should specify a KMS Key
+    resource: aws_db_instance
+    severity: WARNING
+    assertions:
+      - or:
+        - key: storage_encrypted
+          op: present
+        - and:
+          - key: replicate_source_db
+            op: present
+          - key: kms_key_id
+            op: present
+    tags:
+      - rds
+
+  - id: RDS_CLUSTER_ENCYPTION
+    message: RDS Cluster should have storage_encrypted set to True
+    resource: aws_rds_cluster
     severity: FAILURE
     assertions:
       - or:
         - key: storage_encrypted
           op: is-true
-        - key: kms_key_id
-          op: present
-    tags:
-      - rds
-
-  - id: RDS_CLUSTER_ENCYPTION
-    message: RDSCluster encryption
-    resource: aws_rds_cluster
-    severity: FAILURE
-    assertions:
-      - key: storage_encrypted
-        op: is-true
-      - key: kms_key_id
-        op: present
+        # serverless engine_mode has encryption enabled by default
+        - and:
+          - key: engine_mode
+            op: eq
+            value: serverless
+          - key: storage_encrypted
+            op: absent
     tags:
       - rds
 
