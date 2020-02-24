@@ -150,8 +150,9 @@ func RunTestTerraformBuiltInRules(t *testing.T, terraformVersion string) {
 		{"tf", "aws/lb/access_logs_enabled.tf", "ALB_ACCESS_LOGS", 0, 3},
 		{"tf", "aws/ami/ebs_block_device_encrypted.tf", "AMI_VOLUMES_ENCRYPTED", 0, 2},
 		{"tf", "aws/ami_copy/encrypted.tf", "AMI_COPY_SNAPSHOTS_ENCRYPTED", 0, 2},
-		{"both", "aws/ec2.tf", "EBS_BLOCK_DEVICE_ENCRYPTED", 0, 0},
-		{"both", "aws/ec2.tf", "EBS_VOLUME_ENCRYPTION", 0, 2},
+		{"tf", "aws/instance/ebs_block_device_encrypted.tf", "EBS_BLOCK_DEVICE_ENCRYPTED", 0, 2},
+		{"tf", "aws/ebs_volume/encrypted.tf", "EBS_VOLUME_ENCRYPTION", 0, 2},
+		{"tf", "aws/subnet/map_public_ip_on_launch.tf", "EC2_SUBNET_MAP_PUBLIC", 1, 0},
 		{"tf", "aws/cloudtrail/kms_key_id.tf", "CLOUDTRAIL_ENCRYPTION", 1, 0},
 		{"both", "aws/codebuild_project/project_encryption.tf", "CODEBUILD_PROJECT_ENCRYPTION", 0, 1},
 		{"both", "aws/codebuild_project/artifact_encryption.tf", "CODEBUILD_PROJECT_ARTIFACT_ENCRYPTION", 0, 3},
@@ -160,7 +161,7 @@ func RunTestTerraformBuiltInRules(t *testing.T, terraformVersion string) {
 		{"tf", "aws/db_instance/storage_encryption.tf", "REPLICA_DB_INSTANCE_ENCRYPTION", 1, 0},
 		{"tf", "aws/db_instance/publicly_accessible.tf", "RDS_PUBLIC_AVAILABILITY", 0, 1},
 		{"tf", "aws/rds_cluster/storage_encryption.tf", "RDS_CLUSTER_ENCYPTION", 0, 5},
-		{"both", "aws/efs.tf", "EFS_ENCRYPTED", 0, 1},
+		{"tf", "aws/efs_file_system/encrypted.tf", "EFS_ENCRYPTED", 0, 2},
 		{"both", "aws/kinesis.tf", "KINESIS_FIREHOSE_DELIVERY_STREAM_ENCRYPTION", 0, 1},
 		{"tf", "aws/redshift/cluster/encrypted.tf", "REDSHIFT_CLUSTER_ENCRYPTION", 0, 2},
 		{"tf", "aws/redshift/cluster/enhanced_vpc_routing.tf", "REDSHIFT_CLUSTER_ENHANCED_VPC_ROUTING", 2, 0},
@@ -168,7 +169,10 @@ func RunTestTerraformBuiltInRules(t *testing.T, terraformVersion string) {
 		{"tf", "aws/redshift/cluster/logging.tf", "REDSHIFT_CLUSTER_AUDIT_LOGGING", 2, 0},
 		{"tf", "aws/redshift/cluster/publicly_accessible.tf", "REDSHIFT_CLUSTER_PUBLICLY_ACCESSIBLE", 0, 2},
 		{"tf", "aws/redshift/parameter_group/require_ssl.tf", "REDSHIFT_CLUSTER_PARAMETER_GROUP_REQUIRE_SSL", 2, 0},
-		{"both", "aws/ecs.tf", "ECS_ENVIRONMENT_SECRETS", 0, 1},
+		{"tf", "aws/ecs_task_definition/secrets.tf", "ECS_ENVIRONMENT_SECRETS", 0, 3},
+		{"tf", "aws/emr_cluster/logging.tf", "AWS_EMR_CLUSTER_LOGGING", 1, 0},
+		{"tf", "aws/elasticache_replication_group/encryption_at_rest.tf", "ELASTICACHE_ENCRYPTION_REST", 0, 2},
+		{"tf", "aws/elasticache_replication_group/encryption_in_transit.tf", "ELASTICACHE_ENCRYPTION_TRANSIT", 0, 2},
 	}
 
 	// Run test cases
