@@ -1,0 +1,40 @@
+---
+version: 1
+description: Terraform v12 rules
+type: Terraform12
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+  # This test rule is intended to recreate a reported bug, issue 112
+  - id: "TAG_VALID"
+    message: "test: all data sources must have the data_class tag present."
+    resources:
+      - aws_db_instance
+      - aws_dynamodb_table
+      - aws_ebs_volume
+      - aws_efs_file_system
+      - aws_elasticsearch_domain
+      - aws_emr_cluste
+      - aws_kinesis_stream
+      - aws_rds_cluster
+      - aws_redshift_cluster
+      - aws_s3_bucket
+      - aws_sqs_queue
+    category: resource
+    severity: FAILURE
+    assertions:
+      - or:
+          - key: tags[0].data_class
+            op: in
+            value: public,internal,confidential
+          - key: tags.data_class
+            op: in
+            value: public,internal,confidential
+          # Fuzzy matching for nested modules that cant be resolved
+          - key: tags
+            op: contains
+            value: tags
+          - key: tags
+            op: contains
+            value: TAGS

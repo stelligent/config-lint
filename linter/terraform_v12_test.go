@@ -2,13 +2,15 @@ package linter
 
 import (
 	"fmt"
-	"github.com/stelligent/config-lint/assertion"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"testing"
+
+	"github.com/stelligent/config-lint/assertion"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestTerraformV12Linter(t *testing.T) {
@@ -195,6 +197,26 @@ func TestTerraform12ModuleFileName(t *testing.T) {
 	assert.Equal(t, "./testdata/resources/terraform_module.tf", resources[0].Filename)
 }
 
+// String build message for violations. Debug helper
+//  TODO move to class. remove copy pasted function in tt 12 test
+func getViolationsString(violations []assertion.Violation) string {
+	var violationsReported string
+	for count, v := range violations {
+		violationsReported += strconv.Itoa(count+1) + ". Violation:"
+		violationsReported += "\n\tRule Message: " + v.RuleMessage
+		violationsReported += "\n\tRule Id: " + v.RuleID
+		violationsReported += "\n\tResource ID: " + v.ResourceID
+		violationsReported += "\n\tResource Type: " + v.ResourceType
+		violationsReported += "\n\tCategory: " + v.Category
+		violationsReported += "\n\tStatus: " + v.Status
+		violationsReported += "\n\tAssertion Message: " + v.AssertionMessage
+		violationsReported += "\n\tFilename: " + v.Filename
+		violationsReported += "\n\tLine Number: " + strconv.Itoa(v.LineNumber)
+		violationsReported += "\n\tCreated At: " + v.CreatedAt + "\n"
+	}
+	return violationsReported
+}
+
 func TestTerraform12LinterCases(t *testing.T) {
 	testCases := map[string]terraformLinterTestCase{
 		"ParseError": {
@@ -353,6 +375,12 @@ func TestTerraform12LinterCases(t *testing.T) {
 			1,
 			"NO_SSH_ACCESS",
 		},
+		"TF12Tagging": {
+			"./testdata/resources/tagging.tf",
+			"./testdata/rules/tagging.yml",
+			5,
+			"TAG_VALID",
+		},
 	}
 	for name, tc := range testCases {
 		options := Options{
@@ -371,7 +399,8 @@ func TestTerraform12LinterCases(t *testing.T) {
 		}
 		if len(report.Violations) != tc.ExpectedViolationCount {
 			t.Errorf("%s returned %d violations, expecting %d", name, len(report.Violations), tc.ExpectedViolationCount)
-			t.Errorf("Violations: %v", report.Violations)
+			violationsReported := getViolationsString(report.Violations)
+			t.Errorf("\nViolations: %v", violationsReported)
 		}
 		if tc.ExpectedViolationRuleID != "" {
 			assertViolationByRuleID(name, tc.ExpectedViolationRuleID, report.Violations, t)
@@ -428,13 +457,21 @@ func TestTerraform12FileFunctionReferenceFileAbsoultePath(t *testing.T) {
 	var tempReferenceDir string
 
 	tempResourceDir, err = ioutil.TempDir(path, "tf_resource")
-	if err != nil{log.Fatal(err)}
+	if err != nil {
+		log.Fatal(err)
+	}
 	tempReferenceDir, err = ioutil.TempDir(tempResourceDir, "tf_reference")
-	if err != nil{log.Fatal(err)}
+	if err != nil {
+		log.Fatal(err)
+	}
 	tempResourceFile, err = ioutil.TempFile(tempResourceDir, "test_resource.tf")
-	if err != nil{log.Fatal(err)}
+	if err != nil {
+		log.Fatal(err)
+	}
 	tempReferenceFile, err = ioutil.TempFile(tempReferenceDir, "test_reference.txt")
-	if err != nil{log.Fatal(err)}
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// tempReferenceFile.Name() is returned as the Absolute Path of the temp reference file
 	tf12ResourceContent := fmt.Sprintf(`resource "aws_s3_bucket" "a_bucket" {
@@ -445,9 +482,13 @@ func TestTerraform12FileFunctionReferenceFileAbsoultePath(t *testing.T) {
 	tf12ReferenceContent := (`example
 `)
 	err = ioutil.WriteFile(tempResourceFile.Name(), []byte(tf12ResourceContent), 0644)
-	if err != nil{log.Fatal(err)}
+	if err != nil {
+		log.Fatal(err)
+	}
 	err = ioutil.WriteFile(tempReferenceFile.Name(), []byte(tf12ReferenceContent), 0644)
-	if err != nil{log.Fatal(err)}
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	resources := loadResources12ToTest(t, tempResourceFile.Name())
 	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
