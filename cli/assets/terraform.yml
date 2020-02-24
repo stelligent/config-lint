@@ -904,8 +904,6 @@ rules:
     assertions:
       - key: encrypted
         op: is-true
-      - key: kms_key_id
-        op: present
     tags:
       - ec2
       - ebs

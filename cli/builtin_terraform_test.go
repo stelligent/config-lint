@@ -151,7 +151,7 @@ func RunTestTerraformBuiltInRules(t *testing.T, terraformVersion string) {
 		{"tf", "aws/ami/ebs_block_device_encrypted.tf", "AMI_VOLUMES_ENCRYPTED", 0, 2},
 		{"tf", "aws/ami_copy/encrypted.tf", "AMI_COPY_SNAPSHOTS_ENCRYPTED", 0, 2},
 		{"tf", "aws/instance/ebs_block_device_encrypted.tf", "EBS_BLOCK_DEVICE_ENCRYPTED", 0, 2},
-		{"both", "aws/ec2.tf", "EBS_VOLUME_ENCRYPTION", 0, 2},
+		{"tf", "aws/ebs_volume/encrypted.tf", "EBS_VOLUME_ENCRYPTION", 0, 2},
 		{"tf", "aws/cloudtrail/kms_key_id.tf", "CLOUDTRAIL_ENCRYPTION", 1, 0},
 		{"both", "aws/codebuild_project/project_encryption.tf", "CODEBUILD_PROJECT_ENCRYPTION", 0, 1},
 		{"both", "aws/codebuild_project/artifact_encryption.tf", "CODEBUILD_PROJECT_ARTIFACT_ENCRYPTION", 0, 3},
