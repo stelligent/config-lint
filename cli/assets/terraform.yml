@@ -953,10 +953,21 @@ rules:
     tags:
       - firehose
 
+  - id: KINESIS_STREAM_ENCRYPTION
+    message: Kinesis streams should specify the encryption type as KMS
+    resource: aws_kinesis_stream
+    severity: FAILURE
+    assertions:
+      - key: encryption_type
+        op: eq
+        value: KMS
+    tags:
+      - kinesis
+
   - id: KINESIS_STREAM_KMS
     message: Kinesis streams should be associated with a kms key
     resource: aws_kinesis_stream
-    severity: FAILURE
+    severity: WARNING
     assertions:
       - key: kms_key_id
         op: present
