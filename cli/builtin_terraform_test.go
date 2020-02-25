@@ -180,6 +180,7 @@ func RunTestTerraformBuiltInRules(t *testing.T, terraformVersion string) {
 		{"tf", "aws/dms_endpoint/kms_key.tf", "AWS_DMS_ENDPOINT_ENCRYPTION", 1, 0},
 		{"tf", "aws/kms_key/rotation.tf", "AWS_KMS_KEY_ROTATION", 2, 0},
 		{"tf", "aws/sagemaker_endpoint_configuration/kms_key.tf", "SAGEMAKER_ENDPOINT_ENCRYPTION", 1, 0},
+		{"tf", "aws/sagemaker_notebook_instance/kms_key.tf", "SAGEMAKER_NOTEBOOK_ENCRYPTION", 1, 0},
 	}
 
 	// Run test cases
