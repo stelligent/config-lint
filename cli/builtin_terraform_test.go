@@ -176,6 +176,7 @@ func RunTestTerraformBuiltInRules(t *testing.T, terraformVersion string) {
 		{"tf", "aws/elasticache_replication_group/encryption_at_rest.tf", "ELASTICACHE_ENCRYPTION_REST", 0, 2},
 		{"tf", "aws/elasticache_replication_group/encryption_in_transit.tf", "ELASTICACHE_ENCRYPTION_TRANSIT", 0, 2},
 		{"tf", "aws/batch_job_definition/container_properties_privileged.tf", "BATCH_DEFINITION_PRIVILEGED", 1, 0},
+		{"tf", "aws/neptune_cluster/encryption.tf", "NEPTUNE_DB_ENCRYPTION", 0, 2},
 	}
 
 	// Run test cases
