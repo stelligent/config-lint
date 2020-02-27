@@ -6,7 +6,7 @@ resource "aws_ami_copy" "encrypted_set_to_true" {
   encrypted         = true
 }
 
-# Pass
+# Fail
 resource "aws_ami_copy" "encrypted_set_to_false" {
   name              = "foo"
   source_ami_id     = "ami-xxxxxxxx"
@@ -14,7 +14,7 @@ resource "aws_ami_copy" "encrypted_set_to_false" {
   encrypted         = false
 }
 
-# Pass
+# Fail
 resource "aws_ami_copy" "encrypted_not_set" {
   name              = "foo"
   source_ami_id     = "ami-xxxxxxxx"
