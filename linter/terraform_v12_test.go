@@ -92,7 +92,7 @@ func TestTerraform12VariableWithNoDefault(t *testing.T) {
 	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
 	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
 	tags := getResourceTags(resources[0])
-	assert.Equal(t, "", tags["department"], "Unexpected value for variable with no default")
+	assert.Equal(t, "UNDEFINED", tags["department"], "Unexpected value for variable with no default")
 }
 
 func TestTerraform12FunctionCall(t *testing.T) {
