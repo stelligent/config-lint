@@ -1,12 +1,13 @@
 package linter
 
 import (
+	"strconv"
+	"strings"
+
 	"github.com/hashicorp/hcl/v2"
 	"github.com/stelligent/config-lint/assertion"
 	"github.com/stelligent/config-lint/linter/tf12parser"
 	"github.com/zclconf/go-cty/cty"
-	"strconv"
-	"strings"
 )
 
 type (
@@ -198,9 +199,11 @@ func setValue(m map[string]interface{}, name string, value string) {
 }
 
 func ctyValueToString(value cty.Value) string {
-	// In case the value is nil but the type is not necessarily <nil>, return an empty string
+	// In case the value is nil but the type is not necessarily <nil>, ~~return an empty string~~
+	// Update: return an actual string.
+	// We cannot evaluate tf generated values in tf12, such as referenced arn, but we still want to be able to check for it
 	if value.IsNull() || !value.IsKnown() {
-		return ""
+		return "UNDEFINED"
 	} else {
 		switch value.Type() {
 		case cty.NilType:
