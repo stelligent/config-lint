@@ -19,10 +19,6 @@ resource "aws_lb_target_group" "test_lb_target_group" {
   vpc_id = aws_vpc.test_vpc.id
 }
 
-variable "test_foo" {
-  default = "foobar"
-}
-
 # Pass
 resource "aws_alb_listener" "listener_secure_https_set" {
   load_balancer_arn = aws_lb.test_lb.arn
@@ -30,7 +26,6 @@ resource "aws_alb_listener" "listener_secure_https_set" {
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
   certificate_arn   = aws_acm_certificate.test_cert.arn
-  # certificate_arn   = var.test_foo 
 
   default_action {
     type             = "forward"
