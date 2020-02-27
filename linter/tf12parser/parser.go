@@ -158,6 +158,7 @@ func (parser *Parser) buildEvaluationContext(blocks hcl.Blocks, path string, inp
 		ctx.Variables["local"] = parser.getValuesByBlockType(ctx, blocks, "locals", nil)
 		ctx.Variables["provider"] = parser.getValuesByBlockType(ctx, blocks, "provider", nil)
 		resources := parser.getValuesByBlockType(ctx, blocks, "resource", nil)
+
 		for key, resource := range resources.AsValueMap() {
 			ctx.Variables[key] = resource
 		}

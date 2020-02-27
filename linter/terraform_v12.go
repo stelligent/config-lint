@@ -198,9 +198,11 @@ func setValue(m map[string]interface{}, name string, value string) {
 }
 
 func ctyValueToString(value cty.Value) string {
-	// In case the value is nil but the type is not necessarily <nil>, return an empty string
+	// In case the value is nil but the type is not necessarily <nil>, ~~return an empty string~~
+  // Update: return an actual string. 
+  // We cannot evaluate tf generated values in tf12, such as referenced arn, but we still want to be able to check for it
 	if value.IsNull() || !value.IsKnown() {
-		return ""
+		return "UNDEFINED"
 	} else {
 		switch value.Type() {
 		case cty.NilType:
@@ -225,7 +227,24 @@ func ctyValueToString(value cty.Value) string {
 	}
 }
 
+// // PostLoad resolves variable expressions
+// func (l Terraform12ResourceLoader) PostLoad(inputResources FileResources) ([]assertion.Resource, error) {
+// 	return inputResources.Resources, nil
+// }
+
 // PostLoad resolves variable expressions
-func (l Terraform12ResourceLoader) PostLoad(inputResources FileResources) ([]assertion.Resource, error) {
-	return inputResources.Resources, nil
+func (l Terraform12ResourceLoader) PostLoad(fr FileResources) ([]assertion.Resource, error) {
+	for _, resource := range fr.Resources {
+		resource.Properties = replaceVariables(resource.Properties, fr.Variables)
+	}
+	for _, resource := range fr.Resources {
+		properties, err := parseJSONDocuments(resource.Properties)
+		if err != nil {
+			return fr.Resources, err
+		}
+		resource.Properties = properties
+	}
+
+	return fr.Resources, nil
 }
+

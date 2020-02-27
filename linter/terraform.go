@@ -278,6 +278,7 @@ func (l TerraformResourceLoader) PostLoad(fr FileResources) ([]assertion.Resourc
 		}
 		resource.Properties = properties
 	}
+
 	return fr.Resources, nil
 }
 

@@ -52,7 +52,8 @@ func (fl FileLinter) Validate(ruleSet assertion.RuleSet, options Options) (asser
 			//TODO: It would probably be nice if we mapped this back to the correct file
 			loadViolations = append(loadViolations, makeLoadViolation(fl.Filenames[0], err))
 		}
-		resourcesToValidate = result.Resources
+    // resourcesToValidate = result.Resources
+		resourcesToValidate, err = fl.Loader.PostLoad(FileResources{Resources: result.Resources, Variables: variables})
 		filesScanned = append(filesScanned, fl.Filenames...)
 	} else {
 		filesScanned, loadViolations, resources, variables = iterateFiles(fl, ruleSet, filesScanned, loadViolations, resources, variables)

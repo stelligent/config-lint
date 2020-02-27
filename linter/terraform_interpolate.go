@@ -392,7 +392,7 @@ func interpolate(s string, variables []Variable) interface{} {
 		// no interpolation to be done
 		return s
 	}
-	assertion.Debugf("interpolate: %s\n", s)
+	assertion.Debugf("interpolate: %v\n", s)
 	config := &hil.EvalConfig{
 		GlobalScope: &ast.BasicScope{
 			VarMap:  makeVarMap(variables),
