@@ -24,7 +24,7 @@ func TestTerraform12BuiltInRules(t *testing.T) {
 		{"aws/alb/access_logs_enabled.tf", "ALB_ACCESS_LOGS", 0, 3},
 		{"aws/ami_copy/encrypted.tf", "AMI_COPY_SNAPSHOTS_ENCRYPTED", 0, 2},
 		{"aws/ami/ebs_block_device_encrypted.tf", "AMI_VOLUMES_ENCRYPTED", 0, 2},
-		// {"aws/batch_job_definition/container_properties_privileged.tf", "BATCH_DEFINITION_PRIVILEGED", 1, 0},
+		{"aws/batch_job_definition/container_properties_privileged.tf", "BATCH_DEFINITION_PRIVILEGED", 1, 0},
 		// {"aws/cloudfront_distribution/custom_origin_config.tf", "CLOUDFRONT_DISTRIBUTION_ORIGIN_POLICY", 0, 2},
 		// {"aws/cloudfront_distribution/logging_config.tf", "CLOUDFRONT_DISTRIBUTION_LOGGING", 0, 1},
 		// {"aws/cloudfront_distribution/viewer_protocol_policy.tf", "CLOUDFRONT_DISTRIBUTION_PROTOCOL", 0, 2},
