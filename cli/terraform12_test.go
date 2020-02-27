@@ -20,8 +20,8 @@ func TestTerraform12BuiltInRules(t *testing.T) {
 	testCases := []BuiltInTestCase{
 		// AWS
 		{"aws/alb_listener/https.tf", "ALB_LISTENER_HTTPS", 0, 4},
-		// {"aws/alb_listener/ssl_policy.tf", "ALB_LISTENER_SSL_POLICY", 0, 6},
-		// {"aws/alb/access_logs_enabled.tf", "ALB_ACCESS_LOGS", 0, 3},
+		{"aws/alb_listener/ssl_policy.tf", "ALB_LISTENER_SSL_POLICY", 0, 6},
+		{"aws/alb/access_logs_enabled.tf", "ALB_ACCESS_LOGS", 0, 3},
 		// {"aws/ami_copy/encrypted.tf", "AMI_COPY_SNAPSHOTS_ENCRYPTED", 0, 2},
 		// {"aws/ami/ebs_block_device_encrypted.tf", "AMI_VOLUMES_ENCRYPTED", 0, 2},
 		// {"aws/batch_job_definition/container_properties_privileged.tf", "BATCH_DEFINITION_PRIVILEGED", 1, 0},
