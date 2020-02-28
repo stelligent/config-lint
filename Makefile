@@ -66,7 +66,6 @@ $(BUILD_DIR)/config-lint: $(CLI_FILES)
 	@echo "=== building config-lint - $@ ==="
 	mkdir -p $(BUILD_DIR)
 	GOOS=$(GOOS) GOARCH=$(GOARCH) go build -ldflags=$(GOLDFLAGS) -o $(BUILD_DIR)/config-lint cli/*.go
-	GOOS=windows GOARCH=amd64     go build -ldflags=$(GOLDFLAGS) -o $(BUILD_DIR)/config-lint.exe cli/*.go
 
 build: gen $(BUILD_DIR)/config-lint
 
