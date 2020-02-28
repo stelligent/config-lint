@@ -28,7 +28,7 @@ func TestTerraform12BuiltInRules(t *testing.T) {
 		{"aws/cloudfront_distribution/custom_origin_config.tf", "CLOUDFRONT_DISTRIBUTION_ORIGIN_POLICY", 0, 2},
 		{"aws/cloudfront_distribution/logging_config.tf", "CLOUDFRONT_DISTRIBUTION_LOGGING", 0, 1},
 		{"aws/cloudfront_distribution/viewer_protocol_policy.tf", "CLOUDFRONT_DISTRIBUTION_PROTOCOL", 0, 2},
-		// {"aws/cloudtrail/kms_key_id.tf", "CLOUDTRAIL_ENCRYPTION", 1, 0},
+		{"aws/cloudtrail/kms_key_id.tf", "CLOUDTRAIL_ENCRYPTION", 1, 0},
 		// {"aws/codebuild_project/artifact_encryption.tf", "CODEBUILD_PROJECT_ARTIFACT_ENCRYPTION", 0, 3},
 		// {"aws/codebuild_project/project_encryption.tf", "CODEBUILD_PROJECT_ENCRYPTION", 0, 1},
 		// {"aws/codepipeline/encryption_key.tf", "CODEPIPELINE_ENCRYPTION", 1, 0},
