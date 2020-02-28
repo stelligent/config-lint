@@ -257,6 +257,8 @@ To run the Terraform builtin rules tests:
 make testtf
 ```
 
+More information about how to create and run tests can be found [here](docs/tests.md).
+
 ## Linting
 To lint all files (using golint):
 ```
