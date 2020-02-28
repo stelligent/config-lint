@@ -35,7 +35,7 @@ func TestTerraform12BuiltInRules(t *testing.T) {
 		{"aws/db_instance/publicly_accessible.tf", "RDS_PUBLIC_AVAILABILITY", 0, 1},
 		{"aws/db_instance/storage_encryption.tf", "DB_INSTANCE_ENCRYPTION", 0, 2},
 		{"aws/db_instance/storage_encryption.tf", "REPLICA_DB_INSTANCE_ENCRYPTION", 2, 0},
-		// {"aws/dms_endpoint/kms_key.tf", "AWS_DMS_ENDPOINT_ENCRYPTION", 1, 0},
+		{"aws/dms_endpoint/kms_key.tf", "AWS_DMS_ENDPOINT_ENCRYPTION", 1, 0},
 		// {"aws/ebs_volume/encrypted.tf", "EBS_VOLUME_ENCRYPTION", 0, 2},
 		// {"aws/ecs_task_definition/secrets.tf", "ECS_ENVIRONMENT_SECRETS", 0, 3},
 		// {"aws/efs_file_system/encrypted.tf", "EFS_ENCRYPTED", 0, 2},
