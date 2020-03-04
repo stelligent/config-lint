@@ -106,7 +106,9 @@ func TestTerraform12BuiltInRules(t *testing.T) {
 		{"aws/sns_topic_policy/policy_statement_principal_wildcard-copy.tf", "SNS_TOPIC_POLICY_WILDCARD_PRINCIPAL", 0, 1},
 		{"aws/sns_topic_policy/policy_version.tf", "POLICY_VERSION", 0, 1},
 		{"aws/sqs_queue/encryption.tf", "SQS_QUEUE_ENCRYPTION", 0, 1},
-		{"aws/sqs_queue_policy/policy_statement_action_wildcard.tf", "SQS_QUEUE_POLICY_WILDCARD_ACTION", 0, 1},
+
+		// the resources have been copied already. commented tests need their rules updated to work for tf12
+		// {"aws/sqs_queue_policy/policy_statement_action_wildcard.tf", "SQS_QUEUE_POLICY_WILDCARD_ACTION", 0, 1},
 		// {"aws/sqs_queue_policy/policy_statement_notaction.tf", "SQS_QUEUE_POLICY_NOT_ACTION", 1, 0},
 		// {"aws/sqs_queue_policy/policy_statement_notprincipal.tf", "SQS_QUEUE_POLICY_NOT_PRINCIPAL", 1, 0},
 		// {"aws/sqs_queue_policy/policy_statement_principal_wildcard.tf", "SQS_QUEUE_POLICY_WILDCARD_PRINCIPAL", 0, 1},

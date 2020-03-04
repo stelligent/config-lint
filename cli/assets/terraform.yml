@@ -586,16 +586,15 @@ rules:
     resource: aws_sqs_queue_policy
     severity: FAILURE
     assertions:
-      - not:
-        - some:
-            key: policy.Statement[]
-            expressions:
-              - key: Effect
-                op: eq
-                value: Allow
-              - key: Action
-                op: contains
-                value: "*"
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: Effect
+              op: eq
+              value: Allow
+            - key: Action
+              op: contains
+              value: "*"
     tags:
       - sqs
       - policy
