@@ -96,6 +96,7 @@ func ResolveRule(rule Rule, valueSource ValueSource) (Rule, []Violation) {
 	for _, assertion := range rule.Assertions {
 		value, err := valueSource.GetValue(assertion)
 		if err != nil {
+			Debugf("ResolveRule error: %s\n", err.Error())
 			violations = append(violations, Violation{
 				Category:         "load",
 				RuleID:           "RULE_RESOLVE",
