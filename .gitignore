@@ -5,6 +5,7 @@ vendor/
 .vscode/**/*
 .release/
 .idea/
+.DS_Store
 .test/
 */coverage.out
 */*packr.go
