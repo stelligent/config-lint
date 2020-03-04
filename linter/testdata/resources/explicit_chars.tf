@@ -1,6 +1,6 @@
 # Fail
-resource "aws_s3_bucket_policy" "b" {
-  bucket = "${aws_s3_bucket.b.id}"
+resource "aws_s3_bucket_policy" "a" {
+  bucket = aws_s3_bucket.a.id
   policy =<<POLICY
 {
     "Version": "2018-08-09",
@@ -23,7 +23,7 @@ POLICY
 
 # Pass
 resource "aws_s3_bucket_policy" "b" {
-  bucket = "${aws_s3_bucket.b.id}"
+  bucket = aws_s3_bucket.b.id
   policy =<<POLICY
 {
     "Version": "2018-08-09",

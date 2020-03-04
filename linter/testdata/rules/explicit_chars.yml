@@ -11,9 +11,9 @@ rules:
     severity: FAILURE
     category: resource
     assertions:
-      - every:
-           key: policy.Statement.Condition.Bool
-           expressions:
-             - key: aws:SecureTransport
-               op: eq
-               value: "false"
+      - some:
+          key: policy.Statement[]
+          expressions:
+            - key: Condition.Bool."aws:SecureTransport"
+              op: eq
+              value: false

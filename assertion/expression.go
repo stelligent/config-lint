@@ -3,10 +3,11 @@ package assertion
 func searchAndMatch(expression Expression, resource Resource) (MatchResult, error) {
 	v, err := SearchData(expression.Key, resource.Properties)
 	if err != nil {
+		Debugf("Error!")
 		return matchError(err)
 	}
 	match, err := isMatch(v, expression)
-	Debugf("Key: %s Output: %v Looking for %v %v\n", expression.Key, v, expression.Op, expression.Value)
+	Debugf("Key: %s Output: %v Looking for %v %v\n", expression.Key, v, expression.Op, expression.Value) // TODO remove
 	Debugf("ResourceID: %s Type: %s %v\n",
 		resource.ID,
 		resource.Type,
@@ -228,6 +229,7 @@ func CheckExpression(rule Rule, expression Expression, resource Resource) (Resul
 		Message: "",
 	}
 	match, err := booleanExpression(expression, resource)
+	DebugJSON("err:", err)
 	if err != nil {
 		result.Status = "FAILURE"
 		result.Message = err.Error()

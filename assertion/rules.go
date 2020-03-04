@@ -85,6 +85,9 @@ func ResolveRules(rules []Rule, valueSource ValueSource) ([]Rule, []Violation) {
 		resolvedRules = append(resolvedRules, r)
 		violations = append(violations, vs...)
 	}
+
+	Debugf("rules: %s\n", resolvedRules)
+	Debugf("violations: %v\n", violations)
 	return resolvedRules, violations
 }
 
@@ -118,6 +121,7 @@ func ResolveRule(rule Rule, valueSource ValueSource) (Rule, []Violation) {
 
 // CheckRule returns a list of violations for a single Rule applied to a single Resource
 func CheckRule(rule Rule, resource Resource, e ExternalRuleInvoker) (string, []Violation, error) {
+	DebugJSON("resource:::: ", resource)
 	returnStatus := "OK"
 	violations := make([]Violation, 0)
 	if ExcludeResource(rule, resource) {
@@ -135,8 +139,9 @@ func CheckRule(rule Rule, resource Resource, e ExternalRuleInvoker) (string, []V
 		return returnStatus, violations, nil
 	}
 	for _, ruleAssertion := range rule.Assertions {
-        Debugf("Checking category: %s, type: %s, Id: %s\n", resource.Category, resource.Type, resource.ID)
+		Debugf("Checking Category: %s, Type: %s, Id: %s\n", resource.Category, resource.Type, resource.ID)
 		expressionResult, err := CheckExpression(rule, ruleAssertion, resource)
+		Debugf("expression result %v\n", expressionResult)
 		if err != nil {
 			return "FAILURE", violations, err
 		}
