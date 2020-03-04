@@ -1,0 +1,19 @@
+version: 1
+description: Explicit string check test
+type: Terraform12
+files:
+  - "*.tf"
+rules:
+  - id: "CHECK_FOR_COLON"
+    message: "Testing for key with a colon"
+    resources:
+      - aws_s3_bucket_policy
+    severity: FAILURE
+    category: resource
+    assertions:
+      - some:
+          key: policy.Statement[]
+          expressions:
+            - key: Condition.Bool."aws:SecureTransport"
+              op: eq
+              value: false
