@@ -381,7 +381,14 @@ func TestTerraform12LinterCases(t *testing.T) {
 			5,
 			"TAG_VALID",
 		},
+		"TF12ExplicitChar": {
+			"./testdata/resources/explicit_chars.tf",
+			"./testdata/rules/explicit_chars.yml",
+			1,
+			"CHECK_FOR_COLON",
+		},
 	}
+
 	for name, tc := range testCases {
 		options := Options{
 			Tags:    []string{},

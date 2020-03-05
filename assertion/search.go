@@ -9,5 +9,6 @@ func SearchData(expression string, data interface{}) (interface{}, error) {
 	if len(expression) == 0 {
 		return "null", nil
 	}
+
 	return jmespath.Search(expression, data)
 }

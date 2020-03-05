@@ -2,9 +2,19 @@
 # Make sure to check the documentation at http://goreleaser.com
 
 builds:
-- main: ./cli
+-
+  main: ./cli
   env:
-  - CGO_ENABLED=0
+    - CGO_ENABLED=0
+  goos:
+   - linux
+   - darwin
+   - windows
+  goarch:
+    - 386
+    - amd64
+    - arm
+    - arm64
 archives:
   - id: archive
     replacements:
