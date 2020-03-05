@@ -47,7 +47,7 @@ For example:
 ```
 docker run -v $(pwd):/foobar stelligent/config-lint -rules /foobar/path/to/my/rules/kubernetes.yml /foobar/path/to/my/configs
 ```
-If you don't have your own set of custom rules that you want to run against your Kubernetes file then feel free to copy or download the example set that is listed here within the project.
+If you don't have your own set of custom rules that you want to run against your Kubernetes file then feel free to copy or download the example set from `example-files/rules/kubernetes.yml`.
 
 ## Manually
 
