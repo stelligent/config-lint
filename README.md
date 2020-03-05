@@ -45,7 +45,7 @@ If wishing to test Kubernetes configuration, you will need to put the example Ku
 
 For example:
 ```
-docker run -v $(pwd):/foobar stelligent/config-lint -rules /foobar/path/to/my/rules/kubernetes.yml /foobar/path/to/my/configs/configmap.yaml
+docker run -v $(pwd):/foobar stelligent/config-lint -rules /foobar/path/to/my/rules/kubernetes.yml /foobar/path/to/my/configs
 ```
 If you don't have your own set of custom rules that you want to run against your Kubernetes file then feel free to copy or download the example set that is listed here within the project.
 
@@ -310,4 +310,3 @@ written in Terraform v0.12 syntax. Where should be the first place to check for 
            op: eq
            value: ami-f2d3638a
     ```
-
