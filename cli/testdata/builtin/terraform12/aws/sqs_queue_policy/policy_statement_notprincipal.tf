@@ -3,6 +3,7 @@ resource "aws_sqs_queue" "test_queue" {
   name                              = "test_queue"
   kms_master_key_id                 = "alias/foo/bar"
   kms_data_key_reuse_period_seconds = 60
+  arn                               = "mocked_arn"
 }
 
 # Pass
@@ -21,7 +22,7 @@ resource "aws_sqs_queue_policy" "policy_statement_without_notprincipal" {
           "arn:aws:iam::1234567890:user/foo"
         ]
       },
-      "Resource": ${aws_sqs_queue.test_queue.arn}
+      "Resource": "${aws_sqs_queue.test_queue.arn}"
     }
   ]
 }
@@ -44,7 +45,7 @@ resource "aws_sqs_queue_policy" "policy_statement_with_notprincipal" {
           "arn:aws:iam::1234567890:user/foo"
         ]
       },
-      "Resource": ${aws_sqs_queue.test_queue.arn}
+      "Resource": "${aws_sqs_queue.test_queue.arn}"
     }
   ]
 }

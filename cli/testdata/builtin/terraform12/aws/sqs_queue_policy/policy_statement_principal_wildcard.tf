@@ -3,6 +3,7 @@ resource "aws_sqs_queue" "test_queue" {
   name                              = "test_queue"
   kms_master_key_id                 = "alias/foo/bar"
   kms_data_key_reuse_period_seconds = 60
+  arn                               = "mocked_arn"
 }
 
 # Pass

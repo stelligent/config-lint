@@ -1,6 +1,7 @@
 ## Setup Helper
 resource "aws_sqs_queue" "test_queue" {
   name = "examplequeue"
+  arn = "mocked_arn"
 }
 
 # Pass
