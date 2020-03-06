@@ -3,6 +3,7 @@ description: Rules for Kubernetes spec files
 type: Kubernetes
 files:
   - "*.yml"
+  - "*.yaml"
 rules:
 
   - id: ALLOW_KIND
@@ -12,7 +13,7 @@ rules:
     assertions:
       - key: kind
         op: in
-        value: Pod,Policy,ServiceAccount,NetworkPolicy
+        value: Pod,Policy,ServiceAccount,NetworkPolicy,Service,Deployment,ConfigMap,Ingress,PersistentVolumeClaim,Job,Secret,StatefulSet
     tags:
       - kind
 
@@ -26,6 +27,17 @@ rules:
     tags:
       - pod
 
+  - id: DEPLOYMENT_CONTAINERS
+    severity: FAILURE
+    message: Deployment must include containers
+    resource: Deployment
+    assertions:
+      - key: spec.template.spec.containers
+        op: present
+    tags:
+      - deployment
+      - container
+
   - id: POD_SERVICE_ACCOUNT
     severity: FAILURE
     message: Pod should use a service account
@@ -38,7 +50,7 @@ rules:
 
   - id: POD_SECURITY_CONTEXT
     severity: FAILURE
-    message: Pod should set securityContent
+    message: Pod should set securityContexts
     resource: Pod
     assertions:
       - key: spec.securityContext.runAsNonRoot
@@ -49,6 +61,58 @@ rules:
         value: true
     tags:
       - pod
+      - security
+      
+  - id: DEPLOYMENT_POD_MUSTNONROOT_SECURITY_CONTEXT
+    severity: NON_COMPLIANT
+    message: Deployment pod should set runAsNonRoot securityContext
+    resource: Deployment
+    assertions:
+      - key: spec.template.spec.securityContext.runAsNonRoot
+        op: eq
+        value: true
+    tags:
+      - deployment
+      - security
+
+  - id: DEPLOYMENT_POD_READONLYFS_SECURITY_CONTEXT
+    severity: NON_COMPLIANT
+    message: Deployment pod should set readOnlyRootFilesystem securityContext
+    resource: Deployment
+    assertions:
+      - key: spec.template.spec.securityContext.readOnlyRootFilesystem
+        op: eq
+        value: true
+    tags:
+      - deployment
+      - security
+
+  - id: DEPLOYMENT_CONTAINER_MUSTNONROOT_SECURITY_CONTEXT
+    severity: NON_COMPLIANT
+    message: Deployment containers should set runAsNonRoot securityContext
+    resource: Deployment
+    assertions:
+      - every:
+          key: spec.template.spec.containers
+          expressions:
+            - key: securityContext.runAsNonRoot
+              op: is-true
+    tags:
+      - deployment
+      - security
+
+  - id: DEPLOYMENT_CONTAINER_READONLYFS_SECURITY_CONTEXT
+    severity: NON_COMPLIANT
+    message: Deployment containers should set readOnlyRootFilesystem securityContext
+    resource: Deployment
+    assertions:
+      - every:
+          key: spec.template.spec.containers
+          expressions:
+            - key: securityContext.readOnlyRootFilesystem
+              op: is-true
+    tags:
+      - deployment
       - security
 
   - id: POLICY
