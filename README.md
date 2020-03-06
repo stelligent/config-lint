@@ -260,13 +260,9 @@ Tests are located in the `assertion` directory. To run all tests:
 make test
 ```
 
-To run the Terraform builtin rules tests for v0.11 or 0.12 respectively:
+To run the Terraform builtin rules tests:
 ```
-make testtf11
-```
-
-```
-make testtf12
+make testtf
 ```
 
 More information about how to create and run tests can be found [here](docs/tests.md).
