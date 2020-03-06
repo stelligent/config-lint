@@ -51,9 +51,6 @@ test: lint cyclo
 testtf: lint cyclo
 	@echo "=== testing Terraform Built In Rules ==="
 	@go test -v ./cli/... -run TestTerraform11BuiltInRules
-
-testtf12: lint cyclo
-	@echo "=== testing Terraform 12 Built In Rules ==="
 	@go test -v ./cli/... -run TestTerraform12BuiltInRules
 
 beta-bumpversion:
