@@ -11,13 +11,7 @@ config-lint -terraform <FILE_OR_DIRECTORY_OF_TF_FILES>
 
 If you want to run most of the built-in rules, but not all, you can use a [profile](profiles.md) to exclude some rules or resources.
 
-For Terraform files with Terraform 12 specific features, use the `-terraform12` flag:
-
-```
-config-lint -terraform12 <FILE_OR_DIRECTORY_OF_TF_FILES>
-```
-
-The Terraform12 parser is fully backwards compatible with previous versions of Terraform.
+The Terraform12 parser is fully backwards compatible with previous versions of Terraform. By default, Terraform files will be validated with Terraform 0.12 standards. 
 
 If you wish to force a specific parser version, add the `-tfparser tf11|tf12` flag. This is useful if you have a lot of rules with `Type: Terraform` but your Terraform files include Terraform 12 syntax. 
 

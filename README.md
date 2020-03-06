@@ -150,8 +150,6 @@ view them via the -help option.
  * -tags string - Run only tests with tags in this comma separated list
  
  * -terraform - Use built-in rules for Terraform
-
-* -terraform12 - Use built-in rules for Terraform v0.12
  
  * -validate - Validate rules file
  
@@ -161,7 +159,7 @@ view them via the -help option.
  
  * -version - Get program version
  
- * -tfparser - Set the Terraform parser version. Options are `tf11` or `tf12`.
+ * -tfparser - (Optional) Set the Terraform parser version. Options are `tf11` or `tf12`. By default, `tf12` will be used.
 
 # Rules
 
