@@ -134,6 +134,8 @@ func main() {
 		os.Exit(-1)
 	}
 	ruleSets = addExceptions(ruleSets, profileOptions.Exceptions)
+	// Same rule set applies to both TerraformBuiltInRules and Terraform11BuiltInRules
+	// Run for terraform12 by default
 	if useTerraformBuiltInRules {
 		builtInRuleSet, err := loadBuiltInRuleSet("terraform.yml")
 		if err != nil {

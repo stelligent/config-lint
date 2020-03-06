@@ -88,3 +88,7 @@ cover-linter:
 cover-cli:
 	@cd cli && go test -coverprofile=coverage.out && go tool cover -html=coverage.out
 
+smoke-test:
+	@$(BUILD_DIR)/config-lint -terraform cli/testdata/builtin/terraform12/aws/alb/access_logs_enabled.tf
+	@$(BUILD_DIR)/config-lint -tfparser tf11 -terraform cli/testdata/builtin/terraform11/aws/alb/access_logs_enabled.tf
+
