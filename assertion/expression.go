@@ -6,7 +6,6 @@ func searchAndMatch(expression Expression, resource Resource) (MatchResult, erro
 		return matchError(err)
 	}
 	match, err := isMatch(v, expression)
-	Debugf("Key: %s Output: %v Looking for %v %v\n", expression.Key, v, expression.Op, expression.Value)
 	Debugf("ResourceID: %s Type: %s %v\n",
 		resource.ID,
 		resource.Type,
@@ -229,6 +228,7 @@ func CheckExpression(rule Rule, expression Expression, resource Resource) (Resul
 	}
 	match, err := booleanExpression(expression, resource)
 	if err != nil {
+		DebugJSON("Error: ", err)
 		result.Status = "FAILURE"
 		result.Message = err.Error()
 		return result, err
