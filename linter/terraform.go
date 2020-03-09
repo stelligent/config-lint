@@ -323,7 +323,7 @@ func parseJSONDocuments(resource interface{}) (interface{}, error) {
 		if policyAttribute, hasPolicyString := properties[attribute]; hasPolicyString {
 			if policyString, isString := policyAttribute.(string); isString {
 				var policy interface{}
-				if policyString != "" {
+				if policyString != "" && policyString != "UNDEFINED" {
 					err := json.Unmarshal([]byte(policyString), &policy)
 					if err != nil {
 						assertion.Debugf("Unable to parse '%s' as JSON\n", policyString)

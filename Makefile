@@ -50,10 +50,7 @@ test: lint cyclo
 
 testtf: lint cyclo
 	@echo "=== testing Terraform Built In Rules ==="
-	@go test -v ./cli/... -run TestTerraformBuiltInRules
-
-testtf12: lint cyclo
-	@echo "=== testing Terraform 12 Built In Rules ==="
+	@go test -v ./cli/... -run TestTerraform11BuiltInRules
 	@go test -v ./cli/... -run TestTerraform12BuiltInRules
 
 beta-bumpversion:
@@ -73,7 +70,7 @@ $(BUILD_DIR)/config-lint: $(CLI_FILES)
 
 build: gen $(BUILD_DIR)/config-lint
 
-all: clean deps test build
+all: clean deps test build smoke-test
 dev: deps devdeps
 
 clean:
@@ -90,4 +87,8 @@ cover-linter:
 
 cover-cli:
 	@cd cli && go test -coverprofile=coverage.out && go tool cover -html=coverage.out
+
+smoke-test:
+	@$(BUILD_DIR)/config-lint -terraform cli/testdata/builtin/terraform12/smoketest/smoketest.tf
+	@$(BUILD_DIR)/config-lint -tfparser tf11 -terraform cli/testdata/builtin/terraform11/smoketest/smoketest.tf
 

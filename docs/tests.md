@@ -3,7 +3,7 @@
 You can run the project tests by invoking the correct make command:
 
 * `make test` -> Runs all tests residing inside the config-lint project
-* `make testtf` -> Runs all tests defined within the `TestTerraformBuiltInRules` test function.
+* `make testtf` -> Runs all tests defined within the `TestTerraformBuiltInRules` test function. This runs against terraform 0.11 first and then against terraform 0.12
 
 ## Testing Best Practices
 

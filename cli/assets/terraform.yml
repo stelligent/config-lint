@@ -41,11 +41,24 @@ rules:
       - sg
       - ec2
 
+  # Note: 
+  # the rule assertion here is duplicated to function in both terraform 11 and 12.
+  # `` registers the variable correctly in tf 11
+  # '' registers the variable correctly in tf 12
+  # the alternative for each tf version will return a false negative (always passes), so it doesnt affect the test
   - id: SG_SSH_WORLD_INGRESS
     resource: aws_security_group
     message: Security group should not allow SSH ingress from 0.0.0.0/0 or ::/0
     severity: FAILURE
     assertions:
+      - not:
+        - or:
+          - key: "ingress[?(from_port=='22')].cidr_blocks[]"
+            op: contains
+            value: "0.0.0.0/0"
+          - key: "ingress[?(from_port=='22')].ipv6_cidr_blocks[]"
+            op: contains
+            value: "::/0"
       - not:
         - or:
           - key: "ingress[?(from_port==`22`)].cidr_blocks[]"
@@ -58,11 +71,24 @@ rules:
       - sg
       - ec2
 
+  # Note: 
+  # the rule assertion here is duplicated to function in both terraform 11 and 12.
+  # `` registers the variable correctly in tf 11
+  # '' registers the variable correctly in tf 12
+  # the alternative for each tf version will return a false negative (always passes), so it doesnt affect the test
   - id: SG_RDP_WORLD_INGRESS
     resource: aws_security_group
     message: Security group should not allow RDP ingress from 0.0.0.0/0 or ::/0
     severity: FAILURE
     assertions:
+      - not:
+        - or:
+          - key: "ingress[?(from_port=='3389')].cidr_blocks[]"
+            op: contains
+            value: "0.0.0.0/0"
+          - key: "ingress[?(from_port=='3389')].ipv6_cidr_blocks[]"
+            op: contains
+            value: "::/0"
       - not:
         - or:
           - key: "ingress[?(from_port==`3389`)].cidr_blocks[]"

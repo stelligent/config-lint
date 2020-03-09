@@ -14,8 +14,7 @@ import (
 func getCommandLineOptions() CommandLineOptions {
 
 	commandLineOptions := CommandLineOptions{}
-	commandLineOptions.TerraformBuiltInRules = flag.Bool("terraform", false, "Use built-in rules for Terraform")
-	commandLineOptions.Terraform12BuiltInRules = flag.Bool("terraform12", false, "Use built-in rules for Terraform v0.12")
+	commandLineOptions.TerraformBuiltInRules = flag.Bool("terraform", false, "Use built-in rules for Terraform.")
 	flag.Var(&commandLineOptions.RulesFilenames, "rules", "Rules file, can be specified multiple times")
 	//flag.Var(&commandLineOptions.Parser, "parser", "Version of Terraform parser to use (either tf12 or tf11")
 	commandLineOptions.TerraformParser = flag.String("tfparser", "", "Version of Terraform parser to use (must be either 'tf12' or 'tf11')")
