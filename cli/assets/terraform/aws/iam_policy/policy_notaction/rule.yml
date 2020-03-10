@@ -1,0 +1,22 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: IAM_POLICY_NOT_ACTION
+    message: Should not use NotAction in IAM policy
+    resource: aws_iam_policy
+    severity: WARNING
+    assertions:
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: NotAction
+              op: present
+    tags:
+      - iam
+      - policy

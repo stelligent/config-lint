@@ -1,0 +1,22 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: S3_NOT_ACTION
+    message: Should not use NotAction in S3 bucket policy
+    resource: aws_s3_bucket_policy
+    severity: WARNING
+    assertions:
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: NotAction
+              op: present
+    tags:
+      - policy
+      - s3

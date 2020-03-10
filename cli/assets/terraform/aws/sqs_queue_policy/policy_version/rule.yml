@@ -1,0 +1,36 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: POLICY_VERSION
+    message: Version in IAM Policy should be 2012-10-17
+    resources:
+      - aws_sns_topic_policy
+      - aws_s3_bucket_policy
+      - aws_sqs_queue_policy
+      - aws_iam_policy
+      - aws_iam_role_policy
+    severity: FAILURE
+    assertions:
+      - key: policy.Version
+        op: eq
+        value: "2012-10-17"
+    tags:
+      - iam
+      - policy
+  - id: ASSUME_ROLEPOLICY_VERSION
+    message: Version in IAM Policy should be 2012-10-17
+    resource: aws_iam_role
+    severity: FAILURE
+    assertions:
+      - key: assume_role_policy.Version
+        op: eq
+        value: "2012-10-17"
+    tags:
+      - iam
+      - policy

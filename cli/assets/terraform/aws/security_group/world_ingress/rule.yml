@@ -1,0 +1,25 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: SG_WORLD_INGRESS
+    resource: aws_security_group
+    message: Security group should not allow ingress from 0.0.0.0/0 or ::/0
+    severity: WARNING
+    assertions:
+      - not:
+        - or:
+          - key: "ingress[].cidr_blocks[]"
+            op: contains
+            value: "0.0.0.0/0"
+          - key: "ingress[].ipv6_cidr_blocks[]"
+            op: contains
+            value: "::/0"
+    tags:
+      - sg
+      - ec2

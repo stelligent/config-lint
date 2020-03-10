@@ -1,0 +1,19 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: LAMBDA_PERMISSION_WILDCARD_PRINCIPAL
+    message: Lambda permission should not have wildcard principal
+    resource: aws_lambda_permission
+    severity: FAILURE
+    assertions:
+      - key: principal
+        op: does-not-contain
+        value: "*"
+    tags:
+      - lambda

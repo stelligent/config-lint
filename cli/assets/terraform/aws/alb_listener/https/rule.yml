@@ -1,0 +1,29 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: ALB_LISTENER_HTTPS
+    message: ALB listener should use HTTPS
+    resources:
+      - aws_alb_listener
+      - aws_lb_listener
+    severity: FAILURE
+    assertions:
+      - key: port
+        op: eq
+        value: 443
+      - key: protocol
+        op: regex
+        value: "(?i)HTTPS"
+      - key: ssl_policy
+        op: present
+      - key: certificate_arn
+        op: present
+    tags:
+      - alb
+      - lb

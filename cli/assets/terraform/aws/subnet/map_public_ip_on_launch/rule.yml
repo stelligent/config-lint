@@ -1,0 +1,20 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: EC2_SUBNET_MAP_PUBLIC
+    message: EC2 Subnet should not have MapPublicIpOnLaunch set to true
+    resource: aws_subnet
+    severity: WARNING
+    assertions:
+    - not:
+      - key: map_public_ip_on_launch
+        op: is-true
+    tags:
+      - ec2
+      - subnet

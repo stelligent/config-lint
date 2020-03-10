@@ -1,0 +1,18 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: SAGEMAKER_NOTEBOOK_ENCRYPTION
+    message: Sagemaker Notebook should be encrypted
+    resource: aws_sagemaker_notebook_instance
+    severity: WARNING
+    assertions:
+      - key: kms_key_id
+        op: present
+    tags:
+      - sagemaker

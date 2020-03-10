@@ -1,0 +1,26 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: SQS_QUEUE_POLICY_WILDCARD_ACTION
+    message: Should not use wildcard action in SQS queue policy
+    resource: aws_sqs_queue_policy
+    severity: FAILURE
+    assertions:
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: Effect
+              op: eq
+              value: Allow
+            - key: Action
+              op: contains
+              value: "*"
+    tags:
+      - sqs
+      - policy
