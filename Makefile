@@ -89,6 +89,6 @@ cover-cli:
 	@cd cli && go test -coverprofile=coverage.out && go tool cover -html=coverage.out
 
 smoke-test:
-	@$(BUILD_DIR)/config-lint -terraform cli/testdata/builtin/terraform12/smoketest/smoketest.tf
-	@$(BUILD_DIR)/config-lint -tfparser tf11 -terraform cli/testdata/builtin/terraform11/smoketest/smoketest.tf
+	@$(BUILD_DIR)/config-lint -terraform cli/testdata/smoketest_tf12.tf
+	@$(BUILD_DIR)/config-lint -tfparser tf11 -terraform cli/testdata/smoketest_tf11.tf
 
