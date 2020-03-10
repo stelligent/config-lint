@@ -1,0 +1,18 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: CODEBUILD_PROJECT_ENCRYPTION
+    message: CodeBuild Project should be encrypted
+    resource: aws_codebuild_project
+    severity: FAILURE
+    assertions:
+      - key: encryption_key
+        op: present
+    tags:
+      - codebuild

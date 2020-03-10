@@ -1,0 +1,33 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: SG_RDP_WORLD_INGRESS
+    resource: aws_security_group
+    message: Security group should not allow RDP ingress from 0.0.0.0/0 or ::/0
+    severity: FAILURE
+    assertions:
+      - not:
+        - or:
+          - key: "ingress[?(from_port=='3389')].cidr_blocks[]"
+            op: contains
+            value: "0.0.0.0/0"
+          - key: "ingress[?(from_port=='3389')].ipv6_cidr_blocks[]"
+            op: contains
+            value: "::/0"
+      - not:
+        - or:
+          - key: "ingress[?(from_port==`3389`)].cidr_blocks[]"
+            op: contains
+            value: "0.0.0.0/0"
+          - key: "ingress[?(from_port==`3389`)].ipv6_cidr_blocks[]"
+            op: contains
+            value: "::/0"
+    tags:
+      - sg
+      - ec2

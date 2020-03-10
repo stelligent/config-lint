@@ -1,0 +1,22 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: SNS_TOPIC_POLICY_NOT_ACTION
+    message: Should not use NotAction in SNS topic policy
+    resource: aws_sns_topic_policy
+    severity: WARNING
+    assertions:
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: NotAction
+              op: present
+    tags:
+      - sns
+      - policy

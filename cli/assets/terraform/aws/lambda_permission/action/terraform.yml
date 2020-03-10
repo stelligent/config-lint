@@ -1,0 +1,19 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: LAMBDA_PERMISSION_INVOKE_ACTION
+    message: Lambda permission should allow only lambda:InvokeAction
+    resource: aws_lambda_permission
+    severity: WARNING
+    assertions:
+      - key: action
+        op: eq
+        value: lambda:InvokeFunction
+    tags:
+      - lambda

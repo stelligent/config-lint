@@ -1,0 +1,19 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: EFS_ENCRYPTED
+    message: EFS should be encrypted
+    resource: aws_efs_file_system
+    severity: FAILURE
+    assertions:
+      - and:
+        - key: encrypted
+          op: is-true
+    tags:
+      - efs

@@ -1,0 +1,23 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: SG_NON_32_INGRESS
+    resource: aws_security_group
+    message: Security group should not allow ingress from CIDR block that does not end in /32
+    severity: WARNING
+    assertions:
+      - every:
+          key: "ingress[].cidr_blocks[]"
+          expressions:
+            - key: "@"
+              op: regex
+              value: .*/32$
+    tags:
+      - sg
+      - ec2

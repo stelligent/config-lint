@@ -1,0 +1,16 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: REDSHIFT_CLUSTER_ENHANCED_VPC_ROUTING
+    message: RedshiftCluster should use enhanced vpc routing
+    resource: aws_redshift_cluster
+    severity: WARNING
+    assertions:
+      - key: enhanced_vpc_routing
+        op: is-true

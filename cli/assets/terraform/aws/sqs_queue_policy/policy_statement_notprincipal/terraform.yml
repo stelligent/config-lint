@@ -1,0 +1,22 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: SQS_QUEUE_POLICY_NOT_PRINCIPAL
+    message: Should not use NotPrincipal in SQS queue policy
+    resource: aws_sqs_queue_policy
+    severity: WARNING
+    assertions:
+      - none:
+          key: policy.Statement[]
+          expressions:
+            - key: NotPrincipal
+              op: present
+    tags:
+      - sqs
+      - policy

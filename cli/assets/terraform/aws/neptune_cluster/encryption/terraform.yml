@@ -1,0 +1,18 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: NEPTUNE_DB_ENCRYPTION
+    message: Neptune database cluster storage should have encryption enabled
+    resource: aws_neptune_cluster
+    severity: FAILURE
+    assertions:
+    - key: storage_encrypted
+      op: is-true
+    tags:
+      - neptune

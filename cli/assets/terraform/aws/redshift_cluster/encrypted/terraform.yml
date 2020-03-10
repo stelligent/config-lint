@@ -1,0 +1,18 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: REDSHIFT_CLUSTER_ENCRYPTION
+    message: RedshiftCluster should use encryption
+    resource: aws_redshift_cluster
+    severity: FAILURE
+    assertions:
+      - key: encrypted
+        op: is-true
+    tags:
+      - redshift
