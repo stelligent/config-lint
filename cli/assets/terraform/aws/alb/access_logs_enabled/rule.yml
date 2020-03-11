@@ -10,7 +10,6 @@ rules:
     message: ALB should enable access logs
     resources:
       - aws_alb
-      - aws_lb
     severity: FAILURE
     assertions:
       - key: access_logs
@@ -22,5 +21,4 @@ rules:
               op: is-true
     tags:
       - alb
-      - lb
 

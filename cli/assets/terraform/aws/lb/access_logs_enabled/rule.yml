@@ -7,12 +7,9 @@ files:
   - "*.tfvars"
 rules:
 
-  # Rule is duplicated for alb and lb with the same ID
-  # TODO
-  - id: ALB_ACCESS_LOGS
-    message: ALB should enable access logs
+  - id: LB_ACCESS_LOGS
+    message: LB should enable access logs
     resources:
-      - aws_alb
       - aws_lb
     severity: FAILURE
     assertions:
@@ -24,5 +21,4 @@ rules:
             - key: enabled
               op: is-true
     tags:
-      - alb
       - lb
