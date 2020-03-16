@@ -9,7 +9,7 @@ import (
 )
 
 func TestLoadTerraformRules(t *testing.T) {
-	_, err := loadBuiltInRuleSet("terraform.yml")
+	_, err := loadBuiltInRuleSet("terraform")
 	if err != nil {
 		t.Errorf("Cannot load built-in Terraform rules")
 	}
@@ -108,7 +108,7 @@ func TestBuiltRules(t *testing.T) {
 		t.Errorf("Expecting loadBuiltInRulesSet to not return error: %s", err.Error())
 	}
 	vs := assertion.StandardValueSource{}
-	filenames := []string{"assets/terraform.yml", "assets/lint-rules.yml"}
+	filenames := []string{"assets/terraform", "assets/lint-rules.yml"}
 	l, err := linter.NewLinter(ruleSet, vs, filenames, "")
 	if err != nil {
 		t.Errorf("Expecting NewLinter to not return error: %s", err.Error())
@@ -271,5 +271,5 @@ func TestArrayFlags(t *testing.T) {
 
 func TestLoadBuiltInRuleSetMissing(t *testing.T) {
 	_, err := loadBuiltInRuleSet("missing.yml")
-	assert.Contains(t, err.Error(), "file does not exist", "loadBuiltInRuleSet should fail for missing file")
+	assert.Contains(t, err.Error(), "no such file or directory", "loadBuiltInRuleSet should fail for missing file")
 }
