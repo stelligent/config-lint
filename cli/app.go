@@ -4,6 +4,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -233,81 +234,74 @@ func yamlFilesOnly(filenames []string) []string {
 
 // Takes a name of a rule YAML file or a directory containing YAML rules
 // Returns a RuleSet of all rules in that file or directory
-func loadBuiltInRuleSet(name string) (assertion.RuleSet, error) {
-	pathStart := "./assets"
-	ruleSet, err := buildRuleSet(pathStart, name, assertion.RuleSet{})
-	return ruleSet, err
-}
+func loadBuiltInRuleSet(filename string) (assertion.RuleSet, error) {
+	ruleSet := assertion.RuleSet{}
+	box := packr.NewBox("./assets")
+	assertion.Debugf("Looking in Box: %v\n", box)
 
-func isDirectory(path string, name string) (bool, error) {
-	fileInfo, err := os.Stat(path + "/" + name)
-	if err != nil {
-		assertion.Debugf("Failed to get file stats for %v \n %v\n", name, err)
-		return false, err
-	}
-	isDir := fileInfo.IsDir()
-	return isDir, err
-}
-
-// build the ruleSet and return that set combined with the existing ruleSet
-func addRuleSet(path string, name string, ruleSet assertion.RuleSet) (assertion.RuleSet, error) {
-	buildReturn, err := loadSingleBuiltInRuleSet(path, name)
-	if err != nil {
-		assertion.Debugf("Failed to load RuleSet: %v\n", err)
-		return assertion.RuleSet{}, err
-	}
-	ruleSet, err = assertion.JoinRuleSets(ruleSet, buildReturn)
-	if err != nil {
-		assertion.Debugf("Failed to join RuleSets: %v\n", err)
-		return assertion.RuleSet{}, err
+	var err error
+	if box.Has(filename) {
+		if isYamlFile(filename) {
+			ruleSet, err = addRuleSet(ruleSet, box, filename)
+			if err != nil {
+				assertion.Debugf("Failed to add RuleSet: %v\n", err)
+				return assertion.RuleSet{}, err // returns empty rule set
+			}
+		}
+	} else {
+		box = packr.NewBox("./assets/" + filename)
+		assertion.Debugf("New Box: %v\n", box)
+		filesInBox := box.List()
+		if len(filesInBox) > 0 {
+			// Get each file in that box
+			for _, fileInBox := range filesInBox {
+				// Check if file is YAML
+				if isYamlFile(fileInBox) {
+					assertion.Debugf("Adding rule set: %v\n", fileInBox)
+					ruleSet, err = addRuleSet(ruleSet, box, fileInBox)
+					if err != nil {
+						assertion.Debugf("Failed to add RuleSet: %v\n", err)
+						return assertion.RuleSet{}, err // returns empty rule set
+					}
+				}
+			}
+		} else {
+			return assertion.RuleSet{}, errors.New("File or directory doesnt exist")
+		}
 	}
 	return ruleSet, nil
 }
 
-func buildRuleSet(path string, name string, ruleSet assertion.RuleSet) (assertion.RuleSet, error) {
-	if isYamlFile(name) {
-		return addRuleSet(path, name, ruleSet)
-	}
-
-	dir, err := isDirectory(path, name)
+func addRuleSet(ruleSet assertion.RuleSet, box packr.Box, filename string) (assertion.RuleSet, error) {
+	// Get RuleSet from file
+	newRuleSet, err := getRuleSet(box, filename)
 	if err != nil {
-		assertion.Debugf("Failed to check Directory: %v\n", err)
-		return ruleSet, err
-	}
-	if dir {
-		pathExtended := path + "/" + name
-		subfiles := getFilesInDirectory(pathExtended) // this returns the complete path to any file in the directory recursively
-		for _, subfilename := range subfiles {
-			if isYamlFile(subfilename) {
-				// add the ruleSet from each subfile to the total rule set
-				ruleSet, err = addRuleSet("./", subfilename, ruleSet)
-				if err != nil {
-					assertion.Debugf("Failed to add subfile RuleSet: %v\n", err)
-					return assertion.RuleSet{}, err
-				}
-			}
-		}
-		return ruleSet, nil
+		assertion.Debugf("Failed to get RuleSet: %v\n", err)
+		return assertion.RuleSet{}, err // returns empty rule set
 	}
 
-	// handle if file isnt valid
-	return assertion.RuleSet{}, nil
+	// Join with existing rule sets
+	ruleSet, err = assertion.JoinRuleSets(ruleSet, newRuleSet)
+	if err != nil {
+		assertion.Debugf("Failed to join RuleSets: %v\n", err)
+		return assertion.RuleSet{}, err // returns empty rule set
+	}
+
+	return ruleSet, nil
 }
 
-// Takes a name of a single rule YAML file
-// Returns a RuleSet of all rules in that file
-func loadSingleBuiltInRuleSet(path string, name string) (assertion.RuleSet, error) {
-	emptyRuleSet := assertion.RuleSet{}
-	box := packr.NewBox(path)
+// Given a packr box and rule file in that box,
+// build and return a RuleSet
+func getRuleSet(box packr.Box, name string) (assertion.RuleSet, error) {
 	rulesContent, err := box.FindString(name)
 	if err != nil {
 		assertion.Debugf("Failed to find filename string in box: %v\n", err)
-		return emptyRuleSet, err
+		return assertion.RuleSet{}, err
 	}
 	ruleSet, err := assertion.ParseRules(string(rulesContent))
 	if err != nil {
 		assertion.Debugf("Failed to parse rules from file: %v\n", err)
-		return emptyRuleSet, err
+		return assertion.RuleSet{}, err
 	}
 	return ruleSet, nil
 }

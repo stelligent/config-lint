@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"github.com/gobuffalo/packr"
 	"github.com/stelligent/config-lint/assertion"
 	"github.com/stelligent/config-lint/linter"
 	"github.com/stretchr/testify/assert"
@@ -105,10 +106,19 @@ func TestProfileExceptions(t *testing.T) {
 func TestBuiltRules(t *testing.T) {
 	ruleSet, err := loadBuiltInRuleSet("lint-rules.yml")
 	if err != nil {
-		t.Errorf("Expecting loadBuiltInRulesSet to not return error: %s", err.Error())
+		t.Errorf("Expecting loadBuiltInRuleSet to not return error: %s", err.Error())
 	}
 	vs := assertion.StandardValueSource{}
-	filenames := []string{"assets/terraform", "assets/lint-rules.yml"}
+
+	// Get all rule files from the assets box
+	box := packr.NewBox("./assets")
+	allFilenames := box.List()
+	var filenames []string
+	for _, filename := range allFilenames {
+		if isYamlFile(filename) {
+			filenames = append(filenames, "assets/"+filename)
+		}
+	}
 	l, err := linter.NewLinter(ruleSet, vs, filenames, "")
 	if err != nil {
 		t.Errorf("Expecting NewLinter to not return error: %s", err.Error())
@@ -271,5 +281,5 @@ func TestArrayFlags(t *testing.T) {
 
 func TestLoadBuiltInRuleSetMissing(t *testing.T) {
 	_, err := loadBuiltInRuleSet("missing.yml")
-	assert.Contains(t, err.Error(), "no such file or directory", "loadBuiltInRuleSet should fail for missing file")
+	assert.Contains(t, err.Error(), "File or directory doesnt exist", "loadBuiltInRuleSet should fail for missing file")
 }
