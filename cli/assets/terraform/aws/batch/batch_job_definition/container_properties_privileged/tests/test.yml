@@ -1,0 +1,36 @@
+---
+version: 1
+description: Terraform 11 and 12 tests
+type: Terraform
+files: 
+  - "*.tf"
+  - "*.tfvars"
+tests:
+  - id: NOT_SET
+    resource: container_properties_privileged_not_set
+    message: test not set 
+    warnings: 0
+    failures: 0
+    tags:
+      - terraform11
+      - terraform12
+
+  - id: SET_TO_FALSE
+    resource: container_properties_privileged_set_to_false 
+    message: test set to false
+    warnings: 0
+    failures: 0
+    tags:
+      - terraform11
+      - terraform12
+
+  - id: SET_TO_TRUE
+    resource: container_properties_privileged_set_to_true 
+    message: test set to true
+    warnings: 1
+    failures: 0
+    tags:
+      - terraform11
+      - terraform12
+
+
