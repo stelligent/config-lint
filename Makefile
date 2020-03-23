@@ -50,8 +50,7 @@ test: lint cyclo
 
 testtf: lint cyclo
 	@echo "=== testing Terraform Built In Rules ==="
-	@go test -v ./cli/... -run TestTerraform11BuiltInRules
-	@go test -v ./cli/... -run TestTerraform12BuiltInRules
+	@go test -v ./cli/... -run TestTerraformBuiltInRules
 
 beta-bumpversion:
 	@echo "=== promoting $(BETA_NEXT_VERSION) ==="

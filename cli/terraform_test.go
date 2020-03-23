@@ -24,9 +24,7 @@ type TestSuite struct {
 }
 
 type TestCase struct {
-	Id       string
-	Resource string
-	Message  string
+	RuleId   string
 	Warnings int
 	Failures int
 	Tags     []string
@@ -64,71 +62,92 @@ func loadTestSuite(filename string) (TestSuite, error) {
 	return ts, nil
 }
 
-/*
-* Given a rule file and a rule ID
-* Return a RuleSet containing that single named Rule from the Rule File
- */
-func loadSingleRule(ruleFile string, ruleId string) (assertion.RuleSet, error) {
-	// TODO only get the name rule from the given rule file as a ruleSet
-
-	ruleSet, err := loadBuiltInRuleSet(ruleFile)
-	return ruleSet, err
+func getTestResources(directory string) ([]string, error) {
+	var testResources []string
+	box := packr.NewBox(directory)
+	filesInBox := box.List()
+	configPatterns := []string{"*.tf"}
+	for _, f := range filesInBox {
+		match, _ := assertion.ShouldIncludeFile(configPatterns, f)
+		if match {
+			absolutePath, err := filepath.Abs(directory + "/" + f)
+			if err != nil {
+				return []string{}, err
+			}
+			testResources = append(testResources, absolutePath)
+		}
+	}
+	return testResources, nil
 }
 
-/*
-* Given a resource file and a resource ID
-* Create a temporary file containing that single named resource
- */
-func createTestResourceFile(filename string, resourceId string) (string, error) {
-	// _, err := ioutil.ReadFile(filename)
-	// if err != nil {
-	// 	assertion.Debugf("Failed to load Test Suite file: %v\n", err)
-	// 	return "", err
-	// }
-
-	return filename, nil
+func contains(arr []string, str string) bool {
+	for _, a := range arr {
+		if a == str {
+			return true
+		}
+	}
+	return false
 }
 
 // Run each test case in a test suite
 func runTestSuite(t *testing.T, ts TestSuite) {
+	// Load only the rule for this test suite
+	ruleConfigPath := strings.Split(ts.RootPath, "config-lint/cli/assets/")[1] + "/rule.yml"
+	ruleSet, err := loadBuiltInRuleSet(ruleConfigPath)
+	if err != nil {
+		assert.Nil(t, err, "Cannot load built-in Terraform rule")
+	}
+
 	for _, tc := range ts.Tests {
-		assertion.Debugf("Running Test: %v\n", tc.Id)
-
-		// Load only the rule for this test case
-		ruleConfigPath := strings.Split(ts.RootPath, "/cli/")[1] + "/rule.yml"
-		ruleSet, err := loadSingleRule(ruleConfigPath, tc.Id)
-		if err != nil {
-			assert.Nil(t, err, "Cannot load built-in Terraform rule")
+		options := linter.Options{
+			RuleIDs: []string{tc.RuleId},
 		}
+		vs := assertion.StandardValueSource{}
 
-		// Load only the resource to be tested
-		for _, tag := range tc.Tags {
-			testResourceDirectory := strings.Split(ts.RootPath, "/cli/")[1] + "/tests/" + tag + "/" + "container_properties_privileged.tf"
-			assertion.Debugf("test resource dir %v\n", testResourceDirectory)
-			testResourcePath, err := createTestResourceFile(testResourceDirectory, tc.Resource)
+		// validate the rule set
+		if contains(tc.Tags, "terraform11") {
+			// Load the test resources for this test suite
+			testResourceDirectory := strings.Split(ts.RootPath, "config-lint/cli/")[1] + "/tests/terraform11/"
+			testResources, err := getTestResources(testResourceDirectory)
+			if err != nil {
+				assert.Nil(t, err, "Cannot load built-in Terraform 11 test resources")
 
-			options := linter.Options{
-				RuleIDs: []string{tc.Id},
 			}
-			vs := assertion.StandardValueSource{}
+			// Defining 'tf11' for the Parser type
+			l, err := linter.NewLinter(ruleSet, vs, testResources, "tf11")
 
-			// validate the rule set
-			var l linter.Linter
-			if tag == "terraform11" {
-				// Defining 'tf11' for the Parser type
-				l, err = linter.NewLinter(ruleSet, vs, []string{testResourcePath}, "tf11")
-			} else {
-				l, err = linter.NewLinter(ruleSet, vs, []string{testResourcePath}, "tf12")
-			}
 			report, err := l.Validate(ruleSet, options)
 			assert.Nil(t, err, "Validate failed for file")
 
 			warningViolationsReported := getViolationsString("WARNING", report.Violations)
-			warningMessage := fmt.Sprintf("Expecting %d warnings for RuleID %s in File %s:\n %s", tc.Warnings, tc.Id, tc.Resource, warningViolationsReported)
+			warningMessage := fmt.Sprintf("Expecting %d warnings for rule %s:\n %s", tc.Warnings, tc.RuleId, warningViolationsReported)
 			assert.Equal(t, tc.Warnings, numberOfWarnings(report.Violations), warningMessage)
 
 			failureViolationsReported := getViolationsString("FAILURE", report.Violations)
-			failureMessage := fmt.Sprintf("Expecting %d failures for RuleID %s in File %s:\n %s", tc.Failures, tc.Id, tc.Resource, failureViolationsReported)
+			failureMessage := fmt.Sprintf("Expecting %d failures for rule %s:\n %s", tc.Failures, tc.RuleId, failureViolationsReported)
+			assert.Equal(t, tc.Failures, numberOfFailures(report.Violations), failureMessage)
+		}
+
+		if contains(tc.Tags, "terraform12") {
+			// Load the test resources for this test suite
+			testResourceDirectory := strings.Split(ts.RootPath, "config-lint/cli/")[1] + "/tests/terraform12/"
+			testResources, err := getTestResources(testResourceDirectory)
+			if err != nil {
+				assert.Nil(t, err, "Cannot load built-in Terraform 12 test resources")
+
+			}
+			// Defining 'tf11' for the Parser type
+			l, err := linter.NewLinter(ruleSet, vs, testResources, "tf12")
+
+			report, err := l.Validate(ruleSet, options)
+			assert.Nil(t, err, "Validate failed for file")
+
+			warningViolationsReported := getViolationsString("WARNING", report.Violations)
+			warningMessage := fmt.Sprintf("Expecting %d warnings for rule %s:\n %s", tc.Warnings, tc.RuleId, warningViolationsReported)
+			assert.Equal(t, tc.Warnings, numberOfWarnings(report.Violations), warningMessage)
+
+			failureViolationsReported := getViolationsString("FAILURE", report.Violations)
+			failureMessage := fmt.Sprintf("Expecting %d failures for rule %s:\n %s", tc.Failures, tc.RuleId, failureViolationsReported)
 			assert.Equal(t, tc.Failures, numberOfFailures(report.Violations), failureMessage)
 		}
 	}
@@ -138,17 +157,13 @@ func runTestSuite(t *testing.T, ts TestSuite) {
 * Given resource type and tags
 * Run all defined tests per resource type and subtype
  */
-func RunBuiltinTests(t *testing.T, resourceType string, subtypes []string) {
-	assertion.SetDebug(true)
-	assertion.Debugf("#######################\n\n\n%v\n\n", resourceType)
-
+func RunBuiltinTests(t *testing.T, resourceType string) {
 	// Get a list of all test cases
 	box := packr.NewBox("./assets/" + resourceType)
 	filesInBox := box.List()
 	for _, file := range filesInBox {
 		if isTestCase(file) {
 			absolutePath, _ := filepath.Abs("./assets/" + resourceType + "/" + file)
-			assertion.Debugf("Loading test case: %v\n", absolutePath)
 			ts, err := loadTestSuite(absolutePath)
 			if err != nil {
 				assert.Nil(t, err, "Cannot load test case")
@@ -156,49 +171,9 @@ func RunBuiltinTests(t *testing.T, resourceType string, subtypes []string) {
 			runTestSuite(t, ts)
 		}
 	}
-
-	assertion.SetDebug(false)
-	assert.NotNil(t, nil) // fail
 }
 
-// Run built in rules against Terraform v0.11 parser
-func TestTerraform11BuiltInRules(t *testing.T) {
-	RunBuiltinTests(t, "terraform", []string{"terraform11", "terraform12"})
-}
-
-func TestTerraform12BuiltInRules(t *testing.T) {
-
-	// Define file to load rules from
-	// This file is located under cli/assets/
-	ruleSet, err := loadBuiltInRuleSet("terraform")
-	if err != nil {
-		assert.Nil(t, err, "Cannot load built-in Terraform rules")
-	}
-
-	// Get list of test cases
-	testCases := []BuiltInTestCase{
-		// AWS
-	}
-
-	// Run test cases
-	// test files must be included under testdata/builtin/terraform11
-	for _, tc := range testCases {
-		filenames := []string{"testdata/builtin/terraform11/" + tc.Filename}
-		options := linter.Options{
-			RuleIDs: []string{tc.RuleID},
-		}
-		vs := assertion.StandardValueSource{}
-
-		// Defining 'tf11' for the Parser type
-		l, err := linter.NewLinter(ruleSet, vs, filenames, "tf11")
-		report, err := l.Validate(ruleSet, options)
-		assert.Nil(t, err, "Validate failed for file")
-
-		warningViolationsReported := getViolationsString("WARNING", report.Violations)
-		warningMessage := fmt.Sprintf("Expecting %d warnings for RuleID %s in File %s:\n %s", tc.WarningCount, tc.RuleID, tc.Filename, warningViolationsReported)
-		assert.Equal(t, tc.WarningCount, numberOfWarnings(report.Violations), warningMessage)
-		failureViolationsReported := getViolationsString("FAILURE", report.Violations)
-		failureMessage := fmt.Sprintf("Expecting %d failures for RuleID %s in File %s:\n %s", tc.FailureCount, tc.RuleID, tc.Filename, failureViolationsReported)
-		assert.Equal(t, tc.FailureCount, numberOfFailures(report.Violations), failureMessage)
-	}
+// Run built in rules against Terraform parser
+func TestTerraformBuiltInRules(t *testing.T) {
+	RunBuiltinTests(t, "terraform")
 }

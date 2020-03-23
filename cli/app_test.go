@@ -115,7 +115,7 @@ func TestBuiltRules(t *testing.T) {
 	allFilenames := box.List()
 	var filenames []string
 	for _, filename := range allFilenames {
-		if isYamlFile(filename) {
+		if isYamlFile(filename) && !isTestCase(filename) {
 			filenames = append(filenames, "assets/"+filename)
 		}
 	}
