@@ -237,16 +237,14 @@ func yamlFilesOnly(filenames []string) []string {
 func loadBuiltInRuleSet(filename string) (assertion.RuleSet, error) {
 	ruleSet := assertion.RuleSet{}
 	box := packr.NewBox("./assets")
-	assertion.Debugf("Looking in Box: %v\n", box)
+	assertion.Debugf("Looking for file %v in Box: %v\n", filename, box)
 
 	var err error
-	if box.Has(filename) {
-		if isYamlFile(filename) {
-			ruleSet, err = addRuleSet(ruleSet, box, filename)
-			if err != nil {
-				assertion.Debugf("Failed to add RuleSet: %v\n", err)
-				return assertion.RuleSet{}, err // returns empty rule set
-			}
+	if isYamlFile(filename) && box.Has(filename) {
+		ruleSet, err = addRuleSet(ruleSet, box, filename)
+		if err != nil {
+			assertion.Debugf("Failed to add RuleSet: %v\n", err)
+			return assertion.RuleSet{}, err // returns empty rule set
 		}
 	} else {
 		box = packr.NewBox("./assets/" + filename)
