@@ -129,7 +129,7 @@ Attribute contains a substring, or array contains an element
 
 ## does-not-contain
 
-Attribute contains a substring, or array contains an element
+Attribute does not contain a substring, or array does not contain an element
 
 You can also use the 'not-contains' operator to do the same thing.
 
