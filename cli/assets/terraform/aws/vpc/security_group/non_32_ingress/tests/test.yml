@@ -7,8 +7,8 @@ files:
   - "*.tfvars"
 tests:
   -
-    ruleId: BATCH_DEFINITION_PRIVILEGED
-    warnings: 1
+    ruleId: SG_NON_32_INGRESS
+    warnings: 2
     failures: 0
     tags:
       - "terraform11"

@@ -7,9 +7,9 @@ files:
   - "*.tfvars"
 tests:
   -
-    ruleId: BATCH_DEFINITION_PRIVILEGED
-    warnings: 1
-    failures: 0
+    ruleId: SQS_QUEUE_POLICY_WILDCARD_PRINCIPAL
+    warnings: 0
+    failures: 1
     tags:
       - "terraform11"
       - "terraform12"

@@ -7,9 +7,9 @@ files:
   - "*.tfvars"
 tests:
   -
-    ruleId: BATCH_DEFINITION_PRIVILEGED
-    warnings: 1
-    failures: 0
+    ruleId: SG_SSH_WORLD_INGRESS
+    warnings: 0
+    failures: 2
     tags:
       - "terraform11"
       - "terraform12"

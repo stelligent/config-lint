@@ -7,7 +7,7 @@ files:
   - "*.tfvars"
 tests:
   -
-    ruleId: BATCH_DEFINITION_PRIVILEGED
+    ruleId: SG_INGRESS_PORT_RANGE
     warnings: 1
     failures: 0
     tags:

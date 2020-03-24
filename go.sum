@@ -613,6 +613,10 @@ golang.org/x/tools v0.0.0-20200323192200-8849913b6971 h1:7xTjEBkQgB1qdLZddETld2F
 golang.org/x/tools v0.0.0-20200323192200-8849913b6971/go.mod h1:Sl4aGygMT6LrqrWclx+PTx3U+LnKx/seiNR+3G19Ar8=
 golang.org/x/tools v0.0.0-20200323210725-ef1313dc6d0a h1:QpsrlnR31DN2tCItRzamUXN4oAe3U00ru8f0ik9HSYI=
 golang.org/x/tools v0.0.0-20200323210725-ef1313dc6d0a/go.mod h1:Sl4aGygMT6LrqrWclx+PTx3U+LnKx/seiNR+3G19Ar8=
+golang.org/x/tools v0.0.0-20200324182314-a5e5fedfe742 h1:C4Jhhgnr4nUar2rZdLD0pSC6YvxiZgmp4Fl904gxSXU=
+golang.org/x/tools v0.0.0-20200324182314-a5e5fedfe742/go.mod h1:Sl4aGygMT6LrqrWclx+PTx3U+LnKx/seiNR+3G19Ar8=
+golang.org/x/tools v0.0.0-20200324201824-1fc30e1f4ccc h1:pdV61EOqqmHmRMCtqTv+eoY+K04cmKfr4R8aA9ysfgY=
+golang.org/x/tools v0.0.0-20200324201824-1fc30e1f4ccc/go.mod h1:Sl4aGygMT6LrqrWclx+PTx3U+LnKx/seiNR+3G19Ar8=
 golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=

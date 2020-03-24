@@ -7,9 +7,9 @@ files:
   - "*.tfvars"
 tests:
   -
-    ruleId: BATCH_DEFINITION_PRIVILEGED
-    warnings: 1
-    failures: 0
+    ruleId: CODEBUILD_PROJECT_ARTIFACT_ENCRYPTION 
+    warnings: 0
+    failures: 3
     tags:
       - "terraform11"
       - "terraform12"

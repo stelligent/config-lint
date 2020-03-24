@@ -7,9 +7,9 @@ files:
   - "*.tfvars"
 tests:
   -
-    ruleId: BATCH_DEFINITION_PRIVILEGED
-    warnings: 1
-    failures: 0
+    ruleId: IAM_USER_GROUP
+    warnings: 0
+    failures: 4
     tags:
       - "terraform11"
       - "terraform12"

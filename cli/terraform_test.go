@@ -47,17 +47,17 @@ func isTestCase(filename string) bool {
 func loadTestSuite(filename string) (TestSuite, error) {
 	yamlFile, err := ioutil.ReadFile(filename)
 	if err != nil {
-		assertion.Debugf("Failed to load Test Suite file: %v\n", err)
+		assertion.Debugf("Failed to load Test Suite file: %v\n %v\n", filename, err)
 		return TestSuite{}, err
 	}
 	ts := TestSuite{}
 	err = yaml.Unmarshal([]byte(yamlFile), &ts)
 	if err != nil {
-		assertion.Debugf("Failed to unmarshall YAML Test Suite: %v\n", err)
+		assertion.Debugf("Failed to unmarshall YAML Test Suite: %v\n %v\n", filename, err)
 		return TestSuite{}, err
 	}
 
-	ts.RootPath = strings.TrimRight(filename, "tests/test.yml")
+	ts.RootPath = strings.TrimSuffix(filename, "/tests/test.yml")
 
 	return ts, nil
 }

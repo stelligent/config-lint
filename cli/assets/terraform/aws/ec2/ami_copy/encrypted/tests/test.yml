@@ -7,9 +7,9 @@ files:
   - "*.tfvars"
 tests:
   -
-    ruleId: BATCH_DEFINITION_PRIVILEGED
-    warnings: 1
-    failures: 0
+    ruleId: AMI_COPY_SNAPSHOTS_ENCRYPTED
+    warnings: 0
+    failures: 2
     tags:
       - "terraform11"
       - "terraform12"

@@ -7,9 +7,9 @@ files:
   - "*.tfvars"
 tests:
   -
-    ruleId: BATCH_DEFINITION_PRIVILEGED
-    warnings: 1
-    failures: 0
+    ruleId: ALB_LISTENER_SSL_POLICY
+    warnings: 0
+    failures: 6
     tags:
       - "terraform11"
       - "terraform12"

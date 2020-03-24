@@ -7,9 +7,9 @@ files:
   - "*.tfvars"
 tests:
   -
-    ruleId: BATCH_DEFINITION_PRIVILEGED
-    warnings: 1
-    failures: 0
+    ruleId: KINESIS_FIREHOSE_DELIVERY_STREAM_ENCRYPTION
+    warnings: 0
+    failures: 4
     tags:
       - "terraform11"
       - "terraform12"

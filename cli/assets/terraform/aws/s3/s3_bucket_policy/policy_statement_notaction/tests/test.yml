@@ -7,7 +7,7 @@ files:
   - "*.tfvars"
 tests:
   -
-    ruleId: BATCH_DEFINITION_PRIVILEGED
+    ruleId: S3_NOT_ACTION
     warnings: 1
     failures: 0
     tags:

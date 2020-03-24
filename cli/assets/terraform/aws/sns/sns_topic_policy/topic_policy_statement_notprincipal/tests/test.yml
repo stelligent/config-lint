@@ -7,7 +7,7 @@ files:
   - "*.tfvars"
 tests:
   -
-    ruleId: BATCH_DEFINITION_PRIVILEGED
+    ruleId: SNS_TOPIC_POLICY_NOT_PRINCIPAL
     warnings: 1
     failures: 0
     tags:

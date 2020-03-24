@@ -7,9 +7,9 @@ files:
   - "*.tfvars"
 tests:
   -
-    ruleId: BATCH_DEFINITION_PRIVILEGED
-    warnings: 1
-    failures: 0
+    ruleId: RDS_CLUSTER_ENCYPTION
+    warnings: 0
+    failures: 5
     tags:
       - "terraform11"
       - "terraform12"

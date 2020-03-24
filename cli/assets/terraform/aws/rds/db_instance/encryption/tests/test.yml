@@ -1,0 +1,27 @@
+---
+version: 1
+description: Terraform 11 and 12 tests
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+tests:
+  -
+    ruleId: DB_INSTANCE_ENCRYPTION
+    warnings: 0
+    failures: 2
+    tags:
+      - "terraform11"
+      - "terraform12"
+  -
+    ruleId: REPLICA_DB_INSTANCE_ENCRYPTION 
+    warnings: 1
+    failures: 0
+    tags:
+      - "terraform11"
+  -
+    ruleId: REPLICA_DB_INSTANCE_ENCRYPTION 
+    warnings: 2
+    failures: 0
+    tags:
+      - "terraform12"
