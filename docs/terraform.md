@@ -2,8 +2,7 @@
 
 ## Validate Terraform files with built-in rules
 
-There is a set of [built-in rules](/cli/assets/terraform.yml) that cover some best practices for AWS resources.
-There
+There is a set of [built-in rules](/cli/assets/terraform) that cover some best practices for AWS resources.
 
 ```
 config-lint -terraform <FILE_OR_DIRECTORY_OF_TF_FILES>
@@ -21,20 +20,41 @@ If you wish to force a specific parser version, add the `-tfparser tf11|tf12` fl
 config-lint -rules <CUSTOM_RULE_YML_FILE> <FILE_OR_DIRECTORY_OF_TF_FILES>
 ```
 
-You can specify the -rules option multiple times if you have multiple custom rule files. It is also possible to specify both the -terraorm option as well as one or more -rules options, if you want the built-in rules as well as some custom rules.
+You can specify the -rules option multiple times if you have multiple custom rule files. It is also possible to specify both the -terraform option as well as one or more -rules options, if you want the built-in rules as well as some custom rules.
 
 ### Categories
 
-The default category for resources that can be linter is "resource", which covers the most common use case. This is for things like aws__instances, or s3_buckets, etc. But there are some additional categories available for Terraform linting. The current list of supported categories is:
+The default category for resources that can be linter is "resource", which covers the most common use case. This is for things like aws_instances, or s3_buckets, etc. But there are some additional categories available for Terraform linting. The current list of supported categories is:
 
 * resource
 * data
 * provider
 * module
 
-### Resource Example
+### Rule Structure
+
+Rules are divided into their respective resource directory starting under `assets/terraform`. Each rule is organized following the same tiered directory structure `{ Provider }} / {{ Major Family }} / {{ Resource Name }} / {{ Rule Name }} / rule.yml` where Major Family and Resource Name follow the same naming conventions defined by Terraform. For example, `cli/assets/terraform/aws/elastic_load_balancing/elb/access_logs_enabled/rule.yml`. The rule configuration itself must be named `rule.yml`.
 
 ```
+└── terraform
+    ├── aws
+    │   ├── batch
+    │   │   └── batch_job_definition
+    │   │       └── container_properties_privileged
+    │   │           ├── rule.yml
+    │   │           └── tests
+    │   │               ├── terraform11
+    │   │               │   └── container_properties_privileged.tf
+    │   │               ├── terraform12
+    │   │               │   └── container_properties_privileged.tf
+    │   │               └── test.yml
+    ...
+```
+
+
+### Rule Example
+
+```yaml
 ---
 version: 1
 description: Check for tags in Terraform file
@@ -75,7 +95,7 @@ rules:
 
 For providers, set the category to "provider" and the resource attribute to the name of the provider.
 
-```
+```yaml
 ---
 version: 1
 description: Terraform provider example
@@ -100,7 +120,7 @@ For modules, use "module" for category, and for resource use the "source" attrib
 This allows checking of parameters being used when a module is referenced.
 
 
-```
+```yaml
 ---
 version: 1
 description: Terraform module invocation example
@@ -194,3 +214,38 @@ rules:
 ```
 
 
+### Testing Builtin Rules
+
+All rules need to be tested. All tests for a given rule will be included at the same rule path as the rule configuration itself and live under the `tests` folder. That test folder must include a configuration for the tests, named `test.yml`, and the resources required for testing. The test configuration file must follow the following format:
+
+```yaml
+---
+version: 1
+description: Terraform 11 and 12 tests
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+tests:
+  -
+    ruleId: RULE_1_TO_BE_TESTED
+    warnings: 0
+    failures: 2
+    tags:
+      - "terraform11"
+      - "terraform12"
+  -
+    ruleId: RULE_2_TO_BE_TESTED
+    warnings: 2
+    failures: 0
+    tags:
+      - "terraform11"
+  -
+    ruleId: RULE_2_TO_BE_TESTED
+    warnings: 3
+    failures: 0
+    tags:
+      - "terraform12"
+```
+
+The `ruleId` must match the RuleID given in the rule configuration. Warnings or Failures will check against any resource files included under the named `tag` directory within the same tests directory. For example `RULE_1_TO_BE_TESTED` will run the rule against resources in both folders terraform11 and terraform12 and check for the same number of warnings and failures for both. Whereas `RULE_2_TO_BE_TESTED` will check for a different number of warnings for the two versions.
