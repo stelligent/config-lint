@@ -92,6 +92,7 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 // and places them in a slice of assertion.Resources.
 func getBlocksOfType(blocks tf12parser.Blocks, blockType string) []assertion.Resource {
 	var id string
+	var blockID string
 	var resources []assertion.Resource
 
 	tfBlocks := blocks.OfType(blockType)
@@ -103,16 +104,25 @@ func getBlocksOfType(blocks tf12parser.Blocks, blockType string) []assertion.Res
 	for _, block := range tfBlocks {
 		if len(block.Labels()) > 1 {
 			id = block.Labels()[1]
+			blockID = id
+
 		} else {
 			id = strconv.Itoa(i)
 			i++
+			blockID = block.Labels()[0]
 		}
+		properties := attributesToMap(*block)
+		// Expose block ID so it could be linted e.g.
+		// resource "aws_s3_bucket" "web" { ... }
+		// The block id here is "web".
+		properties["__id__"] = blockID
+
 		if block.Type() != "module" {
 			resource := assertion.Resource{
 				ID:         id,
 				Type:       block.Labels()[0],
 				Category:   blockType,
-				Properties: attributesToMap(*block),
+				Properties: properties,
 				Filename:   block.Range().Filename,
 				LineNumber: block.Range().StartLine,
 			}
@@ -120,10 +130,10 @@ func getBlocksOfType(blocks tf12parser.Blocks, blockType string) []assertion.Res
 		} else {
 			moduleSource := block.GetAttribute("source")
 			resource := assertion.Resource{
-				ID:         block.Labels()[0],
+				ID:         blockID,
 				Type:       moduleSource.Value().AsString(),
 				Category:   blockType,
-				Properties: attributesToMap(*block),
+				Properties: properties,
 				Filename:   block.Range().Filename,
 				LineNumber: block.Range().StartLine,
 			}
