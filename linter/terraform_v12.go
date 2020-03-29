@@ -25,6 +25,26 @@ type (
 	}
 )
 
+var (
+	blockTypes = []string{
+		"data",
+		"locals",
+		"module",
+		"output",
+		"provider",
+		"resource",
+		"terraform",
+		"variable",
+	}
+
+	blockLabelSyntax = map[string][]string{
+		"TypeAndName":  []string{"data", "resource"},
+		"TypeOnly":     []string{"provider"},
+		"NameOnly":     []string{"module", "output", "variable"},
+		"NoTypeNoName": []string{"locals", "terraform"},
+	}
+)
+
 // Load parses an HCLv2 file into a collection or Resource objects
 //TODO: This should be unused, but can't remove due to the interface, I think?
 func (l Terraform12ResourceLoader) Load(filename string) (FileResources, error) {
@@ -71,7 +91,6 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 	}
 
 	// Get all Terraform blocks of a given type and append to the slice of Resources
-	blockTypes := []string{"resource", "provider", "data", "module"}
 	for _, blockType := range blockTypes {
 		result.Resources = append(result.Resources, getBlocksOfType(blocks, blockType)...)
 	}
@@ -90,55 +109,60 @@ func loadHCLv2(paths []string) (Terraform12LoadResult, error) {
 
 // Retrieves Terraform blocks of a specific type
 // and places them in a slice of assertion.Resources.
-func getBlocksOfType(blocks tf12parser.Blocks, blockType string) []assertion.Resource {
-	var id string
-	var blockID string
+func getBlocksOfType(blocks tf12parser.Blocks, blockCategory string) []assertion.Resource {
+	var blockType string
+	var blockName string
 	var resources []assertion.Resource
 
-	tfBlocks := blocks.OfType(blockType)
+	tfBlocks := blocks.OfType(blockCategory)
 	i := 0
 
-	// If there is no Terraform ID for a block (in the case of Providers and Modules),
-	// set the id variable to an auto-incrementing integer.
-	// Otherwise, set it to the second item in the block's Labels.
 	for _, block := range tfBlocks {
-		if len(block.Labels()) > 1 {
-			id = block.Labels()[1]
-			blockID = id
 
-		} else {
-			id = strconv.Itoa(i)
-			i++
-			blockID = block.Labels()[0]
-		}
 		properties := attributesToMap(*block)
-		// Expose block ID so it could be linted e.g.
-		// resource "aws_s3_bucket" "web" { ... }
-		// The block id here is "web".
-		properties["__id__"] = blockID
 
-		if block.Type() != "module" {
-			resource := assertion.Resource{
-				ID:         id,
-				Type:       block.Labels()[0],
-				Category:   blockType,
-				Properties: properties,
-				Filename:   block.Range().Filename,
-				LineNumber: block.Range().StartLine,
+		// Terraform has labels between 0 and 2 for each block e.g `locals`, `provider`, and `resource`,
+		// and labels could be fixed types or configurable names.
+		// Thus this code checks which label should be used as type and as a name/id. If the block doesn't have
+		// a unique name, then its name/id assigned to an auto-incrementing integer.
+		if assertion.SliceContains(blockLabelSyntax["TypeAndName"], blockCategory) {
+			blockType = block.Labels()[0]
+			blockName = block.Labels()[1]
+			properties["__type__"] = blockType
+			properties["__name__"] = blockName
+
+		} else if assertion.SliceContains(blockLabelSyntax["TypeOnly"], blockCategory) {
+			blockType = block.Labels()[0]
+			blockName = strconv.Itoa(i)
+			i++
+			properties["__type__"] = blockType
+			properties["__name__"] = blockName
+
+		} else if assertion.SliceContains(blockLabelSyntax["NameOnly"], blockCategory) {
+			// A special handling for module to add its source as a type.
+			if blockCategory == "module" {
+				blockType = block.GetAttribute("source").Value().AsString()
+			} else {
+				blockType = blockCategory
 			}
-			resources = append(resources, resource)
-		} else {
-			moduleSource := block.GetAttribute("source")
-			resource := assertion.Resource{
-				ID:         blockID,
-				Type:       moduleSource.Value().AsString(),
-				Category:   blockType,
-				Properties: properties,
-				Filename:   block.Range().Filename,
-				LineNumber: block.Range().StartLine,
-			}
-			resources = append(resources, resource)
+			blockName = block.Labels()[0]
+			properties["__name__"] = blockName
+
+		} else if assertion.SliceContains(blockLabelSyntax["NoTypeNoName"], blockCategory) {
+			blockType = blockCategory
+			blockName = strconv.Itoa(i)
+			i++
 		}
+
+		resource := assertion.Resource{
+			ID:         blockName,
+			Type:       blockType,
+			Category:   blockCategory,
+			Properties: properties,
+			Filename:   block.Range().Filename,
+			LineNumber: block.Range().StartLine,
+		}
+		resources = append(resources, resource)
 	}
 	return resources
 }
