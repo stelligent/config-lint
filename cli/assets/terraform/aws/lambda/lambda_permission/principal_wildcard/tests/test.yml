@@ -1,0 +1,15 @@
+---
+version: 1
+description: Terraform 11 and 12 tests
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+tests:
+  -
+    ruleId: LAMBDA_PERMISSION_WILDCARD_PRINCIPAL
+    warnings: 0
+    failures: 2
+    tags:
+      - "terraform11"
+      - "terraform12"

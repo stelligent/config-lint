@@ -1,0 +1,15 @@
+---
+version: 1
+description: Terraform 11 and 12 tests
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+tests:
+  -
+    ruleId: ELASTICACHE_ENCRYPTION_TRANSIT
+    warnings: 0
+    failures: 2
+    tags:
+      - "terraform11"
+      - "terraform12"

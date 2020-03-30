@@ -1,0 +1,20 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: SG_INGRESS_ALL_PROTOCOLS
+    resource: aws_security_group
+    message: Best practices recommend not opening all protocols and ports to ingress traffic
+    severity: WARNING
+    assertions:
+      - not:
+        - key: "ingress[].protocol"
+          op: contains
+          value: "-1"
+    tags:
+      - sg

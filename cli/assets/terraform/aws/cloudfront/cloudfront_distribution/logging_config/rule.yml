@@ -1,0 +1,18 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: CLOUDFRONT_DISTRIBUTION_LOGGING
+    message: CloudFront Distribution must configure logging
+    resource: aws_cloudfront_distribution
+    severity: FAILURE
+    assertions:
+      - key: logging_config
+        op: present
+    tags:
+      - cloudfront

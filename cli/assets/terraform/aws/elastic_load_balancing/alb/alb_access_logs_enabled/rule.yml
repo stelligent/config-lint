@@ -1,0 +1,24 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+  - id: ALB_ACCESS_LOGS
+    message: ALB should enable access logs
+    resources:
+      - aws_alb
+    severity: FAILURE
+    assertions:
+      - key: access_logs
+        op: present
+      - every:
+          key: access_logs
+          expressions:
+            - key: enabled
+              op: is-true
+    tags:
+      - alb
+

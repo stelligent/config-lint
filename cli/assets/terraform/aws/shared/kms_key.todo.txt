@@ -1,0 +1,3 @@
+aws/sagemaker/sagemaker_endpoint_configuration/kms_key
+aws/sagemaker/sagemaker_notebook_instance/kms_key
+

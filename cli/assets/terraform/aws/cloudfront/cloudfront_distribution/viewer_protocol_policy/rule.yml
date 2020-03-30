@@ -1,0 +1,22 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: CLOUDFRONT_DISTRIBUTION_PROTOCOL
+    message: CloudFront Distribution should not allow all protocols
+    resource: aws_cloudfront_distribution
+    severity: FAILURE
+    assertions:
+      - key: "default_cache_behavior[].viewer_protocol_policy"
+        op: does-not-contain
+        value: allow-all
+      - key: "ordered_cache_behavior[].viewer_protocol_policy"
+        op: does-not-contain
+        value: allow-all
+    tags:
+      - cloudfront

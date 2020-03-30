@@ -1,0 +1,18 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: REDSHIFT_CLUSTER_KMS_KEY_ID
+    message: RedshiftCluster should specify kms_key_id
+    resource: aws_redshift_cluster
+    severity: WARNING
+    assertions:
+      - key: kms_key_id
+        op: present
+    tags:
+      - redshift

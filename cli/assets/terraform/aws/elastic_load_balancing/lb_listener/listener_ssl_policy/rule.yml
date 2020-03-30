@@ -1,0 +1,28 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: ALB_LISTENER_SSL_POLICY
+    message: ALB listener shouldn't use outdated Predefined Security Policies
+    resources:
+      - aws_alb_listener
+      - aws_lb_listener
+    severity: FAILURE
+    assertions:
+      - key: ssl_policy
+        op: not-in
+        value: ELBSecurityPolicy-2015-05,ELBSecurityPolicy-2015-03,ELBSecurityPolicy-2015-02
+      - key: ssl_policy
+        op: not-in
+        value: ELBSecurityPolicy-2014-10,ELBSecurityPolicy-2014-01
+      - key: ssl_policy
+        op: not-in
+        value: ELBSecurityPolicy-2011-08
+    tags:
+      - alb
+      - lb

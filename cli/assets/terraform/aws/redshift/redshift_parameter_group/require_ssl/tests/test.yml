@@ -1,0 +1,15 @@
+---
+version: 1
+description: Terraform 11 and 12 tests
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+tests:
+  -
+    ruleId: REDSHIFT_CLUSTER_PARAMETER_GROUP_REQUIRE_SSL
+    warnings: 2
+    failures: 0
+    tags:
+      - "terraform11"
+      - "terraform12"

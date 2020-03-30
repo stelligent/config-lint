@@ -1,6 +1,7 @@
 package assertion
 
 import (
+	"errors"
 	"github.com/ghodss/yaml"
 )
 
@@ -158,4 +159,31 @@ func CheckRule(rule Rule, resource Resource, e ExternalRuleInvoker) (string, []V
 		}
 	}
 	return returnStatus, violations, nil
+}
+
+// Join two RuleSets together
+func JoinRuleSets(firstSet RuleSet, secondSet RuleSet) (RuleSet, error) {
+	// if one of the sets is empty, return the other
+	// if both are empty, an empty set is returned
+	if len(firstSet.Rules) == 0 {
+		return secondSet, nil
+	} else if len(secondSet.Rules) == 0 {
+		return firstSet, nil
+	}
+
+	// RuleSets must match Type and Version
+	// Description will be taken from the first given rule set
+	if firstSet.Type != secondSet.Type || firstSet.Version != secondSet.Version {
+		return firstSet, errors.New("RuleSet Type and Version must match")
+	} else {
+		joinedSet := RuleSet{}
+		joinedSet.Type = firstSet.Type
+		joinedSet.Description = firstSet.Description
+		joinedSet.Files = append(firstSet.Files, secondSet.Files...)
+		joinedSet.Rules = append(firstSet.Rules, secondSet.Rules...)
+		joinedSet.Version = firstSet.Version
+		joinedSet.Resources = append(firstSet.Resources, secondSet.Resources...)
+		joinedSet.Columns = append(firstSet.Columns, secondSet.Columns...)
+		return joinedSet, nil
+	}
 }

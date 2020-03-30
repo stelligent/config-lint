@@ -1,0 +1,18 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: ELASTICACHE_ENCRYPTION_REST
+    message: ElastiCache ReplicationGroup should have encryption at rest enabled
+    resource: aws_elasticache_replication_group
+    severity: FAILURE
+    assertions:
+    - key: at_rest_encryption_enabled
+      op: is-true
+    tags:
+      - elasticache

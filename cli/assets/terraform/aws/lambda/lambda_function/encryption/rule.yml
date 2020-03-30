@@ -1,0 +1,18 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: LAMBDA_FUNCTION_ENCRYPTION
+    message: Lambda function should specify kms_key_arn to use a non-default service key
+    resource: aws_lambda_function
+    severity: WARNING
+    assertions:
+      - key: kms_key_arn
+        op: present
+    tags:
+      - lambda

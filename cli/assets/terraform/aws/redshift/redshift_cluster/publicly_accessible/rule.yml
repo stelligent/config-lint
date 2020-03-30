@@ -1,0 +1,18 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: REDSHIFT_CLUSTER_PUBLICLY_ACCESSIBLE
+    message: RedshiftCluster should not be publicly accessible
+    resource: aws_redshift_cluster
+    severity: FAILURE
+    assertions:
+      - key: publicly_accessible
+        op: is-false
+    tags:
+      - redshift

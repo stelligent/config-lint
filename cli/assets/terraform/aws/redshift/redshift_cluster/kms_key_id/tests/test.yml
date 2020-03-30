@@ -1,0 +1,15 @@
+---
+version: 1
+description: Terraform 11 and 12 tests
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+tests:
+  -
+    ruleId: REDSHIFT_CLUSTER_KMS_KEY_ID
+    warnings: 1
+    failures: 0
+    tags:
+      - "terraform11"
+      - "terraform12"

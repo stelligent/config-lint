@@ -1,0 +1,15 @@
+---
+version: 1
+description: Terraform 11 and 12 tests
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+tests:
+  -
+    ruleId: KINESIS_STREAM_KMS
+    warnings: 1
+    failures: 0
+    tags:
+      - "terraform11"
+      - "terraform12"

@@ -4,6 +4,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -135,9 +136,10 @@ func main() {
 	}
 	ruleSets = addExceptions(ruleSets, profileOptions.Exceptions)
 	// Same rule set applies to both TerraformBuiltInRules and Terraform11BuiltInRules
-	// Run for terraform12 by default
+	// loadBuiltInRuleSet can be called recursively against a directory, as done here,
+	// or can be called against a single file, as done with lint-rule.yml
 	if useTerraformBuiltInRules {
-		builtInRuleSet, err := loadBuiltInRuleSet("terraform.yml")
+		builtInRuleSet, err := loadBuiltInRuleSet("terraform")
 		if err != nil {
 			fmt.Printf("Failed to load built-in rules for Terraform: %v\n", err)
 			os.Exit(-1)
@@ -213,11 +215,17 @@ func loadRuleSets(args arrayFlags) ([]assertion.RuleSet, error) {
 	return ruleSets, nil
 }
 
+func isYamlFile(filename string) bool {
+	configPatterns := []string{"*yml", "*.yaml"}
+	match, _ := assertion.ShouldIncludeFile(configPatterns, filename)
+	return match
+
+}
+
 func yamlFilesOnly(filenames []string) []string {
 	configFiles := []string{}
-	configPatterns := []string{"*yml", "*.yaml"}
 	for _, filename := range filenames {
-		match, _ := assertion.ShouldIncludeFile(configPatterns, filename)
+		match := isYamlFile(filename)
 		if match {
 			configFiles = append(configFiles, filename)
 		}
@@ -225,16 +233,74 @@ func yamlFilesOnly(filenames []string) []string {
 	return configFiles
 }
 
-func loadBuiltInRuleSet(name string) (assertion.RuleSet, error) {
-	emptyRuleSet := assertion.RuleSet{}
+// Takes a name of a rule YAML file or a directory containing YAML rules
+// Returns a RuleSet of all rules in that file or directory
+func loadBuiltInRuleSet(filename string) (assertion.RuleSet, error) {
+	ruleSet := assertion.RuleSet{}
 	box := packr.NewBox("./assets")
+	assertion.Debugf("Looking for file %v in Box: %v\n", filename, box)
+
+	var err error
+	if isYamlFile(filename) && box.Has(filename) {
+		ruleSet, err = addRuleSet(ruleSet, box, filename)
+		if err != nil {
+			assertion.Debugf("Failed to add RuleSet: %v\n", err)
+			return assertion.RuleSet{}, err // returns empty rule set
+		}
+	} else {
+		box = packr.NewBox("./assets/" + filename)
+		assertion.Debugf("New Box: %v\n", box)
+		filesInBox := box.List()
+		if len(filesInBox) > 0 {
+			// Get each file in that box
+			for _, fileInBox := range filesInBox {
+				// Check if file is YAML
+				if isYamlFile(fileInBox) {
+					assertion.Debugf("Adding rule set: %v\n", fileInBox)
+					ruleSet, err = addRuleSet(ruleSet, box, fileInBox)
+					if err != nil {
+						assertion.Debugf("Failed to add RuleSet: %v\n", err)
+						return assertion.RuleSet{}, err // returns empty rule set
+					}
+				}
+			}
+		} else {
+			return assertion.RuleSet{}, errors.New("File or directory doesnt exist")
+		}
+	}
+	return ruleSet, nil
+}
+
+func addRuleSet(ruleSet assertion.RuleSet, box packr.Box, filename string) (assertion.RuleSet, error) {
+	// Get RuleSet from file
+	newRuleSet, err := getRuleSet(box, filename)
+	if err != nil {
+		assertion.Debugf("Failed to get RuleSet: %v\n", err)
+		return assertion.RuleSet{}, err // returns empty rule set
+	}
+
+	// Join with existing rule sets
+	ruleSet, err = assertion.JoinRuleSets(ruleSet, newRuleSet)
+	if err != nil {
+		assertion.Debugf("Failed to join RuleSets: %v\n", err)
+		return assertion.RuleSet{}, err // returns empty rule set
+	}
+
+	return ruleSet, nil
+}
+
+// Given a packr box and rule file in that box,
+// build and return a RuleSet
+func getRuleSet(box packr.Box, name string) (assertion.RuleSet, error) {
 	rulesContent, err := box.FindString(name)
 	if err != nil {
-		return emptyRuleSet, err
+		assertion.Debugf("Failed to find filename string in box: %v\n", err)
+		return assertion.RuleSet{}, err
 	}
 	ruleSet, err := assertion.ParseRules(string(rulesContent))
 	if err != nil {
-		return emptyRuleSet, err
+		assertion.Debugf("Failed to parse rules from file: %v\n", err)
+		return assertion.RuleSet{}, err
 	}
 	return ruleSet, nil
 }

@@ -1,0 +1,19 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: S3_BUCKET_ACL
+    message: S3 Bucket should not be public
+    resource: aws_s3_bucket
+    severity: FAILURE
+    assertions:
+      - key: acl
+        op: not-in
+        value: public-read,public-read-write
+    tags:
+      - s3
