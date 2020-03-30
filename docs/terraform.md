@@ -33,7 +33,7 @@ The default category for resources that can be linter is "resource", which cover
 
 ### Rule Structure
 
-Rules are divided into their respective resource directory starting under `assets/terraform`. Each rule is organized following the same tiered directory structure `{ Provider }} / {{ Major Family }} / {{ Resource Name }} / {{ Rule Name }} / rule.yml` where Major Family and Resource Name follow the same naming conventions defined by Terraform. For example, `cli/assets/terraform/aws/elastic_load_balancing/elb/access_logs_enabled/rule.yml`. The rule configuration itself must be named `rule.yml`.
+Rules are divided into their respective resource directory starting under `assets/terraform`. Each rule is organized following the same tiered directory structure `{ Provider }} / {{ Major Family }} / {{ Resource Name }} / {{ Rule Name }} / rule.yml` where Major Family and Resource Name follow the same naming conventions defined by Terraform. For example, `cli/assets/terraform/aws/batch/batch_job_definition/container_properties_privileged/rule.yml`. The rule configuration itself must be named `rule.yml`.
 
 ```
 └── terraform
