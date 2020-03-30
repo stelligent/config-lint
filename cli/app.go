@@ -136,7 +136,8 @@ func main() {
 	}
 	ruleSets = addExceptions(ruleSets, profileOptions.Exceptions)
 	// Same rule set applies to both TerraformBuiltInRules and Terraform11BuiltInRules
-	// Run for terraform12 by default
+	// loadBuiltInRuleSet can be called recursively against a directory, as done here,
+	// or can be called against a single file, as done with lint-rule.yml
 	if useTerraformBuiltInRules {
 		builtInRuleSet, err := loadBuiltInRuleSet("terraform")
 		if err != nil {
