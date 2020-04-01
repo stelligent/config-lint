@@ -24,12 +24,16 @@ You can specify the -rules option multiple times if you have multiple custom rul
 
 ### Categories
 
-The default category for resources that can be linter is "resource", which covers the most common use case. This is for things like aws_instances, or s3_buckets, etc. But there are some additional categories available for Terraform linting. The current list of supported categories is:
+The default category for resources that can be linter is "resource", which covers the most common use case. This is for things like aws_instances, or s3_buckets, etc. But all other block types are available for Terraform linting.
 
-* resource
 * data
-* provider
+* locals
 * module
+* output
+* provider
+* resource
+* terraform
+* variable
 
 ### Rule Structure
 
@@ -90,6 +94,62 @@ rules:
         op: regex
         value: "^[0-9]{4}$"
 ```
+
+### Top level blocks
+
+Config-lint mainly works on [block arguments and expressions](https://www.terraform.io/docs/configuration/index.html#arguments-blocks-and-expressions) level (the inner part of Terraform blocks), however top level block types and names could linted using `__type__` and `__name__` keys.
+
+Here is an example to follow [Terraform best practices](https://www.terraform.io/docs/extend/best-practices/naming.html) for naming:
+
+```yaml
+---
+version: 1
+description: Make sure Terraform top level blocks follow best practices.
+type: Terraform
+files:
+  - "*.tf"
+rules:
+  - id: TF_RESOURCE_NAMING_CONVENTION
+    message: "Terraform resource block name should match the naming convention. Name should be: not more 64 chars, starts with letter, doesn't have dash, and ends with letter or number"
+    severity: FAILURE
+    category: resource
+    assertions:
+    - key: __name__
+      op: regex
+      value: '^[a-z][a-z0-9_]{0,62}[a-z0-9]$'
+  - id: TF_DATA_NAMING_CONVENTION
+    message: "Terraform data block name should match the naming convention. Name should be: not more 64 chars, starts with letter, doesn't have dash, and ends with letter or number"
+    severity: FAILURE
+    category: data
+    assertions:
+    - key: __name__
+      op: regex
+      value: '^[a-z][a-z0-9_]{0,62}[a-z0-9]$'
+```
+
+Another example, maybe you want to make sure there are no beta providers (e.g. [google-beta](https://www.terraform.io/docs/providers/google/guides/provider_versions.html#google-beta)) used in production:
+```yaml
+rules:
+  - id: TF_PROVIDER_NO_BETA
+    message: "No beta feature providers should be used in production"
+    severity: FAILURE
+    category: data
+    assertions:
+    - not:
+      - key: __type__
+        op: regex
+        value: '.*?beta.*'
+```
+
+**Please note:**
+
+Not all blocks have `__type__` and `__name__` keys. It depends on the block itself. For example, `variable` blocks have name but not type.
+
+There are 4 groups in that regard:
+* **Type and name:** data, resource.
+* **Type only:** provider.
+* **Name only:** module, output, variable.
+* **No type and no name:** locals, terraform (they are linted using normal keys defined within them).
 
 ### Provider Example
 
@@ -212,7 +272,6 @@ rules:
         op: not-contains
         value: 22
 ```
-
 
 ### Testing Builtin Rules
 
