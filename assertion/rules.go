@@ -142,6 +142,11 @@ func CheckRule(rule Rule, resource Resource, e ExternalRuleInvoker) (string, []V
 			return "FAILURE", violations, err
 		}
 		if expressionResult.Status != "OK" {
+			// If the rule has category (e.g. Terraform rules), then return violations for that category only.
+			// If the rule has no category it will be applied to all resources as normal.
+			if rule.Category != "" && rule.Category != resource.Category {
+			    break
+			}
 			returnStatus = expressionResult.Status
 			v := Violation{
 				RuleID:           rule.ID,
