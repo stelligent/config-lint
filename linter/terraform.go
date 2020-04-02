@@ -249,8 +249,8 @@ func getResources(filename string, ast *ast.File, objects []interface{}, categor
 						lineNumber := getResourceLineNumber(resourceType, resourceID, filename, ast)
 						// Expose block ID so it could be linted e.g.
 						// resource "aws_s3_bucket" "web" { ... }
-						// The block id here is "web".
-						properties["__id__"] = resourceID
+						// The block name/id here is "web".
+						properties["__name__"] = resourceID
 						properties["__file__"] = filename
 						properties["__dir__"] = filepath.Dir(filename)
 						tr := assertion.Resource{
