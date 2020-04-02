@@ -37,8 +37,19 @@ func loadResources12ToTest(t *testing.T, filename string) []assertion.Resource {
 	return resources
 }
 
+func filterByCategory(t *testing.T, resources []assertion.Resource, categoryName string) []assertion.Resource {
+	result := []assertion.Resource{}
+	for _, resource := range resources {
+		if resource.Category == categoryName {
+			result = append(result, resource)
+		}
+	}
+	return result
+}
+
 func TestSingleResourceType(t *testing.T) {
-	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	allResources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	resources := filterByCategory(t, allResources, "resource")
 	assert.Equal(t, 1, len(resources), "Expecting 1 resource")
 	assert.Equal(t, "aws_instance", resources[0].Type)
 	assert.Equal(t, "first", resources[0].ID)
@@ -73,44 +84,48 @@ func TestMultipleBlocksOfSameType12(t *testing.T) {
 
 func TestInnerObjects12(t *testing.T) {
 	resources := loadResources12ToTest(t, "./testdata/resources/terraform_inner_objects.tf")
-	assert.Equal(t, 2, len(resources), "Expecting 1 resource")
-	properties := resources[0].Properties.(map[string]interface{})
+	assert.Equal(t, 2, len(resources), "Expecting 2 resource")
+	properties := resources[1].Properties.(map[string]interface{})
 	artifactStore := properties["artifact_store"].([]interface{})[0].(map[string]interface{})
 	encryptionKey := artifactStore["encryption_key"]
 	assert.NotNil(t, encryptionKey)
 }
 
 func TestTerraform12Variable(t *testing.T) {
-	loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
-	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	allResources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	resources := filterByCategory(t, allResources, "resource")
 	assert.Equal(t, 1, len(resources), "Expecting 1 resource")
 	properties := resources[0].Properties.(map[string]interface{})
 	assert.Equal(t, "ami-f2d3638a", properties["ami"], "Unexpected value for simple variable")
 }
 
 func TestTerraform12VariableWithNoDefault(t *testing.T) {
-	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	allResources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	resources := filterByCategory(t, allResources, "resource")
 	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
 	tags := getResourceTags(resources[0])
 	assert.Equal(t, "UNDEFINED", tags["department"], "Unexpected value for variable with no default")
 }
 
 func TestTerraform12FunctionCall(t *testing.T) {
-	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	allResources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	resources := filterByCategory(t, allResources, "resource")
 	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
 	tags := getResourceTags(resources[0])
 	assert.Equal(t, "test", tags["environment"], "Unexpected value for lookup function")
 }
 
 func TestTerraform12ListVariable(t *testing.T) {
-	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	allResources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	resources := filterByCategory(t, allResources, "resource")
 	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
 	tags := getResourceTags(resources[0])
 	assert.Equal(t, tags["comment"], "bar", "Unexpected value for list variable")
 }
 
 func TestTerraform12LocalVariable(t *testing.T) {
-	resources := loadResources12ToTest(t, "./testdata/resources/uses_local_variables.tf")
+	allResources := loadResources12ToTest(t, "./testdata/resources/uses_local_variables.tf")
+	resources := filterByCategory(t, allResources, "resource")
 	assert.Equal(t, len(resources), 1, "Expecting 1 resource")
 	properties := resources[0].Properties.(map[string]interface{})
 	assert.Equal(t, "myprojectbucket", properties["name"], "Unexpected value for name attribute")
@@ -118,7 +133,8 @@ func TestTerraform12LocalVariable(t *testing.T) {
 
 func TestTerraform12VariablesFromEnvironment(t *testing.T) {
 	os.Setenv("TF_VAR_instance_type", "c4.large")
-	resources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	allResources := loadResources12ToTest(t, "./testdata/resources/uses_variables.tf")
+	resources := filterByCategory(t, allResources, "resource")
 	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
 	properties := resources[0].Properties.(map[string]interface{})
 	assert.Equal(t, properties["instance_type"], "c4.large", "Unexpected value for instance_type")
@@ -416,7 +432,8 @@ func TestTerraform12LinterCases(t *testing.T) {
 }
 
 func TestTerraform12FileFunctionMultiLineContent(t *testing.T) {
-	resources := loadResources12ToTest(t, "./testdata/resources/reference_file_multi_line.tf")
+	allResources := loadResources12ToTest(t, "./testdata/resources/reference_file_multi_line.tf")
+	resources := filterByCategory(t, allResources, "resource")
 	assert.Equal(t, len(resources), 2, "Unexpected number of resources found")
 	properties_1 := resources[0].Properties.(map[string]interface{})
 	assert.Equal(t, properties_1["test_value"], "multi\nline\nexample", "Unexpected value for bucket property")
@@ -433,21 +450,24 @@ func TestTerraform12FileFunctionResourceFileAbsolutePath(t *testing.T) {
 }
 
 func TestTerraform12FileFunctionTemplateFileFunction(t *testing.T) {
-	resources := loadResources12ToTest(t, "./testdata/resources/template_file_function_basic.tf")
+	allResources := loadResources12ToTest(t, "./testdata/resources/template_file_function_basic.tf")
+	resources := filterByCategory(t, allResources, "resource")
 	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
 	properties := resources[0].Properties.(map[string]interface{})
 	assert.Equal(t, properties["bucket"], "bucket-foo-example-bar", "Unexpected value for bucket property")
 }
 
 func TestTerraform12FileFunctionTemplateFileForLoop(t *testing.T) {
-	resources := loadResources12ToTest(t, "./testdata/resources/template_file_function_for_loop.tf")
+	allResources := loadResources12ToTest(t, "./testdata/resources/template_file_function_for_loop.tf")
+	resources := filterByCategory(t, allResources, "resource")
 	assert.Equal(t, len(resources), 1, "Unexpected number of resources found")
 	properties := resources[0].Properties.(map[string]interface{})
 	assert.Equal(t, properties["test_value"], "testing:foo\ntesting:bar", "Unexpected value for bucket property")
 }
 
 func TestTerraform12FileFunctionTemplateFileConditional(t *testing.T) {
-	resources := loadResources12ToTest(t, "./testdata/resources/template_file_function_conditional.tf")
+	allResources := loadResources12ToTest(t, "./testdata/resources/template_file_function_conditional.tf")
+	resources := filterByCategory(t, allResources, "resource")
 	assert.Equal(t, len(resources), 2, "Unexpected number of resources found")
 	properties := resources[0].Properties.(map[string]interface{})
 	assert.Equal(t, properties["test_value"], "Foo", "Unexpected value for bucket property")
