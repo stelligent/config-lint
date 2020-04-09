@@ -210,6 +210,7 @@ func loadRuleSets(args arrayFlags) ([]assertion.RuleSet, error) {
 		if err != nil {
 			return ruleSets, err
 		}
+		ruleSet.Source = rulesFilename
 		ruleSets = append(ruleSets, ruleSet)
 	}
 	return ruleSets, nil
