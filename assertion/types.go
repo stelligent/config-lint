@@ -14,14 +14,15 @@ type (
 
 	// RuleSet describes a collection of rules for a Linter
 	RuleSet struct {
-		Type        string
-		Description string
-		Files       []string
-		Rules       []Rule
-		Version     string
-		Resources   []ResourceConfig
-		Columns     []ColumnConfig
-	}
+	Type        string
+	Description string
+	Files       []string
+	Rules       []Rule
+	Version     string
+	Resources   []ResourceConfig
+	Columns     []ColumnConfig
+	Source      string
+}
 
 	// Rule is part of a RuleSet
 	Rule struct {

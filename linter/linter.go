@@ -49,6 +49,6 @@ func NewLinter(ruleSet assertion.RuleSet, vs assertion.ValueSource, filenames []
 	case "CSV":
 		return FileLinter{Filenames: filenames, ValueSource: vs, Loader: CSVResourceLoader{Columns: ruleSet.Columns}}, nil
 	default:
-		return nil, fmt.Errorf("Type not supported: %s", ruleSet.Type)
+		return nil, fmt.Errorf("Type not supported: %s", ruleSet.Source)
 	}
 }
