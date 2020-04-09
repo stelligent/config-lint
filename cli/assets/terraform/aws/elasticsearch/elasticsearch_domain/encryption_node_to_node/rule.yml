@@ -1,0 +1,23 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: ELASTICSEARCH_NODE_TO_NODE_ENCRYPTION
+    message: Elasticsearch domain must have encryption at rest
+    resource: aws_elasticsearch_domain
+    severity: FAILURE
+    assertions:
+      - key: node_to_node_encryption
+        op: present
+      - every:
+          key: node_to_node_encryption
+          expressions:
+            - key: enabled
+              op: is-true
+    tags:
+      - elasticsearch

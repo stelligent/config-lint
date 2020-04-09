@@ -1,0 +1,26 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: ELASTICSEARCH_POLICY_WILDCARD_PRINCIPAL
+    message: Elasticsearch allow policy should not use a wildcard princpal
+    resource: aws_elasticsearch_domain_policy
+    severity: FAILURE
+    assertions:
+      - none:
+          key: access_policies.Statement[]
+          expressions:
+            - key: Effect
+              op: eq
+              value: Allow
+            - key: Principal
+              op: contains
+              value: "*"
+    tags:
+      - elasticsearch
+      - policy

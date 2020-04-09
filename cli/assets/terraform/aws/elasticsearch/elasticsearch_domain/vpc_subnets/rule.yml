@@ -1,0 +1,18 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: ELASTICSEARCH_VPC
+    message: Elasticsearch domain must be in a VPC
+    resource: aws_elasticsearch_domain
+    severity: FAILURE
+    assertions:
+      - key: vpc_options
+        op: present
+    tags:
+      - elasticsearch
