@@ -4,7 +4,7 @@ type (
 
 	// Resource describes a resource to be linted
 	Resource struct {
-		ID         string       `cty:"aws_instance"`
+		ID         string `cty:"aws_instance"`
 		Type       string
 		Category   string // default is "resource", can be "data", "provider" for Terraform
 		Properties interface{}
@@ -14,15 +14,15 @@ type (
 
 	// RuleSet describes a collection of rules for a Linter
 	RuleSet struct {
-	Type        string
-	Description string
-	Files       []string
-	Rules       []Rule
-	Version     string
-	Resources   []ResourceConfig
-	Columns     []ColumnConfig
-	Source      string
-}
+		Type        string
+		Description string
+		Files       []string
+		Rules       []Rule
+		Version     string
+		Resources   []ResourceConfig
+		Columns     []ColumnConfig
+		Source      string
+	}
 
 	// Rule is part of a RuleSet
 	Rule struct {
