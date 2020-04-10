@@ -1,0 +1,18 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: OPSWORKS_APP_SSL
+    message: OpsWorks Applications must use SSL
+    resource: aws_opsworks_application
+    severity: FAILURE
+    assertions:
+      - key: enable_ssl
+        op: is-true
+    tags:
+      - opsworks
