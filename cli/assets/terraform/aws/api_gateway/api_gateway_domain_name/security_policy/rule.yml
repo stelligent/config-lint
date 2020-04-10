@@ -1,0 +1,19 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: API_GW_DOMAIN_SECURITY_POLICY_TLS1_2
+    message: API Gateway domain name must use TLS 1.2
+    resource: aws_api_gateway_domain_name
+    severity: FAILURE
+    assertions:
+      - key: security_policy
+        op: eq
+        value: "TLS_1_2"
+    tags:
+      - api_gateway
