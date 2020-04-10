@@ -1,0 +1,19 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: DOCUMENTDB_AUDIT_LOGS
+    message: DocumentDB should have audit logging enabled
+    resource: aws_docdb_cluster
+    severity: FAILURE
+    assertions:
+      - key: enabled_cloudwatch_logs_exports
+        op: contains
+        value: "audit"
+    tags:
+      - documentdb
