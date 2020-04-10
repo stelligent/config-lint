@@ -13,7 +13,7 @@ rules:
     severity: FAILURE
     assertions:
       - none:
-          key: access_policies.Statement[]
+          key: access_policies.Statement
           expressions:
             - key: Effect
               op: eq
