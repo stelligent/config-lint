@@ -11,5 +11,5 @@ tests:
     warnings: 0
     failures: 3
     tags:
-      - "terraform12"
       - "terraform11"
+      - "terraform12"
