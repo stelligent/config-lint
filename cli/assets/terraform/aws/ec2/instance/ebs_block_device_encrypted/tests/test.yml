@@ -13,3 +13,10 @@ tests:
     tags:
       - "terraform11"
       - "terraform12"
+  -
+    ruleId: EBS_BLOCK_DEVICE_ENCRYPTED_KMS
+    warnings: 2
+    failures: 0
+    tags:
+      - "terraform11"
+      - "terraform12"

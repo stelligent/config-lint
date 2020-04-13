@@ -1,5 +1,13 @@
+# Test that EBS block device is using encrpytion and specifies a KMS key
+# https://www.terraform.io/docs/providers/aws/r/instance.html#encrypted
+# https://www.terraform.io/docs/providers/aws/r/instance.html#kms_key_id
+
+provider "aws" {
+  region = "us-east-1"
+}
+
 ## Setup Helper
-data "aws_ami" "test_ami" {
+data "aws_ami" "ubuntu" {
   most_recent = true
 
   filter {
@@ -15,27 +23,29 @@ data "aws_ami" "test_ami" {
   owners = ["099720109477"] # Canonical
 }
 
-# Pass
+# PASS: Not specifiying an EBS block device
 resource "aws_instance" "ebs_block_device_not_set" {
-  ami           = "${data.aws_ami.ubuntu.id}"
+  ami           = "$(data.aws_ami.ubuntu.id}"
   instance_type = "t2.micro"
 }
 
-# Pass
+# PASS: Block device specified with encryption enabled and KMS key
 resource "aws_instance" "ebs_block_device_encrypted_set_to_true" {
-  ami           = "${data.aws_ami.ubuntu.id}"
+  ami           = "$(data.aws_ami.ubuntu.id}"
   instance_type = "t2.micro"
 
   ebs_block_device {
     device_name = "/dev/xvda"
     volume_size = 20
     encrypted   = true
+    kms_key_id  = "arn:aws:kms:us-west-2:111122223333:key/1234abcd-12ab-34cd-56ef-1234567890a"
   }
 }
 
-# Fail
+# FAIL: Encryption disabled
+# WARN: KMS key not specified
 resource "aws_instance" "ebs_block_device_encrypted_set_to_false" {
-  ami           = "${data.aws_ami.ubuntu.id}"
+  ami           = "$(data.aws_ami.ubuntu.id}"
   instance_type = "t2.micro"
 
   ebs_block_device {
@@ -45,9 +55,10 @@ resource "aws_instance" "ebs_block_device_encrypted_set_to_false" {
   }
 }
 
-# Fail
+# FAIL: Encryption not specified
+# WARN: KMS key not specified
 resource "aws_instance" "ebs_block_device_encrypted_not_set" {
-  ami           = "${data.aws_ami.ubuntu.id}"
+  ami           = "$(data.aws_ami.ubuntu.id}"
   instance_type = "t2.micro"
 
   ebs_block_device {
