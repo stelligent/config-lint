@@ -7,9 +7,8 @@ files:
   - "*.tfvars"
 tests:
   -
-    ruleId: SQS_QUEUE_ENCRYPTION
+    ruleId: API_GW_DOMAIN_SECURITY_POLICY_TLS1_2
     warnings: 0
-    failures: 3
+    failures: 2
     tags:
-      - "terraform11"
       - "terraform12"

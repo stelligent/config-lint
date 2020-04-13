@@ -1,0 +1,18 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: GLUE_CONNECTION_PROPERTIES
+    message: Glue connection properties cannot specify plaintext passwords
+    resource: aws_glue_connection
+    severity: FAILURE
+    assertions:
+      - key: connection_properties[].PASSWORD | [0]
+        op: absent
+    tags:
+      - glue

@@ -1,0 +1,23 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: ELASTICSEARCH_ENCRYPTION_REST
+    message: Elasticsearch domain must be encrypted at rest
+    resource: aws_elasticsearch_domain
+    severity: FAILURE
+    assertions:
+      - key: encrypt_at_rest
+        op: present
+      - every:
+          key: encrypt_at_rest
+          expressions:
+            - key: enabled
+              op: is-true
+    tags:
+      - elasticsearch
