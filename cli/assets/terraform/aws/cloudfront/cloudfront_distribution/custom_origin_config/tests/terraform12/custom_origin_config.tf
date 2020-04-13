@@ -1,3 +1,7 @@
+# Test that a cloudfront_distribution resource is using OAI or origin_protocol_policy is using https-only
+# https://www.terraform.io/docs/providers/aws/r/cloudfront_distribution.html#origin_access_identity
+# https://www.terraform.io/docs/providers/aws/r/cloudfront_distribution.html#origin_protocol_policy
+
 ## Setup Helper
 variable "test_domain_s3_location" {
   default = "http://foo.s3-website-us-east-1.amazonaws.com"
@@ -15,7 +19,7 @@ variable "test_logging_prefix" {
   default = "aws_cloudfront_distribution"
 }
 
-# Pass
+# PASS: OIA is used
 resource "aws_cloudfront_distribution" "custom_origin_config_not_set" {
   enabled = true
 
@@ -65,7 +69,7 @@ resource "aws_cloudfront_distribution" "custom_origin_config_not_set" {
   }
 }
 
-# Pass
+# PASS: origin_protocol_policy is https-only
 resource "aws_cloudfront_distribution" "custom_origin_config_set_to_https-only" {
   enabled = true
 
@@ -118,7 +122,7 @@ resource "aws_cloudfront_distribution" "custom_origin_config_set_to_https-only" 
   }
 }
 
-# Fail
+# FAIL: origin_protocol_policy is not https-only
 resource "aws_cloudfront_distribution" "custom_origin_config_set_to_http-only" {
   enabled = true
 
@@ -171,7 +175,7 @@ resource "aws_cloudfront_distribution" "custom_origin_config_set_to_http-only" {
   }
 }
 
-# Fail
+# FAIL: origin_protocol_policy is not https-only
 resource "aws_cloudfront_distribution" "custom_origin_config_set_to_match-viewer" {
   enabled = true
 
