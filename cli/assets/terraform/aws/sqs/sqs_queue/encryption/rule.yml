@@ -8,12 +8,12 @@ files:
 rules:
 
   - id: SQS_QUEUE_ENCRYPTION
-    message: SQSQueue should use encryption
+    message: SQSQueue should use encryption and define a reuse period
     resource: aws_sqs_queue
     severity: FAILURE
     assertions:
       - key: "@"
         op: has-properties
-        value: kms_master_key_id
+        value: kms_master_key_id, kms_data_key_reuse_period_seconds
     tags:
       - sqs
