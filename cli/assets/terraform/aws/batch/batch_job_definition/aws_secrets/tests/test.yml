@@ -1,6 +1,6 @@
 ---
 version: 1
-description: Terraform 11 and 12 tests
+description: Terraform 12 test
 type: Terraform
 files:
   - "*.tf"
