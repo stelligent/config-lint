@@ -22,7 +22,7 @@ rules:
       - ebs
 
   - id: EBS_BLOCK_DEVICE_ENCRYPTED_KMS
-    message: EBS block devices should specify a KMS key for encrpytion
+    message: EBS block devices should specify a KMS key for encryption
     resource: aws_instance
     severity: WARNING
     assertions:
