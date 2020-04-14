@@ -2,10 +2,10 @@ name: Build
 
 on:
   push:
-    branches:
-      - '**'
     tags-ignore:
       - '**'
+    branches-ignore:
+      - 'feature/github_pages' # temporarily ignore github_pages for testing
   pull_request:
     branches:
       - master
