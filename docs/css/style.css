@@ -1,0 +1,29 @@
+/* COVER */
+section.cover {
+    color: #fff;
+    background:url(/img/bg-pattern.png),linear-gradient(to left,#f4842b,#7b4397) !important;
+  }
+  
+  section.cover h1 {
+    font-size: 5rem;
+    font-weight: 600;
+  }
+  
+  section.cover h1 a span {
+    color: #fff;
+  }
+  
+  /* Cover buttons */
+  
+  section.cover .cover-main > p:last-child a {
+    border: 1px solid #fff;
+    color: #fff;
+  }
+  section.cover .cover-main > p:last-child a:last-child {
+    background-color: #fff;
+    color: var(--theme-color,#fff);
+  }
+  section.cover .cover-main > p:last-child a:last-child:hover {
+    color: var(--theme-color,#fff);
+    opacity: .8;
+  }
