@@ -16,3 +16,13 @@ rules:
       op: is-true
     tags:
       - elasticache
+
+  - id: ELASTICACHE_ENCRYPTION_REST_KMS
+    message: ElastiCache ReplicationGroup should have a KMS key specified
+    resource: aws_elasticache_replication_group
+    severity: WARNING
+    assertions:
+    - key: kms_key_id
+      op: present
+    tags:
+      - elasticache
