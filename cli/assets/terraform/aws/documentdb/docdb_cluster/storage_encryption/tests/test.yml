@@ -12,3 +12,9 @@ tests:
     failures: 2
     tags:
       - "terraform12"
+  -
+    ruleId: DOCUMENTDB_STORAGE_KMS
+    warnings: 3
+    failures: 0
+    tags:
+      - "terraform12"
