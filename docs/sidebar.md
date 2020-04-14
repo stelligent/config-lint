@@ -1,4 +1,4 @@
-<!-- docs/_sidebar.md -->
+<!-- _sidebar.md -->
 
 - [home](/)
 - [design](design.md 'Overview of config-lint design')
