@@ -1,7 +1,7 @@
 /* COVER */
 section.cover {
     color: #fff;
-    background:url(/img/bg-pattern.png),linear-gradient(to left,#f4842b,#7b4397) !important;
+    background:url(../img/bg-pattern.png),linear-gradient(to left,#f4842b,#7b4397) !important;
   }
   
   section.cover h1 {
@@ -25,5 +25,5 @@ section.cover {
   }
   section.cover .cover-main > p:last-child a:last-child:hover {
     color: var(--theme-color,#fff);
-    opacity: .8;
+    opacity: 0.8;
   }
