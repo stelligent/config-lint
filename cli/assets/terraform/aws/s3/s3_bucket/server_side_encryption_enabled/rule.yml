@@ -17,3 +17,19 @@ rules:
         value: server_side_encryption_configuration
     tags:
       - s3
+
+  - id: S3_BUCKET_KMS
+    message: S3 bucket should have a KMS key specified and sse_algorithm set to aws:kms
+    resource: aws_s3_bucket
+    severity: WARNING
+    assertions:
+      - every:
+          key: server_side_encryption_configuration[].rule[].apply_server_side_encryption_by_default
+          expressions:
+            - key: kms_master_key_id
+              op: present
+            - key: sse_algorithm
+              op: eq
+              value: "aws:kms"
+    tags:
+      - s3
