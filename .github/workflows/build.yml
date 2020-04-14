@@ -27,8 +27,15 @@ jobs:
         run: |
           go mod download
       -  
-        name: make test
+        name: build
         run: |
           export GOPATH=/home/runner/go
           export PATH="$PATH:$GOPATH/bin"
-          make test && make smoke-test
+          make build
+      -  
+        name: test
+        run: |
+          export GOPATH=/home/runner/go
+          export PATH="$PATH:$GOPATH/bin"
+          make test
+          make smoke-test
