@@ -31,12 +31,19 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.docker_password }}
         run: |
           echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
+      -
+        name: build
+        run: |
+          export GOPATH=/home/runner/go
+          export PATH="$PATH:$GOPATH/bin"
+          make build
       -  
-        name: make test
+        name: test
         run: |
           export GOPATH=/home/runner/go
           export PATH="$PATH:$GOPATH/bin"
           make test
+          make smoke-test
       - 
         name: release
         uses: goreleaser/goreleaser-action@v1
