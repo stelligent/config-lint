@@ -16,3 +16,13 @@ rules:
       op: is-true
     tags:
       - neptune
+
+  - id: NEPTUNE_DB_KMS
+    message: Neptune database cluster storage should have a KMS key specified
+    resource: aws_neptune_cluster
+    severity: WARNING
+    assertions:
+    - key: kms_key_arn
+      op: present
+    tags:
+      - neptune

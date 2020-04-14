@@ -20,3 +20,17 @@ rules:
     tags:
       - ec2
       - ebs
+
+  - id: EBS_BLOCK_DEVICE_ENCRYPTED_KMS
+    message: EBS block devices should specify a KMS key for encryption
+    resource: aws_instance
+    severity: WARNING
+    assertions:
+      - every:
+          key: ebs_block_device
+          expressions:
+            - key: kms_key_id
+              op: present
+    tags:
+      - ec2
+      - ebs
