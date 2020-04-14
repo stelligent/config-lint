@@ -1,5 +1,3 @@
-![Build & Deploy](https://github.com/stelligent/config-lint/workflows/Build%20%26%20Deploy/badge.svg) [![Join the chat at https://gitter.im/stelligent/config-lint](https://badges.gitter.im/stelligent/config-lint.svg)](https://gitter.im/stelligent/config-lint?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 # config-lint
 
 A command line tool to validate configurations using rules specified in a YAML file.
