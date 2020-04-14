@@ -36,7 +36,7 @@ jobs:
         run: |
           export GOPATH=/home/runner/go
           export PATH="$PATH:$GOPATH/bin"
-          make test
+          make test && make smoke-test
       - 
         name: release
         uses: goreleaser/goreleaser-action@v1
