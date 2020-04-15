@@ -1,3 +1,6 @@
+# Push with a commit message containing `#major` to bump major version
+# and update the major version number here.
+
 # MAJOR Version: 1.x
 
 name: Bump Version

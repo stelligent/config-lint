@@ -29,8 +29,8 @@ jobs:
       -
         name: docker login
         env:
-          DOCKER_USER: ${{ secrets.docker_user }}
-          DOCKER_PASSWORD: ${{ secrets.docker_password }}
+          DOCKER_USER: ${{ secrets.dockerhub_user }}
+          DOCKER_PASSWORD: ${{ secrets.dockerhub_token }}
         run: |
           echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
       -
