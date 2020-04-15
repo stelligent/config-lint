@@ -1,13 +1,8 @@
 name: Build & Deploy
 
 on:
-  push:
-    tags:
-      - 'v*.*.*'
-    branches-ignore:
-      - '**'
-    paths-ignore:
-      - 'docs/**'
+  repository_dispatch:
+    types: [release]
 
 jobs:
   build:
