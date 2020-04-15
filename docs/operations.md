@@ -1,3 +1,7 @@
+# Operations
+
+The rules contain a list of expressions that use operations
+
 ## Assertion Operations
 
 | Operation                              | Description                |

@@ -1,6 +1,6 @@
 <!-- _coverpage.md -->
 
-# config-lint <small>1.0</small>
+# config-lint <small>1.x</small>
 
 a tool to validate configuration files against custom specifications
 

@@ -1,8 +1,9 @@
 # Profiles
 
-The -profile command line option takes a filename which contains a set of default values for various command line options.
-If there is a file in the working directory called `config-lint.yml`, it will be loaded automatically.
-All values in the profile are optional, and are overriden by anything specified on the command line.
+You can use a profile to control the default options.
+
+The -profile command line option takes a filename which contains a set of default values for various command line options. If there is a file in the working directory called `config-lint.yml`, it will be loaded automatically. All values in the profile are optional, and are overriden by anything specified on the command line.
+
 An example profile:
 
 ```

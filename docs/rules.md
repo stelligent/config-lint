@@ -1,5 +1,7 @@
 # Rules File
 
+A YAML file that specifies what kinds of files to process, and what validations to perform.
+
 ## Attributes for the Rule Set
 
 |Name       |Description                                                                         |
