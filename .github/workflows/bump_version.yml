@@ -10,6 +10,7 @@ on:
       - '**'
     paths-ignore:
       - 'docs/**'
+      - '*.md'
 
 jobs:
   build:
@@ -21,6 +22,6 @@ jobs:
     - name: Bump version and push tag
       uses: anothrNick/github-tag-action@1.19.0
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.release_bot }}
         WITH_V: true
         DEFAULT_BUMP: minor

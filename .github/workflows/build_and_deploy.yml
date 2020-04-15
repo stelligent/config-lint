@@ -8,6 +8,7 @@ on:
       - '**'
     paths-ignore:
       - 'docs/**'
+      - '*.md'
 
 jobs:
   build:
@@ -51,4 +52,4 @@ jobs:
         with:
           args: release --skip-validate
         env:
-          GITHUB_TOKEN: ${{ secrets.goreleaser }}
+          GITHUB_TOKEN: ${{ secrets.release_bot }}
