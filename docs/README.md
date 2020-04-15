@@ -10,6 +10,8 @@ A command line tool to validate configuration files using rules specified in YAM
 
 ## Blog Posts
 
+✏️ [config-lint: Up and Running](https://stelligent.com/2020/04/15/config-lint-up-and-running/)
+
 ✏️ [Development Acceleration Through VS Code Remote Containers](https://stelligent.com/2020/04/10/development-acceleration-through-vs-code-remote-containers-setting-up-a-foundational-configuration/)
 
 ## Quick Start
