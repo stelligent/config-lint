@@ -49,3 +49,5 @@ You will see failure and warning violations in the output like this:
   },
   ...
 ```
+
+You can find more install options in our [installation guide](/docs/install.md).
