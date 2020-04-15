@@ -29,8 +29,8 @@ jobs:
       -
         name: docker login
         env:
-          DOCKER_USER: ${{ secrets.dockerhub_user }}
-          DOCKER_PASSWORD: ${{ secrets.dockerhub_token }}
+          DOCKER_USER: ${{ secrets.docker_user }}
+          DOCKER_PASSWORD: ${{ secrets.docker_password }}
         run: |
           echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
       -
@@ -52,4 +52,4 @@ jobs:
         with:
           args: release --skip-validate
         env:
-          GITHUB_TOKEN: ${{ secrets.release_bot }}
+          GITHUB_TOKEN: ${{ secrets.gh_actions_token }}
