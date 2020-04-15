@@ -29,3 +29,21 @@ Run the built-in ruleset against your Terraform files. For instance if you want 
 ``` bash
 config-lint -terraform example-files/config
 ```
+
+You will see failure and warning violations in the output like this:
+``` bash
+[
+  {
+    "AssertionMessage": "viewer_certificate[].cloudfront_default_certificate | [0] should be 'false', not ''",
+    "Category": "resource",
+    "CreatedAt": "2020-04-15T19:24:33Z",
+    "Filename": "example-files/config/cloudfront.tf",
+    "LineNumber": 10,
+    "ResourceID": "s3_distribution",
+    "ResourceType": "aws_cloudfront_distribution",
+    "RuleID": "CLOUDFRONT_MINIMUM_SSL",
+    "RuleMessage": "CloudFront Distribution must use TLS 1.2",
+    "Status": "FAILURE"
+  },
+  ...
+```
