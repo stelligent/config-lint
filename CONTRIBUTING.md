@@ -11,6 +11,8 @@ Help wanted! We'd love your contributions to config-lint. Please review the foll
 
 Please don't open a GitHub issue for questions about how to use config-lint, as the goal is to use issues for managing bugs and feature requests.
 
+Until we have a better way to communicate with users, please use the [Stelligent contact page](https://stelligent.com/contact/) if you have any questions.
+
 ## <a name="bugs"></a> Found a Bug?
 
 If you've identified a bug in config-lint, please [submit an issue](#issue) to our GitHub repo:
