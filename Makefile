@@ -1,10 +1,7 @@
-# Versioning based on latest git tag. Only bumping minor versions.
+# Versioning based on latest git tag.
 VERSION := $(shell git tag -l --sort=creatordate | grep "^v[0-9]*.[0-9]*.[0-9]*$$" | tail -1)
-MAJOR_VERSION := $(word 1, $(subst ., ,$(VERSION)))
-MINOR_VERSION := $(word 2, $(subst ., ,$(VERSION)))
-NEXT_VERSION ?= $(MAJOR_VERSION).$(shell echo $(MINOR_VERSION)+1|bc).0
 BUILD_DIR = .release
-GOLDFLAGS = "-X main.version=$(NEXT_VERSION)"
+GOLDFLAGS = "-X main.version=$(VERSION)"
 
 CLI_FILES = $(shell find cli linter assertion -name \*.go)
 
