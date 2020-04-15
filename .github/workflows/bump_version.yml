@@ -28,7 +28,7 @@ jobs:
         WITH_V: true
         DEFAULT_BUMP: minor
     - name: Trigger release
-      uses: peter-evans/repository-dispatch@v1
+      uses: peter-evans/repository-dispatch@v1.0.0
       with:
         token: ${{ secrets.gh_actions_token }}
         event-type: release
