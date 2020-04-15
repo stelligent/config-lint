@@ -27,3 +27,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.gh_actions_token }}
         WITH_V: true
         DEFAULT_BUMP: minor
+    - name: Trigger release
+      uses: peter-evans/repository-dispatch@v1
+      with:
+        token: ${{ secrets.gh_actions_token }}
+        event-type: release
