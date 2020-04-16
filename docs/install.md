@@ -2,9 +2,10 @@
 
 There are three main ways that you can install `config-lint`
 
-* homebrew
-* docker
-* manually
+* Homebrew
+* Docker
+* Linux
+* Windows
 
 ## Homebrew
 
@@ -40,6 +41,14 @@ docker run -v $(pwd):/foobar stelligent/config-lint -rules /foobar/path/to/my/ru
 ```
 If you don't have your own set of custom rules that you want to run against your Kubernetes file then feel free to copy or download the example set from [example-files/rules/kubernetes.yml](example-files/rules/kubernetes.yml).
 
-## Manually
+## Linux
 
-You can install latest and pre-releases manually from [releases](https://github.com/stelligent/config-lint/releases).
+```
+# See https://github.com/stelligent/config-lint/releases for release versions
+VERSION=v1.0.0
+curl -L https://github.com/stelligent/config-lint/releases/download/v1.0.0/config-lint_1.0.0_Linux_x86_64.tar.gz | tar xz -C /usr/local/bin config-lint
+chmod +rx /usr/local/bin/config-lint
+
+
+
+```
