@@ -15,7 +15,7 @@ resource "aws_elasticsearch_domain" "example" {
 resource "aws_elasticsearch_domain_policy" "policy_allow_principal_no_wildcard" {
   domain_name = "${aws_elasticsearch_domain.example.domain_name}"
 
-  access_policies = <<POLICIES
+  access_policies = <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -31,7 +31,7 @@ resource "aws_elasticsearch_domain_policy" "policy_allow_principal_no_wildcard" 
         }
     ]
 }
-POLICIES
+EOF
 }
 
 # PASS: Deny principal doesn't contain a wildcard
