@@ -34,7 +34,7 @@ For example if the `pwd` has rules and configuration files:
 docker run -v $(pwd):/foobar stelligent/config-lint -rules /foobar/path/to/rules/kubernetes.yml /foobar/path/to/configs
 ```
 
-If you don't have your own set of rules that you want to run against your Kubernetes configuration files, you can copy or download the example set from [example-files/rules/kubernetes.yml](example-files/rules/kubernetes.yml).
+If you don't have your own set of rules that you want to run against your Kubernetes configuration files, you can copy or download the example set from [example-files/rules/kubernetes.yml](https://github.com/stelligent/config-lint/blob/master/example-files/rules/kubernetes.yml).
 
 ## Linux
 
@@ -51,4 +51,4 @@ chmod +rx /usr/local/bin/config-lint
 
 ## Windows
 
-Work in progress
+Download the [latest Windows release](https://github.com/stelligent/config-lint/releases/latest) for your platform and add the binary to your Windows PATH.
