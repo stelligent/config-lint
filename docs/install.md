@@ -1,11 +1,4 @@
-# config-lint Installation
-
-There are three main ways that you can install `config-lint`
-
-* Homebrew
-* Docker
-* Linux
-* Windows
+# config-lint installation guide
 
 ## Homebrew
 
@@ -24,22 +17,24 @@ You can pull the latest image from [DockerHub](https://hub.docker.com/r/stellige
 docker pull stelligent/config-lint
 ```
 
-Note that if you choose to install and run via `docker` then you will need mount a directory to the running container so that it has access to your configuration files.
+If you choose to install and run via `docker` you will need mount a directory to the running container so that it has access to your configuration files.
 
 ``` bash
-cd /path/to/your/configs/
-docker run -v $(pwd):/foobar stelligent/config-lint -terraform /foobar/foo.tf
---- or ---
-docker run --mount src="$(pwd)",target=/foobar,type=bind stelligent/config-lint -terraform /foobar/foo.tf
+docker run -v /path/to/your/configs/:/foobar stelligent/config-lint -terraform /foobar/foo.tf
+
+# or 
+
+docker run --mount src=/path/to/your/configs/,target=/foobar,type=bind stelligent/config-lint -terraform /foobar/foo.tf
 ```
 
-If wishing to test Kubernetes configuration, you will need to put the example Kubernetes rules into your local path and reference it accordingly, or you can have your own set of rules that you want to validate against.
+If you are linting Kubernetes configuration files, you will need to reference the path to the Kubernetes rules accordingly.
 
-For example:
+For example if the `pwd` has rules and configuration files:
 ```
-docker run -v $(pwd):/foobar stelligent/config-lint -rules /foobar/path/to/my/rules/kubernetes.yml /foobar/path/to/my/configs
+docker run -v $(pwd):/foobar stelligent/config-lint -rules /foobar/path/to/rules/kubernetes.yml /foobar/path/to/configs
 ```
-If you don't have your own set of custom rules that you want to run against your Kubernetes file then feel free to copy or download the example set from [example-files/rules/kubernetes.yml](example-files/rules/kubernetes.yml).
+
+If you don't have your own set of rules that you want to run against your Kubernetes configuration files, you can copy or download the example set from [example-files/rules/kubernetes.yml](example-files/rules/kubernetes.yml).
 
 ## Linux
 
@@ -53,3 +48,7 @@ curl -L https://github.com/stelligent/config-lint/releases/download/${VERSION}/c
 
 chmod +rx /usr/local/bin/config-lint
 ```
+
+## Windows
+
+Work in progress
