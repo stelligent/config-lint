@@ -44,11 +44,12 @@ If you don't have your own set of custom rules that you want to run against your
 ## Linux
 
 ```
+# Install the latest version of config-lint
+curl -L https://github.com/stelligent/config-lint/releases/download/latest/config-lint_Linux_x86_64.tar.gz | tar xz -C /usr/local/bin config-lint
+
 # See https://github.com/stelligent/config-lint/releases for release versions
 VERSION=v1.0.0
-curl -L https://github.com/stelligent/config-lint/releases/download/v1.0.0/config-lint_1.0.0_Linux_x86_64.tar.gz | tar xz -C /usr/local/bin config-lint
+curl -L https://github.com/stelligent/config-lint/releases/download/${VERSION}/config-lint_Linux_x86_64.tar.gz | tar xz -C /usr/local/bin config-lint
+
 chmod +rx /usr/local/bin/config-lint
-
-
-
 ```
