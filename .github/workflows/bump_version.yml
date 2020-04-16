@@ -24,11 +24,6 @@ jobs:
     - name: Bump version and push tag
       uses: anothrNick/github-tag-action@1.19.0
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.gh_actions_token }}
         WITH_V: true
         DEFAULT_BUMP: minor
-    - name: Trigger release
-      uses: peter-evans/repository-dispatch@v1.0.0
-      with:
-        token: ${{ secrets.gh_actions_token }}
-        event-type: release
