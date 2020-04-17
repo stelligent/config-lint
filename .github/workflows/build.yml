@@ -8,7 +8,11 @@ on:
       - '**'
     paths-ignore:
       - 'docs/**'
+<<<<<<< HEAD
       - '**.md'
+=======
+      - '*.md'
+>>>>>>> master
   pull_request:
     branches:
       - master

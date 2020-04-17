@@ -13,7 +13,11 @@ on:
       - '**'
     paths-ignore:
       - 'docs/**'
+<<<<<<< HEAD
       - '**.md'
+=======
+      - '*.md'
+>>>>>>> master
       - '.devcontainer/**'
 
 jobs:
