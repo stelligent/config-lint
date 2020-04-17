@@ -16,11 +16,18 @@ A command line tool to validate configuration files using rules specified in YAM
 
 ## Quick Start
 
-Install the latest version of config-lint using [Homebrew](https://brew.sh/):
+Install the latest version of config-lint on macOS using [Homebrew](https://brew.sh/):
 
 ``` bash
 brew tap stelligent/tap
 brew install config-lint
+```
+
+Or manually on Linux:
+
+``` bash
+curl -L https://github.com/stelligent/config-lint/releases/download/latest/config-lint_Linux_x86_64.tar.gz | tar xz -C /usr/local/bin config-lint
+chmod +rx /usr/local/bin/config-lint
 ```
 
 Run the built-in ruleset against your Terraform files. For instance if you want to run config-lint against our [example files](https://github.com/stelligent/config-lint/tree/master/example-files):

@@ -45,10 +45,12 @@ RUN go get -x -d github.com/stamblerre/gocode \
 	&& go get -u -v \
 	golang.org/x/tools/gopls \
 	github.com/mdempsky/gocode \
-	github.com/uudashr/gopkgs/cmd/gopkgs \
+	# Workaround for https://github.com/uudashr/gopkgs/issues/25
+	github.com/uudashr/gopkgs/v2/cmd/gopkgs \
 	github.com/sqs/goreturns \
 	golang.org/x/lint/golint \
-	github.com/ramya-rao-a/go-outline
+	github.com/ramya-rao-a/go-outline \
+	&& go get github.com/go-delve/delve/cmd/dlv
 
 # Create a non-root user
 ARG USERNAME=config-lint-dev
