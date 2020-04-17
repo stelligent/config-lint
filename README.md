@@ -28,7 +28,7 @@ brew install config-lint
 Or manually on Linux:
 
 ``` bash
-curl -L https://github.com/stelligent/config-lint/releases/download/latest/config-lint_Linux_x86_64.tar.gz | tar xz -C /usr/local/bin config-lint
+curl -L https://github.com/stelligent/config-lint/releases/latest/download/config-lint_Linux_x86_64.tar.gz | tar xz -C /usr/local/bin config-lint
 chmod +rx /usr/local/bin/config-lint
 ```
 
