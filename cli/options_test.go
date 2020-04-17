@@ -123,6 +123,30 @@ func TestLoadProfile(t *testing.T) {
 	}
 }
 
+func TestProfileExclude(t *testing.T) {
+	p, err := loadProfile("./testdata/profile.yml")
+	if err != nil {
+		t.Errorf("Expecting loadProfile to run without error: %v\n", err.Error())
+	}
+	o := emptyCommandLineOptions()
+	l, err := getLinterOptions(o, p)
+	if err != nil {
+		t.Errorf("Expecting getLinterOptions to run without error: %v\n", err.Error())
+	}
+	if len(l.ExcludePatterns) != 3 {
+		t.Errorf("Expecting 3 excludes in total using 'exclude' and 'exclude_from' in profile: %v\n", l.ExcludePatterns)
+	}
+	if l.ExcludePatterns[0] != "this_file_will_be_excluded.tf" {
+		t.Errorf("Expecting 1st pattern using 'exclude' in profile to be 'this_file_will_be_excluded.tf', not '%s'", l.ExcludePatterns[0])
+	}
+	if l.ExcludePatterns[1] != "*1.tf" {
+		t.Errorf("Expecting 2nd pattern using 'exclude_from' in profile to be '*1.tf', not '%s'", l.ExcludePatterns[1])
+	}
+	if l.ExcludePatterns[2] != "*2.tf" {
+		t.Errorf("Expecting 3rd pattern using 'exclude_from' in profile to be '*2.tf', not '%s'", l.ExcludePatterns[2])
+	}
+}
+
 func TestValidateParser(t *testing.T) {
 	parser, err := validateParser("")
 	if err != nil {

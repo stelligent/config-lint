@@ -1,6 +1,6 @@
 package main
 
-//go:generate packr
+//go:generate packr -v
 
 import (
 	"encoding/json"
@@ -35,15 +35,17 @@ type (
 
 	// ProfileOptions for default options from a project file
 	ProfileOptions struct {
-		Rules      []string
-		IDs        []string
-		IgnoreIDs  []string `json:"ignore_ids"`
-		Tags       []string
-		Query      string
-		Files      []string
-		Terraform  bool
-		Exceptions []RuleException
-		Variables  map[string]string
+		Rules                []string
+		IDs                  []string
+		IgnoreIDs            []string `json:"ignore_ids"`
+		Tags                 []string
+		Query                string
+		Files                []string
+		Terraform            bool
+		Exceptions           []RuleException
+		Variables            map[string]string
+		ExcludePatterns      []string `json:"exclude"`
+		ExcludeFromFilenames []string `json:"exclude_from"`
 	}
 
 	// RuleException optional list allowing a project to ignore specific rules for specific resources
@@ -139,7 +141,7 @@ func main() {
 	// loadBuiltInRuleSet can be called recursively against a directory, as done here,
 	// or can be called against a single file, as done with lint-rule.yml
 	if useTerraformBuiltInRules {
-		builtInRuleSet, err := loadBuiltInRuleSet("terraform")
+		builtInRuleSet, err := loadBuiltInRuleSet("terraform/")
 		if err != nil {
 			fmt.Printf("Failed to load built-in rules for Terraform: %v\n", err)
 			os.Exit(-1)
@@ -248,15 +250,14 @@ func loadBuiltInRuleSet(filename string) (assertion.RuleSet, error) {
 			assertion.Debugf("Failed to add RuleSet: %v\n", err)
 			return assertion.RuleSet{}, err // returns empty rule set
 		}
-	} else {
-		box = packr.NewBox("./assets/" + filename)
-		assertion.Debugf("New Box: %v\n", box)
+	} else if strings.HasSuffix(filename, "/") {
 		filesInBox := box.List()
 		if len(filesInBox) > 0 {
 			// Get each file in that box
 			for _, fileInBox := range filesInBox {
-				// Check if file is YAML
-				if isYamlFile(fileInBox) {
+				// Check if file is YAML and starts with the folder name
+				assertion.Debugf("Box File: %v\n", fileInBox)
+				if isYamlFile(fileInBox) && strings.HasPrefix(fileInBox, filename) {
 					assertion.Debugf("Adding rule set: %v\n", fileInBox)
 					ruleSet, err = addRuleSet(ruleSet, box, fileInBox)
 					if err != nil {
@@ -265,10 +266,11 @@ func loadBuiltInRuleSet(filename string) (assertion.RuleSet, error) {
 					}
 				}
 			}
-		} else {
-			return assertion.RuleSet{}, errors.New("File or directory doesnt exist")
 		}
+	} else {
+		return assertion.RuleSet{}, errors.New("File or directory doesnt exist")
 	}
+
 	return ruleSet, nil
 }
 
