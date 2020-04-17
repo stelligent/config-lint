@@ -1,6 +1,6 @@
 package main
 
-//go:generate packr
+//go:generate packr -v
 
 import (
 	"encoding/json"
@@ -139,7 +139,7 @@ func main() {
 	// loadBuiltInRuleSet can be called recursively against a directory, as done here,
 	// or can be called against a single file, as done with lint-rule.yml
 	if useTerraformBuiltInRules {
-		builtInRuleSet, err := loadBuiltInRuleSet("terraform")
+		builtInRuleSet, err := loadBuiltInRuleSet("terraform/")
 		if err != nil {
 			fmt.Printf("Failed to load built-in rules for Terraform: %v\n", err)
 			os.Exit(-1)
@@ -249,14 +249,13 @@ func loadBuiltInRuleSet(filename string) (assertion.RuleSet, error) {
 			return assertion.RuleSet{}, err // returns empty rule set
 		}
 	} else {
-		box = packr.NewBox("./assets/" + filename)
-		assertion.Debugf("New Box: %v\n", box)
 		filesInBox := box.List()
 		if len(filesInBox) > 0 {
 			// Get each file in that box
 			for _, fileInBox := range filesInBox {
-				// Check if file is YAML
-				if isYamlFile(fileInBox) {
+				// Check if file is YAML and starts with the folder name
+				assertion.Debugf("Box File: %v\n", fileInBox)
+				if isYamlFile(fileInBox) && strings.HasPrefix(fileInBox, filename) {
 					assertion.Debugf("Adding rule set: %v\n", fileInBox)
 					ruleSet, err = addRuleSet(ruleSet, box, fileInBox)
 					if err != nil {

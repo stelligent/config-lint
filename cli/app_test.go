@@ -2,15 +2,16 @@ package main
 
 import (
 	"bytes"
+	"testing"
+
 	"github.com/gobuffalo/packr"
 	"github.com/stelligent/config-lint/assertion"
 	"github.com/stelligent/config-lint/linter"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func TestLoadTerraformRules(t *testing.T) {
-	_, err := loadBuiltInRuleSet("terraform")
+	_, err := loadBuiltInRuleSet("terraform/")
 	if err != nil {
 		t.Errorf("Cannot load built-in Terraform rules")
 	}
