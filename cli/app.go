@@ -248,7 +248,7 @@ func loadBuiltInRuleSet(filename string) (assertion.RuleSet, error) {
 			assertion.Debugf("Failed to add RuleSet: %v\n", err)
 			return assertion.RuleSet{}, err // returns empty rule set
 		}
-	} else {
+	} else if strings.HasSuffix(filename, "/") {
 		filesInBox := box.List()
 		if len(filesInBox) > 0 {
 			// Get each file in that box
@@ -264,10 +264,11 @@ func loadBuiltInRuleSet(filename string) (assertion.RuleSet, error) {
 					}
 				}
 			}
-		} else {
-			return assertion.RuleSet{}, errors.New("File or directory doesnt exist")
 		}
+	} else {
+		return assertion.RuleSet{}, errors.New("File or directory doesnt exist")
 	}
+
 	return ruleSet, nil
 }
 
