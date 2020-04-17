@@ -35,15 +35,17 @@ type (
 
 	// ProfileOptions for default options from a project file
 	ProfileOptions struct {
-		Rules      []string
-		IDs        []string
-		IgnoreIDs  []string `json:"ignore_ids"`
-		Tags       []string
-		Query      string
-		Files      []string
-		Terraform  bool
-		Exceptions []RuleException
-		Variables  map[string]string
+		Rules                []string
+		IDs                  []string
+		IgnoreIDs            []string `json:"ignore_ids"`
+		Tags                 []string
+		Query                string
+		Files                []string
+		Terraform            bool
+		Exceptions           []RuleException
+		Variables            map[string]string
+		ExcludePatterns      []string `json:"exclude"`
+		ExcludeFromFilenames []string `json:"exclude_from"`
 	}
 
 	// RuleException optional list allowing a project to ignore specific rules for specific resources

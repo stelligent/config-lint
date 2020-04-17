@@ -39,7 +39,9 @@ func getCommandLineOptions() CommandLineOptions {
 }
 
 func getLinterOptions(o CommandLineOptions, p ProfileOptions) (LinterOptions, error) {
-	allExcludePatterns, err := loadExcludePatterns(o.ExcludePatterns, o.ExcludeFromFilenames)
+	excludePatterns := append(o.ExcludePatterns, p.ExcludePatterns...)
+	excludeFromFilenames := append(o.ExcludeFromFilenames, p.ExcludeFromFilenames...)
+	allExcludePatterns, err := loadExcludePatterns(excludePatterns, excludeFromFilenames)
 	if err != nil {
 		return LinterOptions{}, err
 	}
