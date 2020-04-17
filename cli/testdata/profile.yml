@@ -14,3 +14,9 @@ exceptions:
 
 tags:
   - iam
+
+exclude:
+  - this_file_will_be_excluded.tf
+
+exclude_from:
+  - ./testdata/exclude-list
