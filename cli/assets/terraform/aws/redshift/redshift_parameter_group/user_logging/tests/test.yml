@@ -7,8 +7,8 @@ files:
   - "*.tfvars"
 tests:
   -
-    ruleId: REDSHIFT_CLUSTER_PARAMETER_GROUP_REQUIRE_SSL
-    warnings: 2
-    failures: 0
+    ruleId: REDSHIFT_CLUSTER_PARAMETER_GROUP_USER_ACTIVITY_LOGGING
+    warnings: 0
+    failures: 2
     tags:
       - "terraform12"
