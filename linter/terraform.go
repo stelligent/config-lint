@@ -323,7 +323,7 @@ func replaceVariablesInList(list []interface{}, variables []Variable) []interfac
 
 func parseJSONDocuments(resource interface{}) (interface{}, error) {
 	properties := resource.(map[string]interface{})
-	for _, attribute := range []string{"assume_role_policy", "policy", "container_definitions", "access_policies", "container_properties"} {
+	for _, attribute := range []string{"assume_role_policy", "policy", "container_definitions", "access_policies", "access_policy", "container_properties"} {
 		if policyAttribute, hasPolicyString := properties[attribute]; hasPolicyString {
 			if policyString, isString := policyAttribute.(string); isString {
 				var policy interface{}
