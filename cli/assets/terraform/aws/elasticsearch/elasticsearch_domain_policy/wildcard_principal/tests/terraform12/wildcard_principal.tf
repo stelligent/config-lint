@@ -1,6 +1,7 @@
 # Test that an elasticsearch domain policy is not using a wildcard principal
 # https://www.terraform.io/docs/providers/aws/r/elasticsearch_domain_policy.html
 
+
 provider "aws" {
   region = "us-east-1"
 }
@@ -27,7 +28,7 @@ resource "aws_elasticsearch_domain_policy" "policy_allow_principal_no_wildcard" 
                 ]
             },
             "Effect": "Allow",
-            "Resource": "${aws_elasticsearch_domain.example.arn}/*"
+            "Resource": "arn:aws:es:us-east-1:123456789012:domain/test/*"
         }
     ]
 }
@@ -50,7 +51,7 @@ resource "aws_elasticsearch_domain_policy" "policy_allow_principal_no_wildcard" 
                 ]
             },
             "Effect": "Deny",
-            "Resource": "${aws_elasticsearch_domain.example.arn}/*"
+            "Resource": "arn:aws:es:us-east-1:123456789012:domain/test/*"
         }
     ]
 }
@@ -72,8 +73,8 @@ resource "aws_elasticsearch_domain_policy" "policy_deny_principal_contains_wildc
                     "arn:aws:iam::1234567890:user/foo*"
                 ]
             },
-            "Effect": "Allow",
-            "Resource": "${aws_elasticsearch_domain.example.arn}/*"
+            "Effect": "Deny",
+            "Resource": "arn:aws:es:us-east-1:123456789012:domain/test/*"
         }
     ]
 }
@@ -96,7 +97,7 @@ resource "aws_elasticsearch_domain_policy" "policy_allow_principal_contains_wild
                 ]
             },
             "Effect": "Allow",
-            "Resource": "${aws_elasticsearch_domain.example.arn}/*"
+            "Resource": "arn:aws:es:us-east-1:123456789012:domain/test/*"
         }
     ]
 }
@@ -115,7 +116,7 @@ resource "aws_elasticsearch_domain_policy" "policy_allow_principal_is_wildcard" 
             "Action": "es:ListDomainNames",
             "Principal": "*",
             "Effect": "Allow",
-            "Resource": "${aws_elasticsearch_domain.example.arn}/*"
+            "Resource": "arn:aws:es:us-east-1:123456789012:domain/test/*"
         }
     ]
 }
