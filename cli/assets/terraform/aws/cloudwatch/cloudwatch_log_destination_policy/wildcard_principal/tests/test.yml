@@ -1,0 +1,14 @@
+---
+version: 1
+description: Terraform 12 tests
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+tests:
+  -
+    ruleId: CLOUDWATCH_WILDCARD_PRINCIPAL
+    warnings: 0
+    failures: 2
+    tags:
+      - "terraform12"
