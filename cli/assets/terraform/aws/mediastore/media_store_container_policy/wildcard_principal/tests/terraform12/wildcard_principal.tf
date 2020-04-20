@@ -1,4 +1,4 @@
-#
+# Test that a MediaStore container policy does not use a wildcard in the principal when allow actions
 # https://www.terraform.io/docs/providers/aws/r/media_store_container_policy.html#policy
 
 provider "aws" {
