@@ -9,6 +9,6 @@ tests:
   -
     ruleId: ELASTICSEARCH_POLICY_WILDCARD_PRINCIPAL
     warnings: 0
-    failures: 2
+    failures: 4
     tags:
       - "terraform12"

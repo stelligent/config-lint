@@ -1,11 +1,6 @@
 # Test that an elasticsearch domain policy is not using a wildcard principal
 # https://www.terraform.io/docs/providers/aws/r/elasticsearch_domain_policy.html
 
-
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Helper
 resource "aws_elasticsearch_domain" "example" {
   domain_name           = "tf-test"
@@ -14,7 +9,7 @@ resource "aws_elasticsearch_domain" "example" {
 
 # PASS: Allow principal does not contain a wildcard
 resource "aws_elasticsearch_domain_policy" "policy_allow_principal_no_wildcard" {
-  domain_name = "${aws_elasticsearch_domain.example.domain_name}"
+  domain_name = aws_elasticsearch_domain.example.domain_name
 
   access_policies = <<EOF
 {
@@ -36,8 +31,8 @@ EOF
 }
 
 # PASS: Deny principal doesn't contain a wildcard
-resource "aws_elasticsearch_domain_policy" "policy_allow_principal_no_wildcard" {
-  domain_name = "${aws_elasticsearch_domain.example.domain_name}"
+resource "aws_elasticsearch_domain_policy" "policy_deny_principal_no_wildcard" {
+  domain_name = aws_elasticsearch_domain.example.domain_name
 
   access_policies = <<POLICIES
 {
@@ -60,7 +55,7 @@ POLICIES
 
 # PASS: Deny principal contains a wildcard
 resource "aws_elasticsearch_domain_policy" "policy_deny_principal_contains_wildcard" {
-  domain_name = "${aws_elasticsearch_domain.example.domain_name}"
+  domain_name = aws_elasticsearch_domain.example.domain_name
 
   access_policies = <<POLICIES
 {
@@ -83,7 +78,7 @@ POLICIES
 
 # FAIL: Allow principal contains a wildcard
 resource "aws_elasticsearch_domain_policy" "policy_allow_principal_contains_wildcard" {
-  domain_name = "${aws_elasticsearch_domain.example.domain_name}"
+  domain_name = aws_elasticsearch_domain.example.domain_name
 
   access_policies = <<POLICIES
 {
@@ -106,7 +101,7 @@ POLICIES
 
 # FAIL: Principal is a wildcard
 resource "aws_elasticsearch_domain_policy" "policy_allow_principal_is_wildcard" {
-  domain_name = "${aws_elasticsearch_domain.example.domain_name}"
+  domain_name = aws_elasticsearch_domain.example.domain_name
 
   access_policies = <<POLICIES
 {

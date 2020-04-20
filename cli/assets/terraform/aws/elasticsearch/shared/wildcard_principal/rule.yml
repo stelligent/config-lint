@@ -9,7 +9,9 @@ rules:
 
   - id: ELASTICSEARCH_POLICY_WILDCARD_PRINCIPAL
     message: Elasticsearch allow policy should not use a wildcard princpal
-    resource: aws_elasticsearch_domain_policy
+    resources:
+      - aws_elasticsearch_domain_policy
+      - aws_elasticsearch_domain
     severity: FAILURE
     assertions:
       - none:
