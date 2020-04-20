@@ -1,0 +1,14 @@
+---
+version: 1
+description: Terraform 11 and 12 tests
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+tests:
+  -
+    ruleId: SQS_POLICY_WILDCARD_PRINCIPAL
+    warnings: 0
+    failures: 4
+    tags:
+      - "terraform12"
