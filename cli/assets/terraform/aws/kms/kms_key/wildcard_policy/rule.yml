@@ -1,0 +1,26 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: KMS_POLICY_WILDCARD_PRINCIPAL
+    message: KMS key allow policy should not use a wildcard princpal
+    resource: aws_kms_key
+    severity: FAILURE
+    assertions:
+      - none:
+          key: policy.Statement
+          expressions:
+            - key: Effect
+              op: eq
+              value: Allow
+            - key: Principal
+              op: contains
+              value: "*"
+    tags:
+      - kms
+      - policy
