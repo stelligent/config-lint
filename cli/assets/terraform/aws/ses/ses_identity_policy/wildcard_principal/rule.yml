@@ -22,5 +22,5 @@ rules:
               op: contains
               value: "*"
     tags:
-      - elasticsearch
+      - ses
       - policy
