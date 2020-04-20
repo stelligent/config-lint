@@ -122,3 +122,6 @@ rules:
               - key: "@"
                 op: has-properties
                 value: none
+              - key: "@"
+                op: has-properties
+                value: exactly-one
