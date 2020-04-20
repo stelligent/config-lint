@@ -1,0 +1,21 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: CLOUDFRONT_MINIMUM_SSL
+    message: CloudFront Distribution must use TLS 1.2
+    resource: aws_cloudfront_distribution
+    severity: FAILURE
+    assertions:
+      - key: viewer_certificate[].cloudfront_default_certificate | [0]
+        op: is-false
+      - key: viewer_certificate[].minimum_protocol_version | [0]
+        op: starts-with
+        value: "TLSv1.2"
+    tags:
+      - cloudfront

@@ -8,15 +8,18 @@ files:
 rules:
 
   - id: CLOUDFRONT_DISTRIBUTION_ORIGIN_POLICY
-    message: CloudFront Distribution custom_origin_config origin_protocol_policy should be https-only
+    message: CloudFront Distribution should use OAI or origin_protocol_policy should be https-only
     resource: aws_cloudfront_distribution
     severity: FAILURE
     assertions:
       - or:
-        - key: "origin[].custom_origin_config"
-          op: absent
-        - key: "origin[].custom_origin_config[].origin_protocol_policy"
-          op: contains
-          value: https-only
+        - key: "origin[].s3_origin_config[].origin_access_identity"
+          op: present
+        - or:
+          - key: "origin[].custom_origin_config"
+            op: absent
+          - key: "origin[].custom_origin_config[].origin_protocol_policy"
+            op: contains
+            value: https-only
     tags:
       - cloudfront

@@ -24,3 +24,24 @@ rules:
             op: absent
     tags:
       - rds
+
+  - id: RDS_CLUSTER_ENCYPTION_KMS
+    message: RDS Cluster should have a KMS key when storage_encrypted is enabled
+    resource: aws_rds_cluster
+    severity: WARNING
+    assertions:
+      # If storage_encrypted is present and enabled, then kms_key_id should also be present
+      - xor:
+        - or:
+          - key: storage_encrypted
+            op: absent
+          - key: storage_encrypted
+            op: is-false
+        - and:
+          - key: storage_encrypted
+            op: present
+          - key: kms_key_id
+            op: present
+
+    tags:
+      - rds

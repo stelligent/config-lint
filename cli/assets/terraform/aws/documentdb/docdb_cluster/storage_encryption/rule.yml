@@ -1,0 +1,28 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: DOCUMENTDB_STORAGE_ENCRYPTION
+    message: DocumentDB should have storage encryption enabled
+    resource: aws_docdb_cluster
+    severity: FAILURE
+    assertions:
+      - key: storage_encrypted
+        op: is-true
+    tags:
+      - documentdb
+
+  - id: DOCUMENTDB_STORAGE_KMS
+    message: DocumentDB should have a KMS key specified
+    resource: aws_docdb_cluster
+    severity: WARNING
+    assertions:
+      - key: kms_key_id
+        op: present
+    tags:
+      - documentdb

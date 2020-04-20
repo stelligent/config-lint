@@ -2,10 +2,13 @@ name: Build
 
 on:
   push:
-    branches:
-      - '**'
+    branches-ignore:
+      - 'master'
     tags-ignore:
       - '**'
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
   pull_request:
     branches:
       - master
@@ -27,8 +30,15 @@ jobs:
         run: |
           go mod download
       -  
-        name: make test
+        name: build
+        run: |
+          export GOPATH=/home/runner/go
+          export PATH="$PATH:$GOPATH/bin"
+          make build
+      -  
+        name: test
         run: |
           export GOPATH=/home/runner/go
           export PATH="$PATH:$GOPATH/bin"
           make test
+          make smoke-test

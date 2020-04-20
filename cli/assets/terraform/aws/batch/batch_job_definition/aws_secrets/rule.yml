@@ -1,0 +1,38 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: BATCH_JOB_AWS_ENVIRONMENT_SECRETS
+    message: Environment for batch jobs should not include AWS secrets
+    resource: aws_batch_job_definition
+    severity: FAILURE
+    # This rule fails if it finds a regex match for either the Access Key ID and/or the Secret Access Key
+    assertions:
+      - not:
+        - some:
+            key: "container_properties.environment[].value"
+            expressions:
+              # Check if the string starts with any known 4 character ACCESS_KEY sequence
+              # and is 20 capital alpha-numeric characters long in total
+              - key: "@"
+                op: regex
+                value: "^(A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}$"
+        - some:
+            key: "container_properties.environment[].value"
+            expressions:
+              - and:
+                # Check if the string is exactly 40 characters long
+                - key: "@"
+                  op: regex
+                  value: "^.{40}$"
+                # Check if the string contains only alpha-numeric-slash-plus characters with at least 1 / or +
+                - key: "@"
+                  op: regex
+                  value: "^[a-zA-Z0-9/+]+[/+]+[a-zA-Z0-9/+]+$"
+    tags:
+      - batch

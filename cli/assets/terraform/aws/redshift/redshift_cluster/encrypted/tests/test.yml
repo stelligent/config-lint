@@ -11,5 +11,10 @@ tests:
     warnings: 0
     failures: 2
     tags:
-      - "terraform11"
+      - "terraform12"
+  -
+    ruleId: REDSHIFT_CLUSTER_ENCRYPTION_KMS
+    warnings: 3
+    failures: 0
+    tags:
       - "terraform12"

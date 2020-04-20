@@ -16,3 +16,13 @@ rules:
         op: is-true
     tags:
       - redshift
+
+  - id: REDSHIFT_CLUSTER_ENCRYPTION_KMS
+    message: RedshiftCluster should have KMS key provided
+    resource: aws_redshift_cluster
+    severity: WARNING
+    assertions:
+      - key: kms_key_id
+        op: present
+    tags:
+      - redshift

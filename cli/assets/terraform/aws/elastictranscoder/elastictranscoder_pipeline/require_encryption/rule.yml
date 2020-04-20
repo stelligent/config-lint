@@ -1,0 +1,18 @@
+---
+version: 1
+description: Terraform rules
+type: Terraform
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+
+  - id: TRANSCODER_REQUIRE_ENCRYPTION
+    message: Elastictranscoder pipeline requires encryption
+    resource: aws_elastictranscoder_pipeline
+    severity: FAILURE
+    assertions:
+      - key: aws_kms_key_arn
+        op: present
+    tags:
+      - elastictranscoder
