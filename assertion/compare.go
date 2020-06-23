@@ -3,6 +3,7 @@ package assertion
 import (
 	"strconv"
 	"time"
+	"math"
 )
 
 func intCompare(n1 int, n2 int) int {
@@ -22,7 +23,7 @@ func daysOld(data interface{}) int {
 		if err != nil {
 			return 0
 		}
-		days := int(time.Since(t).Hours() / 24.0)
+		days := int(math.Round(time.Since(t).Hours() / 24.0))
 		Debugf("Date: %v Days ago: %d\n", data, days)
 		return days
 	}
