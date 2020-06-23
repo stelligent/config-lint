@@ -69,4 +69,4 @@ cover-cli:
 smoke-test:
 	@$(BUILD_DIR)/config-lint -terraform cli/testdata/smoketest_tf12.tf
 	@$(BUILD_DIR)/config-lint -tfparser tf11 -terraform cli/testdata/smoketest_tf11.tf
-
+	@$(BUILD_DIR)/config-lint -tfparser tf11 -terraform -profile cli/testdata/profile-exceptions.yml cli/testdata/smoketest_exceptions.tf
