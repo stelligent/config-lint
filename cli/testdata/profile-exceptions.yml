@@ -6,7 +6,7 @@ files:
   - "*.tf"
 
 exceptions:
-  - RuleID: ROLE_WILDCARD_ACTION
+  - RuleID: IAM_ROLE_WILDCARD_ACTION
     ResourceCategory: resource
     ResourceType: aws_iam_role
     ResourceID: role2
@@ -14,9 +14,3 @@ exceptions:
 
 tags:
   - iam
-
-exclude:
-  - this_file_will_be_excluded.tf
-
-exclude_from:
-  - ./testdata/exclude-list

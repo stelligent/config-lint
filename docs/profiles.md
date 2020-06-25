@@ -32,7 +32,7 @@ exceptions:
   - RuleID: S3_BUCKET_ACL
     ResourceCategory: resource
     ResourceType: aws_s3_bucket
-    ResouceID: simple_website
+    ResourceID: simple_website
     Comments: This bucket hosts a public website
 ```
 

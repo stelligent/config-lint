@@ -136,7 +136,6 @@ func main() {
 		fmt.Printf("Failed to load rules: %v\n", err)
 		os.Exit(-1)
 	}
-	ruleSets = addExceptions(ruleSets, profileOptions.Exceptions)
 	// Same rule set applies to both TerraformBuiltInRules and Terraform11BuiltInRules
 	// loadBuiltInRuleSet can be called recursively against a directory, as done here,
 	// or can be called against a single file, as done with lint-rule.yml
@@ -152,6 +151,9 @@ func main() {
 		fmt.Println("No rules")
 		os.Exit(-1)
 	}
+
+	ruleSets = addExceptions(ruleSets, profileOptions.Exceptions)
+
 	os.Exit(applyRules(ruleSets, configFilenames, linterOptions, DefaultReportWriter{Writer: os.Stdout}))
 }
 
