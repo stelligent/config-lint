@@ -20,8 +20,6 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/testify v1.5.1
 	github.com/zclconf/go-cty v1.1.1
-	golang.org/x/crypto v0.0.0-20200214034016-1d94cc7ab1c6 // indirect
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
-	golang.org/x/sys v0.0.0-20200217220822-9197077df867 // indirect
-	golang.org/x/tools v0.0.0-20200406213809-066fd1390ee0 // indirect
+	golang.org/x/tools v0.0.0-20200707211228-9c9572d6f9fb // indirect
 )
