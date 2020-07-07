@@ -403,6 +403,13 @@ func TestTerraform12LinterCases(t *testing.T) {
 			1,
 			"CHECK_FOR_COLON",
 		},
+		// Test added for issue #207 alternate attr syntax as a block - DM
+		"TF12AttrBlock": {
+			"./testdata/resources/attr_block_syntax.tf",
+			"./testdata/rules/attr_block_syntax.yml",
+			2,
+			"ATTR_BLOCK",
+		},
 	}
 
 	for name, tc := range testCases {

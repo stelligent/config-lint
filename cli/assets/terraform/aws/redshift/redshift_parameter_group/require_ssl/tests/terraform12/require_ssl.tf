@@ -48,24 +48,3 @@ resource "aws_redshift_parameter_group" "require_ssl_set_to_true" {
     value = "example"
   }
 }
-
-# PASS: require_ssl is set to true with alternate syntax -- issue #207
-resource "aws_redshift_parameter_group" "require_ssl_set_to_true" {
-  name   = "foobar"
-  family = "redshift-1.0"
-
-  parameter = [
-    {
-      name  = "enable_user_activity_logging"
-      value = "true"
-    },
-    {
-      name  = "require_ssl"
-      value = "true"
-    },
-    {
-      name  = "query_group"
-      value = "example"
-    }
-  ]
-}

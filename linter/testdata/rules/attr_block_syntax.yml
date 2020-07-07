@@ -1,0 +1,26 @@
+---
+version: 1
+description: Terraform v12 rules
+type: Terraform12
+files:
+  - "*.tf"
+  - "*.tfvars"
+rules:
+  # This test rule is intended to recreate a reported bug, issue 207
+  - id: "ATTR_BLOCK"
+    message: "test: alternate syntax is allowed"
+    resources:
+      - aws_redshift_parameter_group
+    category: resource
+    severity: FAILURE
+    assertions:
+      - some:
+          key: parameter
+          expressions:
+            - and:
+              - key: name
+                op: eq
+                value: tls
+              - key: value
+                op: eq
+                value: enabled
