@@ -41,7 +41,7 @@ The rules contain a list of expressions that use operations
 
 Equal
 
-###Example:
+### Example:
 
 ```
 ...
@@ -60,7 +60,7 @@ Equal
 
 Not Equal
 
-Example:
+### Example:
 ```
 ...
   - id: SG1
@@ -101,7 +101,7 @@ Not in list of values
 
 Attribute is present
 
-###Example:
+### Example:
 
 ```
 ...
@@ -214,7 +214,7 @@ Logical xor of a list of assertions. The assertion is true when exactly one test
 
 Logical not of an assertion
 
-Example:
+### Example:
 
 ```
 ...
@@ -235,7 +235,7 @@ Example:
 Checks for the present of every property in a comma separated list. This could also be done using the [and](#and) expression,
 but this will often be more convenient.
 
-Example:
+### Example:
 
 ```
 ...
@@ -257,7 +257,7 @@ The key is a JMESPath expression that should return an array of objects. The key
 
 This provides a simple looping mechanism that is easier to write and understand than a complex JMESPath expression.
 
-Example:
+### Example:
 
 ```
 ...
@@ -283,7 +283,7 @@ The key is a JMESPath expression that should return an array of objects. The key
 
 This provides a simple looping mechanism that is easier to write and understand than a complex JMESPath expression.
 
-Example:
+### Example:
 
 ```
 ...
@@ -309,7 +309,7 @@ The key is a JMESPath expression that should return an array of objects. The key
 
 This provides a simple looping mechanism that is easier to write and understand than a complex JMESPath expression.
 
-Example:
+### Example:
 
 ```
 ...
@@ -338,7 +338,7 @@ The key is a JMESPath expression that should return an array of objects. The key
 
 This provides a simple looping mechanism that is easier to write and understand than a complex JMESPath expression.
 
-Example:
+### Example:
 
 ```
   - id: ONLY_ONE_DEFAULT
@@ -357,7 +357,7 @@ Example:
 
 Check that the data has a true value. Shorthand for using { op: "eq" , "value": true }
 
-Example:
+### Example:
 
 ```
 ...
@@ -375,7 +375,7 @@ Example:
 
 Check that the data has a false value. Shorthand for using { op: "eq" , "value": false }
 
-Example:
+### Example:
 
 ```
 ...
@@ -393,7 +393,7 @@ Example:
 
 Check that a string value starts with a value
 
-Example:
+### Example:
 
 ```
 ...
@@ -412,7 +412,7 @@ Example:
 
 Check that a string value ends with a value
 
-Example:
+### Example:
 
 ```
 ...
@@ -431,7 +431,7 @@ Example:
 
 Check that an attribute is an array
 
-Example:
+### Example:
 
 ```
 ...
@@ -449,7 +449,7 @@ Example:
 
 Check that an attribute is not an array
 
-Example:
+### Example:
 
 ```
 ...
@@ -467,7 +467,7 @@ Example:
 
 Check whether a given IP or CIDR block is a subnet of a larger CIDR  block
 
-Example:
+### Example:
 
 ```
 ...
@@ -486,7 +486,7 @@ Example:
 
 Check whether a given IP is in RFC1918 address space.
 
-Example:
+### Example:
 
 ```
 ...
@@ -504,7 +504,7 @@ Example:
 
 Checks how many hosts in a given CIDR range. This is useful for evaluating security group rules, for instance.
 
-Example:
+### Example:
 
 ```
 ...
@@ -521,3 +521,4 @@ Example:
             value: 1016
 ...
 ```
+
