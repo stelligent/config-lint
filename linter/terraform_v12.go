@@ -35,13 +35,14 @@ var (
 		"resource",
 		"terraform",
 		"variable",
+		"moved",
 	}
 
 	blockLabelSyntax = map[string][]string{
 		"TypeAndName":  []string{"data", "resource"},
 		"TypeOnly":     []string{"provider"},
 		"NameOnly":     []string{"module", "output", "variable"},
-		"NoTypeNoName": []string{"locals", "terraform"},
+		"NoTypeNoName": []string{"locals", "terraform", "moved"},
 	}
 )
 

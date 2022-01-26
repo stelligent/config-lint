@@ -20,6 +20,9 @@ var terraformSchema = &hcl.BodySchema{
 			Type: "locals",
 		},
 		{
+			Type: "moved",
+		},
+		{
 			Type:       "output",
 			LabelNames: []string{"name"},
 		},
