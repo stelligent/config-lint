@@ -524,3 +524,10 @@ func TestTerraform12FileFunctionReferenceFileAbsoultePath(t *testing.T) {
 	os.RemoveAll(tempResourceDir)
 	os.RemoveAll(tempReferenceDir)
 }
+
+func TestSyntaxMoved(t *testing.T) {
+  // Allow parsing Terraform 1.1 syntax with `moved` block
+  // with a v0.12 parser
+	loadResources12ToTest(t, "./testdata/resources/moved.tf")
+}
+
