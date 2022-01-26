@@ -61,6 +61,11 @@ resource "aws_instance" "first" {
     environment = lookup(var.default_tags,"environment","dev")
   }
 }
+
+moved {
+  from = "x"
+  to = "y"
+}
 `)
 
 	blocks, err := parser.ParseDirectory(filepath.Dir(path))
@@ -122,6 +127,10 @@ resource "aws_instance" "first" {
 	assert.Equal(t, "the-cats-mother", dataBlocks[0].Labels()[1])
 
 	assert.Equal(t, "boots", dataBlocks[0].GetAttribute("name").Value().AsString())
+
+	// moved
+	movedBlocks := blocks.OfType("moved")
+	require.Len(t, movedBlocks, 1)
 }
 
 func Test_Modules(t *testing.T) {
