@@ -3,6 +3,7 @@ package linter
 import (
 	"github.com/stelligent/config-lint/assertion"
 	"path/filepath"
+        "fmt"
 )
 
 // CSVResourceLoader loads a list of Resource objects based on the list of ResourceConfig objects
@@ -36,7 +37,7 @@ func (l CSVResourceLoader) Load(filename string) (FileResources, error) {
 			properties[columnConfig.Name] = row[columnNumber]
 		}
 		resource := assertion.Resource{
-			ID:         string(rowNumber),
+			ID:         fmt.Sprint(rowNumber),
 			Type:       "row",
 			Properties: properties,
 			Filename:   filename,

@@ -24,8 +24,10 @@ gen:
 
 lint: gen
 	@echo "=== linting ==="
+	@go get github.com/ghodss/yaml@v1.0.0
+	@go get github.com/stretchr/testify/assert@v1.8.0
 	@go vet ./...
-	@go get -u golang.org/x/lint/golint
+	@go install golang.org/x/lint/golint@latest
 	@golint $(go list ./... | grep -v /vendor/)
 
 cyclo:
